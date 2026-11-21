@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "4419cbdf5af1c5cd73dfc82dacc541ce70f5f08fd0dcf749135fda34c793eedf"
 
 [messages.about-blender]
@@ -724,53 +724,25 @@ translation = """
        *[other] { $count } στοιχεία
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Κατάργηση"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Διατήρηση εικασιών"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Κατάργηση της κατηγορίας κάθε επιλεγμένου στοιχείου"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Διατήρηση ως δικών σας όλων των ετικετών που έβαλαν οι κανόνες και η AI στα επιλεγμένα στοιχεία"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
 { $count ->
-        [one] Καταργήθηκε η κατηγορία από { $count } στοιχείο
-       *[other] Καταργήθηκε η κατηγορία από { $count } στοιχεία
+        [one] Διατηρήθηκαν οι εικαζόμενες ετικέτες σε { $count } στοιχείο
+       *[other] Διατηρήθηκαν οι εικαζόμενες ετικέτες σε { $count } στοιχεία
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Κατηγορία για τα επιλεγμένα στοιχεία (κενό για κατάργηση)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Κατηγορία"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-{ $count ->
-        [one] Ορίστηκε η κατηγορία { $category } σε { $count } στοιχείο
-       *[other] Ορίστηκε η κατηγορία { $category } σε { $count } στοιχεία
-    }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Ορισμός"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Ορισμός της κατηγορίας κάθε επιλεγμένου στοιχείου"
 
 [messages.app-bulk-failed]
 source = """
@@ -782,6 +754,26 @@ translation = """
 { $count ->
         [one] Δεν ήταν δυνατή η αλλαγή αυτού του στοιχείου: { $error }
        *[other] Δεν ήταν δυνατή η αλλαγή αυτών των { $count } στοιχείων: { $error }
+    }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Σήμανση ως ελεγμένα"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Σήμανση των επιλεγμένων στοιχείων ως ελεγμένων: οι κανόνες και η AI δεν θα αγγίζουν πλέον τις ετικέτες τους"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] Σημάνθηκε ως ελεγμένο { $count } στοιχείο
+       *[other] Σημάνθηκαν ως ελεγμένα { $count } στοιχεία
     }"""
 
 [messages.app-bulk-tag-add]
@@ -818,6 +810,26 @@ translation = """
 { $count ->
         [one] Προστέθηκε η ετικέτα { $tag } σε { $count } στοιχείο
        *[other] Προστέθηκε η ετικέτα { $tag } σε { $count } στοιχεία
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Σήμανση ως μη ελεγμένα"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Αφαίρεση της σήμανσης «ελεγμένο» από τα επιλεγμένα στοιχεία"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Αφαιρέθηκε η σήμανση «ελεγμένο» από { $count } στοιχείο
+       *[other] Αφαιρέθηκε η σήμανση «ελεγμένο» από { $count } στοιχεία
     }"""
 
 [messages.app-bulk-untagged]
@@ -960,6 +972,18 @@ translation = "Δεν ήταν δυνατή η δημιουργία των credi
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md για τα πακέτα από τα οποία προέρχονται: ποιος τα δημιούργησε, οι άδειες χρήσης τους και οι αναφορές που ζητούν"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Άνοιγμα της βιβλιοθήκης με την { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Η βιβλιοθήκη ανοίγει με αυτή την αναζήτηση. Κάντε κλικ για να σταματήσει."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Άνοιγμα της βιβλιοθήκης με αυτή την αναζήτηση"
+
 [messages.app-done]
 source = "Done"
 translation = "Τέλος"
@@ -979,6 +1003,14 @@ translation = "Κάθε αρχείο ή φάκελος πρώτου επιπέδ
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Αφήστε { $count } αντικείμενα για να τα προσθέσετε"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Επεξεργασία…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Αλλαγή των ετικετών και των πεδίων όλων (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1143,6 +1175,14 @@ translation = "Φόρτωση περισσότερων"
 [messages.app-music]
 source = "Music"
 translation = "Μουσική"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Προς έλεγχο"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Μόνο στοιχεία που δεν τα έχει ελέγξει κανείς ακόμη (λειτουργεί μαζί με τα άλλα φίλτρα)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1336,9 +1376,37 @@ translation = "Μοιάζει περισσότερο"
 source = "Best match"
 translation = "Καλύτερη αντιστοιχία"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Βαθμολογημένα"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Κάντε ξανά κλικ για να δείτε όλες τις βαθμολογίες"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } αστέρι και άνω
+       *[other] { $count } αστέρια και άνω
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Αφαίρεση από τη συλλογή { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Μετονομασία"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Νέο όνομα για την { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1376,6 +1444,10 @@ translation = "Δώστε όνομα"
 source = "Save search"
 translation = "Αποθήκευση αναζήτησης"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Αποθήκευση ως νέας"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Διατήρηση αυτής της αναζήτησης στα Φίλτρα, στην ενότητα Δικά σας"
@@ -1396,6 +1468,14 @@ translation = "Αναζήτηση σε ονόματα, διαδρομές, ετ�
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Αποθηκεύτηκε η «{ $name }»: βρίσκεται στα Φίλτρα, στην ενότητα Δικά σας"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Ενημερώθηκε η «{ $name }»"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Αναζήτηση…"
@@ -1412,6 +1492,18 @@ translation = "Επιλογή"
 source = "Select all { $count }"
 translation = "Επιλογή και των { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Επιλογή του { $count } αποτελέσματος
+       *[other] Επιλογή και των { $count } αποτελεσμάτων
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Επιλέξτε πολλά στοιχεία για να τους δώσετε ετικέτες, κατηγορία, να τα βάλετε σε συλλογή, να τα κατεβάσετε ή να τα αρχειοθετήσετε μαζί (X ή Ctrl-κλικ)"
@@ -1419,6 +1511,18 @@ translation = "Επιλέξτε πολλά στοιχεία για να τους
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } επιλεγμένα"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] Επιλέχθηκε { $count } αποτέλεσμα
+       *[other] Επιλέχθηκαν και τα { $count } αποτελέσματα
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1440,6 +1544,10 @@ translation = "Ταξινόμηση"
 source = "A to Z"
 translation = "Α έως Ω"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Υψηλότερη βαθμολογία πρώτα"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Δημιουργία"
@@ -1447,6 +1555,10 @@ translation = "Δημιουργία"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Μεγαλύτερα πρώτα"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Χαμηλότερη βαθμολογία πρώτα"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1459,6 +1571,10 @@ translation = "Νεότερα πρώτα"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Παλαιότερα πρώτα"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Βαθμολογία"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1527,6 +1643,66 @@ translation = "Με τα βοηθητικά αρχεία"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο. Ένα στοιχείο που το πακέτο έχει σε πολλές μορφές εμφανίζεται μία φορά, στη μορφή που το Hoard διαβάζει καλύτερα."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Αντιγράφηκε { $count } ετικέτα
+       *[other] Αντιγράφηκαν { $count } ετικέτες
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "Το { $name } δεν έχει ετικέτες για αντιγραφή"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Έχει ήδη αυτές τις ετικέτες
+       *[other] Και τα { $count } έχουν ήδη αυτές τις ετικέτες
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Δεν αντιγράφηκε καμία ετικέτα. Πάτα C σε ένα στοιχείο για να αντιγράψεις τις ετικέτες του."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Προστέθηκε { $count } ετικέτα
+               *[other] Προστέθηκαν { $count } ετικέτες
+            }
+       *[other]
+            { $count ->
+                [one] Προστέθηκε { $count } ετικέτα σε { $assets } στοιχεία
+               *[other] Προστέθηκαν { $count } ετικέτες σε { $assets } στοιχεία
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1599,6 +1775,14 @@ translation = "Το Hoard δεν απαντά: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Ενημέρωση"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Ενημέρωση της «{ $name }»"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Διατήρηση της τρέχουσας επιλογής σε αυτή την αποθηκευμένη αναζήτηση"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1831,8 +2015,8 @@ source = "Animations"
 translation = "Animation"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Εφαρμογή των αλλαγών σε ετικέτες, κατηγορία και περιγραφή και στις { $count } παραλλαγές"
+source = "Apply changes to all { $count } variants"
+translation = "Εφαρμογή των αλλαγών και στις { $count } παραλλαγές"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1998,6 +2182,10 @@ translation = "Γράψτε μια περιγραφή"
 source = "Asset details"
 translation = "Λεπτομέρειες στοιχείου"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Λεπτομέρειες"
+
 [messages.asset-download]
 source = "Download"
 translation = "Λήψη"
@@ -2045,6 +2233,62 @@ translation = "Προσθήκη στα αγαπημένα σας (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Στα αγαπημένα σας (το F το αφαιρεί)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Προσθήκη"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Κατηγορία"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Εκκαθαρίστηκε: { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Επεξεργασία: { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "από το πακέτο"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Άδεια"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Π.χ. CC0 ή CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Όνομα πεδίου"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Προσθήκη πεδίου"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Βαθμολογία"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Κενό για αφαίρεση"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Αποθηκεύτηκε: { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Πηγή"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Τιμή"
 
 [messages.asset-file]
 source = "File"
@@ -2618,6 +2862,50 @@ translation = "{ $current } από { $duration }"
 source = "Previous asset"
 translation = "Προηγούμενο στοιχείο"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } αστέρι
+       *[other] { $count } αστέρια
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Βαθμολογήθηκε με { $count ->
+        [one] { $count } αστέρι
+       *[other] { $count } αστέρια
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Κάντε ξανά κλικ για εκκαθάριση της βαθμολογίας"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Η βαθμολογία εκκαθαρίστηκε"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Κάντε ξανά κλικ για { $count } αστέρι
+       *[other] Κάντε ξανά κλικ για { $count } αστέρια
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Το αρχικό .{ $ext } ήταν αποθηκευμένο μέσα σε αυτό το πακέτο και το Hoard το εξήγαγε."
@@ -2669,6 +2957,34 @@ translation = "παραλλαγή"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Κάντε κλικ για μετονομασία"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Ελεγμένο"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Αφαιρέθηκε η σήμανση «ελεγμένο»"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Αφαιρέθηκε η σήμανση «ελεγμένο» από το { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Σήμανση ως ελεγμένο, ώστε οι κανόνες και η AI να μην αγγίζουν τις ετικέτες του (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Σημάνθηκε ως ελεγμένο"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Το { $name } σημάνθηκε ως ελεγμένο"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Ελεγμένο: οι κανόνες και η AI δεν αγγίζουν τις ετικέτες του. Κάντε κλικ για να αφαιρέσετε τη σήμανση (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2754,10 +3070,6 @@ translation = "Εύρεση στοιχείων με { $hex }, { $percent }% αυ
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% της εικόνας. Εύρεση στοιχείων με αυτό το χρώμα"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Προσθήκη"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Προσθήκη ετικέτας"
@@ -2770,9 +3082,69 @@ translation = "Προσθέστε ετικέτα, π.χ. mood:tense"
 source = "Removed { $tag }"
 translation = "Αφαιρέθηκε η ετικέτα { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Επαναφορά της { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Η ετικέτα { $tag } τοποθετήθηκε ξανά"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Προσθήκη { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Ετικέτες"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Διατήρηση { $count } εικασίας
+       *[other] Διατήρηση όλων των { $count } εικασιών
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Διατήρηση ως δικών σας όλων των ετικετών που εικάστηκαν από τους κανόνες και την AI"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] Διατηρήθηκε { $count } εικαζόμενη ετικέτα
+       *[other] Διατηρήθηκαν { $count } εικαζόμενες ετικέτες
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Προστέθηκαν { $count ->
+        [one] { $count } ετικέτα
+       *[other] { $count } ετικέτες
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Παρόμοια έχουν:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Απορρίφθηκαν:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3344,6 +3716,106 @@ translation = "Κάθε αρχείο όπως εισήχθη, με ό,τι χρ�
 source = "Take { $name } out of the selection"
 translation = "Αφαίρεση του { $name } από την επιλογή"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Αυτό αλλάζει όλα τα αποτελέσματα, και όσα δεν έχουν φορτωθεί ακόμη, και δεν αναιρείται με ένα βήμα."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Εκκαθαρίστηκε σε όλα"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Κλείσιμο"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Μένει ως έχει"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Διαφορετικές τιμές, μένουν ως έχουν"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Δεν άλλαξε τίποτα"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Επαναφορά"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Αποθήκευση { $count } αλλαγής
+       *[other] Αποθήκευση { $count } αλλαγών
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Ενημερώθηκε { $count } στοιχείο
+       *[other] Ενημερώθηκαν { $count } στοιχεία
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Προσθήκη ετικέτας σε όλα"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } από { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Ετικέτες"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Οι πιο χρησιμοποιημένες ετικέτες ανάμεσά τους"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Επεξεργασία { $count } στοιχείου
+       *[other] Επεξεργασία { $count } στοιχείων
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Επεξεργασία { $count } αποτελέσματος
+       *[other] Επεξεργασία και των { $count } αποτελεσμάτων
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Αποεπιλογή όλων"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Αφαίρεση όλων των ετικετών και μετά επιλογή αυτών που θα μείνουν"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Προσθήκη σε συλλογή"
@@ -3544,6 +4016,10 @@ translation = "λανθασμένη ρύθμιση: { $reason }"
 source = "blob { $hash } not found"
 translation = "το blob { $hash } δεν βρέθηκε"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "μια αναζήτηση κατά εμφάνιση δεν μπορεί να επεξεργαστεί όλη μαζί: επιλέξτε τα στοιχεία"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "δεν είναι δυνατή η δημιουργία του { $path }"
@@ -3563,6 +4039,10 @@ translation = "δεν είναι δυνατή η ανάγνωση του { $path
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "δεν είναι δυνατή η εγγραφή στο { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "αυτή η αλλαγή δεν υπάρχει στο ιστορικό αυτού του στοιχείου"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4156,6 +4636,10 @@ translation = "δεν είναι δεκαεξαδικό hash blake3"
 source = "not a picture Hoard can read: { $reason }"
 translation = "δεν είναι εικόνα που μπορεί να διαβάσει το Hoard: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "Το «{ $text }» δεν είναι ετικέτα"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "αυτό το αντίγραφο του Hoard δημιουργήθηκε χωρίς { $feature }"
@@ -4499,6 +4983,10 @@ translation = "Το { $name } δεν είναι SoundFont με το οποίο �
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "τίποτα προς αναζήτηση· πληκτρολογήστε το όνομα του πακέτου"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "Η { $parent } είναι ήδη κάτω από την { $tag }, οπότε η { $tag } δεν μπορεί να μπει κάτω από αυτήν"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5042,6 +5530,98 @@ translation = "Τι διαβάζει"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Δεν ήταν δυνατή η δημιουργία του zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } μέσω εφαρμογής"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } μέσω βοηθού"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Ένας κανόνας"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Κάποιος"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: εκκαθαρίστηκε (ήταν { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Περιγραφή"
+
+[messages.history-heading]
+source = "History"
+translation = "Ιστορικό"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Δεν ήταν δυνατή η φόρτωση του ιστορικού: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Φόρτωση…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Δεν έχει αλλάξει τίποτα εδώ ακόμη."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Αναίρεση"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Δεν ήταν δυνατή η αναίρεση: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Επαναφορά αυτού που άλλαξε αυτή η αλλαγή"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Αναιρέθηκε: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Επισημάνθηκε ως ελεγμένο"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: ορίστηκε σε { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Προστέθηκε η ετικέτα { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Άλλαξε η ετικέτα { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Διατηρήθηκε η προτεινόμενη ετικέτα { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Αφαιρέθηκε η ετικέτα { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Επισημάνθηκε ως μη ελεγμένο"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7429,6 +8009,18 @@ translation = "Περισσότερες ενέργειες για { $name }"
 source = "No packs match."
 translation = "Κανένα πακέτο δεν ταιριάζει."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } στοιχείο έχει δική του άδεια χρήσης: να ακολουθεί και την άδεια του πακέτου
+       *[other] { $count } στοιχεία έχουν δική τους άδεια χρήσης: να ακολουθούν και την άδεια του πακέτου
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Όνομα πακέτου"
@@ -7472,6 +8064,34 @@ translation = "Νέα εκτέλεση του μηχανισμού ετικετ�
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Νέα εκτέλεση του εκτός σύνδεσης μηχανισμού ετικετών"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Τώρα"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Θα διαβαστεί από τη σελίδα κατά την αποθήκευση"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Ίδιο"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Από το κατάστημα"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Συμπλήρωση { $count } πεδίου
+       *[other] Συμπλήρωση { $count } πεδίων
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7895,6 +8515,14 @@ translation = "διπλότυπα ίδια παρόμοια σμίκρυνση �
 source = "Dark theme: { $name }"
 translation = "Σκοτεινό θέμα: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Επεξεργασία των { $count } επιλεγμένων"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "μαζική αλλαγή ετικέτες κατηγορία άδεια αξιολόγηση"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Αγαπημένα"
@@ -7994,6 +8622,18 @@ translation = "Δεν βρέθηκε τίποτα για «{ $query }»"
 [messages.palette-packs]
 source = "Packs"
 translation = "Πακέτα"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Επικόλληση των αντιγραμμένων ετικετών στο επιλεγμένο στοιχείο
+       *[other] Επικόλληση των αντιγραμμένων ετικετών στα { $count } επιλεγμένα
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8119,10 +8759,6 @@ translation = "Το Hoard χρησιμοποιεί το { $hoard } των επε
 source = "Couldn’t read the profiler: { $error }"
 translation = "Δεν ήταν δυνατή η ανάγνωση του αναλυτή επιδόσεων: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Μνήμη"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Πιο αργό 5%"
@@ -8162,6 +8798,22 @@ translation = "Αναμονή όσο το δίκτυο παραλαμβάνει 
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "τα αρχεία της ίδιας της διεπαφής"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } από { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Μέγιστο"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Το Hoard χρησιμοποιεί { $hoard } RAM και έφτασε το πολύ τα { $peak } τα τελευταία δέκα λεπτά."
 
 [messages.profiler-request-count]
 source = """
@@ -8238,6 +8890,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Τίποτα δεν εκτελέστηκε στο παρασκήνιο."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Δεν ήταν δυνατή η αλλαγή της «{ $name }»: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10509,6 +11165,14 @@ translation = "Εμφάνιση ενός καναλιού"
 source = "Close"
 translation = "Κλείσιμο"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Αντιγραφή των ετικετών του"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Επεξεργασία των επιλεγμένων"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Κλείσιμο, απαλοιφή επιλογής ή κλείσιμο λεπτομερειών"
@@ -10545,6 +11209,10 @@ translation = "Άνοιγμα λεπτομερειών"
 source = "Command palette: search, jump, run"
 translation = "Παλέτα εντολών: αναζήτηση, μετάβαση, εκτέλεση"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Επικόλληση των αντιγραμμένων ετικετών στα επιλεγμένα"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Αναπαραγωγή ή παύση"
@@ -10552,6 +11220,10 @@ translation = "Αναπαραγωγή ή παύση"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Αναπαραγωγή ή διακοπή ήχου"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Σήμανση ως ελεγμένο ή όχι"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10580,6 +11252,10 @@ translation = "Πρόγραμμα αναπαραγωγής ήχου"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Αρχή ή τέλος"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Προσθήκη ετικέτας"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11136,6 +11812,146 @@ translation = "Αρχεία που υπάρχουν σε περισσότερα 
 source = "Yours"
 translation = "Δική σας"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Διατήρηση ετικέτας { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Διατήρηση αυτής της εικασίας ως δική σας ετικέτα"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Παλιό όνομα: { $names }
+       *[other] Παλιά ονόματα: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } στοιχείο
+       *[other] { $count } στοιχεία
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Πείτε τι σημαίνει αυτή η ετικέτα…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Κάντε κλικ για αλλαγή"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Τι σημαίνει αυτή η ετικέτα"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Σε τι χρησιμεύει, τι ανήκει σε αυτήν. Το Enter αποθηκεύει."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Αποθηκεύτηκε η σημασία της ετικέτας"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "Η ετικέτα { $tag } συγχωνεύθηκε στην { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Στενότερες:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Αν αναζητήσετε την { $tag }, θα βρείτε και αυτές"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Τοποθέτηση κάτω από…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Βάλτε αυτήν την ετικέτα κάτω από μια ευρύτερη: αν αναζητήσετε την ευρύτερη, θα βρείτε και αυτές"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Μια ευρύτερη ετικέτα, όπως όχημα"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Αφαίρεση της { $tag } από την { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "Η { $tag } δεν είναι πια κάτω από την { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "Η { $tag } είναι τώρα κάτω από την { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Επιλέξτε εικόνα για αυτή την ετικέτα"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Επιλέξτε ένα από τα στοιχεία της για να την αντιπροσωπεύει"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Χωρίς εικόνα"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Κανένα από τα εμφανιζόμενα στοιχεία δεν έχει εικόνα."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Η εικόνα αφαιρέθηκε"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Η εικόνα ορίστηκε"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Μετονομασία…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Νέο όνομα"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Δώστε της νέο όνομα ή το όνομα άλλης ετικέτας για να συγχωνευθεί σε αυτήν"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Δεν ήταν δυνατή η αποθήκευση της ετικέτας: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Εμφάνιση της { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Κάτω από"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Αφαίρεση· ο μηχανισμός ετικετών δεν θα την ξαναβάλει"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Αφαίρεση ετικέτας { $tag }"
@@ -11155,6 +11971,18 @@ translation = "μετρήθηκε από το αρχείο"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "από τον εκτός σύνδεσης μηχανισμό ετικετών"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "πρώην { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Εννοούσατε"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Νέα ετικέτα"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11287,6 +12115,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Αποθηκεύτηκε ως"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Ευρύτερες και στενότερες"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Ετικέτες που μπήκαν κάτω από ευρύτερες από τις σελίδες τους. Η αναζήτηση μιας ετικέτας βρίσκει και ό,τι υπάρχει κάτω από αυτήν."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

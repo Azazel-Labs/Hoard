@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "929b1679e1e3d56c7bee2ef626c703af1e4424772a8b07378b4cce80a92ad981"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "{ $count } 個素材"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "清除"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "保留推測標籤"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "清除每個選取素材的類別"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "將規則和 AI 為所選素材加上的所有標籤保留為你自己的標籤"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "已清除 { $count } 個素材的類別"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "所選素材的類別（留空即清除）"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "類別"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "已將 { $count } 個素材的類別設為 { $category }"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "設定"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "設定每個選取素材的類別"
+translation = "已保留 { $count } 個素材的推測標籤"
 
 [messages.app-bulk-failed]
 source = """
@@ -766,6 +742,22 @@ translation = """
 { $count ->
        *[other] 無法變更這 { $count } 個素材：{ $error }
     }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "標記已審閱"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "將所選素材標記為已看過：此後規則和 AI 不再更動它們的標籤"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "已將 { $count } 個素材標記為已審閱"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -798,6 +790,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "已為 { $count } 個素材加上 { $tag }"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "標記未審閱"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "取消所選素材的已審閱標記"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "已取消 { $count } 個素材的已審閱標記"
 
 [messages.app-bulk-untagged]
 source = """
@@ -927,6 +935,18 @@ translation = "無法製作致謝名單：{ $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "這些素材所屬素材包的 CREDITS.md：作者、授權，以及他們要求的致謝文字"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "開啟素材庫時使用 { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "素材庫會以此搜尋開啟。按一下即可取消。"
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "開啟素材庫時使用此搜尋"
+
 [messages.app-done]
 source = "Done"
 translation = "完成"
@@ -946,6 +966,14 @@ translation = "每個最上層的檔案或資料夾都會成為獨立的素材�
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "放開以新增 { $count } 個項目"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "編輯…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "變更全部的標籤和欄位 (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1106,6 +1134,14 @@ translation = "正在載入更多"
 [messages.app-music]
 source = "Music"
 translation = "音樂"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "待審閱"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "僅顯示還沒人看過的素材（可與其他篩選條件同時使用）"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1299,9 +1335,36 @@ translation = "聽起來最像"
 source = "Best match"
 translation = "最符合"
 
+[messages.app-rated]
+source = "Rated"
+translation = "已評"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "再按一下可顯示所有評分"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 顆星以上
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "從 { $name } 移除"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "重新命名"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "{ $name } 的新名稱"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1339,6 +1402,10 @@ translation = "命名"
 source = "Save search"
 translation = "儲存搜尋"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "另存為新搜尋"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "將這個搜尋保留在「篩選條件」的「我的」底下"
@@ -1359,6 +1426,14 @@ translation = "搜尋名稱、路徑、標籤"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "已儲存「{ $name }」：位於「篩選條件」的「我的」底下"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = '岩石 or 石頭：二選一 · -苔蘚：排除 · "乾苔蘚"：這些詞一起出現'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "已更新「{ $name }」"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "搜尋中…"
@@ -1375,6 +1450,17 @@ translation = "選取"
 source = "Select all { $count }"
 translation = "全選 { $count } 個"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] 選取全部 { $count } 個結果
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "挑選多個素材，一起加上標籤、分類、收藏、下載或封存（X 或 Ctrl+按一下）"
@@ -1382,6 +1468,17 @@ translation = "挑選多個素材，一起加上標籤、分類、收藏、下�
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "已選取 { $count } 個"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] 已選取 { $count } 個結果
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1403,6 +1500,10 @@ translation = "排序"
 source = "A to Z"
 translation = "A 到 Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "評分最高的在前"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "建立時間"
@@ -1410,6 +1511,10 @@ translation = "建立時間"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "最大的在前"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "評分最低的在前"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1422,6 +1527,10 @@ translation = "最新的在前"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "最舊的在前"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "評分"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1482,6 +1591,46 @@ translation = "包含輔助檔案"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF 緩衝區、材質庫、材質的貼圖、只有一個模型使用的材質，以及描述模型的商店檔案。下載使用它們的素材時會一併附上。 精靈圖集的頁面，以及套件中也以單獨圖片存在的精靈，會與圖集一起顯示。 套件中有多種格式的資源只顯示一次，使用 Hoard 讀取得最好的格式。"
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "已複製 { $count } 個標籤"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } 沒有可複製的標籤"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "這 { $count } 個素材都已有這些標籤"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "尚未複製標籤。在素材上按 C 即可複製它的標籤。"
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "已為 { $assets } 個素材新增 { $count } 個標籤"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1554,6 +1703,14 @@ translation = "Hoard 沒有回應：{ $error }"
 [messages.app-update]
 source = "Update"
 translation = "更新"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "更新「{ $name }」"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "將目前所選內容保留在此已儲存的搜尋中"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1763,8 +1920,8 @@ source = "Animations"
 translation = "動畫"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "將標籤、類別與描述的變更套用到全部 { $count } 個變體"
+source = "Apply changes to all { $count } variants"
+translation = "將變更套用到全部 { $count } 個變體"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1930,6 +2087,10 @@ translation = "撰寫描述"
 source = "Asset details"
 translation = "素材詳細資訊"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "詳細資料"
+
 [messages.asset-download]
 source = "Download"
 translation = "下載"
@@ -1969,6 +2130,62 @@ translation = "加入你的最愛（F）"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "已在你的最愛中（按 F 移除）"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "加上"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "類別"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "已清除 { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "編輯 { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "來自素材包"
+
+[messages.asset-field-license]
+source = "License"
+translation = "授權"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "例如 CC0 或 CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "欄位名稱"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "新增欄位"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "評分"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "留空即移除"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "已儲存 { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "來源"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "值"
 
 [messages.asset-file]
 source = "File"
@@ -2528,6 +2745,41 @@ translation = "{ $current }／{ $duration }"
 source = "Previous asset"
 translation = "上一個素材"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "{ $count } 顆星"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "已評 { $count } 顆星"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "再按一下可清除評分"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "已清除評分"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] 再按一下可改為 { $count } 顆星
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "原始的 .{ $ext } 存放在這個套件中，Hoard 已將它取出。"
@@ -2579,6 +2831,34 @@ translation = "變體"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "按一下以重新命名"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "已審閱"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "已取消已審閱標記"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "已取消 { $name } 的已審閱標記"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "標記為已審閱，這樣規則和 AI 就不會更動它的標籤（R）"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "已標記為已審閱"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "已將 { $name } 標記為已審閱"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "已審閱：規則和 AI 不再更動它的標籤。按一下可取消標記（R）"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2664,10 +2944,6 @@ translation = "尋找含有 { $hex } 的素材，佔這張圖片的 { $percent }
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }，佔圖片的 { $percent }%。尋找含有這個顏色的素材"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "新增"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "新增標籤"
@@ -2680,9 +2956,57 @@ translation = "新增標籤，例如 mood:tense"
 source = "Removed { $tag }"
 translation = "已移除 { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "恢復 { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "已恢復 { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "新增 { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "標籤"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "保留全部 { $count } 個推測"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "將規則和 AI 推測的所有標籤保留為你自己的標籤"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "已保留 { $count } 個推測標籤"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "已新增 { $count } 個標籤"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "相似的有："
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "已拒絕："
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3246,6 +3570,102 @@ translation = "每個檔案保持匯入時的樣子，連同所需的檔案，�
 source = "Take { $name } out of the selection"
 translation = "將 { $name } 移出選取"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "這會變更所有結果，包括尚未載入的，且無法一步復原。"
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "已在全部中清除"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "關閉"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "維持原樣"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "各不相同，維持原樣"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "沒有變更"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "還原"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] 儲存 { $count } 項變更
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] 已更新 { $count } 個素材
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "為全部新增標籤"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } / { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "標籤"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "其中最常用的標籤"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] 編輯 { $count } 個素材
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] 編輯全部 { $count } 個結果
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "全部取消勾選"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "移除所有標籤，再勾選要保留的標籤"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "加入收藏集"
@@ -3446,6 +3866,10 @@ translation = "無效的設定：{ $reason }"
 source = "blob { $hash } not found"
 translation = "找不到 blob { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "依外觀搜尋的結果無法一次全部編輯：請改為選取資源"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "無法建立 { $path }"
@@ -3465,6 +3889,10 @@ translation = "無法讀取 { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "無法寫入 { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "此資源的歷史中沒有這項變更"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4058,6 +4486,10 @@ translation = "不是 blake3 十六進位雜湊值"
 source = "not a picture Hoard can read: { $reason }"
 translation = "不是 Hoard 可以讀取的圖片：{ $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "「{ $text }」不是標籤"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "此 Hoard 建置時未包含 { $feature }"
@@ -4401,6 +4833,10 @@ translation = "{ $name } 不是 MIDI 能用來播放的 SoundFont：{ $reason }"
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "沒有要搜尋的內容；請輸入素材包的名稱"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4924,6 +5360,98 @@ translation = "讀取結果"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "無法建立 zip：{ $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who }（透過應用程式）"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who }（透過助理）"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "規則"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "某人"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }：{ $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }：已清除（原為 { $from }）"
+
+[messages.history-field-description]
+source = "Description"
+translation = "描述"
+
+[messages.history-heading]
+source = "History"
+translation = "歷史記錄"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "無法載入歷史記錄：{ $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "載入中…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "這裡還沒有任何變更。"
+
+[messages.history-revert]
+source = "Revert"
+translation = "復原"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "無法復原：{ $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "還原此變更所改動的內容"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "已復原：{ $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "標記為已審核"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }：設為 { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "加上了標籤 { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "變更了標籤 { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "保留了建議的標籤 { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "移除了標籤 { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "標記為未審核"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7235,6 +7763,17 @@ translation = "{ $name } 的更多動作"
 source = "No packs match."
 translation = "沒有符合的素材包。"
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 個素材有自己的授權：改為沿用素材包的授權
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "素材包名稱"
@@ -7278,6 +7817,33 @@ translation = "重新執行 LLM 標記器"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "重新執行離線標記器"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "目前"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "儲存時從頁面讀取"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "相同"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "來自商店"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] 填入 { $count } 個欄位
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7675,6 +8241,14 @@ translation = "重複 相同 相似 縮放 轉換 浪費 空間 duplicates same 
 source = "Dark theme: { $name }"
 translation = "深色主題：{ $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "編輯已選取的 { $count } 個"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "批次變更 標籤 分類 授權 評分"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "最愛"
@@ -7774,6 +8348,14 @@ translation = "沒有符合「{ $query }」的項目"
 [messages.palette-packs]
 source = "Packs"
 translation = "素材包"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "將複製的標籤貼到所選的 { $count } 個素材"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7899,10 +8481,6 @@ translation = "Hoard 正在使用 { $hoard } 的處理器，整台機器則為 {
 source = "Couldn’t read the profiler: { $error }"
 translation = "無法讀取效能分析器：{ $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "記憶體"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "最慢的 5%"
@@ -7942,6 +8520,22 @@ translation = "等待網路接收已傳送的內容"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "介面本身的檔案"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "記憶體"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "峰值"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard 正在使用 { $hoard } 記憶體，過去十分鐘內最多使用 { $peak }。"
 
 [messages.profiler-request-count]
 source = """
@@ -8016,6 +8610,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "背景沒有執行任何工作。"
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "無法變更 { $name }：{ $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10262,6 +10860,14 @@ translation = "只顯示一個色版"
 source = "Close"
 translation = "關閉"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "複製它的標籤"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "編輯所選項目"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "關閉、清除選取，或關閉詳細資訊"
@@ -10298,6 +10904,10 @@ translation = "開啟詳細資訊"
 source = "Command palette: search, jump, run"
 translation = "命令面板：搜尋、跳轉、執行"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "將複製的標籤貼到所選項目"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "播放或暫停"
@@ -10305,6 +10915,10 @@ translation = "播放或暫停"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "播放或停止音效"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "標記為已審閱或取消"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10333,6 +10947,10 @@ translation = "音效播放器"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "開頭或結尾"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "新增標籤"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10868,6 +11486,141 @@ translation = "出現在多個素材包中，或命名方式像商店檔案，�
 source = "Yours"
 translation = "我的"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "保留標籤 { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "將這個推測保留為你自己的標籤"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] 舊名稱：{ $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } 個素材"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "說說這個標籤是什麼意思…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "點一下即可修改"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "這個標籤的意思"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "用來做什麼、哪些內容屬於它。按 Enter 儲存。"
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "已儲存標籤的意思"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } 已合併為 { $into }。"
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "下層標籤："
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "搜尋 { $tag } 時，也會找到這些"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "設定上層標籤…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "把這個標籤放到更廣泛的標籤下：搜尋那個標籤時，也會找到這些"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "更廣泛的標籤，例如交通工具"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "把 { $tag } 從 { $parent } 下移出"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } 不再位於 { $parent } 下"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } 現在位於 { $parent } 下"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "為這個標籤挑一張圖片"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "挑一個它的素材作為代表"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "沒有圖片"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "目前顯示的素材都沒有圖片。"
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "已移除圖片"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "已設定圖片"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "重新命名…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "新名稱"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "幫它取個新名稱，或輸入另一個標籤的名稱，把它合併過去"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "無法儲存標籤：{ $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "顯示 { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "上層標籤"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "移除它；自動標記不會再加回來"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "移除標籤 { $tag }"
@@ -10887,6 +11640,18 @@ translation = "從檔案量測"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "來自離線標記器"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "原名 { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "你是不是想找"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "新標籤"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11007,6 +11772,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "儲存為"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "上層與下層"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "在標籤頁面中放到更廣泛標籤下的標籤。搜尋一個標籤時，也會找到它底下的所有內容。"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

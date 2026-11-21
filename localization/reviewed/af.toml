@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "ac32481da99b685200b599a0b42111713ba8e1daf08ea7fad7d1e37e027f0a2c"
 
 [messages.about-blender]
@@ -724,53 +724,25 @@ translation = """
        *[other] { $count } bates
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Maak skoon"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Hou geraaide etikette"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Maak die kategorie van elke gekose bate skoon"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Hou elke etiket wat die reëls en die KI op die gekose bates gesit het as jou eie"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
-Die kategorie van { $count ->
+Geraaide etikette behou op { $count ->
         [one] { $count } bate
        *[other] { $count } bates
-    } skoongemaak"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Kategorie vir die gekose bates (leeg maak dit skoon)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategorie"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-Die kategorie van { $count ->
-        [one] { $count } bate
-       *[other] { $count } bates
-    } op { $category } gestel"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Stel"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Stel die kategorie van elke gekose bate"
+    }"""
 
 [messages.app-bulk-failed]
 source = """
@@ -783,6 +755,26 @@ Kon nie { $count ->
         [one] daardie bate
        *[other] daardie { $count } bates
     } verander nie: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Merk nagegaan"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Merk die gekose bates as nagegaan: reëls en die KI laat hul etikette hierna met rus"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] { $count } bate as nagegaan gemerk
+       *[other] { $count } bates as nagegaan gemerk
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -819,6 +811,26 @@ translation = """
         [one] { $count } bate
        *[other] { $count } bates
     } met { $tag } geëtiketteer"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Merk nie nagegaan nie"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Haal die nagegaan-merk van die gekose bates af"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+Nagegaan-merk afgehaal van { $count ->
+        [one] { $count } bate
+       *[other] { $count } bates
+    }"""
 
 [messages.app-bulk-untagged]
 source = """
@@ -956,6 +968,18 @@ translation = "Kon nie die erkennings maak nie: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md vir die pakke waaruit hierdie kom: wie hulle gemaak het, hul lisensies en die erkenningsreëls waarvoor hulle vra"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Maak die biblioteek oop met { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Die biblioteek maak met hierdie soektog oop. Klik om dit te stop."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Maak die biblioteek met hierdie soektog oop"
+
 [messages.app-done]
 source = "Done"
 translation = "Klaar"
@@ -975,6 +999,14 @@ translation = "Elke lêer of vouer op die boonste vlak word sy eie pak. Gigagrep
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Laat val { $count } items om hulle by te voeg"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Wysig…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Verander die etikette en velde van almal (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1135,6 +1167,14 @@ translation = "Laai meer"
 [messages.app-music]
 source = "Music"
 translation = "Musiek"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Moet nagegaan word"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Net bates wat nog niemand nagegaan het nie (werk saam met die ander filters)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1328,9 +1368,37 @@ translation = "Klink die meeste so"
 source = "Best match"
 translation = "Beste passing"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Gegradeer"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Klik weer om elke gradering te wys"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } ster of meer
+       *[other] { $count } sterre of meer
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Verwyder uit { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Hernoem"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nuwe naam vir { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1368,6 +1436,10 @@ translation = "Gee dit 'n naam"
 source = "Save search"
 translation = "Stoor soektog"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Stoor as nuwe"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Hou hierdie soektog in Filters, onder Joune"
@@ -1388,6 +1460,14 @@ translation = "Soek name, paaie, etikette"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” gestoor: dit is in Filters, onder Joune"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "“{ $name }” opgedateer"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Soek tans…"
@@ -1404,6 +1484,18 @@ translation = "Kies"
 source = "Select all { $count }"
 translation = "Kies al { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Kies die { $count } resultaat
+       *[other] Kies al { $count } resultate
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Kies etlike bates om saam te etiketteer, te kategoriseer, te versamel, af te laai of te argiveer (X, of Ctrl-klik)"
@@ -1411,6 +1503,18 @@ translation = "Kies etlike bates om saam te etiketteer, te kategoriseer, te vers
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } gekies"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resultaat gekies
+       *[other] Al { $count } resultate gekies
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1432,6 +1536,10 @@ translation = "Sorteer"
 source = "A to Z"
 translation = "A tot Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Beste gegradeer eerste"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Geskep"
@@ -1439,6 +1547,10 @@ translation = "Geskep"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Grootste eerste"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Laagste gegradeer eerste"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1451,6 +1563,10 @@ translation = "Nuutste eerste"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Oudste eerste"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Gradering"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1515,6 +1631,66 @@ translation = "Ondersteunende lêers ingesluit"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys. ’n Bate wat die pak in verskeie formate het, word een keer gewys, in die formaat wat Hoard die beste lees."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } etiket gekopieer
+       *[other] { $count } etikette gekopieer
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } het geen etikette om te kopieer nie"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Dit het reeds daardie etikette
+       *[other] Al { $count } het reeds daardie etikette
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Geen etikette gekopieer nie. Druk C op 'n bate om sy etikette te kopieer."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] { $count } etiket bygevoeg
+               *[other] { $count } etikette bygevoeg
+            }
+       *[other]
+            { $count ->
+                [one] { $count } etiket by { $assets } bates gevoeg
+               *[other] { $count } etikette by { $assets } bates gevoeg
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1587,6 +1763,14 @@ translation = "Hoard antwoord nie: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Bywerk"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Werk “{ $name }” op"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Hou wat nou gekies is in hierdie gestoorde soektog"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1819,8 +2003,8 @@ source = "Animations"
 translation = "Animasies"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Pas etiket-, kategorie- en beskrywingveranderings op al { $count } variante toe"
+source = "Apply changes to all { $count } variants"
+translation = "Pas veranderinge op al { $count } variante toe"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1986,6 +2170,10 @@ translation = "Skryf 'n beskrywing"
 source = "Asset details"
 translation = "Batebesonderhede"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Besonderhede"
+
 [messages.asset-download]
 source = "Download"
 translation = "Laai af"
@@ -2033,6 +2221,62 @@ translation = "Voeg by jou gunstelinge (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "In jou gunstelinge (F haal dit uit)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Voeg by"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategorie"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field } skoongemaak"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Wysig { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "uit die pakket"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Lisensie"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Soos CC0 of CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Veldnaam"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Voeg 'n veld by"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Gradering"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Leeg om dit te verwyder"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field } gestoor"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Bron"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Waarde"
 
 [messages.asset-file]
 source = "File"
@@ -2606,6 +2850,50 @@ translation = "{ $current } van { $duration }"
 source = "Previous asset"
 translation = "Vorige bate"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } ster
+       *[other] { $count } sterre
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Gegradeer { $count ->
+        [one] { $count } ster
+       *[other] { $count } sterre
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Klik weer om die gradering skoon te maak"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Gradering skoongemaak"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Klik weer vir { $count } ster
+       *[other] Klik weer vir { $count } sterre
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Die oorspronklike .{ $ext } is binne hierdie pakket gestoor, en Hoard het dit uitgehaal."
@@ -2657,6 +2945,34 @@ translation = "variant"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Klik om te hernoem"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Nagegaan"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Nagegaan-merk afgehaal"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Nagegaan-merk afgehaal van { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Merk as nagegaan, sodat reëls en die KI sy etikette met rus laat (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "As nagegaan gemerk"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } as nagegaan gemerk"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Nagegaan: reëls en die KI laat sy etikette met rus. Klik om die merk af te haal (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2742,10 +3058,6 @@ translation = "Vind bates met { $hex }, { $percent }% van hierdie prent"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% van die prent. Vind bates met hierdie kleur"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Voeg by"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Voeg 'n etiket by"
@@ -2758,9 +3070,69 @@ translation = "Voeg 'n etiket by, bv. mood:tense"
 source = "Removed { $tag }"
 translation = "{ $tag } verwyder"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Sit { $tag } terug"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } teruggesit"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Voeg { $tag } by"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Etikette"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Hou { $count } raaiskoot
+       *[other] Hou al { $count } raaiskote
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Hou elke etiket wat die reëls en die KI geraai het as jou eie"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } geraaide etiket behou
+       *[other] { $count } geraaide etikette behou
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } etiket bygevoeg
+       *[other] { $count } etikette bygevoeg
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Soortgelykes het:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Van die hand gewys:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3332,6 +3704,106 @@ translation = "Elke lêer soos dit ingevoer is, met wat dit nodig het, in 'n gid
 source = "Take { $name } out of the selection"
 translation = "Haal { $name } uit die keuse"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Dit verander elke resultaat, ook dié wat nog nie gelaai is nie, en kan nie in een stap ongedaan gemaak word nie."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Op almal skoongemaak"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Maak toe"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Los soos dit is"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Gemeng, los soos dit is"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Niks verander nie"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Sit terug soos dit was"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Stoor { $count } verandering
+       *[other] Stoor { $count } veranderinge
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } baat opgedateer
+       *[other] { $count } bates opgedateer
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Voeg 'n etiket by almal by"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } van { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Etikette"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Die mees gebruikte etikette onder hulle"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Wysig { $count } baat
+       *[other] Wysig { $count } bates
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Wysig { $count } resultaat
+       *[other] Wysig al { $count } resultate
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Ontmerk almal"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Haal elke etiket af en merk dan dié om te behou"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Voeg by versameling"
@@ -3532,6 +4004,10 @@ translation = "foutiewe instelling: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob { $hash } nie gevind nie"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "'n soektog volgens voorkoms kan nie alles op een slag gewysig word nie: kies eerder die bates"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "kan nie { $path } skep nie"
@@ -3551,6 +4027,10 @@ translation = "kan nie { $path } lees nie"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "kan nie na { $path } skryf nie"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "daardie verandering is nie in hierdie bate se geskiedenis nie"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4144,6 +4624,10 @@ translation = "nie 'n blake3-hekshash nie"
 source = "not a picture Hoard can read: { $reason }"
 translation = "nie 'n prent wat Hoard kan lees nie: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = """"{ $text }" is nie 'n etiket nie"""
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "hierdie kopie van Hoard is sonder { $feature } gebou"
@@ -4487,6 +4971,10 @@ translation = "{ $name } is nie ’n SoundFont waarmee MIDI kan speel nie: { $re
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "niks om na te soek nie; tik die pak se naam"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } is reeds onder { $tag }, so { $tag } kan nie daaronder gaan nie"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5021,6 +5509,98 @@ translation = "Wat dit lees"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Kon nie die zip maak nie: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "KI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } deur 'n program"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } deur 'n assistent"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "'n Reël"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Iemand"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: uitgevee (was { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Beskrywing"
+
+[messages.history-heading]
+source = "History"
+translation = "Geskiedenis"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Kon nie die geskiedenis laai nie: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Laai tans…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Hier is nog niks verander nie."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Ontdoen"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Kon dit nie ontdoen nie: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Herstel wat hierdie verandering verander het"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Ontdoen: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "As nagegaan gemerk"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: gestel op { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Etiket { $tag } bygevoeg"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Etiket { $tag } verander"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Voorgestelde etiket { $tag } behou"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Etiket { $tag } verwyder"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "As nie nagegaan gemerk nie"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7380,6 +7960,18 @@ translation = "Meer aksies vir { $name }"
 source = "No packs match."
 translation = "Geen pakke pas nie."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } bate het sy eie lisensie: laat dit ook die pak se lisensie volg
+       *[other] { $count } bates het hul eie lisensie: laat hulle ook die pak se lisensie volg
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Paknaam"
@@ -7423,6 +8015,34 @@ translation = "Laat LLM-etiketteerder weer loop"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Laat vanlyn etiketteerder weer loop"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Nou"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Word van die bladsy gelees wanneer jy stoor"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Dieselfde"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Van die winkel"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Vul { $count } veld in
+       *[other] Vul { $count } velde in
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7836,6 +8456,14 @@ translation = "duplikate dieselfde soortgelyk verklein omgeskakel vermorste spas
 source = "Dark theme: { $name }"
 translation = "Donker tema: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Wysig die { $count } gekose"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "grootmaat verander etikette kategorie lisensie gradering"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Gunstelinge"
@@ -7935,6 +8563,18 @@ translation = "Niks pas by “{ $query }” nie"
 [messages.palette-packs]
 source = "Packs"
 translation = "Pakke"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Plak die gekopieerde etikette op die gekose bate
+       *[other] Plak die gekopieerde etikette op die { $count } gekose
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8060,10 +8700,6 @@ translation = "Hoard gebruik { $hoard } van die verwerkers, en die hele masjien 
 source = "Couldn’t read the profiler: { $error }"
 translation = "Kon nie die profileerder lees nie: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Geheue"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Stadigste 5%"
@@ -8103,6 +8739,22 @@ translation = "Wag terwyl die netwerk neem wat gestuur is"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "die koppelvlak se eie lêers"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } van { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Hoogste"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard gebruik { $hoard } RAM, en het die afgelope tien minute hoogstens { $peak } gebruik."
 
 [messages.profiler-request-count]
 source = """
@@ -8179,6 +8831,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Niks het in die agtergrond geloop nie."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Kon nie { $name } verander nie: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10448,6 +11104,14 @@ translation = "Wys een kanaal"
 source = "Close"
 translation = "Sluit"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Kopieer sy etikette"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Wysig wat gekies is"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Sluit, maak die keuse skoon, of sluit die besonderhede"
@@ -10484,6 +11148,10 @@ translation = "Maak die besonderhede oop"
 source = "Command palette: search, jump, run"
 translation = "Opdragpalet: soek, spring, voer uit"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Plak gekopieerde etikette op wat gekies is"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Speel of pouseer"
@@ -10491,6 +11159,10 @@ translation = "Speel of pouseer"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Speel of stop 'n klank"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Merk as nagegaan, of nie"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10519,6 +11191,10 @@ translation = "Klankspeler"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Begin of einde"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Voeg 'n etiket by"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11058,6 +11734,146 @@ translation = "Lêers in meer as een pak, of benoem soos 'n winkel s'n, wat geen
 source = "Yours"
 translation = "Joune"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Hou etiket { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Hou hierdie raaiskoot as jou eie etiket"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Ou naam: { $names }
+       *[other] Ou name: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } baat
+       *[other] { $count } bates
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Sê wat hierdie etiket beteken…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Klik om te verander"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Wat hierdie etiket beteken"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Waarvoor dit is, wat daaronder hoort. Enter stoor."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Wat die etiket beteken, is gestoor"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } is saamgevoeg met { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Smaller:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "As jy { $tag } soek, vind jy ook hierdie"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Plaas onder…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Plaas hierdie etiket onder 'n breër een: as jy daardie een soek, vind jy ook hierdie"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "'n Breër etiket, soos voertuig"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Haal { $tag } van onder { $parent } af"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } is nie meer onder { $parent } nie"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } is nou onder { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Kies 'n prent vir hierdie etiket"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Kies een van sy bates om dit voor te stel"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Geen prent"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Geen van die bates wat gewys word het 'n prent nie."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Prent verwyder"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Prent gestel"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Hernoem…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nuwe naam"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Gee dit 'n nuwe naam, of die naam van 'n ander etiket om dit daarmee saam te voeg"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Kon nie die etiket stoor nie: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Wys { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Onder"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Verwyder dit; die etiketteerder sit dit nie terug nie"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Verwyder etiket { $tag }"
@@ -11077,6 +11893,18 @@ translation = "uit die lêer gemeet"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "van die vanlyn etiketteerder"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "was { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Bedoel jy"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Nuwe etiket"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11205,6 +12033,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Gestoor as"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Breër en smaller"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Etikette wat vanaf hul etiketbladsye onder breër etikette geplaas is. As jy 'n etiket soek, vind jy ook alles daaronder."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

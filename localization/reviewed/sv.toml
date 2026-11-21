@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "7df23a6d55c8b7e2671eb75dcb168701d8751d71c86d193212d830c73e16516f"
 
 [messages.about-blender]
@@ -724,53 +724,25 @@ translation = """
        *[other] { $count } resurser
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Rensa"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Behåll gissade taggar"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Rensa kategorin för alla valda resurser"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Behåll alla taggar som regler och AI satt på de valda resurserna som dina egna"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
-Rensade kategorin för { $count ->
+Behöll de gissade taggarna på { $count ->
         [one] { $count } resurs
        *[other] { $count } resurser
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Kategori för de valda resurserna (tom rensar den)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategori"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-Satte kategorin för { $count ->
-        [one] { $count } resurs
-       *[other] { $count } resurser
-    } till { $category }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Ange"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Ange kategorin för alla valda resurser"
 
 [messages.app-bulk-failed]
 source = """
@@ -783,6 +755,26 @@ Kunde inte ändra { $count ->
         [one] den resursen
        *[other] de { $count } resurserna
     }: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Markera granskade"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Markera de valda resurserna som genomgångna: regler och AI lämnar deras taggar ifred efter det"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+Markerade { $count ->
+        [one] { $count } resurs som granskad
+       *[other] { $count } resurser som granskade
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -819,6 +811,26 @@ Taggade { $count ->
         [one] { $count } resurs
        *[other] { $count } resurser
     } med { $tag }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Markera ogranskade"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Ta bort granskningsmarkeringen från de valda resurserna"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+Tog bort granskningsmarkeringen från { $count ->
+        [one] { $count } resurs
+       *[other] { $count } resurser
+    }"""
 
 [messages.app-bulk-untagged]
 source = """
@@ -956,6 +968,18 @@ translation = "Kunde inte skapa krediteringarna: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md för paketen de kommer från: vem som gjorde dem, deras licenser och de krediteringsrader de ber om"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Öppna biblioteket med { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Biblioteket öppnas med den här sökningen. Klicka för att sluta."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Öppna biblioteket med den här sökningen"
+
 [messages.app-done]
 source = "Done"
 translation = "Klar"
@@ -975,6 +999,14 @@ translation = "Varje fil eller mapp på översta nivån blir ett eget paket. Gig
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Släpp { $count } objekt för att lägga till dem"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Redigera…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Ändra taggar och fält för alla (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1135,6 +1167,14 @@ translation = "Läser in fler"
 [messages.app-music]
 source = "Music"
 translation = "Musik"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Behöver granskas"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Bara resurser som ingen har gått igenom ännu (fungerar ihop med de andra filtren)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1328,9 +1368,37 @@ translation = "Låter mest så"
 source = "Best match"
 translation = "Bäst matchning"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Betygsatta"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Klicka igen för att visa alla betyg"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } stjärna eller fler
+       *[other] { $count } stjärnor eller fler
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Ta bort från { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Byt namn"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nytt namn för { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1368,6 +1436,10 @@ translation = "Namnge den"
 source = "Save search"
 translation = "Spara sökning"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Spara som ny"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Behåll sökningen i Filter, under Ditt"
@@ -1388,6 +1460,14 @@ translation = "Sök namn, sökvägar, taggar"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Sparade ”{ $name }”: den finns i Filter, under Ditt"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'berg or sten: det ena eller det andra · -mossa: utelämna · "torr mossa": dessa ord tillsammans'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Uppdaterade ”{ $name }”"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Söker…"
@@ -1404,6 +1484,18 @@ translation = "Välj"
 source = "Select all { $count }"
 translation = "Välj alla { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Välj { $count } träff
+       *[other] Välj alla { $count } träffar
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Välj flera resurser för att tagga, kategorisera, samla, ladda ner eller arkivera dem tillsammans (X, eller Ctrl-klick)"
@@ -1411,6 +1503,18 @@ translation = "Välj flera resurser för att tagga, kategorisera, samla, ladda n
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } valda"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } träff vald
+       *[other] Alla { $count } träffar valda
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1432,6 +1536,10 @@ translation = "Sortera"
 source = "A to Z"
 translation = "A till Ö"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Högst betyg först"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Skapad"
@@ -1439,6 +1547,10 @@ translation = "Skapad"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Störst först"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Lägst betyg först"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1451,6 +1563,10 @@ translation = "Nyast först"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Äldst först"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Betyg"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1515,6 +1631,66 @@ translation = "Inklusive stödfiler"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-buffertar, materialbibliotek, materialens kartor, material som bara en modell använder och butiksfiler som beskriver modeller. De följer med när du laddar ner det som använder dem. Ett spritearks sidor, och de sprites som paketet även har som separata bilder, visas tillsammans med arket. En tillgång som paketet har i flera format visas en gång, i det format Hoard läser bäst."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Kopierade { $count } tagg
+       *[other] Kopierade { $count } taggar
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } har inga taggar att kopiera"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Den har redan de taggarna
+       *[other] Alla { $count } har redan de taggarna
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Inga taggar kopierade. Tryck på C på en resurs för att kopiera dess taggar."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Lade till { $count } tagg
+               *[other] Lade till { $count } taggar
+            }
+       *[other]
+            { $count ->
+                [one] Lade till { $count } tagg på { $assets } resurser
+               *[other] Lade till { $count } taggar på { $assets } resurser
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1587,6 +1763,14 @@ translation = "Hoard svarar inte: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Uppdatera"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Uppdatera ”{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Behåll det som är valt nu i den här sparade sökningen"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1819,8 +2003,8 @@ source = "Animations"
 translation = "Animationer"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Tillämpa ändringar av taggar, kategori och beskrivning på alla { $count } varianter"
+source = "Apply changes to all { $count } variants"
+translation = "Tillämpa ändringarna på alla { $count } varianter"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1986,6 +2170,10 @@ translation = "Skriv en beskrivning"
 source = "Asset details"
 translation = "Resursdetaljer"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Detaljer"
+
 [messages.asset-download]
 source = "Download"
 translation = "Ladda ner"
@@ -2033,6 +2221,62 @@ translation = "Lägg till i dina favoriter (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Bland dina favoriter (F tar bort den)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Lägg till"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategori"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Rensade { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Redigera { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "från paketet"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Licens"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Till exempel CC0 eller CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Fältnamn"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Lägg till ett fält"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Betyg"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Tomt för att ta bort"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Sparade { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Källa"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Värde"
 
 [messages.asset-file]
 source = "File"
@@ -2606,6 +2850,50 @@ translation = "{ $current } av { $duration }"
 source = "Previous asset"
 translation = "Föregående resurs"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } stjärna
+       *[other] { $count } stjärnor
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Betygsatt med { $count ->
+        [one] { $count } stjärna
+       *[other] { $count } stjärnor
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Klicka igen för att rensa betyget"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Rensade betyget"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Klicka igen för { $count } stjärna
+       *[other] Klicka igen för { $count } stjärnor
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Originalet .{ $ext } låg lagrat i den här paketfilen, och Hoard plockade ut det."
@@ -2657,6 +2945,34 @@ translation = "variant"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Klicka för att byta namn"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Granskad"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Tog bort granskningsmarkeringen"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Tog bort granskningsmarkeringen från { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Markera som granskad, så att regler och AI lämnar dess taggar ifred (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Markerad som granskad"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Markerade { $name } som granskad"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Granskad: regler och AI lämnar dess taggar ifred. Klicka för att ta bort markeringen (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2742,10 +3058,6 @@ translation = "Hitta resurser med { $hex }, { $percent } % av den här bilden"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % av bilden. Hitta resurser med den här färgen"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Lägg till"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Lägg till en tagg"
@@ -2758,9 +3070,69 @@ translation = "Lägg till en tagg, t.ex. mood:tense"
 source = "Removed { $tag }"
 translation = "Tog bort { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Sätt tillbaka { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Satte tillbaka { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Lägg till { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Taggar"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+Behåll alla { $count ->
+        [one] { $count } gissning
+       *[other] { $count } gissningar
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Behåll alla taggar som regler och AI gissade som dina egna"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+Behöll { $count ->
+        [one] { $count } gissad tagg
+       *[other] { $count } gissade taggar
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Lade till { $count ->
+        [one] { $count } tagg
+       *[other] { $count } taggar
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Liknande har:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Avvisade:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3332,6 +3704,106 @@ translation = "Varje fil som den importerades, med det den behöver, i en mapp f
 source = "Take { $name } out of the selection"
 translation = "Ta bort { $name } ur urvalet"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Det här ändrar alla träffar, även de som inte har lästs in än, och kan inte ångras i ett steg."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Rensat på alla"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Stäng"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Lämnas som det är"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Blandat, lämnas som det är"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Inget ändrades"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Återställ"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Spara { $count } ändring
+       *[other] Spara { $count } ändringar
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurs uppdaterad
+       *[other] { $count } resurser uppdaterade
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Lägg till en tagg på alla"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } av { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Taggar"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "De mest använda taggarna bland dem"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Redigera { $count } resurs
+       *[other] Redigera { $count } resurser
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Redigera { $count } träff
+       *[other] Redigera alla { $count } träffar
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Avmarkera alla"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Ta bort alla taggar och markera sedan dem som ska behållas"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Lägg till i samling"
@@ -3532,6 +4004,10 @@ translation = "felaktig inställning: { $reason }"
 source = "blob { $hash } not found"
 translation = "bloben { $hash } hittades inte"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "en sökning efter utseende kan inte redigeras på en gång: markera tillgångarna i stället"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "kan inte skapa { $path }"
@@ -3551,6 +4027,10 @@ translation = "kan inte läsa { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "kan inte skriva till { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "den ändringen finns inte i den här tillgångens historik"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4144,6 +4624,10 @@ translation = "inte en blake3-hash i hex"
 source = "not a picture Hoard can read: { $reason }"
 translation = "inte en bild som Hoard kan läsa: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" är inte en tagg'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "den här kopian av Hoard är byggd utan { $feature }"
@@ -4487,6 +4971,10 @@ translation = "{ $name } är inte en SoundFont som MIDI kan spela med: { $reason
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "inget att söka efter; skriv paketets namn"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } ligger redan under { $tag }, så { $tag } kan inte läggas under den"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5021,6 +5509,98 @@ translation = "Vad det läser"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Kunde inte skapa zip-filen: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } via en app"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } via en assistent"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "En regel"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Någon"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: rensad (var { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Beskrivning"
+
+[messages.history-heading]
+source = "History"
+translation = "Historik"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Det gick inte att läsa in historiken: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Läser in…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Inget har ändrats här ännu."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Ångra"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Det gick inte att ångra: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Återställ det som den här ändringen ändrade"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Ångrade: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Markerad som granskad"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: satt till { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Taggen { $tag } lades till"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Taggen { $tag } ändrades"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Den föreslagna taggen { $tag } behölls"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Taggen { $tag } togs bort"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Markerad som ogranskad"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7380,6 +7960,18 @@ translation = "Fler åtgärder för { $name }"
 source = "No packs match."
 translation = "Inga paket matchar."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurs har egen licens: låt den också följa paketets
+       *[other] { $count } resurser har egen licens: låt dem också följa paketets
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Paketets namn"
@@ -7423,6 +8015,34 @@ translation = "Kör LLM-taggaren igen"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Kör offlinetaggaren igen"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Nu"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Läses från sidan när du sparar"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Samma"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Från butiken"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Fyll i { $count } fält
+       *[other] Fyll i { $count } fält
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7839,6 +8459,14 @@ translation = "dubbletter samma liknande skalade konverterade slösat utrymme du
 source = "Dark theme: { $name }"
 translation = "Mörkt tema: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Redigera de { $count } valda"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "massändring taggar kategori licens betyg"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Favoriter"
@@ -7938,6 +8566,18 @@ translation = "Inget matchar ”{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paket"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Klistra in de kopierade taggarna på den valda resursen
+       *[other] Klistra in de kopierade taggarna på de { $count } valda
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8063,10 +8703,6 @@ translation = "Hoard använder { $hoard } av processorerna, och hela maskinen { 
 source = "Couldn’t read the profiler: { $error }"
 translation = "Kunde inte läsa profileraren: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Minne"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Långsammaste 5 %"
@@ -8106,6 +8742,22 @@ translation = "Väntar medan nätverket tar emot det som skickats"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "gränssnittets egna filer"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } av { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Topp"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard använder { $hoard } RAM och har som mest använt { $peak } de senaste tio minuterna."
 
 [messages.profiler-request-count]
 source = """
@@ -8182,6 +8834,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Inget kördes i bakgrunden."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Kunde inte ändra { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10453,6 +11109,14 @@ translation = "Visa en kanal"
 source = "Close"
 translation = "Stäng"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Kopiera dess taggar"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Redigera det valda"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Stäng, rensa markeringen eller stäng detaljerna"
@@ -10489,6 +11153,10 @@ translation = "Öppna detaljerna"
 source = "Command palette: search, jump, run"
 translation = "Kommandopalett: sök, hoppa, kör"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Klistra in kopierade taggar på det valda"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Spela upp eller pausa"
@@ -10496,6 +11164,10 @@ translation = "Spela upp eller pausa"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Spela upp eller stoppa ett ljud"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Markera som granskad eller inte"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10524,6 +11196,10 @@ translation = "Ljudspelare"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Början eller slutet"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Lägg till en tagg"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11064,6 +11740,146 @@ translation = "Filer som finns i mer än ett paket, eller som heter som en butik
 source = "Yours"
 translation = "Ditt"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Behåll taggen { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Behåll den här gissningen som din egen tagg"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Gammalt namn: { $names }
+       *[other] Gamla namn: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurs
+       *[other] { $count } resurser
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Skriv vad den här taggen betyder…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Klicka för att ändra"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Vad den här taggen betyder"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Vad den är till för, vad som hör hit. Enter sparar."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Sparade vad taggen betyder"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } slogs ihop med { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Smalare:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Att söka på { $tag } hittar även dessa"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Lägg under…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Lägg den här taggen under en bredare: när du söker på den hittar du även dessa"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "En bredare tagg, till exempel fordon"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Ta { $tag } från under { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } ligger inte längre under { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } ligger nu under { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Välj en bild till den här taggen"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Välj en av dess resurser som ska representera den"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Ingen bild"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Ingen av de visade resurserna har en bild."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Bilden har tagits bort"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Bilden är inställd"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Byt namn…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nytt namn"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Ge den ett nytt namn, eller namnet på en annan tagg för att slå ihop den med den"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Det gick inte att spara taggen: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Visa { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Under"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Ta bort den; taggaren lägger inte tillbaka den"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Ta bort taggen { $tag }"
@@ -11083,6 +11899,18 @@ translation = "uppmätt från filen"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "från offlinetaggaren"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "var { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Menade du"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Ny tagg"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11211,6 +12039,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Sparad som"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Bredare och smalare"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Taggar som lagts under bredare taggar från sina taggsidor. Att söka på en tagg hittar även allt under den."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

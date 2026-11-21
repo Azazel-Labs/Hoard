@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "88c93caf26ca85de6ac9eb500324a8632ade96bb5f63645e32297d86befc8f7a"
 
 [messages.about-blender]
@@ -716,45 +716,25 @@ source = """
     }"""
 translation = "{ $count } asset"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Törlés"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Tippelt címkék megtartása"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Minden kijelölt asset kategóriájának törlése"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "A szabályok és az MI által a kijelölt assetekre tett összes címke megtartása saját címkeként"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "{ $count } asset kategóriája törölve"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "A kijelölt assetek kategóriája (üresen hagyva törli)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategória"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "{ $count } asset kategóriája beállítva: { $category }"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Beállítás"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Minden kijelölt asset kategóriájának beállítása"
+translation = """
+{ $count ->
+        [one] Tippelt címkék megtartva { $count } asseten
+       *[other] Tippelt címkék megtartva { $count } asseten
+    }"""
 
 [messages.app-bulk-failed]
 source = """
@@ -767,6 +747,26 @@ translation = """
         [one] Nem sikerült módosítani az assetet
        *[other] Nem sikerült módosítani { $count } assetet
     }: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Megjelölés átnézettként"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "A kijelölt assetek megjelölése átnézettként: a szabályok és az MI ezután nem nyúlnak a címkéikhez"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] { $count } asset megjelölve átnézettként
+       *[other] { $count } asset megjelölve átnézettként
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -799,6 +799,26 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "{ $count } asset felcímkézve ezzel: { $tag }"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Jelölés levétele"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Az átnézett jelölés levétele a kijelölt assetekről"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Átnézett jelölés levéve { $count } assetről
+       *[other] Átnézett jelölés levéve { $count } assetről
+    }"""
 
 [messages.app-bulk-untagged]
 source = """
@@ -928,6 +948,18 @@ translation = "Nem sikerült elkészíteni a szerzők listáját: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md azokhoz a csomagokhoz, amelyekből ezek származnak: kik készítették őket, milyen licenccel, és milyen forrásmegjelölést kérnek"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "A könyvtár nyíljon meg ezzel: { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "A könyvtár ezzel a kereséssel nyílik meg. Kattintson a kikapcsoláshoz."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "A könyvtár ezzel a kereséssel nyíljon meg"
+
 [messages.app-done]
 source = "Done"
 translation = "Kész"
@@ -947,6 +979,14 @@ translation = "Minden legfelső szintű fájl vagy mappa külön csomag lesz. T�
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Engedje el, és { $count } elem hozzáadódik"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Szerkesztés…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Az összes címkéjének és mezőjének módosítása (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1107,6 +1147,14 @@ translation = "További találatok betöltése"
 [messages.app-music]
 source = "Music"
 translation = "Zene"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Átnézésre vár"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Csak azok az assetek, amelyeket még senki nem nézett át (a többi szűrővel együtt működik)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1300,9 +1348,37 @@ translation = "Leginkább így szól"
 source = "Best match"
 translation = "Legjobb egyezés"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Értékelt"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Kattintson újra az összes értékelés megjelenítéséhez"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] legalább { $count } csillag
+       *[other] legalább { $count } csillag
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Eltávolítás innen: { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Átnevezés"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Új név: { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1340,6 +1416,10 @@ translation = "Adjon nevet"
 source = "Save search"
 translation = "Keresés mentése"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Mentés újként"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "A keresés megőrzése a Szűrők között, a Saját alatt"
@@ -1360,6 +1440,14 @@ translation = "Keresés név, elérési út, címke szerint"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Mentve: „{ $name }”. A Szűrők között, a Saját alatt találja"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Frissítve: „{ $name }”"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Keresés…"
@@ -1376,6 +1464,18 @@ translation = "Kijelölés"
 source = "Select all { $count }"
 translation = "Mind kijelölése ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] A(z) { $count } találat kijelölése
+       *[other] Mind a(z) { $count } találat kijelölése
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Több asset kijelölése együttes címkézéshez, kategorizáláshoz, gyűjteménybe tételhez, letöltéshez vagy archiváláshoz (X vagy Ctrl+kattintás)"
@@ -1383,6 +1483,18 @@ translation = "Több asset kijelölése együttes címkézéshez, kategorizálá
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } kijelölve"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } találat kijelölve
+       *[other] Mind a(z) { $count } találat kijelölve
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1404,6 +1516,10 @@ translation = "Rendezés"
 source = "A to Z"
 translation = "A–Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Legjobbra értékelt elöl"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Létrehozva"
@@ -1411,6 +1527,10 @@ translation = "Létrehozva"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Legnagyobb elöl"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Legrosszabbra értékelt elöl"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1423,6 +1543,10 @@ translation = "Legújabb elöl"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Legrégebbi elöl"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Értékelés"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1483,6 +1607,66 @@ translation = "Kiegészítő fájlokkal együtt"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-pufferek, anyagkönyvtárak, az anyagok térképei, csak egy modell által használt anyagok és a modelleket leíró áruházi fájlok. Velük együtt töltődnek le, amikor letölti az őket használó elemet. A sprite-lap oldalai és azon spritejai, amelyek a csomagban külön képként is megvannak, a lappal együtt jelennek meg. Egy elem, amely a csomagban több formátumban is megvan, egyszer jelenik meg, abban a formátumban, amelyet a Hoard a legjobban olvas."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } címke másolva
+       *[other] { $count } címke másolva
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } nem rendelkezik másolható címkével"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Már megvannak rajta ezek a címkék
+       *[other] Mind a { $count } asseten megvannak már ezek a címkék
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Nincs másolt címke. Nyomd meg a C-t egy asseten a címkéi másolásához."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] { $count } címke hozzáadva
+               *[other] { $count } címke hozzáadva
+            }
+       *[other]
+            { $count ->
+                [one] { $count } címke hozzáadva { $assets } assethez
+               *[other] { $count } címke hozzáadva { $assets } assethez
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1555,6 +1739,14 @@ translation = "A Hoard nem válaszol: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Frissítés"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Frissítés: „{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "A jelenlegi kijelölés megtartása ebben a mentett keresésben"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1764,8 +1956,8 @@ source = "Animations"
 translation = "Animációk"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "A címke-, kategória- és leírásmódosítások alkalmazása mindegyik változatra ({ $count })"
+source = "Apply changes to all { $count } variants"
+translation = "A módosítások alkalmazása mindegyik változatra ({ $count })"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1931,6 +2123,10 @@ translation = "Leírás írása"
 source = "Asset details"
 translation = "Asset részletei"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Részletek"
+
 [messages.asset-download]
 source = "Download"
 translation = "Letöltés"
@@ -1970,6 +2166,62 @@ translation = "Hozzáadás a kedvencekhez (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "A kedvencei között (az F eltávolítja)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Hozzáadás"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategória"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Törölve: { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "{ $field } szerkesztése"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "a csomagból"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Licenc"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Például CC0 vagy CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Mező neve"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Mező hozzáadása"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Értékelés"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Üresen hagyva törli"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Mentve: { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Forrás"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Érték"
 
 [messages.asset-file]
 source = "File"
@@ -2531,6 +2783,50 @@ translation = "{ $current } / { $duration }"
 source = "Previous asset"
 translation = "Előző asset"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } csillag
+       *[other] { $count } csillag
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Értékelés: { $count } csillag
+       *[other] Értékelés: { $count } csillag
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Kattintson újra az értékelés törléséhez"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Értékelés törölve"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Kattintson újra: { $count } csillag
+       *[other] Kattintson újra: { $count } csillag
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Az eredeti .{ $ext } fájl ebben a csomagfájlban volt tárolva, és a Hoard kinyerte."
@@ -2582,6 +2878,34 @@ translation = "változat"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Kattintson az átnevezéshez"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Átnézve"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Átnézett jelölés levéve"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Átnézett jelölés levéve: { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Megjelölés átnézettként, hogy a szabályok és az MI ne nyúljanak a címkéihez (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Megjelölve átnézettként"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } megjelölve átnézettként"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Átnézve: a szabályok és az MI nem nyúlnak a címkéihez. Kattintson a jelölés levételéhez (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2667,10 +2991,6 @@ translation = "Assetek keresése ezzel a színnel: { $hex } (a képből { $perce
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, a képből { $percent }%. Ilyen színű assetek keresése"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Hozzáadás"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Címke hozzáadása"
@@ -2683,9 +3003,69 @@ translation = "Címke hozzáadása, pl. mood:tense"
 source = "Removed { $tag }"
 translation = "Eltávolítva: { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Visszatétel: { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Visszatéve: { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "{ $tag } hozzáadása"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Címkék"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } tipp megtartása
+       *[other] Mind a(z) { $count } tipp megtartása
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "A szabályok és az MI által tippelt összes címke megtartása saját címkeként"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } tippelt címke megtartva
+       *[other] { $count } tippelt címke megtartva
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Hozzáadva: { $count ->
+        [one] { $count } címke
+       *[other] { $count } címke
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "A hasonlókon ezek vannak:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Elutasítva:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3249,6 +3629,106 @@ translation = "Minden fájl úgy, ahogy importálva lett, azzal, amire szükség
 source = "Take { $name } out of the selection"
 translation = "{ $name } kivétele a kijelölésből"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Ez minden találatot módosít, a még be nem töltötteket is, és egy lépésben nem vonható vissza."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Mindegyiknél törölve"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Bezárás"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Változatlan marad"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Vegyes, változatlan marad"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Nincs változás"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Visszaállítás"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } módosítás mentése
+       *[other] { $count } módosítás mentése
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } asset frissítve
+       *[other] { $count } asset frissítve
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Címke hozzáadása mindegyikhez"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } / { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Címkék"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "A legtöbbet használt címkék közöttük"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } asset szerkesztése
+       *[other] { $count } asset szerkesztése
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } találat szerkesztése
+       *[other] Mind a(z) { $count } találat szerkesztése
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Minden jelölés törlése"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Az összes címke eltávolítása, majd a megtartandók bejelölése"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Hozzáadás gyűjteményhez"
@@ -3449,6 +3929,10 @@ translation = "hibás beállítás: { $reason }"
 source = "blob { $hash } not found"
 translation = "nem található blob: { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "a megjelenés szerinti keresés nem szerkeszthető egyszerre: inkább jelöld ki az asseteket"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "nem hozható létre: { $path }"
@@ -3468,6 +3952,10 @@ translation = "nem olvasható: { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "nem írható: { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "ez a változás nincs az asset előzményeiben"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4061,6 +4549,10 @@ translation = "nem blake3 hexadecimális hash"
 source = "not a picture Hoard can read: { $reason }"
 translation = "nem olyan kép, amelyet a Hoard be tud olvasni: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "A(z) „{ $text }” nem címke"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "a Hoard ezen példánya { $feature } nélkül készült"
@@ -4404,6 +4896,10 @@ translation = "A(z) { $name } nem olyan SoundFont, amellyel a MIDI szólni tud: 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "nincs mit keresni; írja be a csomag nevét"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "A(z) { $parent } már a(z) { $tag } alá tartozik, ezért a(z) { $tag } nem rendelhető alá"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4927,6 +5423,98 @@ translation = "Amit beolvas"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Nem sikerült elkészíteni a zipet: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "MI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } egy alkalmazáson keresztül"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } egy asszisztensen keresztül"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Egy szabály"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Valaki"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: törölve (ez volt: { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Leírás"
+
+[messages.history-heading]
+source = "History"
+translation = "Előzmények"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Nem sikerült betölteni az előzményeket: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Betöltés…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Itt még nem változott semmi."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Visszavonás"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Nem sikerült visszavonni: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "A módosítás előtti állapot visszaállítása"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Visszavonva: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Átnézettnek jelölve"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: beállítva erre: { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Címke hozzáadva: { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Címke módosítva: { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Javasolt címke megtartva: { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Címke eltávolítva: { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Nem átnézettnek jelölve"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7239,6 +7827,17 @@ translation = "További műveletek: { $name }"
 source = "No packs match."
 translation = "Nincs egyező csomag."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } asset saját licenccel rendelkezik: kövesse a csomag licencét is
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Csomag neve"
@@ -7282,6 +7881,33 @@ translation = "LLM-címkéző újrafuttatása"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Offline címkéző újrafuttatása"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Most"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Mentéskor beolvassa az oldalról"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Azonos"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Az áruházból"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } mező kitöltése
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7679,6 +8305,14 @@ translation = "duplikátumok azonos hasonló átméretezett konvertált pazarolt
 source = "Dark theme: { $name }"
 translation = "Sötét téma: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "A kijelölt { $count } szerkesztése"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "tömeges módosítás címkék kategória licenc értékelés"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Kedvencek"
@@ -7778,6 +8412,18 @@ translation = "Nincs találat erre: „{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Csomagok"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] A másolt címkék beillesztése a kijelölt assetre
+       *[other] A másolt címkék beillesztése a { $count } kijelölt assetre
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7903,10 +8549,6 @@ translation = "A Hoard processzorhasználata { $hoard }, az egész gépé { $mac
 source = "Couldn’t read the profiler: { $error }"
 translation = "Nem sikerült beolvasni a profilozót: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Memória"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Leglassabb 5%"
@@ -7946,6 +8588,22 @@ translation = "Várakozás, amíg a hálózat átveszi az elküldötteket"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "a felület saját fájljai"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Csúcs"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "A Hoard { $hoard } RAM-ot használ, az elmúlt tíz percben legfeljebb { $peak }-ot."
 
 [messages.profiler-request-count]
 source = """
@@ -8022,6 +8680,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "A háttérben semmi sem futott."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Nem sikerült módosítani: { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10283,6 +10945,14 @@ translation = "Egy csatorna megjelenítése"
 source = "Close"
 translation = "Bezárás"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "A címkéinek másolása"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "A kijelöltek szerkesztése"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Bezárás, a kijelölés megszüntetése vagy a részletek bezárása"
@@ -10319,6 +10989,10 @@ translation = "Részletek megnyitása"
 source = "Command palette: search, jump, run"
 translation = "Parancspaletta: keresés, ugrás, futtatás"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "A másolt címkék beillesztése a kijelöltekre"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Lejátszás vagy szünet"
@@ -10326,6 +11000,10 @@ translation = "Lejátszás vagy szünet"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Hang lejátszása vagy leállítása"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Megjelölés átnézettként, vagy a jelölés levétele"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10354,6 +11032,10 @@ translation = "Hanglejátszó"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Eleje vagy vége"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Címke hozzáadása"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10889,6 +11571,141 @@ translation = "Több csomagban is előforduló vagy áruházi fájlhoz hasonló 
 source = "Yours"
 translation = "Saját"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "A(z) { $tag } címke megtartása"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "A tipp megtartása saját címkeként"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] Régi név: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } asset"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Írja le, mit jelent ez a címke…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Kattintson a módosításhoz"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Mit jelent ez a címke"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Mire való, mi tartozik alá. Az Enter ment."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "A címke jelentése elmentve"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "A(z) { $tag } összevonásra került ide: { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Szűkebbek:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "A(z) { $tag } keresése ezeket is megtalálja"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Alárendelés…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Rendelje ezt a címkét egy tágabb alá: ha azt keresi, ezeket is megtalálja"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Egy tágabb címke, például jármű"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "A(z) { $tag } kivétele a(z) { $parent } alól"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "A(z) { $tag } már nem tartozik a(z) { $parent } alá"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "A(z) { $tag } mostantól a(z) { $parent } alá tartozik"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Válasszon képet ehhez a címkéhez"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Válassza ki az egyik assetjét, amely képviseli"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Nincs kép"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "A megjelenített assetek egyikének sincs képe."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Kép eltávolítva"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Kép beállítva"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Átnevezés…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Új név"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Adjon neki új nevet, vagy egy másik címke nevét, hogy abba összevonja"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Nem sikerült menteni a címkét: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "{ $tag } megjelenítése"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Alá tartozik"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Eltávolítás; a címkéző nem teszi vissza"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Címke eltávolítása: { $tag }"
@@ -10908,6 +11725,18 @@ translation = "a fájlból mérve"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "az offline címkézőtől"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "korábban { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Erre gondolt"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Új címke"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11028,6 +11857,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Mentve ezen a néven:"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Tágabb és szűkebb"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "A címkeoldalukon tágabb címkék alá rendelt címkék. Ha egy címkére keres, mindent megtalál, ami alatta van."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

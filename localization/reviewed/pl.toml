@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "d0e6acc5bd4349cf2e38516e2111f5e558cb5c06ac0604e881c65c5a1160098e"
 
 [messages.about-blender]
@@ -728,57 +728,27 @@ translation = """
        *[other] { $count } zasobu
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Wyczyść"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Zachowaj podpowiedzi"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Wyczyść kategorię każdego zaznaczonego zasobu"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Zachowaj jako własne wszystkie tagi dodane przez reguły i AI do zaznaczonych zasobów"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
-Wyczyszczono kategorię { $count ->
+Zachowano podpowiedziane tagi dla { $count ->
         [one] { $count } zasobu
         [few] { $count } zasobów
         [many] { $count } zasobów
        *[other] { $count } zasobu
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Kategoria zaznaczonych zasobów (puste pole ją czyści)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategoria"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-Ustawiono kategorię { $category } dla { $count ->
-        [one] { $count } zasobu
-        [few] { $count } zasobów
-        [many] { $count } zasobów
-       *[other] { $count } zasobu
-    }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Ustaw"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Ustaw kategorię każdego zaznaczonego zasobu"
 
 [messages.app-bulk-failed]
 source = """
@@ -793,6 +763,28 @@ Nie udało się zmienić { $count ->
         [many] tych { $count } zasobów
        *[other] tych { $count } zasobu
     }: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Oznacz jako sprawdzone"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Oznacz zaznaczone zasoby jako przejrzane: reguły i AI nie ruszają potem ich tagów"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+Oznaczono jako sprawdzone: { $count ->
+        [one] { $count } zasób
+        [few] { $count } zasoby
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -826,6 +818,28 @@ Tagged { $count ->
     } with { $tag }"""
 translation = """
 Dodano tag { $tag } do { $count ->
+        [one] { $count } zasobu
+        [few] { $count } zasobów
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Oznacz jako niesprawdzone"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Zdejmij oznaczenie „sprawdzone” z zaznaczonych zasobów"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+Zdjęto oznaczenie „sprawdzone” z { $count ->
         [one] { $count } zasobu
         [few] { $count } zasobów
         [many] { $count } zasobów
@@ -972,6 +986,18 @@ translation = "Nie udało się utworzyć listy autorów: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md dla paczek, z których pochodzą: kto je stworzył, ich licencje i wymagane przez nie podziękowania"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Otwieraj bibliotekę z wyszukiwaniem { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Biblioteka otwiera się z tym wyszukiwaniem. Kliknij, aby to wyłączyć."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Otwieraj bibliotekę z tym wyszukiwaniem"
+
 [messages.app-done]
 source = "Done"
 translation = "Gotowe"
@@ -997,6 +1023,14 @@ translation = """
         [many] Upuść { $count } elementów, aby je dodać
        *[other] Upuść { $count } elementu, aby je dodać
     }"""
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Edytuj…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Zmień tagi i pola wszystkich (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1157,6 +1191,14 @@ translation = "Ładowanie kolejnych"
 [messages.app-music]
 source = "Music"
 translation = "Muzyka"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Do sprawdzenia"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Tylko zasoby, których nikt jeszcze nie przejrzał (działa razem z innymi filtrami)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1350,9 +1392,39 @@ translation = "Najbardziej podobne"
 source = "Best match"
 translation = "Najlepsze dopasowanie"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Ocenione"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Kliknij ponownie, aby pokazać wszystkie oceny"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } gwiazdka lub więcej
+        [few] { $count } gwiazdki lub więcej
+        [many] { $count } gwiazdek lub więcej
+       *[other] { $count } gwiazdki lub więcej
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Usuń z { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Zmień nazwę"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nowa nazwa dla { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1390,6 +1462,10 @@ translation = "Nazwa"
 source = "Save search"
 translation = "Zapisz wyszukiwanie"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Zapisz jako nowe"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Zachowaj to wyszukiwanie w Filtrach, w sekcji Moje"
@@ -1410,6 +1486,14 @@ translation = "Szukaj nazw, ścieżek, tagów"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Zapisano „{ $name }”: jest w Filtrach, w sekcji Moje"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'skała or kamień: jedno z dwóch · -mech: pomiń · "suchy mech": te słowa razem'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Zaktualizowano „{ $name }”"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Wyszukiwanie…"
@@ -1426,6 +1510,20 @@ translation = "Zaznacz"
 source = "Select all { $count }"
 translation = "Zaznacz wszystkie ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Zaznacz { $count } wynik
+        [few] Zaznacz wszystkie { $count } wyniki
+        [many] Zaznacz wszystkie { $count } wyników
+       *[other] Zaznacz wszystkie { $count } wyniku
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Zaznacz kilka zasobów, by razem je otagować, skategoryzować, dodać do kolekcji, pobrać lub zarchiwizować (X lub Ctrl+kliknięcie)"
@@ -1433,6 +1531,20 @@ translation = "Zaznacz kilka zasobów, by razem je otagować, skategoryzować, d
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "Zaznaczono: { $count }"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] Zaznaczono { $count } wynik
+        [few] Zaznaczono { $count } wyniki
+        [many] Zaznaczono { $count } wyników
+       *[other] Zaznaczono wszystkie { $count } wyniku
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1454,6 +1566,10 @@ translation = "Sortuj"
 source = "A to Z"
 translation = "Od A do Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Najpierw najlepiej oceniane"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Data utworzenia"
@@ -1461,6 +1577,10 @@ translation = "Data utworzenia"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Najpierw największe"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Najpierw najgorzej oceniane"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1473,6 +1593,10 @@ translation = "Najpierw najnowsze"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Najpierw najstarsze"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Ocena"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1546,6 +1670,72 @@ translation = "Z plikami pomocniczymi"
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa. Strony arkusza sprite’ów oraz jego sprite’y, które paczka ma też jako osobne obrazy, są pokazywane razem z arkuszem. Zasób, który paczka ma w kilku formatach, jest pokazywany raz, w formacie, który Hoard czyta najlepiej."
 
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Skopiowano { $count } tag
+        [few] Skopiowano { $count } tagi
+        [many] Skopiowano { $count } tagów
+       *[other] Skopiowano { $count } tagu
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } nie ma tagów do skopiowania"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Ma już te tagi
+       *[other] Wszystkie { $count } mają już te tagi
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Nie skopiowano żadnych tagów. Naciśnij C na zasobie, aby skopiować jego tagi."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Dodano { $count } tag
+                [few] Dodano { $count } tagi
+                [many] Dodano { $count } tagów
+               *[other] Dodano { $count } tagu
+            }
+       *[other]
+            { $count ->
+                [one] Dodano { $count } tag do { $assets } zasobów
+                [few] Dodano { $count } tagi do { $assets } zasobów
+                [many] Dodano { $count } tagów do { $assets } zasobów
+               *[other] Dodano { $count } tagu do { $assets } zasobów
+            }
+    }"""
+
 [messages.app-tempo]
 source = "BPM"
 translation = "BPM"
@@ -1617,6 +1807,14 @@ translation = "Hoard nie odpowiada: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Aktualizuj"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Zaktualizuj „{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Zachowaj obecny wybór w tym zapisanym wyszukiwaniu"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1855,8 +2053,8 @@ source = "Animations"
 translation = "Animacje"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Zastosuj zmiany tagów, kategorii i opisu do wszystkich wariantów ({ $count })"
+source = "Apply changes to all { $count } variants"
+translation = "Zastosuj zmiany do wszystkich wariantów ({ $count })"
 
 [messages.asset-archive]
 source = "Archive"
@@ -2022,6 +2220,10 @@ translation = "Napisz opis"
 source = "Asset details"
 translation = "Szczegóły zasobu"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Szczegóły"
+
 [messages.asset-download]
 source = "Download"
 translation = "Pobierz"
@@ -2073,6 +2275,62 @@ translation = "Dodaj do ulubionych (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "W ulubionych (F usuwa)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Dodaj"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategoria"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Wyczyszczono { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Edytuj { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "z paczki"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Licencja"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Na przykład CC0 lub CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Nazwa pola"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Dodaj pole"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Ocena"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Puste pole usuwa wartość"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Zapisano { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Źródło"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Wartość"
 
 [messages.asset-file]
 source = "File"
@@ -2662,6 +2920,56 @@ translation = "{ $current } z { $duration }"
 source = "Previous asset"
 translation = "Poprzedni zasób"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } gwiazdka
+        [few] { $count } gwiazdki
+        [many] { $count } gwiazdek
+       *[other] { $count } gwiazdki
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Oceniono na { $count ->
+        [one] { $count } gwiazdkę
+        [few] { $count } gwiazdki
+        [many] { $count } gwiazdek
+       *[other] { $count } gwiazdki
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Kliknij ponownie, aby wyczyścić ocenę"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Wyczyszczono ocenę"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Kliknij ponownie, aby ustawić { $count } gwiazdkę
+        [few] Kliknij ponownie, aby ustawić { $count } gwiazdki
+        [many] Kliknij ponownie, aby ustawić { $count } gwiazdek
+       *[other] Kliknij ponownie, aby ustawić { $count } gwiazdki
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Oryginalny plik .{ $ext } był zapisany w tym pakiecie, a Hoard go wydobył."
@@ -2713,6 +3021,34 @@ translation = "wariant"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Kliknij, aby zmienić nazwę"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Sprawdzone"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Zdjęto oznaczenie „sprawdzone”"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Zdjęto oznaczenie „sprawdzone” z { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Oznacz jako sprawdzone, aby reguły i AI nie ruszały jego tagów (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Oznaczono jako sprawdzone"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Oznaczono { $name } jako sprawdzone"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Sprawdzone: reguły i AI nie ruszają jego tagów. Kliknij, aby zdjąć oznaczenie (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2798,10 +3134,6 @@ translation = "Znajdź zasoby z kolorem { $hex }, { $percent }% tego obrazu"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% obrazu. Znajdź zasoby z tym kolorem"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Dodaj"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Dodaj tag"
@@ -2814,9 +3146,75 @@ translation = "Dodaj tag, np. mood:tense"
 source = "Removed { $tag }"
 translation = "Usunięto { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Przywróć { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Przywrócono { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Dodaj { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Tagi"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+Zachowaj { $count ->
+        [one] { $count } podpowiedź
+        [few] { $count } podpowiedzi
+        [many] { $count } podpowiedzi
+       *[other] { $count } podpowiedzi
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Zachowaj jako własne wszystkie tagi podpowiedziane przez reguły i AI"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+Zachowano { $count ->
+        [one] { $count } podpowiedziany tag
+        [few] { $count } podpowiedziane tagi
+        [many] { $count } podpowiedzianych tagów
+       *[other] { $count } podpowiedzianego tagu
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Dodano: { $count ->
+        [one] { $count } tag
+        [few] { $count } tagi
+        [many] { $count } tagów
+       *[other] { $count } tagu
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Podobne mają:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Odrzucone:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3392,6 +3790,114 @@ translation = "Każdy plik tak, jak został zaimportowany, z tym, czego potrzebu
 source = "Take { $name } out of the selection"
 translation = "Usuń { $name } z zaznaczenia"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "To zmieni wszystkie wyniki, także te jeszcze niezaładowane, i nie da się tego cofnąć jednym krokiem."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Wyczyszczono u wszystkich"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Zamknij"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Bez zmian"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Różne, bez zmian"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Nic się nie zmieniło"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Przywróć"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Zapisz { $count } zmianę
+        [few] Zapisz { $count } zmiany
+        [many] Zapisz { $count } zmian
+       *[other] Zapisz { $count } zmiany
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Zaktualizowano { $count } zasób
+        [few] Zaktualizowano { $count } zasoby
+        [many] Zaktualizowano { $count } zasobów
+       *[other] Zaktualizowano { $count } zasobu
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Dodaj tag do wszystkich"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } z { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Tagi"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Najczęściej używane tagi wśród nich"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Edytuj { $count } zasób
+        [few] Edytuj { $count } zasoby
+        [many] Edytuj { $count } zasobów
+       *[other] Edytuj { $count } zasobu
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Edytuj { $count } wynik
+        [few] Edytuj wszystkie { $count } wyniki
+        [many] Edytuj wszystkie { $count } wyników
+       *[other] Edytuj wszystkie { $count } wyniku
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Odznacz wszystko"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Usuń wszystkie tagi, a potem zaznacz te do zachowania"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Dodaj do kolekcji"
@@ -3592,6 +4098,10 @@ translation = "błędne ustawienie: { $reason }"
 source = "blob { $hash } not found"
 translation = "nie znaleziono obiektu blob { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "wyszukiwania według wyglądu nie można edytować naraz: zaznacz zasoby"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "nie można utworzyć { $path }"
@@ -3611,6 +4121,10 @@ translation = "nie można odczytać { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "nie można zapisywać w { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "tej zmiany nie ma w historii tego zasobu"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4210,6 +4724,10 @@ translation = "to nie jest skrót blake3 w zapisie szesnastkowym"
 source = "not a picture Hoard can read: { $reason }"
 translation = "to nie jest obraz, który Hoard potrafi odczytać: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "„{ $text }” nie jest tagiem"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "ta kopia Hoarda została zbudowana bez { $feature }"
@@ -4553,6 +5071,10 @@ translation = "{ $name } nie jest SoundFontem, z którym MIDI może grać: { $re
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "brak frazy do wyszukania; należy wpisać nazwę paczki"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "Tag { $parent } jest już pod { $tag }, więc { $tag } nie może trafić pod niego"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5104,6 +5626,98 @@ translation = "Co odczytuje"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Nie udało się utworzyć pliku zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } przez aplikację"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } przez asystenta"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Reguła"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Ktoś"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: wyczyszczono (było { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Opis"
+
+[messages.history-heading]
+source = "History"
+translation = "Historia"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Nie udało się wczytać historii: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Wczytywanie…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Nic tu jeszcze nie zmieniono."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Cofnij"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Nie udało się tego cofnąć: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Przywróć to, co zmieniła ta zmiana"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Cofnięto: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Oznaczono jako sprawdzone"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: ustawiono na { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Dodano tag { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Zmieniono tag { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Zachowano sugerowany tag { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Usunięto tag { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Oznaczono jako niesprawdzone"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7501,6 +8115,20 @@ translation = "Więcej działań dla { $name }"
 source = "No packs match."
 translation = "Żadna paczka nie pasuje."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } zasób ma własną licencję: niech stosuje też licencję paczki
+        [few] { $count } zasoby mają własną licencję: niech stosują też licencję paczki
+        [many] { $count } zasobów ma własną licencję: niech stosują też licencję paczki
+       *[other] { $count } zasobu ma własną licencję: niech stosują też licencję paczki
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Nazwa paczki"
@@ -7544,6 +8172,36 @@ translation = "Uruchom ponownie tagowanie LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Uruchom ponownie tagowanie offline"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Teraz"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Zostanie odczytane ze strony przy zapisie"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Takie samo"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Ze sklepu"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Wypełnij { $count } pole
+        [few] Wypełnij { $count } pola
+        [many] Wypełnij { $count } pól
+       *[other] Wypełnij { $count } pola
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7980,6 +8638,14 @@ translation = "duplikaty takie same podobne przeskalowane przekonwertowane zmarn
 source = "Dark theme: { $name }"
 translation = "Motyw ciemny: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Edytuj zaznaczone ({ $count })"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "zmiana zbiorcza tagi kategoria licencja ocena"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Ulubione"
@@ -8079,6 +8745,18 @@ translation = "Brak wyników dla „{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paczki"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Wklej skopiowane tagi do zaznaczonego zasobu
+       *[other] Wklej skopiowane tagi do { $count } zaznaczonych
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8204,10 +8882,6 @@ translation = "Hoard używa { $hoard } procesorów, a cały komputer { $machine 
 source = "Couldn’t read the profiler: { $error }"
 translation = "Nie udało się odczytać profilera: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Pamięć"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Najwolniejsze 5%"
@@ -8247,6 +8921,22 @@ translation = "Oczekiwanie, aż sieć odbierze to, co wysłano"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "własne pliki interfejsu"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } z { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Szczyt"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard używa { $hoard } RAM, a w ostatnich dziesięciu minutach najwięcej { $peak }."
 
 [messages.profiler-request-count]
 source = """
@@ -8327,6 +9017,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Nic nie działało w tle."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Nie udało się zmienić { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10647,6 +11341,14 @@ translation = "Pokaż jeden kanał"
 source = "Close"
 translation = "Zamknij"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Skopiuj jego tagi"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Edytuj zaznaczone"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Zamknij, wyczyść zaznaczenie lub zamknij szczegóły"
@@ -10683,6 +11385,10 @@ translation = "Otwórz szczegóły"
 source = "Command palette: search, jump, run"
 translation = "Paleta poleceń: szukanie, przechodzenie, uruchamianie"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Wklej skopiowane tagi do zaznaczonych"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Odtwórz lub wstrzymaj"
@@ -10690,6 +11396,10 @@ translation = "Odtwórz lub wstrzymaj"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Odtwórz lub zatrzymaj dźwięk"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Oznacz jako sprawdzone lub nie"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10718,6 +11428,10 @@ translation = "Odtwarzacz dźwięku"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Początek lub koniec"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Dodaj tag"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11286,6 +12000,150 @@ translation = "Pliki występujące w więcej niż jednej paczce lub nazwane jak 
 source = "Yours"
 translation = "Własny"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Zachowaj tag { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Zachowaj tę podpowiedź jako własny tag"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Dawna nazwa: { $names }
+        [few] Dawne nazwy: { $names }
+        [many] Dawne nazwy: { $names }
+       *[other] Dawne nazwy: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } zasób
+        [few] { $count } zasoby
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Napisz, co oznacza ten tag…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Kliknij, aby zmienić"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Co oznacza ten tag"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Do czego służy, co do niego należy. Enter zapisuje."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Zapisano znaczenie tagu"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "Tag { $tag } został scalony z { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Węższe:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Wyszukanie { $tag } znajdzie też te"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Umieść pod…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Umieść ten tag pod szerszym: wyszukanie szerszego znajdzie też te"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Szerszy tag, np. pojazd"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Usuń { $tag } spod { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "Tag { $tag } nie jest już pod { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "Tag { $tag } jest teraz pod { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Wybierz obraz dla tego tagu"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Wybierz jeden z jego zasobów, który będzie go reprezentować"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Bez obrazu"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Żaden z wyświetlanych zasobów nie ma obrazu."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Usunięto obraz"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Ustawiono obraz"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Zmień nazwę…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nowa nazwa"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Nadaj mu nową nazwę albo podaj nazwę innego tagu, z którym ma zostać scalony"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Nie udało się zapisać tagu: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Pokaż { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Pod"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Usuń; tagowanie nie doda go ponownie"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Usuń tag { $tag }"
@@ -11305,6 +12163,18 @@ translation = "zmierzony z pliku"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "z tagowania offline"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "wcześniej { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Czy chodziło o"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Nowy tag"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11443,6 +12313,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Zapisano jako"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Szersze i węższe"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Tagi umieszczone pod szerszymi tagami na ich stronach. Wyszukanie tagu znajdzie też wszystko, co jest pod nim."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

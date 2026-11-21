@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "3890c90fa88633a6ab70ef57bf24cb23df5f0ca93b1323895034945b5971b327"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "{ $count } tài nguyên"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Xóa"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Giữ thẻ phỏng đoán"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Xóa danh mục của mọi tài nguyên đã chọn"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Giữ mọi thẻ mà quy tắc và AI đã gắn cho các tài nguyên đã chọn làm thẻ của riêng bạn"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "Đã xóa danh mục của { $count } tài nguyên"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Danh mục cho các tài nguyên đã chọn (để trống sẽ xóa danh mục)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Danh mục"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "Đã đặt danh mục của { $count } tài nguyên thành { $category }"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Đặt"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Đặt danh mục cho mọi tài nguyên đã chọn"
+translation = "Đã giữ thẻ phỏng đoán của { $count } tài nguyên"
 
 [messages.app-bulk-failed]
 source = """
@@ -763,6 +739,22 @@ Couldn't change { $count ->
        *[other] those { $count } assets
     }: { $error }"""
 translation = "Không thể thay đổi { $count } tài nguyên đó: { $error }"
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Đánh dấu đã duyệt"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Đánh dấu các tài nguyên đã chọn là đã xem qua: sau đó quy tắc và AI sẽ không đụng đến thẻ của chúng"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "Đã đánh dấu đã duyệt cho { $count } tài nguyên"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -795,6 +787,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "Đã gắn thẻ { $tag } cho { $count } tài nguyên"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Đánh dấu chưa duyệt"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Bỏ dấu đã duyệt khỏi các tài nguyên đã chọn"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "Đã bỏ dấu đã duyệt khỏi { $count } tài nguyên"
 
 [messages.app-bulk-untagged]
 source = """
@@ -927,6 +935,18 @@ translation = "Không thể tạo phần ghi công: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md cho các gói chứa những tài nguyên này: ai đã tạo, giấy phép của chúng và dòng ghi công mà họ yêu cầu"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Mở thư viện với { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Thư viện mở với tìm kiếm này. Nhấp để tắt."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Mở thư viện với tìm kiếm này"
+
 [messages.app-done]
 source = "Done"
 translation = "Xong"
@@ -946,6 +966,14 @@ translation = "Mỗi tệp hoặc thư mục cấp cao nhất sẽ thành một 
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Thả { $count } mục để thêm"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Sửa…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Đổi thẻ và các trường của tất cả (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1106,6 +1134,14 @@ translation = "Đang tải thêm"
 [messages.app-music]
 source = "Music"
 translation = "Nhạc"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Cần duyệt"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Chỉ các tài nguyên chưa ai xem qua (dùng cùng các bộ lọc khác)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1299,9 +1335,36 @@ translation = "Giống nhất"
 source = "Best match"
 translation = "Khớp nhất"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Đã xếp hạng"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Nhấp lại để hiện mọi xếp hạng"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] Từ { $count } sao trở lên
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Gỡ khỏi { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Đổi tên"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Tên mới cho { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1339,6 +1402,10 @@ translation = "Đặt tên"
 source = "Save search"
 translation = "Lưu tìm kiếm"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Lưu thành mới"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Giữ tìm kiếm này trong Bộ lọc, mục Của bạn"
@@ -1359,6 +1426,14 @@ translation = "Tìm theo tên, đường dẫn, thẻ"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Đã lưu “{ $name }”: nằm trong Bộ lọc, mục Của bạn"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Đã cập nhật “{ $name }”"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Đang tìm…"
@@ -1375,6 +1450,17 @@ translation = "Chọn"
 source = "Select all { $count }"
 translation = "Chọn tất cả { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] Chọn tất cả { $count } kết quả
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Chọn nhiều tài nguyên để gắn thẻ, phân loại, đưa vào bộ sưu tập, tải xuống hoặc lưu trữ cùng lúc (X, hoặc Ctrl-nhấp)"
@@ -1382,6 +1468,17 @@ translation = "Chọn nhiều tài nguyên để gắn thẻ, phân loại, đư
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "Đã chọn { $count }"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] Đã chọn { $count } kết quả
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1403,6 +1500,10 @@ translation = "Sắp xếp"
 source = "A to Z"
 translation = "A đến Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Xếp hạng cao nhất trước"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Ngày tạo"
@@ -1410,6 +1511,10 @@ translation = "Ngày tạo"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Lớn nhất trước"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Xếp hạng thấp nhất trước"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1422,6 +1527,10 @@ translation = "Mới nhất trước"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Cũ nhất trước"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Xếp hạng"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1482,6 +1591,46 @@ translation = "Đang bao gồm tệp hỗ trợ"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffer glTF, thư viện vật liệu, các map của vật liệu, vật liệu chỉ một mô hình dùng và tệp cửa hàng mô tả mô hình. Chúng được tải kèm khi bạn tải xuống thứ dùng đến chúng. Các trang của một sprite sheet, và các sprite của nó mà gói cũng có dưới dạng ảnh riêng, được hiển thị cùng sheet. Một tài nguyên mà gói có ở nhiều định dạng được hiển thị một lần, ở định dạng Hoard đọc tốt nhất."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "Đã sao chép { $count } thẻ"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } không có thẻ nào để sao chép"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "Cả { $count } tài nguyên đều đã có các thẻ đó"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Chưa sao chép thẻ nào. Nhấn C trên một tài nguyên để sao chép thẻ của nó."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "Đã thêm { $count } thẻ vào { $assets } tài nguyên"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1554,6 +1703,14 @@ translation = "Hoard không phản hồi: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Cập nhật"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Cập nhật “{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Giữ lựa chọn hiện tại trong tìm kiếm đã lưu này"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1763,8 +1920,8 @@ source = "Animations"
 translation = "Hoạt ảnh"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Áp dụng thay đổi về thẻ, danh mục và mô tả cho cả { $count } biến thể"
+source = "Apply changes to all { $count } variants"
+translation = "Áp dụng thay đổi cho cả { $count } biến thể"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1930,6 +2087,10 @@ translation = "Viết mô tả"
 source = "Asset details"
 translation = "Chi tiết tài nguyên"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Chi tiết"
+
 [messages.asset-download]
 source = "Download"
 translation = "Tải xuống"
@@ -1969,6 +2130,62 @@ translation = "Thêm vào mục yêu thích (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Có trong mục yêu thích (F để bỏ ra)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Thêm"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Danh mục"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Đã xóa { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Sửa { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "từ gói"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Giấy phép"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Như CC0 hoặc CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Tên trường"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Thêm trường"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Xếp hạng"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Để trống để xóa"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Đã lưu { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Nguồn"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Giá trị"
 
 [messages.asset-file]
 source = "File"
@@ -2522,6 +2739,41 @@ translation = "{ $current } / { $duration }"
 source = "Previous asset"
 translation = "Tài nguyên trước"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "{ $count } sao"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "Đã xếp hạng { $count } sao"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Nhấp lại để xóa xếp hạng"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Đã xóa xếp hạng"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] Nhấp lại để chọn { $count } sao
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Tệp .{ $ext } gốc được lưu bên trong package này, và Hoard đã lấy nó ra."
@@ -2573,6 +2825,34 @@ translation = "biến thể"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Nhấp để đổi tên"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Đã duyệt"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Đã bỏ dấu đã duyệt"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Đã bỏ dấu đã duyệt khỏi { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Đánh dấu đã duyệt, để quy tắc và AI không đụng đến thẻ của nó (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Đã đánh dấu đã duyệt"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Đã đánh dấu đã duyệt cho { $name }"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Đã duyệt: quy tắc và AI không đụng đến thẻ của nó. Nhấp để bỏ dấu (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2658,10 +2938,6 @@ translation = "Tìm tài nguyên có { $hex }, { $percent }% ảnh này"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% ảnh. Tìm tài nguyên có màu này"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Thêm"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Thêm thẻ"
@@ -2674,9 +2950,57 @@ translation = "Thêm thẻ, ví dụ mood:tense"
 source = "Removed { $tag }"
 translation = "Đã bỏ { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Đặt lại { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Đã đặt lại { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Thêm { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Thẻ"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "Giữ cả { $count } phỏng đoán"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Giữ mọi thẻ mà quy tắc và AI đã đoán làm thẻ của riêng bạn"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "Đã giữ { $count } thẻ phỏng đoán"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "Đã thêm { $count } thẻ"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Những mục giống có:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Đã từ chối:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3240,6 +3564,102 @@ translation = "Mỗi tệp giữ nguyên như khi nhập, kèm những gì nó c
 source = "Take { $name } out of the selection"
 translation = "Bỏ { $name } khỏi lựa chọn"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Thao tác này thay đổi mọi kết quả, kể cả những kết quả chưa tải, và không thể hoàn tác trong một bước."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Đã xóa ở tất cả"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Đóng"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Giữ nguyên"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Khác nhau, giữ nguyên"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Không có gì thay đổi"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Hoàn lại như cũ"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] Lưu { $count } thay đổi
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] Đã cập nhật { $count } tài nguyên
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Thêm thẻ cho tất cả"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } trên { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Thẻ"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Các thẻ dùng nhiều nhất trong số đó"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] Sửa { $count } tài nguyên
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] Sửa tất cả { $count } kết quả
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Bỏ chọn tất cả"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Gỡ mọi thẻ, rồi chọn lại những thẻ cần giữ"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Thêm vào bộ sưu tập"
@@ -3440,6 +3860,10 @@ translation = "cài đặt không hợp lệ: { $reason }"
 source = "blob { $hash } not found"
 translation = "không tìm thấy blob { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "không thể sửa cùng lúc kết quả tìm theo hình thức: hãy chọn các tài nguyên"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "không thể tạo { $path }"
@@ -3459,6 +3883,10 @@ translation = "không thể đọc { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "không thể ghi vào { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "thay đổi đó không có trong lịch sử của tài nguyên này"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4052,6 +4480,10 @@ translation = "không phải mã băm blake3 dạng hex"
 source = "not a picture Hoard can read: { $reason }"
 translation = "không phải ảnh mà Hoard đọc được: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" không phải là thẻ'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "bản Hoard này được dựng mà không có { $feature }"
@@ -4395,6 +4827,10 @@ translation = "{ $name } không phải SoundFont mà MIDI có thể dùng để 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "không có gì để tìm; hãy nhập tên gói"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } đã nằm dưới { $tag }, nên { $tag } không thể đặt dưới nó"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4918,6 +5354,98 @@ translation = "Những gì nó đọc được"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Không thể tạo tệp zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } qua một ứng dụng"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } qua một trợ lý"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Một quy tắc"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Ai đó"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: đã xóa (trước đó là { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Mô tả"
+
+[messages.history-heading]
+source = "History"
+translation = "Lịch sử"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Không thể tải lịch sử: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Đang tải…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Chưa có gì thay đổi ở đây."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Hoàn tác"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Không thể hoàn tác: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Khôi phục lại như trước thay đổi này"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Đã hoàn tác: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Đã đánh dấu là đã xem xét"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: đặt thành { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Đã thêm thẻ { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Đã đổi thẻ { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Đã giữ thẻ được gợi ý { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Đã bỏ thẻ { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Đã đánh dấu là chưa xem xét"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7229,6 +7757,17 @@ translation = "Thêm thao tác cho { $name }"
 source = "No packs match."
 translation = "Không có gói nào phù hợp."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tài nguyên có giấy phép riêng: chuyển sang dùng giấy phép của gói
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Tên gói"
@@ -7272,6 +7811,33 @@ translation = "Chạy lại bộ gắn thẻ LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Chạy lại bộ gắn thẻ ngoại tuyến"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Hiện tại"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Đọc từ trang khi lưu"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Giống nhau"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Từ cửa hàng"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] Điền { $count } trường
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7669,6 +8235,14 @@ translation = "trùng lặp giống nhau tương tự thu nhỏ chuyển đổi 
 source = "Dark theme: { $name }"
 translation = "Chủ đề tối: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Sửa { $count } mục đã chọn"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "thay đổi hàng loạt thẻ danh mục giấy phép xếp hạng"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Yêu thích"
@@ -7768,6 +8342,14 @@ translation = "Không có kết quả phù hợp với “{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Gói"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "Dán các thẻ đã sao chép vào { $count } mục đã chọn"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7893,10 +8475,6 @@ translation = "Hoard đang dùng { $hoard } bộ xử lý, còn toàn bộ máy 
 source = "Couldn’t read the profiler: { $error }"
 translation = "Không thể đọc trình phân tích hiệu năng: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Bộ nhớ"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "5% chậm nhất"
@@ -7936,6 +8514,22 @@ translation = "Chờ trong khi mạng nhận những gì đã gửi"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "các tệp của chính giao diện"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Cao nhất"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard đang dùng { $hoard } RAM, và dùng nhiều nhất { $peak } trong mười phút qua."
 
 [messages.profiler-request-count]
 source = """
@@ -8010,6 +8604,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Không có gì chạy trong nền."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Không thể thay đổi { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10256,6 +10854,14 @@ translation = "Hiện một kênh"
 source = "Close"
 translation = "Đóng"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Sao chép thẻ của nó"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Sửa mục đã chọn"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Đóng, bỏ chọn, hoặc đóng chi tiết"
@@ -10292,6 +10898,10 @@ translation = "Mở chi tiết"
 source = "Command palette: search, jump, run"
 translation = "Bảng lệnh: tìm kiếm, chuyển tới, chạy"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Dán thẻ đã sao chép vào mục đã chọn"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Phát hoặc tạm dừng"
@@ -10299,6 +10909,10 @@ translation = "Phát hoặc tạm dừng"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Phát hoặc dừng âm thanh"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Đánh dấu đã duyệt, hoặc bỏ đánh dấu"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10327,6 +10941,10 @@ translation = "Trình phát âm thanh"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Đầu hoặc cuối"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Thêm thẻ"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10862,6 +11480,141 @@ translation = "Các tệp có trong nhiều gói, hoặc được đặt tên gi
 source = "Yours"
 translation = "Của bạn"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Giữ thẻ { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Giữ phỏng đoán này làm thẻ của riêng bạn"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] Tên cũ: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } tài nguyên"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Cho biết thẻ này có nghĩa là gì…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Nhấp để thay đổi"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Thẻ này có nghĩa là gì"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Dùng để làm gì, những gì thuộc về thẻ. Nhấn Enter để lưu."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Đã lưu ý nghĩa của thẻ"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } đã được gộp vào { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Hẹp hơn:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Tìm { $tag } cũng sẽ thấy các thẻ này"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Đặt dưới…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Đặt thẻ này dưới một thẻ rộng hơn: tìm thẻ rộng hơn sẽ thấy cả các thẻ này"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Một thẻ rộng hơn, ví dụ phương tiện"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Gỡ { $tag } khỏi dưới { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } không còn nằm dưới { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } giờ nằm dưới { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Chọn ảnh cho thẻ này"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Chọn một tài nguyên của thẻ để làm ảnh đại diện"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Không có ảnh"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Không tài nguyên nào đang hiện có ảnh."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Đã bỏ ảnh"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Đã đặt ảnh"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Đổi tên…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Tên mới"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Đặt tên mới, hoặc tên của một thẻ khác để gộp vào thẻ đó"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Không lưu được thẻ: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Hiện { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Dưới"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Bỏ thẻ; bộ gắn thẻ sẽ không thêm lại"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Bỏ thẻ { $tag }"
@@ -10881,6 +11634,18 @@ translation = "đo từ tệp"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "từ bộ gắn thẻ ngoại tuyến"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "trước là { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Ý bạn là"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Thẻ mới"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11001,6 +11766,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Đã lưu thành"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Rộng hơn và hẹp hơn"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Các thẻ được đặt dưới thẻ rộng hơn từ trang thẻ của chúng. Tìm một thẻ cũng sẽ thấy mọi thứ nằm dưới nó."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

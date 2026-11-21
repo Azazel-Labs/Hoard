@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "f7546468fd3611c4870cb915c81c0a74e9859af5deb4f3a4d7c3f316e3b19fca"
 
 [messages.about-blender]
@@ -726,55 +726,26 @@ translation = """
        *[other] { $count } assetů
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Vymazat"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Ponechat odhady"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Vymazat kategorii všem vybraným assetům"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Ponechat jako vlastní všechny štítky, které vybraným assetům přidala pravidla a AI"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
-Kategorie vymazána u { $count ->
+Ponechány odhadnuté štítky u { $count ->
         [one] { $count } assetu
         [few] { $count } assetů
        *[other] { $count } assetů
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Kategorie pro vybrané assety (prázdná ji vymaže)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategorie"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-Kategorie { $count ->
-        [one] { $count } assetu
-        [few] { $count } assetů
-       *[other] { $count } assetů
-    } nastavena na { $category }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Nastavit"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Nastavit kategorii všem vybraným assetům"
 
 [messages.app-bulk-failed]
 source = """
@@ -788,6 +759,27 @@ translation = """
         [few] Tyto { $count } assety se nepodařilo změnit
        *[other] Těchto { $count } assetů se nepodařilo změnit
     }: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Označit jako zkontrolované"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Označit vybrané assety jako zkontrolované: pravidla a AI pak jejich štítky nechají být"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+Označeno jako zkontrolované: { $count ->
+        [one] { $count } asset
+        [few] { $count } assety
+       *[other] { $count } assetů
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -824,6 +816,27 @@ translation = """
         [one] { $count } assetu
         [few] { $count } assetům
        *[other] { $count } assetům
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Označit jako nezkontrolované"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Odebrat značku zkontrolováno z vybraných assetů"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+Odebrána značka zkontrolováno u { $count ->
+        [one] { $count } assetu
+        [few] { $count } assetů
+       *[other] { $count } assetů
     }"""
 
 [messages.app-bulk-untagged]
@@ -964,6 +977,18 @@ translation = "Nepodařilo se vytvořit poděkování autorům: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md pro balíčky, ze kterých pocházejí: kdo je vytvořil, jejich licence a řádky s poděkováním, o které žádají"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Otevřít knihovnu s hledáním { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Knihovna se otevírá s tímto hledáním. Kliknutím to zrušíte."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Otevřít knihovnu s tímto hledáním"
+
 [messages.app-done]
 source = "Done"
 translation = "Hotovo"
@@ -988,6 +1013,14 @@ translation = """
         [few] Pusťte { $count } položky a přidáte je
        *[other] Pusťte { $count } položek a přidáte je
     }"""
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Upravit…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Změnit štítky a pole u všech (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1153,6 +1186,14 @@ translation = "Načítám další"
 [messages.app-music]
 source = "Music"
 translation = "Hudba"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Ke kontrole"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Jen assety, které zatím nikdo nezkontroloval (funguje spolu s ostatními filtry)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1346,9 +1387,38 @@ translation = "Nejvíc se podobá"
 source = "Best match"
 translation = "Nejlepší shoda"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Hodnocené"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Dalším kliknutím zobrazíte všechna hodnocení"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } hvězdička a více
+        [few] { $count } hvězdičky a více
+       *[other] { $count } hvězdiček a více
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Odebrat z { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Přejmenovat"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nový název pro { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1386,6 +1456,10 @@ translation = "Pojmenujte ho"
 source = "Save search"
 translation = "Uložit hledání"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Uložit jako nové"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Uchovat toto hledání ve Filtrech v části Vaše"
@@ -1406,6 +1480,14 @@ translation = "Hledat názvy, cesty, štítky"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Uloženo „{ $name }“: najdete ho ve Filtrech v části Vaše"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'skála or kámen: jedno z obou · -mech: vynechat · "suchý mech": tato slova pohromadě'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Aktualizováno „{ $name }“"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Hledám…"
@@ -1422,6 +1504,19 @@ translation = "Vybrat"
 source = "Select all { $count }"
 translation = "Vybrat vše ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Vybrat { $count } výsledek
+        [few] Vybrat všechny { $count } výsledky
+       *[other] Vybrat všech { $count } výsledků
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Vyberte několik assetů, které chcete společně oštítkovat, zařadit do kategorie, přidat do kolekce, stáhnout nebo archivovat (X nebo Ctrl+klik)"
@@ -1429,6 +1524,19 @@ translation = "Vyberte několik assetů, které chcete společně oštítkovat, 
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "Vybráno: { $count }"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] Vybrán { $count } výsledek
+        [few] Vybrány { $count } výsledky
+       *[other] Vybráno všech { $count } výsledků
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1450,6 +1558,10 @@ translation = "Řadit"
 source = "A to Z"
 translation = "A až Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Od nejlépe hodnocených"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Vytvořeno"
@@ -1457,6 +1569,10 @@ translation = "Vytvořeno"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Od největších"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Od nejhůře hodnocených"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1469,6 +1585,10 @@ translation = "Od nejnovějších"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Od nejstarších"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Hodnocení"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1539,6 +1659,72 @@ translation = "Včetně podpůrných souborů"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu. Asset, který balíček má v několika formátech, se zobrazí jednou, ve formátu, který Hoard čte nejlépe."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Zkopírován { $count } štítek
+        [few] Zkopírovány { $count } štítky
+        [many] Zkopírováno { $count } štítku
+       *[other] Zkopírováno { $count } štítků
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } nemá žádné štítky ke zkopírování"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Už tyto štítky má
+       *[other] Všechny { $count } už tyto štítky mají
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Žádné štítky nejsou zkopírované. Stisknutím C na assetu zkopírujete jeho štítky."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Přidán { $count } štítek
+                [few] Přidány { $count } štítky
+                [many] Přidáno { $count } štítku
+               *[other] Přidáno { $count } štítků
+            }
+       *[other]
+            { $count ->
+                [one] Přidán { $count } štítek k { $assets } assetům
+                [few] Přidány { $count } štítky k { $assets } assetům
+                [many] Přidáno { $count } štítku k { $assets } assetům
+               *[other] Přidáno { $count } štítků k { $assets } assetům
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1611,6 +1797,14 @@ translation = "Hoard neodpovídá: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Aktualizovat"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Aktualizovat „{ $name }“"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Uložit aktuální výběr do tohoto uloženého hledání"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1849,8 +2043,8 @@ source = "Animations"
 translation = "Animace"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Použít změny štítků, kategorie a popisu na všechny varianty ({ $count })"
+source = "Apply changes to all { $count } variants"
+translation = "Použít změny na všechny varianty ({ $count })"
 
 [messages.asset-archive]
 source = "Archive"
@@ -2016,6 +2210,10 @@ translation = "Napsat popis"
 source = "Asset details"
 translation = "Podrobnosti assetu"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Podrobnosti"
+
 [messages.asset-download]
 source = "Download"
 translation = "Stáhnout"
@@ -2065,6 +2263,62 @@ translation = "Přidat do oblíbených (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "V oblíbených (F ho odebere)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Přidat"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategorie"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Vymazáno: { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Upravit: { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "z balíčku"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Licence"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Například CC0 nebo CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Název pole"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Přidat pole"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Hodnocení"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Prázdné = odebrat"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Uloženo: { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Zdroj"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Hodnota"
 
 [messages.asset-file]
 source = "File"
@@ -2645,6 +2899,53 @@ translation = "{ $current } z { $duration }"
 source = "Previous asset"
 translation = "Předchozí asset"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } hvězdička
+        [few] { $count } hvězdičky
+       *[other] { $count } hvězdiček
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Hodnocení: { $count ->
+        [one] { $count } hvězdička
+        [few] { $count } hvězdičky
+       *[other] { $count } hvězdiček
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Dalším kliknutím hodnocení zrušíte"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Hodnocení zrušeno"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Klikněte znovu pro { $count } hvězdičku
+        [few] Klikněte znovu pro { $count } hvězdičky
+       *[other] Klikněte znovu pro { $count } hvězdiček
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Původní .{ $ext } byl uložen uvnitř tohoto souboru Unrealu a Hoard ho vytáhl."
@@ -2696,6 +2997,34 @@ translation = "varianta"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Kliknutím přejmenujete"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Zkontrolováno"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Značka zkontrolováno odebrána"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Odebrána značka zkontrolováno u { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Označit jako zkontrolované, aby pravidla a AI jeho štítky nechaly být (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Označeno jako zkontrolované"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Asset { $name } označen jako zkontrolovaný"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Zkontrolováno: pravidla a AI jeho štítky nechají být. Kliknutím značku odeberete (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2781,10 +3110,6 @@ translation = "Najít assety s barvou { $hex }, { $percent } % tohoto obrázku"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % obrázku. Najít assety s touto barvou"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Přidat"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Přidat štítek"
@@ -2797,9 +3122,73 @@ translation = "Přidejte štítek, např. mood:tense"
 source = "Removed { $tag }"
 translation = "Odebráno: { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Vrátit štítek { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Štítek { $tag } vrácen"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Přidat { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Štítky"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Ponechat { $count } odhad
+        [few] Ponechat všechny { $count } odhady
+       *[other] Ponechat všech { $count } odhadů
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Ponechat jako vlastní všechny štítky, které pravidla a AI odhadly"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+Ponecháno: { $count ->
+        [one] { $count } odhadnutý štítek
+        [few] { $count } odhadnuté štítky
+       *[other] { $count } odhadnutých štítků
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Přidáno: { $count ->
+        [one] { $count } štítek
+        [few] { $count } štítky
+        [many] { $count } štítku
+       *[other] { $count } štítků
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Podobné mají:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Zamítnuté:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3373,6 +3762,110 @@ translation = "Každý soubor tak, jak byl importován, s tím, co potřebuje, v
 source = "Take { $name } out of the selection"
 translation = "Odebrat { $name } z výběru"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Změní všechny výsledky, i ty, které ještě nejsou načtené, a nelze to vrátit jedním krokem."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "U všech vymazáno"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Zavřít"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Beze změny"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Různé, beze změny"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Nic se nezměnilo"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Vrátit zpět"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Uložit { $count } změnu
+        [few] Uložit { $count } změny
+       *[other] Uložit { $count } změn
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Aktualizován { $count } asset
+        [few] Aktualizovány { $count } assety
+       *[other] Aktualizováno { $count } assetů
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Přidat štítek všem"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } z { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Štítky"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Nejpoužívanější štítky mezi nimi"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Upravit { $count } asset
+        [few] Upravit { $count } assety
+       *[other] Upravit { $count } assetů
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Upravit { $count } výsledek
+        [few] Upravit všechny { $count } výsledky
+       *[other] Upravit všech { $count } výsledků
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Zrušit označení všech"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Odebrat všechny štítky a poté označit ty, které se mají ponechat"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Přidat do kolekce"
@@ -3573,6 +4066,10 @@ translation = "chybné nastavení: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob { $hash } nebyl nalezen"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "hledání podle vzhledu nelze upravit najednou: vyberte assety ručně"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "nelze vytvořit { $path }"
@@ -3592,6 +4089,10 @@ translation = "nelze číst { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "nelze zapisovat do { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "tato změna v historii tohoto assetu není"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4190,6 +4691,10 @@ translation = "toto není hexadecimální hash blake3"
 source = "not a picture Hoard can read: { $reason }"
 translation = "není to obrázek, který Hoard umí přečíst: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "„{ $text }“ není štítek"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "tato kopie Hoardu byla sestavena bez { $feature }"
@@ -4533,6 +5038,10 @@ translation = "{ $name } není SoundFont, se kterým může MIDI hrát: { $reaso
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "není co hledat; napište název balíčku"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } je už pod { $tag }, takže { $tag } nejde zařadit pod něj"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5079,6 +5588,98 @@ translation = "Co přečte"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip se nepodařilo vytvořit: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } přes aplikaci"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } přes asistenta"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Pravidlo"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Někdo"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: vymazáno (bylo { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Popis"
+
+[messages.history-heading]
+source = "History"
+translation = "Historie"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Historii se nepodařilo načíst: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Načítání…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Zatím tu nic nebylo změněno."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Vrátit"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Tuto změnu se nepodařilo vrátit: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Vrátit, co tato změna změnila"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Vráceno: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Označeno jako zkontrolované"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: nastaveno na { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Přidán štítek { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Změněn štítek { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Ponechán navržený štítek { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Odebrán štítek { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Označeno jako nezkontrolované"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7492,6 +8093,20 @@ translation = "Další akce pro { $name }"
 source = "No packs match."
 translation = "Žádné balíčky neodpovídají."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } asset má vlastní licenci: ať se řídí i licencí balíčku
+        [few] { $count } assety mají vlastní licenci: ať se řídí i licencí balíčku
+        [many] { $count } assetu má vlastní licenci: ať se řídí i licencí balíčku
+       *[other] { $count } assetů má vlastní licenci: ať se řídí i licencí balíčku
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Název balíčku"
@@ -7535,6 +8150,36 @@ translation = "Znovu spustit štítkovač LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Znovu spustit offline štítkovač"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Nyní"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Při uložení se načte ze stránky"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Stejné"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Z obchodu"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Vyplnit { $count } pole
+        [few] Vyplnit { $count } pole
+        [many] Vyplnit { $count } pole
+       *[other] Vyplnit { $count } polí
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7964,6 +8609,14 @@ translation = "duplikáty stejné podobné zmenšené převedené plýtvání m�
 source = "Dark theme: { $name }"
 translation = "Tmavý motiv: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Upravit vybrané ({ $count })"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "hromadná změna štítky kategorie licence hodnocení"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Oblíbené"
@@ -8063,6 +8716,18 @@ translation = "„{ $query }“ nic neodpovídá"
 [messages.palette-packs]
 source = "Packs"
 translation = "Balíčky"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Vložit zkopírované štítky do vybraného assetu
+       *[other] Vložit zkopírované štítky do { $count } vybraných
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8188,10 +8853,6 @@ translation = "Hoard využívá { $hoard } procesorů a celý počítač { $mach
 source = "Couldn’t read the profiler: { $error }"
 translation = "Profiler se nepodařilo přečíst: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Paměť"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Nejpomalejších 5 %"
@@ -8231,6 +8892,22 @@ translation = "Čekání, než síť převezme to, co se odeslalo"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "vlastní soubory rozhraní"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } z { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Nejvíc"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard používá { $hoard } RAM a za posledních deset minut použil nejvýš { $peak }."
 
 [messages.profiler-request-count]
 source = """
@@ -8311,6 +8988,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Na pozadí nic neběželo."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "{ $name } se nepodařilo změnit: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10626,6 +11307,14 @@ translation = "Zobrazit jeden kanál"
 source = "Close"
 translation = "Zavřít"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Zkopírovat jeho štítky"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Upravit vybrané"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Zavřít, zrušit výběr nebo zavřít podrobnosti"
@@ -10662,6 +11351,10 @@ translation = "Otevřít podrobnosti"
 source = "Command palette: search, jump, run"
 translation = "Paleta příkazů: hledat, přejít, spustit"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Vložit zkopírované štítky na vybrané"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Přehrát nebo pozastavit"
@@ -10669,6 +11362,10 @@ translation = "Přehrát nebo pozastavit"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Přehrát nebo zastavit zvuk"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Označit jako zkontrolované, nebo ne"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10697,6 +11394,10 @@ translation = "Přehrávač zvuků"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Začátek nebo konec"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Přidat štítek"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11264,6 +11965,150 @@ translation = "Soubory ve více než jednom balíčku nebo pojmenované jako sou
 source = "Yours"
 translation = "Vlastní"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Ponechat štítek { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Ponechat tento odhad jako vlastní štítek"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Starý název: { $names }
+        [few] Staré názvy: { $names }
+        [many] Staré názvy: { $names }
+       *[other] Staré názvy: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } asset
+        [few] { $count } assety
+        [many] { $count } assetu
+       *[other] { $count } assetů
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Napište, co tento štítek znamená…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Kliknutím změníte"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Co tento štítek znamená"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "K čemu slouží a co pod něj patří. Enter uloží."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Význam štítku byl uložen"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "Štítek { $tag } byl sloučen do { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Užší:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Vyhledáním { $tag } najdete i tyto"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Zařadit pod…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Zařaďte tento štítek pod širší: vyhledáním širšího najdete i tyto"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Širší štítek, třeba vozidlo"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Odebrat { $tag } zpod { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "Štítek { $tag } už není pod { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "Štítek { $tag } je nyní pod { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Vyberte obrázek pro tento štítek"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Vyberte jeden z jeho assetů, který ho bude zastupovat"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Bez obrázku"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Žádný ze zobrazených assetů nemá obrázek."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Obrázek odebrán"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Obrázek nastaven"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Přejmenovat…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nový název"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Dejte mu nový název, nebo název jiného štítku, do kterého se sloučí"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Štítek se nepodařilo uložit: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Zobrazit { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Pod"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Odebrat; štítkovač ho nevrátí"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Odebrat štítek { $tag }"
@@ -11283,6 +12128,18 @@ translation = "změřeno ze souboru"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "z offline štítkovače"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "dříve { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Měli jste na mysli"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Nový štítek"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11423,6 +12280,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Uloženo jako"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Širší a užší"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Štítky zařazené pod širší štítky na svých stránkách. Vyhledáním štítku najdete i vše, co je pod ním."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

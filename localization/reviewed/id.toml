@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "5c145ad92a4f48b6321a4514298f54705660673c84778e6e1e3be88d52788269"
 
 [messages.about-blender]
@@ -716,45 +716,25 @@ source = """
     }"""
 translation = "{ $count } aset"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Kosongkan"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Pertahankan tag tebakan"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Kosongkan kategori setiap aset terpilih"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Pertahankan semua tag yang dipasang aturan dan AI pada aset terpilih sebagai tag Anda sendiri"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "Kategori { $count } aset dikosongkan"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Kategori untuk aset terpilih (kosong untuk mengosongkannya)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategori"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "Kategori { $count } aset ditetapkan menjadi { $category }"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Tetapkan"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Tetapkan kategori setiap aset terpilih"
+translation = """
+{ $count ->
+        [one] Tag tebakan dipertahankan pada { $count } aset
+       *[other] Tag tebakan dipertahankan pada { $count } aset
+    }"""
 
 [messages.app-bulk-failed]
 source = """
@@ -763,6 +743,26 @@ Couldn't change { $count ->
        *[other] those { $count } assets
     }: { $error }"""
 translation = "Tidak dapat mengubah { $count } aset itu: { $error }"
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Tandai ditinjau"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Tandai aset terpilih sebagai sudah ditinjau: aturan dan AI tidak akan mengubah tag-nya lagi"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] { $count } aset ditandai sudah ditinjau
+       *[other] { $count } aset ditandai sudah ditinjau
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -795,6 +795,26 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "{ $count } aset diberi tag { $tag }"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Tandai belum ditinjau"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Hapus tanda ditinjau dari aset terpilih"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Tanda ditinjau dihapus dari { $count } aset
+       *[other] Tanda ditinjau dihapus dari { $count } aset
+    }"""
 
 [messages.app-bulk-untagged]
 source = """
@@ -924,6 +944,18 @@ translation = "Tidak dapat membuat kredit: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md untuk paket asal aset ini: siapa pembuatnya, lisensinya, dan baris kredit yang diminta"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Buka pustaka dengan { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Pustaka dibuka dengan pencarian ini. Klik untuk menghentikan."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Buka pustaka dengan pencarian ini"
+
 [messages.app-done]
 source = "Done"
 translation = "Selesai"
@@ -943,6 +975,14 @@ translation = "Setiap berkas atau folder tingkat atas menjadi paket tersendiri. 
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Jatuhkan { $count } item untuk menambahkannya"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Edit…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Ubah tag dan kolom semuanya (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1103,6 +1143,14 @@ translation = "Memuat lebih banyak"
 [messages.app-music]
 source = "Music"
 translation = "Musik"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Perlu ditinjau"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Hanya aset yang belum pernah ditinjau siapa pun (berlaku bersama filter lain)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1296,9 +1344,36 @@ translation = "Paling mirip"
 source = "Best match"
 translation = "Paling cocok"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Diberi peringkat"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Klik lagi untuk menampilkan semua peringkat"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } bintang ke atas
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Keluarkan dari { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Ganti nama"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nama baru untuk { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1336,6 +1411,10 @@ translation = "Beri nama"
 source = "Save search"
 translation = "Simpan pencarian"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Simpan sebagai baru"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Simpan pencarian ini di Filter, di bawah Milik Anda"
@@ -1356,6 +1435,14 @@ translation = "Cari nama, path, tag"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” disimpan: ada di Filter, di bawah Milik Anda"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "“{ $name }” diperbarui"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Mencari…"
@@ -1372,6 +1459,17 @@ translation = "Pilih"
 source = "Select all { $count }"
 translation = "Pilih semua { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] Pilih semua { $count } hasil
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Pilih beberapa aset untuk diberi tag, dikategorikan, dikoleksi, diunduh, atau diarsipkan bersama (X, atau Ctrl-klik)"
@@ -1379,6 +1477,17 @@ translation = "Pilih beberapa aset untuk diberi tag, dikategorikan, dikoleksi, d
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } dipilih"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } hasil dipilih
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1400,6 +1509,10 @@ translation = "Urutkan"
 source = "A to Z"
 translation = "A ke Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Peringkat tertinggi dulu"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Dibuat"
@@ -1407,6 +1520,10 @@ translation = "Dibuat"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Terbesar dulu"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Peringkat terendah dulu"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1419,6 +1536,10 @@ translation = "Terbaru dulu"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Terlama dulu"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Peringkat"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1479,6 +1600,46 @@ translation = "Termasuk berkas pendukung"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffer glTF, pustaka material, map dari material, material yang hanya dipakai satu model, dan berkas toko yang menjelaskan model. Semuanya ikut terunduh saat Anda mengunduh yang memakainya. Halaman lembar sprite, dan sprite-nya yang juga ada di paket sebagai gambar terpisah, ditampilkan bersama lembarnya. Aset yang ada di paket dalam beberapa format ditampilkan sekali, dalam format yang paling baik dibaca Hoard."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "{ $count } tag disalin"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } tidak punya tag untuk disalin"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "{ $count } aset sudah punya tag itu"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Belum ada tag yang disalin. Tekan C pada aset untuk menyalin tagnya."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "{ $count } tag ditambahkan ke { $assets } aset"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1551,6 +1712,14 @@ translation = "Hoard tidak merespons: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Perbarui"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Perbarui “{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Simpan pilihan saat ini ke pencarian tersimpan ini"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1760,8 +1929,8 @@ source = "Animations"
 translation = "Animasi"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Terapkan perubahan tag, kategori, dan deskripsi ke semua { $count } varian"
+source = "Apply changes to all { $count } variants"
+translation = "Terapkan perubahan ke semua { $count } varian"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1927,6 +2096,10 @@ translation = "Tulis deskripsi"
 source = "Asset details"
 translation = "Detail aset"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Detail"
+
 [messages.asset-download]
 source = "Download"
 translation = "Unduh"
@@ -1966,6 +2139,62 @@ translation = "Tambahkan ke favorit Anda (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Ada di favorit Anda (F untuk mengeluarkannya)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Tambah"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategori"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field } dikosongkan"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Edit { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "dari paket"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Lisensi"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Misalnya CC0 atau CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Nama kolom"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Tambah kolom"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Peringkat"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Kosongkan untuk menghapus"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field } disimpan"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Sumber"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Nilai"
 
 [messages.asset-file]
 source = "File"
@@ -2525,6 +2754,49 @@ translation = "{ $current } dari { $duration }"
 source = "Previous asset"
 translation = "Aset sebelumnya"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } bintang
+       *[other] { $count } bintang
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Diberi peringkat { $count } bintang
+       *[other] Diberi peringkat { $count } bintang
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Klik lagi untuk menghapus peringkat"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Peringkat dikosongkan"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] Klik lagi untuk { $count } bintang
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Berkas .{ $ext } asli tersimpan di dalam paket Unreal ini, dan Hoard mengeluarkannya."
@@ -2576,6 +2848,34 @@ translation = "varian"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Klik untuk mengganti nama"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Ditinjau"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Tanda ditinjau dihapus"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Tanda ditinjau dihapus dari { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Tandai sudah ditinjau, agar aturan dan AI tidak mengubah tag-nya (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Ditandai sudah ditinjau"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } ditandai sudah ditinjau"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Ditinjau: aturan dan AI tidak mengubah tag-nya. Klik untuk menghapus tanda (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2661,10 +2961,6 @@ translation = "Cari aset dengan { $hex }, { $percent }% dari gambar ini"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% dari gambar. Cari aset dengan warna ini"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Tambah"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Tambahkan tag"
@@ -2677,9 +2973,65 @@ translation = "Tambahkan tag, mis. mood:tense"
 source = "Removed { $tag }"
 translation = "{ $tag } dihapus"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Pasang kembali { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } dipasang kembali"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Tambah { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Tag"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Pertahankan { $count } tebakan
+       *[other] Pertahankan { $count } tebakan
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Pertahankan semua tag yang ditebak aturan dan AI sebagai tag Anda sendiri"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } tag tebakan dipertahankan
+       *[other] { $count } tag tebakan dipertahankan
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "{ $count } tag ditambahkan"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Yang mirip punya:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Ditolak:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3243,6 +3595,102 @@ translation = "Setiap file seperti saat diimpor, dengan yang dibutuhkannya, dala
 source = "Take { $name } out of the selection"
 translation = "Keluarkan { $name } dari pilihan"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Ini mengubah semua hasil, termasuk yang belum dimuat, dan tidak bisa dibatalkan dalam satu langkah."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Dikosongkan di semuanya"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Tutup"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Dibiarkan apa adanya"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Beragam, dibiarkan apa adanya"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Tidak ada yang berubah"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Kembalikan seperti semula"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] Simpan { $count } perubahan
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } aset diperbarui
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Tambah tag ke semuanya"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } dari { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Tag"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Tag yang paling sering dipakai di antaranya"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] Edit { $count } aset
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] Edit semua { $count } hasil
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Hapus semua centang"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Lepas semua tag, lalu centang yang ingin dipertahankan"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Tambahkan ke koleksi"
@@ -3443,6 +3891,10 @@ translation = "pengaturan tidak valid: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob { $hash } tidak ditemukan"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "pencarian berdasarkan tampilan tidak bisa diedit sekaligus: pilih asetnya saja"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "tidak dapat membuat { $path }"
@@ -3462,6 +3914,10 @@ translation = "tidak dapat membaca { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "tidak dapat menulis ke { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "perubahan itu tidak ada di riwayat aset ini"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4055,6 +4511,10 @@ translation = "bukan hash hex blake3"
 source = "not a picture Hoard can read: { $reason }"
 translation = "bukan gambar yang dapat dibaca Hoard: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" bukan tag'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "salinan Hoard ini dibuat tanpa { $feature }"
@@ -4398,6 +4858,10 @@ translation = "{ $name } bukan SoundFont yang bisa dipakai MIDI: { $reason }"
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "tidak ada yang dicari; ketik nama paket"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } sudah ada di bawah { $tag }, jadi { $tag } tidak bisa ditaruh di bawahnya"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4921,6 +5385,98 @@ translation = "Yang dibacanya"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Tidak dapat membuat zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } melalui aplikasi"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } melalui asisten"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Sebuah aturan"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Seseorang"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: dikosongkan (sebelumnya { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Deskripsi"
+
+[messages.history-heading]
+source = "History"
+translation = "Riwayat"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Tidak dapat memuat riwayat: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Memuat…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Belum ada yang diubah di sini."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Urungkan"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Tidak dapat mengurungkan: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Kembalikan seperti sebelum perubahan ini"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Diurungkan: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Ditandai sudah ditinjau"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: diatur ke { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Tag { $tag } ditambahkan"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Tag { $tag } diubah"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Tag usulan { $tag } dipertahankan"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Tag { $tag } dilepas"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Ditandai belum ditinjau"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7233,6 +7789,17 @@ translation = "Tindakan lain untuk { $name }"
 source = "No packs match."
 translation = "Tidak ada paket yang cocok."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } aset punya lisensi sendiri: buat mengikuti lisensi paket juga
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Nama paket"
@@ -7276,6 +7843,33 @@ translation = "Jalankan ulang pemberi tag LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Jalankan ulang pemberi tag offline"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Sekarang"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Dibaca dari halaman saat menyimpan"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Sama"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Dari toko"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] Isi { $count } kolom
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7673,6 +8267,14 @@ translation = "duplikat sama mirip diubah-ukuran dikonversi ruang terbuang dupli
 source = "Dark theme: { $name }"
 translation = "Tema gelap: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Edit { $count } yang dipilih"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "ubah massal tag kategori lisensi rating"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Favorit"
@@ -7772,6 +8374,14 @@ translation = "Tidak ada yang cocok dengan “{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paket"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "Tempel tag yang disalin ke { $count } aset terpilih"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7897,10 +8507,6 @@ translation = "Hoard memakai { $hoard } dari prosesor, dan seluruh mesin { $mach
 source = "Couldn’t read the profiler: { $error }"
 translation = "Tidak dapat membaca profiler: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Memori"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "5% paling lambat"
@@ -7940,6 +8546,22 @@ translation = "Menunggu selagi jaringan menerima apa yang dikirim"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "berkas antarmuka itu sendiri"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } dari { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Puncak"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard memakai { $hoard } RAM, dan paling banyak { $peak } dalam sepuluh menit terakhir."
 
 [messages.profiler-request-count]
 source = """
@@ -8014,6 +8636,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Tidak ada yang berjalan di latar belakang."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Tidak dapat mengubah { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10260,6 +10886,14 @@ translation = "Tampilkan satu kanal"
 source = "Close"
 translation = "Tutup"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Salin tagnya"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Edit yang dipilih"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Tutup, kosongkan pilihan, atau tutup detail"
@@ -10296,6 +10930,10 @@ translation = "Buka detail"
 source = "Command palette: search, jump, run"
 translation = "Palet perintah: cari, lompat, jalankan"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Tempel tag yang disalin ke yang dipilih"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Putar atau jeda"
@@ -10303,6 +10941,10 @@ translation = "Putar atau jeda"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Putar atau hentikan suara"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Tandai sudah ditinjau, atau tidak"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10331,6 +10973,10 @@ translation = "Pemutar suara"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Awal atau akhir"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Tambah tag"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10866,6 +11512,141 @@ translation = "Berkas yang ada di lebih dari satu paket, atau bernama seperti be
 source = "Yours"
 translation = "Milik Anda"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Pertahankan tag { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Pertahankan tebakan ini sebagai tag Anda sendiri"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] Nama lama: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } aset"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Jelaskan arti tag ini…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Klik untuk mengubah"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Arti tag ini"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Untuk apa tag ini, apa yang termasuk di dalamnya. Enter untuk menyimpan."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Arti tag disimpan"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } digabungkan ke { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Lebih sempit:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Mencari { $tag } juga menemukan ini"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Taruh di bawah…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Taruh tag ini di bawah tag yang lebih luas: mencari tag itu juga akan menemukan ini"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Tag yang lebih luas, misalnya kendaraan"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Keluarkan { $tag } dari bawah { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } tidak lagi di bawah { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } sekarang ada di bawah { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Pilih gambar untuk tag ini"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Pilih salah satu asetnya untuk mewakilinya"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Tanpa gambar"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Tidak ada aset yang ditampilkan yang memiliki gambar."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Gambar dihapus"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Gambar diatur"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Ganti nama…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nama baru"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Beri nama baru, atau nama tag lain untuk menggabungkannya ke tag itu"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Tidak dapat menyimpan tag: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Tampilkan { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Di bawah"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Lepas; pemberi tag tidak akan memasangnya lagi"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Hapus tag { $tag }"
@@ -10885,6 +11666,18 @@ translation = "diukur dari berkas"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "dari pemberi tag offline"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "dulu { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Maksud Anda"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Tag baru"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11005,6 +11798,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Disimpan sebagai"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Lebih luas dan lebih sempit"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Tag yang ditaruh di bawah tag yang lebih luas dari halaman tag-nya. Mencari sebuah tag juga menemukan semua yang ada di bawahnya."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

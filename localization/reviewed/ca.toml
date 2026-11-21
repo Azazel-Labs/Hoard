@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "bd7cd34aed4768345a5f9fea614ee34f51ffb924aa266c18a1b392a66b52d3b0"
 
 [messages.about-blender]
@@ -724,53 +724,25 @@ translation = """
        *[other] { $count } recursos
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Esborra"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Conserva les proposades"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Esborra la categoria de tots els recursos seleccionats"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Conserva com a pròpies totes les etiquetes que les regles i la IA han posat als recursos seleccionats"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
 { $count ->
-        [one] S'ha esborrat la categoria de { $count } recurs
-       *[other] S'ha esborrat la categoria de { $count } recursos
+        [one] S'han conservat les etiquetes proposades de { $count } recurs
+       *[other] S'han conservat les etiquetes proposades de { $count } recursos
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Categoria per als recursos seleccionats (buida l'esborra)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Categoria"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-{ $count ->
-        [one] S'ha definit la categoria de { $count } recurs com a { $category }
-       *[other] S'ha definit la categoria de { $count } recursos com a { $category }
-    }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Defineix"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Defineix la categoria de tots els recursos seleccionats"
 
 [messages.app-bulk-failed]
 source = """
@@ -782,6 +754,26 @@ translation = """
 { $count ->
         [one] No s'ha pogut canviar aquest recurs: { $error }
        *[other] No s'han pogut canviar aquests { $count } recursos: { $error }
+    }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Marca com a revisats"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Marca els recursos seleccionats com a revisats: les regles i la IA deixaran en pau les seves etiquetes"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] S'ha marcat com a revisat { $count } recurs
+       *[other] S'han marcat com a revisats { $count } recursos
     }"""
 
 [messages.app-bulk-tag-add]
@@ -818,6 +810,26 @@ translation = """
 { $count ->
         [one] S'ha etiquetat { $count } recurs amb { $tag }
        *[other] S'han etiquetat { $count } recursos amb { $tag }
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Marca com a no revisats"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Treu la marca de revisat dels recursos seleccionats"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] S'ha tret la marca de revisat a { $count } recurs
+       *[other] S'ha tret la marca de revisat a { $count } recursos
     }"""
 
 [messages.app-bulk-untagged]
@@ -956,6 +968,18 @@ translation = "No s'han pogut generar els crèdits: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md dels paquets d'on provenen: qui els ha fet, les seves llicències i les línies de crèdit que demanen"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Obre la biblioteca amb { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "La biblioteca s'obre amb aquesta cerca. Fes clic per deixar-ho."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Obre la biblioteca amb aquesta cerca"
+
 [messages.app-done]
 source = "Done"
 translation = "Fet"
@@ -975,6 +999,14 @@ translation = "Cada fitxer o carpeta de primer nivell es converteix en un paquet
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Deixeu anar { $count } elements per afegir-los"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Edita…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Canvia les etiquetes i els camps de tots (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1135,6 +1167,14 @@ translation = "S'està carregant més"
 [messages.app-music]
 source = "Music"
 translation = "Música"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Per revisar"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Només els recursos que ningú no ha revisat encara (funciona amb els altres filtres)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1328,9 +1368,37 @@ translation = "Els que més hi sonen"
 source = "Best match"
 translation = "Millor coincidència"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Valorats"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Feu clic un altre cop per mostrar totes les valoracions"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } estrella o més
+       *[other] { $count } estrelles o més
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Treu de { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Canvia el nom"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nou nom per a { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1368,6 +1436,10 @@ translation = "Poseu-hi un nom"
 source = "Save search"
 translation = "Desa la cerca"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Desa com a nova"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Conserva aquesta cerca a Filtres, a Vostres"
@@ -1388,6 +1460,14 @@ translation = "Cerca noms, camins, etiquetes"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "S'ha desat «{ $name }»: és a Filtres, a Vostres"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'roca or pedra: una de les dues · -molsa: exclou-la · "molsa seca": aquestes paraules juntes'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "S'ha actualitzat «{ $name }»"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "S'està cercant…"
@@ -1404,6 +1484,18 @@ translation = "Selecciona"
 source = "Select all { $count }"
 translation = "Selecciona'ls tots ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Selecciona el resultat ({ $count })
+       *[other] Selecciona els { $count } resultats
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Trieu diversos recursos per etiquetar-los, categoritzar-los, afegir-los a una col·lecció, baixar-los o arxivar-los alhora (X, o Ctrl+clic)"
@@ -1411,6 +1503,18 @@ translation = "Trieu diversos recursos per etiquetar-los, categoritzar-los, afeg
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } seleccionats"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resultat seleccionat
+       *[other] Tots { $count } resultats seleccionats
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1432,6 +1536,10 @@ translation = "Ordena"
 source = "A to Z"
 translation = "De la A a la Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Primer les més ben valorades"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Creació"
@@ -1439,6 +1547,10 @@ translation = "Creació"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Primer els més grans"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Primer les pitjor valorades"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1451,6 +1563,10 @@ translation = "Primer els més recents"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Primer els més antics"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Valoració"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1515,6 +1631,66 @@ translation = "S'inclouen els fitxers auxiliars"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir. Les pàgines d’un full de sprites, i els sprites que el paquet també té com a imatges soltes, es mostren amb el full. Un recurs que el paquet té en diversos formats es mostra un sol cop, en el format que Hoard llegeix millor."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] S'ha copiat { $count } etiqueta
+       *[other] S'han copiat { $count } etiquetes
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } no té etiquetes per copiar"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Ja té aquestes etiquetes
+       *[other] Els { $count } ja tenen aquestes etiquetes
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "No s'ha copiat cap etiqueta. Prem C en un recurs per copiar-ne les etiquetes."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] S'ha afegit { $count } etiqueta
+               *[other] S'han afegit { $count } etiquetes
+            }
+       *[other]
+            { $count ->
+                [one] S'ha afegit { $count } etiqueta a { $assets } recursos
+               *[other] S'han afegit { $count } etiquetes a { $assets } recursos
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1587,6 +1763,14 @@ translation = "Hoard no respon: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Actualitza"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Actualitza «{ $name }»"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Conserva el que està triat ara en aquesta cerca desada"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1819,8 +2003,8 @@ source = "Animations"
 translation = "Animacions"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Aplica els canvis d'etiquetes, categoria i descripció a totes les { $count } variants"
+source = "Apply changes to all { $count } variants"
+translation = "Aplica els canvis a totes les { $count } variants"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1986,6 +2170,10 @@ translation = "Escriu una descripció"
 source = "Asset details"
 translation = "Detalls del recurs"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Detalls"
+
 [messages.asset-download]
 source = "Download"
 translation = "Baixa"
@@ -2033,6 +2221,62 @@ translation = "Afegeix als preferits (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Als vostres preferits (F el treu)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Afegeix"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Categoria"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "S'ha esborrat { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Edita { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "del paquet"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Llicència"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Com CC0 o CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Nom del camp"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Afegeix un camp"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Valoració"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Buit per eliminar-lo"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "S'ha desat { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Origen"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Valor"
 
 [messages.asset-file]
 source = "File"
@@ -2606,6 +2850,50 @@ translation = "{ $current } de { $duration }"
 source = "Previous asset"
 translation = "Recurs anterior"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } estrella
+       *[other] { $count } estrelles
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Valorat amb { $count ->
+        [one] { $count } estrella
+       *[other] { $count } estrelles
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Feu clic un altre cop per esborrar la valoració"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "S'ha esborrat la valoració"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Feu clic un altre cop per a { $count } estrella
+       *[other] Feu clic un altre cop per a { $count } estrelles
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "El .{ $ext } original estava desat dins d'aquest paquet, i Hoard l'ha extret."
@@ -2657,6 +2945,34 @@ translation = "variant"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Feu clic per canviar el nom"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Revisat"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "S'ha tret la marca de revisat"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "S'ha tret la marca de revisat a { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Marca com a revisat perquè les regles i la IA deixin en pau les seves etiquetes (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Marcat com a revisat"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "S'ha marcat { $name } com a revisat"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Revisat: les regles i la IA deixen en pau les seves etiquetes. Feu clic per treure la marca (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2742,10 +3058,6 @@ translation = "Cerca recursos amb { $hex }, { $percent } % d'aquesta imatge"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % de la imatge. Cerca recursos amb aquest color"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Afegeix"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Afegeix una etiqueta"
@@ -2758,9 +3070,69 @@ translation = "Afegiu una etiqueta, p. ex. mood:tense"
 source = "Removed { $tag }"
 translation = "S'ha tret { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Torna a posar { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "S'ha tornat a posar { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Afegeix { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Etiquetes"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Conserva { $count } proposta
+       *[other] Conserva les { $count } propostes
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Conserva com a pròpies totes les etiquetes proposades per les regles i la IA"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] S'ha conservat { $count } etiqueta proposada
+       *[other] S'han conservat { $count } etiquetes proposades
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+S'han afegit { $count ->
+        [one] { $count } etiqueta
+       *[other] { $count } etiquetes
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Els semblants tenen:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Rebutjades:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3332,6 +3704,106 @@ translation = "Cada fitxer tal com es va importar, amb el que necessita, en una 
 source = "Take { $name } out of the selection"
 translation = "Treu { $name } de la selecció"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Això canvia tots els resultats, també els que encara no s'han carregat, i no es pot desfer d'un sol cop."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Esborrat a tots"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Tanca"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Es deixa tal com està"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Barrejat, es deixa tal com està"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "No ha canviat res"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Torna a deixar-ho com estava"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Desa { $count } canvi
+       *[other] Desa { $count } canvis
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] S'ha actualitzat { $count } recurs
+       *[other] S'han actualitzat { $count } recursos
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Afegeix una etiqueta a tots"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } de { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Etiquetes"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Les etiquetes més usades entre ells"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Edita { $count } recurs
+       *[other] Edita { $count } recursos
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Edita { $count } resultat
+       *[other] Edita els { $count } resultats
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Desmarca-ho tot"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Treu totes les etiquetes i marca després les que vulguis conservar"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Afegeix a una col·lecció"
@@ -3532,6 +4004,10 @@ translation = "configuració incorrecta: { $reason }"
 source = "blob { $hash } not found"
 translation = "no s'ha trobat el blob { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "una cerca per aspecte no es pot editar tota alhora: selecciona els recursos"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "no es pot crear { $path }"
@@ -3551,6 +4027,10 @@ translation = "no es pot llegir { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "no es pot escriure a { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "aquest canvi no és a l'historial d'aquest recurs"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4144,6 +4624,10 @@ translation = "no és un hash blake3 hexadecimal"
 source = "not a picture Hoard can read: { $reason }"
 translation = "no és una imatge que Hoard pugui llegir: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "«{ $text }» no és una etiqueta"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "aquesta còpia de Hoard s'ha compilat sense { $feature }"
@@ -4487,6 +4971,10 @@ translation = "{ $name } no és un SoundFont amb què el MIDI pugui sonar: { $re
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "no hi ha res a cercar; escriviu el nom del paquet"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } ja és sota { $tag }, així que { $tag } no hi pot anar"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5021,6 +5509,98 @@ translation = "Què llegeix"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "No s'ha pogut crear el zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "IA"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } mitjançant una aplicació"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } mitjançant un assistent"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Una regla"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Algú"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: esborrat (era { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Descripció"
+
+[messages.history-heading]
+source = "History"
+translation = "Historial"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "No s'ha pogut carregar l'historial: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "S'està carregant…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Encara no s'hi ha canviat res."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Desfés"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "No s'ha pogut desfer: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Torna a deixar el que aquest canvi va modificar"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "S'ha desfet: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Marcat com a revisat"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: establert a { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Etiqueta { $tag } afegida"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Etiqueta { $tag } canviada"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Etiqueta suggerida { $tag } conservada"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Etiqueta { $tag } treta"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Marcat com a no revisat"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7380,6 +7960,18 @@ translation = "Més accions per a { $name }"
 source = "No packs match."
 translation = "No hi ha cap paquet que hi coincideixi."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } recurs té llicència pròpia: fes que segueixi també la del paquet
+       *[other] { $count } recursos tenen llicència pròpia: fes que segueixin també la del paquet
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Nom del paquet"
@@ -7423,6 +8015,34 @@ translation = "Torna a executar l'etiquetador LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Torna a executar l'etiquetador fora de línia"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Ara"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Es llegirà de la pàgina en desar"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Igual"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "De la botiga"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Omple { $count } camp
+       *[other] Omple { $count } camps
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7842,6 +8462,14 @@ translation = "duplicats iguals semblants redimensionats convertits espai malgas
 source = "Dark theme: { $name }"
 translation = "Tema fosc: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Edita els { $count } seleccionats"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "canvi massiu etiquetes categoria llicència valoració"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Preferits"
@@ -7941,6 +8569,18 @@ translation = "No hi ha cap coincidència per a «{ $query }»"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paquets"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Enganxa les etiquetes copiades al recurs seleccionat
+       *[other] Enganxa les etiquetes copiades als { $count } seleccionats
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8066,10 +8706,6 @@ translation = "Hoard fa servir el { $hoard } dels processadors, i tota la màqui
 source = "Couldn’t read the profiler: { $error }"
 translation = "No s'ha pogut llegir el perfilador: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Memòria"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "El 5 % més lent"
@@ -8109,6 +8745,22 @@ translation = "Esperant mentre la xarxa recull el que s'ha enviat"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "els fitxers de la mateixa interfície"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } de { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Màxim"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard fa servir { $hoard } de RAM, i n’ha fet servir com a màxim { $peak } en els darrers deu minuts."
 
 [messages.profiler-request-count]
 source = """
@@ -8185,6 +8837,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "No s'ha executat res en segon pla."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "No s'ha pogut canviar { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10454,6 +11110,14 @@ translation = "Mostra un sol canal"
 source = "Close"
 translation = "Tanca"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Copia'n les etiquetes"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Edita la selecció"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Tanca, esborra la selecció o tanca els detalls"
@@ -10490,6 +11154,10 @@ translation = "Obre els detalls"
 source = "Command palette: search, jump, run"
 translation = "Paleta d'ordres: cerca, salta, executa"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Enganxa les etiquetes copiades a la selecció"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Reprodueix o fa una pausa"
@@ -10497,6 +11165,10 @@ translation = "Reprodueix o fa una pausa"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Reprodueix o atura un so"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Marca com a revisat o no"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10525,6 +11197,10 @@ translation = "Reproductor de so"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Inici o final"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Afegeix una etiqueta"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11065,6 +11741,146 @@ translation = "Fitxers que són a més d'un paquet, o amb nom de fitxer de botig
 source = "Yours"
 translation = "Vostre"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Conserva l'etiqueta { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Conserva aquesta proposta com a etiqueta pròpia"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Nom antic: { $names }
+       *[other] Noms antics: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } recurs
+       *[other] { $count } recursos
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Digueu què vol dir aquesta etiqueta…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Feu clic per canviar-ho"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Què vol dir aquesta etiqueta"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Per a què serveix i què hi pertany. Enter desa."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "S'ha desat què vol dir l'etiqueta"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } s'ha fusionat amb { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Més específiques:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "En cercar { $tag }, també es troben aquestes"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Posa sota…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Poseu aquesta etiqueta sota una de més àmplia: en cercar-la, també es trobaran aquestes"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Una etiqueta més àmplia, com ara vehicle"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Treu { $tag } de sota { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } ja no és sota { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } ara és sota { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Trieu una imatge per a aquesta etiqueta"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Trieu un dels seus recursos perquè la representi"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Sense imatge"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Cap dels recursos mostrats té imatge."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Imatge treta"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Imatge definida"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Canvia el nom…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nom nou"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Poseu-li un nom nou, o el nom d'una altra etiqueta per fusionar-la amb aquella"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "No s'ha pogut desar l'etiqueta: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Mostra { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Sota"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Treu-la; l'etiquetador no la tornarà a posar"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Treu l'etiqueta { $tag }"
@@ -11084,6 +11900,18 @@ translation = "mesurada a partir del fitxer"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "de l'etiquetador fora de línia"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "abans { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Volies dir"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Etiqueta nova"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11212,6 +12040,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "S'ha desat com a"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Més àmplies i més específiques"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Etiquetes posades sota altres de més àmplies des de les seves pàgines. En cercar una etiqueta, també es troba tot el que té a sota."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

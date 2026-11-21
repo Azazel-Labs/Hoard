@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "dbfdb160954897a3050083ea51198e41df631fe78dd356d68112fc6eb1484d1a"
 
 [messages.about-blender]
@@ -728,57 +728,27 @@ translation = """
        *[other] { $count } ресурсу
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Очистити"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Залишити припущення"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Очистити категорію кожного вибраного ресурсу"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Залишити як власні всі теги, які правила та ШІ поставили вибраним ресурсам"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
-Категорію { $count ->
-        [one] { $count } ресурсу
-        [few] { $count } ресурсів
-        [many] { $count } ресурсів
-       *[other] { $count } ресурсу
-    } очищено"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Категорія для вибраних ресурсів (порожнє поле очищає її)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Категорія"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-Категорію { $count ->
-        [one] { $count } ресурсу
-        [few] { $count } ресурсів
-        [many] { $count } ресурсів
-       *[other] { $count } ресурсу
-    } змінено на { $category }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Задати"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Задати категорію кожному вибраному ресурсу"
+Припущені теги залишено в { $count ->
+        [one] { $count } ресурсі
+        [few] { $count } ресурсах
+        [many] { $count } ресурсах
+       *[other] { $count } ресурсі
+    }"""
 
 [messages.app-bulk-failed]
 source = """
@@ -794,6 +764,28 @@ translation = """
         [many] ці { $count } ресурсів
        *[other] ці { $count } ресурсу
     }: { $error }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Позначити переглянутим"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Позначити вибрані ресурси як переглянуті: після цього правила та ШІ не чіпають їхніх тегів"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+Позначено переглянутими { $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурси
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }"""
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -827,6 +819,28 @@ Tagged { $count ->
     } with { $tag }"""
 translation = """
 Тег { $tag } додано до { $count ->
+        [one] { $count } ресурсу
+        [few] { $count } ресурсів
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Позначити непереглянутим"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Зняти позначку «переглянуто» з вибраних ресурсів"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+Позначку «переглянуто» знято з { $count ->
         [one] { $count } ресурсу
         [few] { $count } ресурсів
         [many] { $count } ресурсів
@@ -973,6 +987,18 @@ translation = "Не вдалося скласти список авторів: {
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md для пакетів, з яких вони походять: хто їх створив, їхні ліцензії та рядки подяки, про які просять автори"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Відкривати бібліотеку з пошуком { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Бібліотека відкривається з цим пошуком. Натисніть, щоб вимкнути."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Відкривати бібліотеку з цим пошуком"
+
 [messages.app-done]
 source = "Done"
 translation = "Готово"
@@ -998,6 +1024,14 @@ translation = """
         [many] Відпустіть, щоб додати { $count } елементів
        *[other] Відпустіть, щоб додати { $count } елемента
     }"""
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Редагувати…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Змінити теги та поля всіх (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1164,6 +1198,14 @@ translation = "Завантаження…"
 [messages.app-music]
 source = "Music"
 translation = "Музика"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Потребує перегляду"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Лише ресурси, які ще ніхто не переглядав (працює разом з іншими фільтрами)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1357,9 +1399,39 @@ translation = "Найбільш схожі"
 source = "Best match"
 translation = "Найкращий збіг"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Оцінені"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Клацніть ще раз, щоб показати всі оцінки"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } зірка і більше
+        [few] { $count } зірки і більше
+        [many] { $count } зірок і більше
+       *[other] { $count } зірки і більше
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Вилучити з { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Перейменувати"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Нова назва для { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1397,6 +1469,10 @@ translation = "Назвіть його"
 source = "Save search"
 translation = "Зберегти пошук"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Зберегти як новий"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Зберегти цей пошук у «Фільтри» → «Ваше»"
@@ -1417,6 +1493,14 @@ translation = "Шукайте за назвами, шляхами, тегами"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Збережено «{ $name }»: шукайте у «Фільтри» → «Ваше»"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'скеля or камінь: одне з двох · -мох: виключити · "сухий мох": ці слова разом'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Оновлено «{ $name }»"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Пошук…"
@@ -1433,6 +1517,20 @@ translation = "Вибрати"
 source = "Select all { $count }"
 translation = "Вибрати всі ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Вибрати { $count } результат
+        [few] Вибрати всі { $count } результати
+        [many] Вибрати всі { $count } результатів
+       *[other] Вибрати всі { $count } результату
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Виберіть кілька ресурсів, щоб разом додати теги, категорію, колекцію, завантажити або перенести в архів (X або Ctrl+клацання)"
@@ -1440,6 +1538,20 @@ translation = "Виберіть кілька ресурсів, щоб разом
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "Вибрано: { $count }"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] Вибрано { $count } результат
+        [few] Вибрано { $count } результати
+        [many] Вибрано { $count } результатів
+       *[other] Вибрано { $count } результату
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1461,6 +1573,10 @@ translation = "Сортування"
 source = "A to Z"
 translation = "Від А до Я"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Спершу найвище оцінені"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Створено"
@@ -1468,6 +1584,10 @@ translation = "Створено"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Спершу найбільші"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Спершу найнижче оцінені"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1480,6 +1600,10 @@ translation = "Спершу нові"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Спершу старі"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Оцінка"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1553,6 +1677,72 @@ translation = "Разом із допоміжними файлами"
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Буфери glTF, бібліотеки матеріалів, карти матеріалів, матеріали лише однієї моделі та файли магазинів, що описують моделі. Вони завантажуються разом із тим, що їх використовує. Сторінки спрайт-аркуша та його спрайти, що є в наборі й окремими зображеннями, показуються разом з аркушем. Ресурс, що є в наборі в кількох форматах, показується один раз, у форматі, який Hoard читає найкраще."
 
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Скопійовано { $count } тег
+        [few] Скопійовано { $count } теги
+        [many] Скопійовано { $count } тегів
+       *[other] Скопійовано { $count } тега
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "У { $name } немає тегів для копіювання"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [1] Ці теги в нього вже є
+       *[other] Ці теги вже є в усіх { $count }
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Теги не скопійовано. Натисніть C на ресурсі, щоб скопіювати його теги."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [1]
+            { $count ->
+                [one] Додано { $count } тег
+                [few] Додано { $count } теги
+                [many] Додано { $count } тегів
+               *[other] Додано { $count } тега
+            }
+       *[other]
+            { $count ->
+                [one] Додано { $count } тег до { $assets } ресурсів
+                [few] Додано { $count } теги до { $assets } ресурсів
+                [many] Додано { $count } тегів до { $assets } ресурсів
+               *[other] Додано { $count } тега до { $assets } ресурсів
+            }
+    }"""
+
 [messages.app-tempo]
 source = "BPM"
 translation = "BPM"
@@ -1624,6 +1814,14 @@ translation = "Hoard не відповідає: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Оновити"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Оновити «{ $name }»"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Зберегти поточний вибір у цьому збереженому пошуку"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1868,13 +2066,13 @@ source = "Animations"
 translation = "Анімації"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
+source = "Apply changes to all { $count } variants"
 translation = """
 { $count ->
-        [one] Застосувати зміни тегів, категорії та опису до { $count } варіанта
-        [few] Застосувати зміни тегів, категорії та опису до всіх { $count } варіантів
-        [many] Застосувати зміни тегів, категорії та опису до всіх { $count } варіантів
-       *[other] Застосувати зміни тегів, категорії та опису до всіх { $count } варіанта
+        [one] Застосувати зміни до { $count } варіанта
+        [few] Застосувати зміни до всіх { $count } варіантів
+        [many] Застосувати зміни до всіх { $count } варіантів
+       *[other] Застосувати зміни до всіх { $count } варіанта
     }"""
 
 [messages.asset-archive]
@@ -2047,6 +2245,10 @@ translation = "Написати опис"
 source = "Asset details"
 translation = "Відомості про ресурс"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Подробиці"
+
 [messages.asset-download]
 source = "Download"
 translation = "Завантажити"
@@ -2098,6 +2300,62 @@ translation = "Додати в обране (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "В обраному (F прибирає звідти)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Додати"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Категорія"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Очищено { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Змінити { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "з пакета"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Ліцензія"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Наприклад, CC0 або CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Назва поля"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Додати поле"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Оцінка"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Порожнє поле видаляє його"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Збережено { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Джерело"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Значення"
 
 [messages.asset-file]
 source = "File"
@@ -2681,6 +2939,56 @@ translation = "{ $current } з { $duration }"
 source = "Previous asset"
 translation = "Попередній ресурс"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } зірка
+        [few] { $count } зірки
+        [many] { $count } зірок
+       *[other] { $count } зірки
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+Оцінено на { $count ->
+        [one] { $count } зірку
+        [few] { $count } зірки
+        [many] { $count } зірок
+       *[other] { $count } зірки
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Клацніть ще раз, щоб очистити оцінку"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Оцінку очищено"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Клацніть ще раз: { $count } зірка
+        [few] Клацніть ще раз: { $count } зірки
+        [many] Клацніть ще раз: { $count } зірок
+       *[other] Клацніть ще раз: { $count } зірки
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Оригінальний .{ $ext } зберігався всередині цього пакунка, і Hoard витягнув його."
@@ -2732,6 +3040,34 @@ translation = "варіант"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Клацніть, щоб перейменувати"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Переглянуто"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Позначку «переглянуто» знято"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "З ресурсу { $name } знято позначку «переглянуто»"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Позначити як переглянутий, щоб правила та ШІ не чіпали його тегів (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Позначено переглянутим"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "Ресурс { $name } позначено переглянутим"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Переглянуто: правила та ШІ не чіпають його тегів. Клацніть, щоб зняти позначку (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2817,10 +3153,6 @@ translation = "Знайти ресурси з { $hex }, { $percent }% цього
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% зображення. Знайти ресурси з цим кольором"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Додати"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Додати тег"
@@ -2833,9 +3165,75 @@ translation = "Додайте тег, напр. mood:tense"
 source = "Removed { $tag }"
 translation = "Тег { $tag } прибрано"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Повернути { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Повернуто { $tag }"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Додати { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Теги"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+Залишити { $count ->
+        [one] { $count } припущення
+        [few] { $count } припущення
+        [many] { $count } припущень
+       *[other] { $count } припущення
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Залишити як власні всі теги, які припустили правила та ШІ"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+Залишено { $count ->
+        [one] { $count } припущений тег
+        [few] { $count } припущені теги
+        [many] { $count } припущених тегів
+       *[other] { $count } припущеного тега
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Додано: { $count ->
+        [one] { $count } тег
+        [few] { $count } теги
+        [many] { $count } тегів
+       *[other] { $count } тегу
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "У схожих є:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Відхилені:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3411,6 +3809,114 @@ translation = "Кожен файл у тому вигляді, в якому й�
 source = "Take { $name } out of the selection"
 translation = "Прибрати { $name } з вибору"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Це змінить усі результати, зокрема ще не завантажені, і скасувати це одним кроком не можна."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Очищено в усіх"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Закрити"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Не змінюється"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Різні значення, не змінюються"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Нічого не змінено"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Повернути як було"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Зберегти { $count } зміну
+        [few] Зберегти { $count } зміни
+        [many] Зберегти { $count } змін
+       *[other] Зберегти { $count } зміни
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Оновлено { $count } ресурс
+        [few] Оновлено { $count } ресурси
+        [many] Оновлено { $count } ресурсів
+       *[other] Оновлено { $count } ресурсу
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Додати тег усім"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } з { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Теги"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Найуживаніші теги серед них"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Редагувати { $count } ресурс
+        [few] Редагувати { $count } ресурси
+        [many] Редагувати { $count } ресурсів
+       *[other] Редагувати { $count } ресурсу
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Редагувати { $count } результат
+        [few] Редагувати всі { $count } результати
+        [many] Редагувати всі { $count } результатів
+       *[other] Редагувати всі { $count } результату
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Зняти всі позначки"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Прибрати всі теги, а потім позначити ті, що треба залишити"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Додати до колекції"
@@ -3611,6 +4117,10 @@ translation = "неправильне налаштування: { $reason }"
 source = "blob { $hash } not found"
 translation = "блоб { $hash } не знайдено"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "пошук за виглядом не можна змінити цілком: виберіть ассети вручну"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "не вдалося створити { $path }"
@@ -3630,6 +4140,10 @@ translation = "не вдалося прочитати { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "не вдалося записати в { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "цієї зміни немає в історії цього ассета"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4229,6 +4743,10 @@ translation = "це не хеш blake3 у шістнадцятковому ви�
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard не може прочитати це зображення: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "«{ $text }» не є тегом"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "цю копію Hoard зібрано без { $feature }"
@@ -4572,6 +5090,10 @@ translation = "{ $name } — не SoundFont, з яким може грати MID
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "немає чого шукати; введіть назву пакета"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } уже під { $tag }, тому { $tag } не можна помістити під нього"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5113,6 +5635,98 @@ translation = "Що він читає"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Не вдалося створити zip: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "ШІ"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } через застосунок"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } через асистента"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Правило"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Хтось"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: очищено (було { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Опис"
+
+[messages.history-heading]
+source = "History"
+translation = "Історія"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Не вдалося завантажити історію: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Завантаження…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Тут ще нічого не змінювали."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Скасувати"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Не вдалося скасувати: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Повернути те, що змінила ця зміна"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Скасовано: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Позначено як перевірене"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: встановлено { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Додано тег { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Змінено тег { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Залишено запропонований тег { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Знято тег { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Позначено як неперевірене"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7540,6 +8154,20 @@ translation = "Інші дії з { $name }"
 source = "No packs match."
 translation = "Немає відповідних пакетів."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+        [few] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+        [many] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+       *[other] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Назва пакета"
@@ -7583,6 +8211,36 @@ translation = "Знову запустити LLM-тегувальник"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Знову запустити офлайн-тегувальник"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Зараз"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Під час збереження буде прочитано зі сторінки"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Однаково"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "З магазину"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Заповнити { $count } поле
+        [few] Заповнити { $count } поля
+        [many] Заповнити { $count } полів
+       *[other] Заповнити { $count } поля
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -8028,6 +8686,14 @@ translation = "дублікати однакові схожі зменшені �
 source = "Dark theme: { $name }"
 translation = "Темна тема: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Редагувати вибрані ({ $count })"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "масова зміна теги категорія ліцензія оцінка"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Обране"
@@ -8127,6 +8793,18 @@ translation = "За запитом «{ $query }» нічого не знайде
 [messages.palette-packs]
 source = "Packs"
 translation = "Пакети"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [1] Вставити скопійовані теги до вибраного ресурсу
+       *[other] Вставити скопійовані теги до { $count } вибраних
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8258,10 +8936,6 @@ translation = "Hoard використовує { $hoard } процесорів, �
 source = "Couldn’t read the profiler: { $error }"
 translation = "Не вдалося прочитати профілювальник: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Пам’ять"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Найповільніші 5%"
@@ -8301,6 +8975,22 @@ translation = "Очікування, поки мережа прийме наді
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "власні файли інтерфейсу"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "ОЗП"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } з { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Пік"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard використовує { $hoard } ОЗП, а за останні десять хвилин — щонайбільше { $peak }."
 
 [messages.profiler-request-count]
 source = """
@@ -8381,6 +9071,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "У фоні нічого не виконувалося."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Не вдалося змінити { $name }: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10696,6 +11390,14 @@ translation = "Показати один канал"
 source = "Close"
 translation = "Закрити"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Скопіювати його теги"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Редагувати вибране"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Закрити, скасувати вибір або закрити відомості"
@@ -10732,6 +11434,10 @@ translation = "Відкрити відомості"
 source = "Command palette: search, jump, run"
 translation = "Палітра команд: пошук, перехід, виконання"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Вставити скопійовані теги до вибраного"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Відтворити або призупинити"
@@ -10739,6 +11445,10 @@ translation = "Відтворити або призупинити"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Відтворити або зупинити звук"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Позначити як переглянутий або зняти позначку"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10767,6 +11477,10 @@ translation = "Звуковий програвач"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "На початок або в кінець"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Додати тег"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11341,6 +12055,150 @@ translation = "Файли, що є в кількох пакетах або на�
 source = "Yours"
 translation = "Ваш"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Залишити тег { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Залишити це припущення як власний тег"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Стара назва: { $names }
+        [few] Старі назви: { $names }
+        [many] Старі назви: { $names }
+       *[other] Старі назви: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурси
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Напишіть, що означає цей тег…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Натисніть, щоб змінити"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Що означає цей тег"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Для чого він, що до нього належить. Enter зберігає."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Значення тега збережено"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } об’єднано з { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Вужчі:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "При пошуку { $tag } знайдуться й ці"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Помістити під…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Помістіть цей тег під ширший: при пошуку ширшого знайдуться й ці"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Ширший тег, наприклад транспорт"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Прибрати { $tag } з-під { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } більше не під { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } тепер під { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Вибрати зображення для цього тега"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Виберіть один з його ресурсів, який його представлятиме"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Без зображення"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Жоден із показаних ресурсів не має зображення."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Зображення прибрано"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Зображення встановлено"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Перейменувати…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Нова назва"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Дайте йому нову назву або назву іншого тега, щоб об’єднати з ним"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Не вдалося зберегти тег: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Показати { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Під"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Прибрати; тегувальник не поверне його"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Прибрати тег { $tag }"
@@ -11360,6 +12218,18 @@ translation = "виміряно з файлу"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "від офлайн-тегувальника"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "раніше { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Ви мали на увазі"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Новий тег"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11510,6 +12380,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Збережено як"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Ширші й вужчі"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Теги, поміщені під ширші на своїх сторінках. При пошуку тега знаходиться й усе, що під ним."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

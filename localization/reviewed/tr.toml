@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "{ $count } varlık"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Temizle"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Tahminleri tut"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Seçili her varlığın kategorisini temizle"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Kuralların ve yapay zekânın seçili varlıklara koyduğu her etiketi kendi etiketiniz olarak tutun"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "{ $count } varlığın kategorisi temizlendi"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Seçili varlıkların kategorisi (boş bırakmak temizler)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Kategori"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "{ $count } varlığın kategorisi { $category } olarak ayarlandı"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Ayarla"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Seçili her varlığın kategorisini ayarla"
+translation = "{ $count } varlıktaki tahmin edilen etiketler tutuldu"
 
 [messages.app-bulk-failed]
 source = """
@@ -767,6 +743,22 @@ translation = """
         [one] Bu varlık değiştirilemedi: { $error }
        *[other] Bu { $count } varlık değiştirilemedi: { $error }
     }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "İncelendi say"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Seçili varlıkları gözden geçirilmiş olarak işaretleyin: bundan sonra kurallar ve yapay zekâ etiketlerine dokunmaz"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "{ $count } varlık incelendi olarak işaretlendi"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -799,6 +791,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "{ $count } varlığa { $tag } etiketi eklendi"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "İncelenmedi say"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Seçili varlıklardan incelendi işaretini kaldırın"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } varlığın incelendi işareti kaldırıldı"
 
 [messages.app-bulk-untagged]
 source = """
@@ -928,6 +936,18 @@ translation = "Emeği geçenler listesi oluşturulamadı: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "Bunların geldiği paketler için CREDITS.md: onları kimin yaptığı, lisansları ve istedikleri emek satırları"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Kütüphaneyi { $name } ile aç"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Kütüphane bu aramayla açılır. Durdurmak için tıkla."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Kütüphaneyi bu aramayla aç"
+
 [messages.app-done]
 source = "Done"
 translation = "Bitti"
@@ -947,6 +967,14 @@ translation = "Her üst düzey dosya ya da klasör kendi paketi olur. Gigabaytla
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Eklemek için { $count } öğeyi bırakın"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Düzenle…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Hepsinin etiketlerini ve alanlarını değiştir (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1107,6 +1135,14 @@ translation = "Daha fazlası yükleniyor"
 [messages.app-music]
 source = "Music"
 translation = "Müzik"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "İnceleme bekliyor"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Yalnızca henüz kimsenin incelemediği varlıklar (diğer filtrelerle birlikte çalışır)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1300,9 +1336,37 @@ translation = "En çok benzeyenler"
 source = "Best match"
 translation = "En iyi eşleşme"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Puanlı"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Tüm puanları göstermek için yeniden tıklayın"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } yıldız veya üzeri
+       *[other] { $count } yıldız veya üzeri
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "{ $name } koleksiyonundan çıkar"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Yeniden adlandır"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "{ $name } için yeni ad"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1340,6 +1404,10 @@ translation = "Ad verin"
 source = "Save search"
 translation = "Aramayı kaydet"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Yeni olarak kaydet"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Bu aramayı Filtreler’de, Kişisel altında tut"
@@ -1360,6 +1428,14 @@ translation = "Ad, yol ya da etiket ara"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” kaydedildi: Filtreler’de, Kişisel altında"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "“{ $name }” güncellendi"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Aranıyor…"
@@ -1376,6 +1452,18 @@ translation = "Seç"
 source = "Select all { $count }"
 translation = "Tümünü seç ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sonucu seç
+       *[other] { $count } sonucun tümünü seç
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Birlikte etiketlemek, kategorilemek, koleksiyona eklemek, indirmek ya da arşivlemek için birkaç varlık seçin (X ya da Ctrl ile tıklama)"
@@ -1383,6 +1471,18 @@ translation = "Birlikte etiketlemek, kategorilemek, koleksiyona eklemek, indirme
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } seçili"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sonuç seçildi
+       *[other] { $count } sonucun tümü seçildi
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1404,6 +1504,10 @@ translation = "Sırala"
 source = "A to Z"
 translation = "A'dan Z'ye"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Önce en yüksek puanlı"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Oluşturulma"
@@ -1411,6 +1515,10 @@ translation = "Oluşturulma"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Önce en büyük"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Önce en düşük puanlı"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1423,6 +1531,10 @@ translation = "Önce en yeni"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Önce en eski"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Puan"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1483,6 +1595,66 @@ translation = "Yardımcı dosyalar dahil"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF arabellekleri, malzeme kütüphaneleri, malzemelerin haritaları, yalnızca tek bir modelin kullandığı malzemeler ve modelleri tanımlayan mağaza dosyaları. Onları kullanan şeyi indirdiğinizde birlikte gelirler. Bir sprite sayfasının sayfaları ve paketin ayrı görseller olarak da içerdiği spriteları sayfayla birlikte gösterilir. Paketin birkaç biçimde içerdiği bir varlık, Hoard’un en iyi okuduğu biçimde bir kez gösterilir."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } etiket kopyalandı
+       *[other] { $count } etiket kopyalandı
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } için kopyalanacak etiket yok"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Bu etiketlere zaten sahip
+       *[other] { $count } varlığın hepsinde bu etiketler zaten var
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Kopyalanmış etiket yok. Etiketlerini kopyalamak için bir varlıkta C'ye bas."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] { $count } etiket eklendi
+               *[other] { $count } etiket eklendi
+            }
+       *[other]
+            { $count ->
+                [one] { $count } etiket { $assets } varlığa eklendi
+               *[other] { $count } etiket { $assets } varlığa eklendi
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1555,6 +1727,14 @@ translation = "Hoard yanıt vermiyor: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Güncelle"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "“{ $name }” aramasını güncelle"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Şu an seçili olanları bu kayıtlı aramada tut"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1764,8 +1944,8 @@ source = "Animations"
 translation = "Animasyonlar"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Etiket, kategori ve açıklama değişikliklerini { $count } varyantın tümüne uygula"
+source = "Apply changes to all { $count } variants"
+translation = "Değişiklikleri { $count } varyantın tümüne uygula"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1931,6 +2111,10 @@ translation = "Bir açıklama yazın"
 source = "Asset details"
 translation = "Varlık ayrıntıları"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Ayrıntılar"
+
 [messages.asset-download]
 source = "Download"
 translation = "İndir"
@@ -1974,6 +2158,62 @@ translation = "Favorilerinize ekleyin (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Favorilerinizde (F ile çıkarılır)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Ekle"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Kategori"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field } temizlendi"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "{ $field } alanını düzenle"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "paketten"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Lisans"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "CC0 ya da CC-BY 4.0 gibi"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Alan adı"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Alan ekle"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Puan"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Kaldırmak için boş bırakın"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field } kaydedildi"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Kaynak"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Değer"
 
 [messages.asset-file]
 source = "File"
@@ -2535,6 +2775,42 @@ translation = "{ $current } / { $duration }"
 source = "Previous asset"
 translation = "Önceki varlık"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "{ $count } yıldız"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "{ $count } yıldız verildi"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Puanı temizlemek için yeniden tıklayın"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Puan temizlendi"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } yıldız için yeniden tıklayın
+       *[other] { $count } yıldız için yeniden tıklayın
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Özgün .{ $ext } dosyası bu paketin içinde saklanıyordu ve Hoard onu çıkardı."
@@ -2586,6 +2862,34 @@ translation = "varyant"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Yeniden adlandırmak için tıklayın"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "İncelendi"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "İncelendi işareti kaldırıldı"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "{ $name } için incelendi işareti kaldırıldı"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "İncelendi olarak işaretleyin; kurallar ve yapay zekâ etiketlerine dokunmasın (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "İncelendi olarak işaretlendi"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } incelendi olarak işaretlendi"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "İncelendi: kurallar ve yapay zekâ etiketlerine dokunmaz. İşareti kaldırmak için tıklayın (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2671,10 +2975,6 @@ translation = "{ $hex } rengine sahip varlıkları bul (bu resmin %{ $percent } 
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, resmin %{ $percent } kadarı. Bu renkteki varlıkları bul"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Ekle"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Etiket ekle"
@@ -2687,9 +2987,57 @@ translation = "Bir etiket ekleyin, ör. mood:tense"
 source = "Removed { $tag }"
 translation = "Kaldırıldı: { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "{ $tag } etiketini geri ekle"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } geri eklendi"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "{ $tag } ekle"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Etiketler"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "{ $count } tahminin tümünü tut"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Kuralların ve yapay zekânın tahmin ettiği her etiketi kendi etiketiniz olarak tutun"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "{ $count } tahmin edilen etiket tutuldu"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "{ $count } etiket eklendi"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Benzerlerinde şunlar var:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Reddedilenler:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3253,6 +3601,106 @@ translation = "Her dosya içe aktarıldığı gibi, ihtiyaç duyduklarıyla birl
 source = "Take { $name } out of the selection"
 translation = "{ $name } öğesini seçimden çıkar"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Bu, henüz yüklenmemiş olanlar dahil tüm sonuçları değiştirir ve tek adımda geri alınamaz."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Hepsinde temizlendi"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Kapat"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Olduğu gibi bırakılır"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Karışık, olduğu gibi bırakılır"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Hiçbir şey değişmedi"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Eski haline getir"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } değişikliği kaydet
+       *[other] { $count } değişikliği kaydet
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } varlık güncellendi
+       *[other] { $count } varlık güncellendi
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Hepsine etiket ekle"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $count } içinde { $have }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Etiketler"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Bunlar arasında en çok kullanılan etiketler"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } varlığı düzenle
+       *[other] { $count } varlığı düzenle
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sonucu düzenle
+       *[other] { $count } sonucun tümünü düzenle
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Tüm işaretleri kaldır"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Tüm etiketleri kaldır, sonra tutulacakları işaretle"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Koleksiyona ekle"
@@ -3453,6 +3901,10 @@ translation = "hatalı ayar: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob bulunamadı: { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "görünüme göre arama tek seferde düzenlenemez: bunun yerine varlıkları seçin"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "oluşturulamıyor: { $path }"
@@ -3472,6 +3924,10 @@ translation = "okunamıyor: { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "yazılamıyor: { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "bu değişiklik bu varlığın geçmişinde yok"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4065,6 +4521,10 @@ translation = "bu bir blake3 onaltılık özeti değil"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard’un okuyabildiği bir resim değil: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" bir etiket değil'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "Hoard'un bu kopyası { $feature } olmadan derlendi"
@@ -4408,6 +4868,10 @@ translation = "{ $name }, MIDI’nin çalabileceği bir SoundFont değil: { $rea
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "aranacak bir şey yok; paketin adını yazın"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } zaten { $tag } altında, bu yüzden { $tag } onun altına konamaz"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4931,6 +5395,98 @@ translation = "Ne okuyor"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip oluşturulamadı: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "Yapay zekâ"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who }, bir uygulama aracılığıyla"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who }, bir asistan aracılığıyla"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Bir kural"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Biri"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: temizlendi (önceki: { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Açıklama"
+
+[messages.history-heading]
+source = "History"
+translation = "Geçmiş"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Geçmiş yüklenemedi: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Yükleniyor…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Burada henüz bir şey değiştirilmedi."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Geri al"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Geri alınamadı: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Bu değişikliğin değiştirdiğini eski haline getir"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Geri alındı: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "İncelendi olarak işaretlendi"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: { $to } olarak ayarlandı"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "{ $tag } etiketi eklendi"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "{ $tag } etiketi değiştirildi"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Önerilen { $tag } etiketi korundu"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "{ $tag } etiketi kaldırıldı"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "İncelenmedi olarak işaretlendi"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7243,6 +7799,17 @@ translation = "{ $name } için diğer eylemler"
 source = "No packs match."
 translation = "Eşleşen paket yok."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } varlığın kendi lisansı var: paketin lisansını da kullansın
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Paket adı"
@@ -7286,6 +7853,33 @@ translation = "LLM etiketleyiciyi yeniden çalıştır"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Çevrim dışı etiketleyiciyi yeniden çalıştır"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Şimdi"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Kaydederken sayfadan okunur"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Aynı"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Mağazadan"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } alanı doldur
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7683,6 +8277,14 @@ translation = "yinelenen aynı benzer boyutlandırılmış dönüştürülmüş 
 source = "Dark theme: { $name }"
 translation = "Koyu tema: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Seçili { $count } öğeyi düzenle"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "toplu değişiklik etiketler kategori lisans puan"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Favoriler"
@@ -7782,6 +8384,18 @@ translation = "“{ $query }” ile eşleşen bir şey yok"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paketler"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Kopyalanan etiketleri seçili varlığa yapıştır
+       *[other] Kopyalanan etiketleri seçili { $count } varlığa yapıştır
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7907,10 +8521,6 @@ translation = "Hoard işlemcilerin { $hoard } kadarını, tüm makine ise { $mac
 source = "Couldn’t read the profiler: { $error }"
 translation = "Profil oluşturucu okunamadı: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Bellek"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "En yavaş %5"
@@ -7950,6 +8560,22 @@ translation = "Ağın gönderileni almasını bekleme"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "arayüzün kendi dosyaları"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Zirve"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard { $hoard } RAM kullanıyor; son on dakikada en fazla { $peak } kullandı."
 
 [messages.profiler-request-count]
 source = """
@@ -8026,6 +8652,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Arka planda hiçbir şey çalışmadı."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "{ $name } değiştirilemedi: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10287,6 +10917,14 @@ translation = "Tek bir kanalı göster"
 source = "Close"
 translation = "Kapat"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Etiketlerini kopyala"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Seçilenleri düzenle"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Kapat, seçimi temizle ya da ayrıntıları kapat"
@@ -10323,6 +10961,10 @@ translation = "Ayrıntıları aç"
 source = "Command palette: search, jump, run"
 translation = "Komut paleti: ara, atla, çalıştır"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Kopyalanan etiketleri seçililere yapıştır"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Oynat ya da duraklat"
@@ -10330,6 +10972,10 @@ translation = "Oynat ya da duraklat"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Bir sesi çal ya da durdur"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "İncelendi olarak işaretle ya da işareti kaldır"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10358,6 +11004,10 @@ translation = "Ses oynatıcı"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Başa ya da sona git"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Etiket ekle"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10893,6 +11543,141 @@ translation = "Birden fazla pakette bulunan ya da bir mağazanınki gibi adland�
 source = "Yours"
 translation = "Sizin"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "{ $tag } etiketini tut"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Bu tahmini kendi etiketiniz olarak tutun"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] Eski ad: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } varlık"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Bu etiketin ne anlama geldiğini yazın…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Değiştirmek için tıklayın"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Bu etiketin anlamı"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Ne için olduğu, hangilerinin buraya ait olduğu. Enter kaydeder."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Etiketin anlamı kaydedildi"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag }, { $into } ile birleştirildi."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Daha dar:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "{ $tag } aranınca bunlar da bulunur"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Altına koy…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Bu etiketi daha geniş bir etiketin altına koyun: onu aradığınızda bunlar da bulunur"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Daha geniş bir etiket, örneğin araç"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "{ $tag } etiketini { $parent } altından çıkar"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } artık { $parent } altında değil"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } artık { $parent } altında"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Bu etiket için bir resim seçin"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Onu temsil etmesi için varlıklarından birini seçin"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Resim yok"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Gösterilen varlıkların hiçbirinde resim yok."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Resim kaldırıldı"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Resim ayarlandı"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Yeniden adlandır…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Yeni ad"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Ona yeni bir ad verin ya da birleştirileceği başka bir etiketin adını yazın"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Etiket kaydedilemedi: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "{ $tag } etiketini göster"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Altında"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Kaldırın; etiketleyici geri eklemez"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "{ $tag } etiketini kaldır"
@@ -10912,6 +11697,18 @@ translation = "dosyadan ölçüldü"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "çevrim dışı etiketleyiciden"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "eskiden { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Şunu mu demek istediniz"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Yeni etiket"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11032,6 +11829,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Kaydedilen ad:"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Daha geniş ve daha dar"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Etiket sayfalarından daha geniş etiketlerin altına konan etiketler. Bir etiketi aradığınızda altındaki her şey de bulunur."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

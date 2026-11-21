@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "ba53414f761bfe22b8de76cd70f11c6ffe1e1dd97c499b1280e56b909a994a6c"
 
 [messages.about-blender]
@@ -726,55 +726,26 @@ translation = """
        *[other] { $count } de resurse
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Ștergeți"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Păstrați presupunerile"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Ștergeți categoria fiecărei resurse selectate"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Păstrați ca ale dvs. toate etichetele puse de reguli și de AI pe resursele selectate"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
 { $count ->
-        [one] Categoria pentru { $count } resursă a fost golită
-        [few] Categoria pentru { $count } resurse a fost golită
-       *[other] Categoria pentru { $count } de resurse a fost golită
+        [one] S-a păstrat presupunerea pentru { $count } resursă
+        [few] S-au păstrat presupunerile pentru { $count } resurse
+       *[other] S-au păstrat presupunerile pentru { $count } de resurse
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Categoria pentru resursele selectate (gol o șterge)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Categorie"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-{ $count ->
-        [one] Categoria pentru { $count } resursă a fost setată la { $category }
-        [few] Categoria pentru { $count } resurse a fost setată la { $category }
-       *[other] Categoria pentru { $count } de resurse a fost setată la { $category }
-    }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Setați"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Setați categoria fiecărei resurse selectate"
 
 [messages.app-bulk-failed]
 source = """
@@ -787,6 +758,27 @@ translation = """
         [one] Resursa nu a putut fi modificată: { $error }
         [few] Cele { $count } resurse nu au putut fi modificate: { $error }
        *[other] Cele { $count } de resurse nu au putut fi modificate: { $error }
+    }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Marcați verificate"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Marcați resursele selectate ca verificate: regulile și AI nu le mai ating etichetele după aceea"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] A fost marcată ca verificată { $count } resursă
+        [few] Au fost marcate ca verificate { $count } resurse
+       *[other] Au fost marcate ca verificate { $count } de resurse
     }"""
 
 [messages.app-bulk-tag-add]
@@ -824,6 +816,27 @@ translation = """
         [one] S-a etichetat { $count } resursă cu { $tag }
         [few] S-au etichetat { $count } resurse cu { $tag }
        *[other] S-au etichetat { $count } de resurse cu { $tag }
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Marcați neverificate"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Scoateți marcajul de verificat de pe resursele selectate"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] S-a scos marcajul de verificat de pe { $count } resursă
+        [few] S-a scos marcajul de verificat de pe { $count } resurse
+       *[other] S-a scos marcajul de verificat de pe { $count } de resurse
     }"""
 
 [messages.app-bulk-untagged]
@@ -969,6 +982,18 @@ translation = "Creditele nu au putut fi create: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md pentru pachetele din care provin: cine le-a creat, licențele lor și mențiunile pe care le cer"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Deschideți biblioteca cu { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Biblioteca se deschide cu această căutare. Faceți clic pentru a opri."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Deschideți biblioteca cu această căutare"
+
 [messages.app-done]
 source = "Done"
 translation = "Gata"
@@ -993,6 +1018,14 @@ translation = """
         [few] Plasați cele { $count } elemente pentru a le adăuga
        *[other] Plasați cele { $count } de elemente pentru a le adăuga
     }"""
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Editează…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Schimbă etichetele și câmpurile tuturor (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1158,6 +1191,14 @@ translation = "Se încarcă mai multe"
 [messages.app-music]
 source = "Music"
 translation = "Muzică"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "De verificat"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Doar resursele pe care nu le-a verificat încă nimeni (merge împreună cu celelalte filtre)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1351,9 +1392,38 @@ translation = "Cele mai asemănătoare"
 source = "Best match"
 translation = "Cea mai bună potrivire"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Evaluate"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Faceți din nou clic pentru a afișa toate evaluările"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } stea sau mai multe
+        [few] { $count } stele sau mai multe
+       *[other] { $count } de stele sau mai multe
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Eliminați din { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Redenumiți"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Nume nou pentru { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1391,6 +1461,10 @@ translation = "Denumiți-o"
 source = "Save search"
 translation = "Salvați căutarea"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Salvați ca nouă"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Păstrați această căutare în Filtre, la Ale dvs."
@@ -1411,6 +1485,14 @@ translation = "Căutați nume, căi, etichete"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "„{ $name }” a fost salvată: o găsiți în Filtre, la Ale dvs."
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "„{ $name }” a fost actualizată"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Se caută…"
@@ -1427,6 +1509,19 @@ translation = "Selectați"
 source = "Select all { $count }"
 translation = "Selectați toate ({ $count })"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Selectează rezultatul ({ $count })
+        [few] Selectează cele { $count } rezultate
+       *[other] Selectează toate cele { $count } de rezultate
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Alegeți mai multe resurse pentru a le eticheta, categorisi, colecta, descărca sau arhiva împreună (X sau Ctrl-clic)"
@@ -1434,6 +1529,19 @@ translation = "Alegeți mai multe resurse pentru a le eticheta, categorisi, cole
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } selectate"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } rezultat selectat
+        [few] { $count } rezultate selectate
+       *[other] Toate cele { $count } de rezultate selectate
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1455,6 +1563,10 @@ translation = "Sortare"
 source = "A to Z"
 translation = "De la A la Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Cele mai bine evaluate primele"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Data creării"
@@ -1462,6 +1574,10 @@ translation = "Data creării"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Cele mai mari primele"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Cele mai slab evaluate primele"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1474,6 +1590,10 @@ translation = "Cele mai noi primele"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Cele mai vechi primele"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Evaluare"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1544,6 +1664,69 @@ translation = "Inclusiv fișierele auxiliare"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia. Un element pe care pachetul îl are în mai multe formate este afișat o dată, în formatul pe care Hoard îl citește cel mai bine."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] S-a copiat { $count } etichetă
+        [few] S-au copiat { $count } etichete
+       *[other] S-au copiat { $count } de etichete
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } nu are etichete de copiat"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Are deja aceste etichete
+       *[other] Toate cele { $count } au deja aceste etichete
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Nicio etichetă copiată. Apasă C pe o resursă ca să-i copiezi etichetele."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] S-a adăugat { $count } etichetă
+                [few] S-au adăugat { $count } etichete
+               *[other] S-au adăugat { $count } de etichete
+            }
+       *[other]
+            { $count ->
+                [one] S-a adăugat { $count } etichetă la { $assets } resurse
+                [few] S-au adăugat { $count } etichete la { $assets } resurse
+               *[other] S-au adăugat { $count } de etichete la { $assets } resurse
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1616,6 +1799,14 @@ translation = "Hoard nu răspunde: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Actualizare"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Actualizați „{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Păstrați selecția curentă în această căutare salvată"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1854,13 +2045,8 @@ source = "Animations"
 translation = "Animații"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = """
-{ $count ->
-        [one] Aplicați modificările de etichete, categorie și descriere la { $count } variantă
-        [few] Aplicați modificările de etichete, categorie și descriere la toate cele { $count } variante
-       *[other] Aplicați modificările de etichete, categorie și descriere la toate cele { $count } de variante
-    }"""
+source = "Apply changes to all { $count } variants"
+translation = "Aplicați modificările la toate cele { $count } variante"
 
 [messages.asset-archive]
 source = "Archive"
@@ -2031,6 +2217,10 @@ translation = "Scrieți o descriere"
 source = "Asset details"
 translation = "Detaliile resursei"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Detalii"
+
 [messages.asset-download]
 source = "Download"
 translation = "Descărcați"
@@ -2080,6 +2270,62 @@ translation = "Adăugați la favorite (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "În favoritele dvs. (F o scoate)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Adăugați"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Categorie"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field } a fost golit"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Editați { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "din pachet"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Licență"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "De exemplu CC0 sau CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Numele câmpului"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Adăugați un câmp"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Evaluare"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Goliți pentru a elimina"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field } a fost salvat"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Sursă"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Valoare"
 
 [messages.asset-file]
 source = "File"
@@ -2663,6 +2909,53 @@ translation = "{ $current } din { $duration }"
 source = "Previous asset"
 translation = "Resursa anterioară"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } stea
+        [few] { $count } stele
+       *[other] { $count } de stele
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Evaluat cu { $count } stea
+        [few] Evaluat cu { $count } stele
+       *[other] Evaluat cu { $count } de stele
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Faceți din nou clic pentru a șterge evaluarea"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Evaluarea a fost ștearsă"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Faceți din nou clic pentru { $count } stea
+        [few] Faceți din nou clic pentru { $count } stele
+       *[other] Faceți din nou clic pentru { $count } de stele
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Fișierul .{ $ext } original era stocat în acest pachet, iar Hoard l-a extras."
@@ -2714,6 +3007,34 @@ translation = "variantă"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Faceți clic pentru a redenumi"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Verificat"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "S-a scos marcajul de verificat"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "S-a scos marcajul de verificat de pe { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Marcați ca verificat, ca regulile și AI să nu îi atingă etichetele (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Marcat ca verificat"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } a fost marcat ca verificat"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Verificat: regulile și AI nu îi ating etichetele. Faceți clic pentru a scoate marcajul (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2799,10 +3120,6 @@ translation = "Găsiți resurse cu { $hex }, { $percent }% din această imagine"
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% din imagine. Găsiți resurse cu această culoare"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Adăugați"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Adăugați o etichetă"
@@ -2815,9 +3132,72 @@ translation = "Adăugați o etichetă, de ex. mood:tense"
 source = "Removed { $tag }"
 translation = "S-a eliminat { $tag }"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Puneți { $tag } la loc"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } a fost pusă la loc"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Adaugă { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Etichete"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Păstrați { $count } presupunere
+        [few] Păstrați toate cele { $count } presupuneri
+       *[other] Păstrați toate cele { $count } de presupuneri
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Păstrați ca ale dvs. toate etichetele presupuse de reguli și de AI"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] S-a păstrat { $count } etichetă presupusă
+        [few] S-au păstrat { $count } etichete presupuse
+       *[other] S-au păstrat { $count } de etichete presupuse
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Adăugate: { $count ->
+        [one] { $count } etichetă
+        [few] { $count } etichete
+       *[other] { $count } de etichete
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Cele asemănătoare au:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Respinse:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3396,6 +3776,110 @@ translation = "Fiecare fișier așa cum a fost importat, cu ce îi trebuie, înt
 source = "Take { $name } out of the selection"
 translation = "Scoateți { $name } din selecție"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Aceasta modifică toate rezultatele, inclusiv pe cele încă neîncărcate, și nu poate fi anulată dintr-un singur pas."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Golit la toate"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Închide"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Lăsat neschimbat"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Mixt, lăsat neschimbat"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Nimic modificat"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Revino la cum era"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Salvează { $count } modificare
+        [few] Salvează { $count } modificări
+       *[other] Salvează { $count } de modificări
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resursă actualizată
+        [few] { $count } resurse actualizate
+       *[other] { $count } de resurse actualizate
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Adaugă o etichetă la toate"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } din { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Etichete"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Cele mai folosite etichete dintre ele"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Editează { $count } resursă
+        [few] Editează { $count } resurse
+       *[other] Editează { $count } de resurse
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Editează { $count } rezultat
+        [few] Editează cele { $count } rezultate
+       *[other] Editează toate cele { $count } de rezultate
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Debifează tot"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Scoate toate etichetele, apoi bifează-le pe cele de păstrat"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Adăugați în colecție"
@@ -3596,6 +4080,10 @@ translation = "setare greșită: { $reason }"
 source = "blob { $hash } not found"
 translation = "blobul { $hash } nu a fost găsit"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "o căutare după aspect nu poate fi editată deodată: selectează asset-urile"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "{ $path } nu poate fi creat"
@@ -3615,6 +4103,10 @@ translation = "{ $path } nu poate fi citit"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "nu se poate scrie în { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "această modificare nu este în istoricul acestui asset"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4213,6 +4705,10 @@ translation = "nu este un hash blake3 hexazecimal"
 source = "not a picture Hoard can read: { $reason }"
 translation = "nu este o imagine pe care Hoard o poate citi: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "„{ $text }” nu este o etichetă"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "această copie Hoard a fost compilată fără { $feature }"
@@ -4556,6 +5052,10 @@ translation = "{ $name } nu e un SoundFont cu care MIDI poate cânta: { $reason 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "nimic de căutat; tastați numele pachetului"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } este deja sub { $tag }, deci { $tag } nu poate fi plasată sub ea"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5098,6 +5598,98 @@ translation = "Ce citește"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Arhiva zip nu a putut fi creată: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } printr-o aplicație"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } printr-un asistent"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "O regulă"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Cineva"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: golit (era { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Descriere"
+
+[messages.history-heading]
+source = "History"
+translation = "Istoric"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Istoricul nu a putut fi încărcat: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Se încarcă…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Încă nu s-a modificat nimic aici."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Anulați"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Nu s-a putut anula: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Readuce ce a schimbat această modificare"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Anulat: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Marcat ca verificat"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: setat la { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Etichetă adăugată: { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Etichetă modificată: { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Etichetă sugerată păstrată: { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Etichetă eliminată: { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Marcat ca neverificat"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7500,6 +8092,19 @@ translation = "Mai multe acțiuni pentru { $name }"
 source = "No packs match."
 translation = "Niciun pachet nu se potrivește."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resursă are licență proprie: aplicați-i și licența pachetului
+        [few] { $count } resurse au licență proprie: aplicați-le și licența pachetului
+       *[other] { $count } de resurse au licență proprie: aplicați-le și licența pachetului
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Numele pachetului"
@@ -7543,6 +8148,35 @@ translation = "Rulați din nou etichetatorul LLM"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Rulați din nou etichetatorul offline"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Acum"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Se citește de pe pagină la salvare"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "La fel"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Din magazin"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Completați { $count } câmp
+        [few] Completați { $count } câmpuri
+       *[other] Completați { $count } de câmpuri
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7972,6 +8606,14 @@ translation = "duplicate identice asemănătoare redimensionate convertite spaț
 source = "Dark theme: { $name }"
 translation = "Temă întunecată: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Editează cele { $count } selectate"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "modificare în masă etichete categorie licență evaluare"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Favorite"
@@ -8071,6 +8713,18 @@ translation = "Nimic nu se potrivește cu „{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Pachete"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Lipește etichetele copiate pe resursa selectată
+       *[other] Lipește etichetele copiate pe cele { $count } selectate
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8196,10 +8850,6 @@ translation = "Hoard folosește { $hoard } din procesoare, iar întreaga mașin�
 source = "Couldn’t read the profiler: { $error }"
 translation = "Profilerul nu a putut fi citit: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Memorie"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Cele mai lente 5%"
@@ -8239,6 +8889,22 @@ translation = "Așteptarea cât timp rețeaua preia ce s-a trimis"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "fișierele proprii ale interfeței"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } din { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Vârf"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard folosește { $hoard } RAM și a folosit cel mult { $peak } în ultimele zece minute."
 
 [messages.profiler-request-count]
 source = """
@@ -8317,6 +8983,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Nimic nu a rulat în fundal."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "{ $name } nu a putut fi modificată: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10616,6 +11286,14 @@ translation = "Afișarea unui singur canal"
 source = "Close"
 translation = "Închideți"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Copiază-i etichetele"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Editează selecția"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Închidere, golirea selecției sau închiderea detaliilor"
@@ -10652,6 +11330,10 @@ translation = "Deschiderea detaliilor"
 source = "Command palette: search, jump, run"
 translation = "Paleta de comenzi: căutare, salt, rulare"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Lipește etichetele copiate pe selecție"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Redare sau pauză"
@@ -10659,6 +11341,10 @@ translation = "Redare sau pauză"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Redarea sau oprirea unui sunet"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Marcare ca verificat sau nu"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10687,6 +11373,10 @@ translation = "Player de sunet"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Început sau sfârșit"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Adăugarea unei etichete"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11249,6 +11939,148 @@ translation = "Fișiere aflate în mai multe pachete sau denumite ca ale unui ma
 source = "Yours"
 translation = "Ale dvs."
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Păstrați eticheta { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Păstrați această presupunere ca etichetă proprie"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Nume vechi: { $names }
+        [few] Nume vechi: { $names }
+       *[other] Nume vechi: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resursă
+        [few] { $count } resurse
+       *[other] { $count } de resurse
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Spuneți ce înseamnă această etichetă…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Faceți clic pentru a schimba"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Ce înseamnă această etichetă"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Pentru ce e, ce se încadrează aici. Enter salvează."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Semnificația etichetei a fost salvată"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } a fost unită cu { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Mai înguste:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Căutarea după { $tag } le găsește și pe acestea"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Plasați sub…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Plasați această etichetă sub una mai largă: dacă o căutați pe cea largă, le găsiți și pe acestea"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "O etichetă mai largă, de exemplu vehicul"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Scoateți { $tag } de sub { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } nu mai este sub { $parent }"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } este acum sub { $parent }"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Alegeți o imagine pentru această etichetă"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Alegeți una dintre resursele ei care s-o reprezinte"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Fără imagine"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Niciuna dintre resursele afișate nu are imagine."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Imaginea a fost scoasă"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Imaginea a fost setată"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Redenumiți…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Nume nou"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Dați-i un nume nou sau numele altei etichete, ca să fie unită cu aceasta"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Eticheta nu a putut fi salvată: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Afișați { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Sub"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Eliminați-o; etichetatorul nu o va pune la loc"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Eliminați eticheta { $tag }"
@@ -11268,6 +12100,18 @@ translation = "măsurată din fișier"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "de la etichetatorul offline"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "înainte { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Ați vrut să spuneți"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Etichetă nouă"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11418,6 +12262,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Salvată ca"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Mai largi și mai înguste"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Etichete plasate sub etichete mai largi din paginile lor. Căutarea după o etichetă găsește și tot ce este sub ea."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "19af1556db5b772a542174850d260c29dc1e0f9f92eb519c88ebd9c71e8bbcca"
 
 [messages.about-blender]
@@ -724,53 +724,25 @@ translation = """
        *[other] { $count } resurssia
     }"""
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "Tyhjennä"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "Säilytä arvatut tunnisteet"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "Tyhjennä jokaisen valitun resurssin luokka"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "Säilytä kaikki sääntöjen ja tekoälyn valittuihin resursseihin lisäämät tunnisteet omina tunnisteinasi"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
 translation = """
 { $count ->
-        [one] Luokka tyhjennettiin { $count } resurssilta
-       *[other] Luokka tyhjennettiin { $count } resurssilta
+        [one] Arvatut tunnisteet säilytetty { $count } resurssissa
+       *[other] Arvatut tunnisteet säilytetty { $count } resurssissa
     }"""
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "Valittujen resurssien luokka (tyhjä tyhjentää sen)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "Luokka"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = """
-{ $count ->
-        [one] Luokaksi asetettiin { $category } { $count } resurssille
-       *[other] Luokaksi asetettiin { $category } { $count } resurssille
-    }"""
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "Aseta"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "Aseta jokaisen valitun resurssin luokka"
 
 [messages.app-bulk-failed]
 source = """
@@ -782,6 +754,26 @@ translation = """
 { $count ->
         [one] Resurssin muuttaminen epäonnistui: { $error }
        *[other] { $count } resurssin muuttaminen epäonnistui: { $error }
+    }"""
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "Merkitse tarkistetuiksi"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "Merkitse valitut resurssit läpikäydyiksi: säännöt ja tekoäly eivät enää koske niiden tunnisteisiin"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = """
+{ $count ->
+        [one] { $count } resurssi merkitty tarkistetuksi
+       *[other] { $count } resurssia merkitty tarkistetuiksi
     }"""
 
 [messages.app-bulk-tag-add]
@@ -818,6 +810,26 @@ translation = """
 { $count ->
         [one] Tunniste { $tag } lisättiin { $count } resurssiin
        *[other] Tunniste { $tag } lisättiin { $count } resurssiin
+    }"""
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "Poista tarkistusmerkintä"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "Poista tarkistusmerkintä valituilta resursseilta"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Tarkistusmerkintä poistettu { $count } resurssilta
+       *[other] Tarkistusmerkintä poistettu { $count } resurssilta
     }"""
 
 [messages.app-bulk-untagged]
@@ -956,6 +968,18 @@ translation = "Tekijätietojen luonti epäonnistui: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md niille paketeille, joista nämä ovat: kuka ne teki, niiden lisenssit ja niiden pyytämät tekijämaininnat"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "Avaa kirjasto haulla { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "Kirjasto avautuu tällä haulla. Lopeta napsauttamalla."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "Avaa kirjasto tällä haulla"
+
 [messages.app-done]
 source = "Done"
 translation = "Valmis"
@@ -975,6 +999,14 @@ translation = "Jokaisesta ylimmän tason tiedostosta tai kansiosta tulee oma pak
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "Pudota { $count } kohdetta lisätäksesi ne"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "Muokkaa…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "Muuta kaikkien tunnisteita ja kenttiä (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1135,6 +1167,14 @@ translation = "Ladataan lisää"
 [messages.app-music]
 source = "Music"
 translation = "Musiikki"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "Tarkistettavat"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "Vain resurssit, joita kukaan ei ole vielä käynyt läpi (toimii muiden suodattimien kanssa)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1328,9 +1368,37 @@ translation = "Eniten sen kaltaiset"
 source = "Best match"
 translation = "Paras osuma"
 
+[messages.app-rated]
+source = "Rated"
+translation = "Arvioidut"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "Napsauta uudelleen nähdäksesi kaikki arvosanat"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } tähti tai enemmän
+       *[other] { $count } tähteä tai enemmän
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "Poista kokoelmasta { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "Nimeä uudelleen"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "Haun { $name } uusi nimi"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1368,6 +1436,10 @@ translation = "Anna nimi"
 source = "Save search"
 translation = "Tallenna haku"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "Tallenna uutena"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "Säilytä tämä haku suodattimissa kohdassa Omat"
@@ -1388,6 +1460,14 @@ translation = "Hae nimiä, polkuja, tunnisteita"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Tallennettu ”{ $name }”: löytyy suodattimista kohdasta Omat"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'kallio or kivi: jompikumpi · -sammal: jätä pois · "kuiva sammal": nämä sanat yhdessä'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "Päivitetty ”{ $name }”"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "Haetaan…"
@@ -1404,6 +1484,18 @@ translation = "Valitse"
 source = "Select all { $count }"
 translation = "Valitse kaikki { $count }"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Valitse { $count } osuma
+       *[other] Valitse kaikki { $count } osumaa
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "Valitse useita resursseja lisätäksesi tunnisteita, luokitellaksesi, kerätäksesi, ladataksesi tai arkistoidaksesi ne yhdessä (X tai Ctrl-napsautus)"
@@ -1411,6 +1503,18 @@ translation = "Valitse useita resursseja lisätäksesi tunnisteita, luokitellaks
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } valittuna"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } osuma valittu
+       *[other] Kaikki { $count } osumaa valittu
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1432,6 +1536,10 @@ translation = "Lajittelu"
 source = "A to Z"
 translation = "A–Ö"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "Parhaat arvosanat ensin"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "Luotu"
@@ -1439,6 +1547,10 @@ translation = "Luotu"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "Suurimmat ensin"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "Heikoimmat arvosanat ensin"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1451,6 +1563,10 @@ translation = "Uusimmat ensin"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "Vanhimmat ensin"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "Arvosana"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1519,6 +1635,66 @@ translation = "Tukitiedostot mukana"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä. Resurssi, joka paketissa on useassa muodossa, näytetään kerran, siinä muodossa, jonka Hoard lukee parhaiten."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = """
+{ $count ->
+        [one] Kopioitu { $count } tunniste
+       *[other] Kopioitu { $count } tunnistetta
+    }"""
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "Kohteella { $name } ei ole kopioitavia tunnisteita"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = """
+{ $count ->
+        [one] Sillä on jo nuo tunnisteet
+       *[other] Kaikilla { $count } on jo nuo tunnisteet
+    }"""
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "Tunnisteita ei ole kopioitu. Paina C resurssin kohdalla kopioidaksesi sen tunnisteet."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Lisätty { $count } tunniste
+               *[other] Lisätty { $count } tunnistetta
+            }
+       *[other]
+            { $count ->
+                [one] Lisätty { $count } tunniste { $assets } resurssiin
+               *[other] Lisätty { $count } tunnistetta { $assets } resurssiin
+            }
+    }"""
 
 [messages.app-tempo]
 source = "BPM"
@@ -1591,6 +1767,14 @@ translation = "Hoard ei vastaa: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "Päivitä"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "Päivitä ”{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "Säilytä nykyinen valinta tässä tallennetussa haussa"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1823,8 +2007,8 @@ source = "Animations"
 translation = "Animaatiot"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "Käytä tunnisteen, luokan ja kuvauksen muutoksia kaikkiin { $count } muunnelmaan"
+source = "Apply changes to all { $count } variants"
+translation = "Käytä muutoksia kaikkiin { $count } muunnelmaan"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1990,6 +2174,10 @@ translation = "Kirjoita kuvaus"
 source = "Asset details"
 translation = "Resurssin tiedot"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "Tiedot"
+
 [messages.asset-download]
 source = "Download"
 translation = "Lataa"
@@ -2037,6 +2225,62 @@ translation = "Lisää suosikkeihin (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "Suosikeissasi (F poistaa sen)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "Lisää"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "Luokka"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "Tyhjennetty: { $field }"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "Muokkaa kenttää { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "paketista"
+
+[messages.asset-field-license]
+source = "License"
+translation = "Lisenssi"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "Esimerkiksi CC0 tai CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "Kentän nimi"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "Lisää kenttä"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "Arvosana"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "Tyhjä poistaa sen"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "Tallennettu: { $field }"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "Lähde"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "Arvo"
 
 [messages.asset-file]
 source = "File"
@@ -2610,6 +2854,50 @@ translation = "{ $current } / { $duration }"
 source = "Previous asset"
 translation = "Edellinen resurssi"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } tähti
+       *[other] { $count } tähteä
+    }"""
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Arvosana: { $count } tähti
+       *[other] Arvosana: { $count } tähteä
+    }"""
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "Napsauta uudelleen tyhjentääksesi arvosanan"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "Arvosana tyhjennetty"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+        [one] Napsauta uudelleen: { $count } tähti
+       *[other] Napsauta uudelleen: { $count } tähteä
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "Alkuperäinen .{ $ext }-tiedosto oli tallennettu tämän paketin sisään, ja Hoard poimi sen."
@@ -2661,6 +2949,34 @@ translation = "muunnelma"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "Napsauta nimetäksesi uudelleen"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "Tarkistettu"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "Tarkistusmerkintä poistettu"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "Tarkistusmerkintä poistettu: { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "Merkitse tarkistetuksi, jotta säännöt ja tekoäly eivät koske sen tunnisteisiin (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "Merkitty tarkistetuksi"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } merkitty tarkistetuksi"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "Tarkistettu: säännöt ja tekoäly eivät koske sen tunnisteisiin. Napsauta poistaaksesi merkinnän (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2746,10 +3062,6 @@ translation = "Etsi resursseja värillä { $hex }, { $percent } % tästä kuvast
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % kuvasta. Etsi resursseja, joissa on tätä väriä"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "Lisää"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "Lisää tunniste"
@@ -2762,9 +3074,69 @@ translation = "Lisää tunniste, esim. mood:tense"
 source = "Removed { $tag }"
 translation = "Tunniste { $tag } poistettu"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "Palauta { $tag }"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "Tunniste { $tag } palautettu"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "Lisää { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "Tunnisteet"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = """
+{ $count ->
+        [one] Säilytä { $count } arvaus
+       *[other] Säilytä kaikki { $count } arvausta
+    }"""
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "Säilytä kaikki sääntöjen ja tekoälyn arvaamat tunnisteet omina tunnisteinasi"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } arvattu tunniste säilytetty
+       *[other] { $count } arvattua tunnistetta säilytetty
+    }"""
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = """
+Lisättiin { $count ->
+        [one] { $count } tunniste
+       *[other] { $count } tunnistetta
+    }"""
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "Samankaltaisilla on:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "Hylätyt:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3340,6 +3712,106 @@ translation = "Jokainen tiedosto sellaisena kuin se tuotiin, tarvitsemiensa kans
 source = "Take { $name } out of the selection"
 translation = "Poista { $name } valinnasta"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "Tämä muuttaa kaikkia osumia, myös niitä, joita ei ole vielä ladattu, eikä sitä voi perua yhdellä kertaa."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "Tyhjennetty kaikista"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "Sulje"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "Jää ennalleen"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "Vaihtelee, jää ennalleen"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "Mikään ei muuttunut"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "Palauta ennalleen"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+        [one] Tallenna { $count } muutos
+       *[other] Tallenna { $count } muutosta
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurssi päivitetty
+       *[other] { $count } resurssia päivitetty
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "Lisää tunniste kaikkiin"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } / { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "Tunnisteet"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "Niistä eniten käytetyt tunnisteet"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] Muokkaa { $count } resurssia
+       *[other] Muokkaa { $count } resurssia
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+        [one] Muokkaa { $count } osumaa
+       *[other] Muokkaa kaikkia { $count } osumaa
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "Poista kaikki valinnat"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "Poista kaikki tunnisteet ja valitse sitten ne, jotka jätetään"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "Lisää kokoelmaan"
@@ -3540,6 +4012,10 @@ translation = "virheellinen asetus: { $reason }"
 source = "blob { $hash } not found"
 translation = "blobia { $hash } ei löydy"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "ulkonäköhakua ei voi muokata kerralla: valitse assetit sen sijaan"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "ei voi luoda: { $path }"
@@ -3559,6 +4035,10 @@ translation = "ei voi lukea: { $path }"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "ei voi kirjoittaa: { $path }"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "tätä muutosta ei ole tämän assetin historiassa"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4156,6 +4636,10 @@ translation = "ei ole blake3-heksatiiviste"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard ei pysty lukemaan kuvaa: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" ei ole tunniste'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "tämä Hoardin kopio on käännetty ilman { $feature } -tukea"
@@ -4499,6 +4983,10 @@ translation = "{ $name } ei ole SoundFont, jolla MIDI voi soida: { $reason }"
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "ei mitään haettavaa; kirjoita paketin nimi"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } on jo tunnisteen { $tag } alla, joten { $tag } ei voi mennä sen alle"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -5037,6 +5525,98 @@ translation = "Mitä se lukee"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zipin luonti epäonnistui: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "Tekoäly"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } sovelluksen kautta"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } avustajan kautta"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "Sääntö"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "Joku"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: tyhjennetty (oli { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "Kuvaus"
+
+[messages.history-heading]
+source = "History"
+translation = "Historia"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "Historian lataus epäonnistui: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "Ladataan…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "Täällä ei ole vielä muutettu mitään."
+
+[messages.history-revert]
+source = "Revert"
+translation = "Kumoa"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "Kumoaminen epäonnistui: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "Palauta se, mitä tämä muutos muutti"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "Kumottu: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "Merkitty tarkistetuksi"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: asetettu arvoon { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "Lisätty tunniste { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "Muutettu tunnistetta { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "Säilytetty ehdotettu tunniste { $tag }"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "Poistettu tunniste { $tag }"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "Merkitty tarkistamattomaksi"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7411,6 +7991,18 @@ translation = "Lisää toimintoja: { $name }"
 source = "No packs match."
 translation = "Mikään paketti ei vastaa hakua."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurssilla on oma lisenssi: anna sen noudattaa myös paketin lisenssiä
+       *[other] { $count } resurssilla on oma lisenssi: anna niiden noudattaa myös paketin lisenssiä
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "Paketin nimi"
@@ -7454,6 +8046,34 @@ translation = "Aja LLM-tunnistelija uudelleen"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "Aja sääntöpohjainen tunnistelija uudelleen"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "Nyt"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "Luetaan sivulta tallennettaessa"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "Sama"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "Kaupasta"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+        [one] Täytä { $count } kenttä
+       *[other] Täytä { $count } kenttää
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7877,6 +8497,14 @@ translation = "kaksoiskappaleet samat samankaltaiset skaalatut muunnetut hukattu
 source = "Dark theme: { $name }"
 translation = "Tumma teema: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "Muokkaa valittuja ({ $count })"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "massamuutos tunnisteet luokka lisenssi arvosana"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "Suosikit"
@@ -7976,6 +8604,18 @@ translation = "Mikään ei vastaa hakua ”{ $query }”"
 [messages.palette-packs]
 source = "Packs"
 translation = "Paketit"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = """
+{ $count ->
+        [one] Liitä kopioidut tunnisteet valittuun resurssiin
+       *[other] Liitä kopioidut tunnisteet { $count } valittuun
+    }"""
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -8105,10 +8745,6 @@ translation = "Hoard käyttää { $hoard } suorittimista ja koko kone { $machine
 source = "Couldn’t read the profiler: { $error }"
 translation = "Profiloijan luku epäonnistui: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "Muisti"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "Hitain 5 %"
@@ -8148,6 +8784,22 @@ translation = "Odottaminen, kun verkko ottaa vastaan lähetettyä"
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "käyttöliittymän omat tiedostot"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "Huippu"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard käyttää { $hoard } RAM-muistia ja on käyttänyt enintään { $peak } viimeisten kymmenen minuutin aikana."
 
 [messages.profiler-request-count]
 source = """
@@ -8224,6 +8876,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "Taustalla ei ajettu mitään."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "Haun { $name } muuttaminen epäonnistui: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10499,6 +11155,14 @@ translation = "Näytä yksi kanava"
 source = "Close"
 translation = "Sulje"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "Kopioi sen tunnisteet"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "Muokkaa valittuja"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "Sulje, tyhjennä valinta tai sulje tiedot"
@@ -10535,6 +11199,10 @@ translation = "Avaa tiedot"
 source = "Command palette: search, jump, run"
 translation = "Komentopaletti: hae, siirry, suorita"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "Liitä kopioidut tunnisteet valittuihin"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "Toista tai tauko"
@@ -10542,6 +11210,10 @@ translation = "Toista tai tauko"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "Toista tai pysäytä ääni"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "Merkitse tarkistetuksi tai poista merkintä"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10570,6 +11242,10 @@ translation = "Äänisoitin"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "Alkuun tai loppuun"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "Lisää tunniste"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -11130,6 +11806,146 @@ translation = "Useammassa kuin yhdessä paketissa olevat tai kauppatiedoston tap
 source = "Yours"
 translation = "Oma"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "Säilytä tunniste { $tag }"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "Säilytä tämä arvaus omana tunnisteenasi"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+        [one] Vanha nimi: { $names }
+       *[other] Vanhat nimet: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } resurssi
+       *[other] { $count } resurssia
+    }"""
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "Kerro, mitä tämä tunniste tarkoittaa…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "Muuta napsauttamalla"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "Mitä tämä tunniste tarkoittaa"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "Mihin se on tarkoitettu, mitä sen alle kuuluu. Enter tallentaa."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "Tunnisteen merkitys tallennettu"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } yhdistettiin tunnisteeseen { $into }."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "Suppeammat:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "Kun haet tunnistetta { $tag }, löydät myös nämä"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "Aseta alle…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "Aseta tämä tunniste laajemman alle: kun haet laajempaa, löydät myös nämä"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "Laajempi tunniste, esim. ajoneuvo"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "Poista { $tag } tunnisteen { $parent } alta"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } ei ole enää tunnisteen { $parent } alla"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } on nyt tunnisteen { $parent } alla"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "Valitse kuva tälle tunnisteelle"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "Valitse yksi sen resursseista edustamaan sitä"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "Ei kuvaa"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "Yhdelläkään näytetyistä resursseista ei ole kuvaa."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "Kuva poistettu"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "Kuva asetettu"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "Nimeä uudelleen…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "Uusi nimi"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "Anna sille uusi nimi tai toisen tunnisteen nimi, niin se yhdistetään siihen"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "Tunnistetta ei voitu tallentaa: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "Näytä { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "Alla"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "Poista se; tunnistelija ei lisää sitä takaisin"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "Poista tunniste { $tag }"
@@ -11149,6 +11965,18 @@ translation = "mitattu tiedostosta"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "sääntöpohjaisen tunnistelijan antama"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "ennen { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "Tarkoititko"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "Uusi tunniste"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11281,6 +12109,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "Tallennettu nimellä"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "Laajemmat ja suppeammat"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "Tunnisteet, jotka on asetettu laajempien alle tunnisteiden omilla sivuilla. Tunnistetta hakemalla löydät myös kaiken sen alla olevan."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

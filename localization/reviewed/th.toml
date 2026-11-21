@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "9b9cdb0c0c213f51025310f204d8fd86748602acc18d04be07e8b2b164492a1d"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "{ $count } แอสเซ็ต"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "ล้าง"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "เก็บแท็กที่เดา"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "ล้างหมวดหมู่ของทุกแอสเซ็ตที่เลือก"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "เก็บทุกแท็กที่กฎและ AI ใส่ให้แอสเซ็ตที่เลือกไว้เป็นแท็กของคุณเอง"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "ล้างหมวดหมู่ของ { $count } แอสเซ็ตแล้ว"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "หมวดหมู่ของแอสเซ็ตที่เลือก (เว้นว่างเพื่อล้าง)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "หมวดหมู่"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "ตั้งหมวดหมู่ของ { $count } แอสเซ็ตเป็น { $category } แล้ว"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "ตั้ง"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "ตั้งหมวดหมู่ของทุกแอสเซ็ตที่เลือก"
+translation = "เก็บแท็กที่เดาของ { $count } แอสเซ็ตไว้แล้ว"
 
 [messages.app-bulk-failed]
 source = """
@@ -763,6 +739,22 @@ Couldn't change { $count ->
        *[other] those { $count } assets
     }: { $error }"""
 translation = "เปลี่ยนแอสเซ็ต { $count } รายการนั้นไม่ได้: { $error }"
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "ทำเครื่องหมายว่าตรวจแล้ว"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "ทำเครื่องหมายแอสเซ็ตที่เลือกว่าดูแล้ว: หลังจากนี้กฎและ AI จะไม่แตะแท็กของแอสเซ็ตเหล่านั้น"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "ทำเครื่องหมาย { $count } แอสเซ็ตว่าตรวจแล้ว"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -795,6 +787,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "ติดแท็ก { $tag } ให้ { $count } แอสเซ็ตแล้ว"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "ยกเลิกว่าตรวจแล้ว"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "เอาเครื่องหมายตรวจแล้วออกจากแอสเซ็ตที่เลือก"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "เอาเครื่องหมายตรวจแล้วออกจาก { $count } แอสเซ็ต"
 
 [messages.app-bulk-untagged]
 source = """
@@ -924,6 +932,18 @@ translation = "สร้างเครดิตไม่ได้: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "CREDITS.md ของแพ็กที่แอสเซ็ตเหล่านี้มาจาก: ใครเป็นผู้สร้าง สัญญาอนุญาต และข้อความเครดิตที่ผู้สร้างขอ"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "เปิดคลังด้วย { $name }"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "คลังจะเปิดด้วยการค้นหานี้ คลิกเพื่อยกเลิก"
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "เปิดคลังด้วยการค้นหานี้"
+
 [messages.app-done]
 source = "Done"
 translation = "เสร็จ"
@@ -943,6 +963,14 @@ translation = "ไฟล์หรือโฟลเดอร์ระดับ�
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "วาง { $count } รายการเพื่อเพิ่ม"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "แก้ไข…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "เปลี่ยนแท็กและช่องข้อมูลของทั้งหมด (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1103,6 +1131,14 @@ translation = "กำลังโหลดเพิ่ม"
 [messages.app-music]
 source = "Music"
 translation = "เพลง"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "ต้องตรวจ"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "เฉพาะแอสเซ็ตที่ยังไม่มีใครตรวจ (ใช้ร่วมกับตัวกรองอื่นได้)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1296,9 +1332,36 @@ translation = "เสียงใกล้เคียงที่สุด"
 source = "Best match"
 translation = "ตรงที่สุด"
 
+[messages.app-rated]
+source = "Rated"
+translation = "ให้คะแนน"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "คลิกอีกครั้งเพื่อแสดงทุกคะแนน"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ดาวขึ้นไป
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "นำออกจาก { $name }"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "เปลี่ยนชื่อ"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "ชื่อใหม่ของ { $name }"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1336,6 +1399,10 @@ translation = "ตั้งชื่อ"
 source = "Save search"
 translation = "บันทึกการค้นหา"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "บันทึกเป็นรายการใหม่"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "เก็บการค้นหานี้ไว้ในตัวกรอง ใต้หัวข้อ ของคุณ"
@@ -1356,6 +1423,14 @@ translation = "ค้นหาชื่อ พาธ แท็ก"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "บันทึก “{ $name }” แล้ว: อยู่ในตัวกรอง ใต้หัวข้อ ของคุณ"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = 'หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "อัปเดต “{ $name }” แล้ว"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "กำลังค้นหา…"
@@ -1372,6 +1447,17 @@ translation = "เลือก"
 source = "Select all { $count }"
 translation = "เลือกทั้งหมด { $count } รายการ"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] เลือกผลลัพธ์ทั้ง { $count } รายการ
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "เลือกหลายแอสเซ็ตเพื่อติดแท็ก จัดหมวดหมู่ เพิ่มลงคอลเลกชัน ดาวน์โหลด หรือเก็บถาวรพร้อมกัน (X หรือ Ctrl-คลิก)"
@@ -1379,6 +1465,17 @@ translation = "เลือกหลายแอสเซ็ตเพื่อ�
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "เลือก { $count } รายการ"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] เลือกผลลัพธ์ { $count } รายการ
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1400,6 +1497,10 @@ translation = "เรียง"
 source = "A to Z"
 translation = "A ถึง Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "คะแนนสูงสุดก่อน"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "วันที่สร้าง"
@@ -1407,6 +1508,10 @@ translation = "วันที่สร้าง"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "ใหญ่สุดก่อน"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "คะแนนต่ำสุดก่อน"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1419,6 +1524,10 @@ translation = "ใหม่สุดก่อน"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "เก่าสุดก่อน"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "คะแนน"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1479,6 +1588,46 @@ translation = "รวมไฟล์ประกอบด้วย"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้ หน้าของสไปรต์ชีต และสไปรต์ของชีตที่แพ็กมีเป็นภาพแยกด้วย จะแสดงร่วมกับชีต แอสเซ็ตที่แพ็กมีหลายรูปแบบจะแสดงครั้งเดียว ในรูปแบบที่ Hoard อ่านได้ดีที่สุด"
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "คัดลอก { $count } แท็กแล้ว"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } ไม่มีแท็กให้คัดลอก"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "แอสเซ็ต { $count } รายการมีแท็กเหล่านั้นอยู่แล้ว"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "ยังไม่ได้คัดลอกแท็ก กด C บนแอสเซ็ตเพื่อคัดลอกแท็กของมัน"
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "เพิ่ม { $count } แท็กให้ { $assets } แอสเซ็ตแล้ว"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1551,6 +1700,14 @@ translation = "Hoard ไม่ตอบสนอง: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "อัปเดต"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "อัปเดต “{ $name }”"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "เก็บสิ่งที่เลือกอยู่ตอนนี้ไว้ในการค้นหาที่บันทึกนี้"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1760,8 +1917,8 @@ source = "Animations"
 translation = "แอนิเมชัน"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "ใช้การเปลี่ยนแปลงแท็ก หมวดหมู่ และคำอธิบายกับรูปแบบย่อยทั้ง { $count } รายการ"
+source = "Apply changes to all { $count } variants"
+translation = "ใช้การเปลี่ยนแปลงกับรูปแบบย่อยทั้ง { $count } รายการ"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1927,6 +2084,10 @@ translation = "เขียนคำอธิบาย"
 source = "Asset details"
 translation = "รายละเอียดแอสเซ็ต"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "รายละเอียด"
+
 [messages.asset-download]
 source = "Download"
 translation = "ดาวน์โหลด"
@@ -1966,6 +2127,62 @@ translation = "เพิ่มในรายการโปรด (F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "อยู่ในรายการโปรดของคุณ (กด F เพื่อนำออก)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "เพิ่ม"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "หมวดหมู่"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "ล้าง { $field } แล้ว"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "แก้ไข { $field }"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "จากแพ็ก"
+
+[messages.asset-field-license]
+source = "License"
+translation = "สัญญาอนุญาต"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "เช่น CC0 หรือ CC-BY 4.0"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "ชื่อช่อง"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "เพิ่มช่อง"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "คะแนน"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "เว้นว่างเพื่อลบ"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "บันทึก { $field } แล้ว"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "แหล่งที่มา"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "ค่า"
 
 [messages.asset-file]
 source = "File"
@@ -2525,6 +2742,41 @@ translation = "{ $current } จาก { $duration }"
 source = "Previous asset"
 translation = "แอสเซ็ตก่อนหน้า"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "{ $count } ดาว"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "ให้ { $count } ดาว"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "คลิกอีกครั้งเพื่อล้างคะแนน"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "ล้างคะแนนแล้ว"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] คลิกอีกครั้งเพื่อให้ { $count } ดาว
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "ไฟล์ .{ $ext } ต้นฉบับถูกเก็บไว้ในแพ็กเกจนี้ และ Hoard ดึงออกมาให้แล้ว"
@@ -2576,6 +2828,34 @@ translation = "รูปแบบย่อย"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "คลิกเพื่อเปลี่ยนชื่อ"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "ตรวจแล้ว"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "เอาเครื่องหมายตรวจแล้วออก"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "เอาเครื่องหมายตรวจแล้วออกจาก { $name }"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "ทำเครื่องหมายว่าตรวจแล้ว กฎและ AI จะได้ไม่แตะแท็กของแอสเซ็ตนี้ (R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "ทำเครื่องหมายว่าตรวจแล้ว"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "ทำเครื่องหมาย { $name } ว่าตรวจแล้ว"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "ตรวจแล้ว: กฎและ AI จะไม่แตะแท็กของแอสเซ็ตนี้ คลิกเพื่อเอาเครื่องหมายออก (R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2661,10 +2941,6 @@ translation = "ค้นหาแอสเซ็ตที่มี { $hex } ค�
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex } คิดเป็น { $percent }% ของภาพ ค้นหาแอสเซ็ตที่มีสีนี้"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "เพิ่ม"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "เพิ่มแท็ก"
@@ -2677,9 +2953,57 @@ translation = "เพิ่มแท็ก เช่น mood:tense"
 source = "Removed { $tag }"
 translation = "นำ { $tag } ออกแล้ว"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "ใส่ { $tag } กลับ"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "ใส่ { $tag } กลับแล้ว"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "เพิ่ม { $tag }"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "แท็ก"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "เก็บแท็กที่เดาทั้ง { $count } แท็ก"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "เก็บทุกแท็กที่กฎและ AI เดาไว้เป็นแท็กของคุณเอง"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "เก็บแท็กที่เดาไว้ { $count } แท็ก"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "เพิ่มแท็กแล้ว { $count } รายการ"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "รายการที่คล้ายกันมี:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "ที่ปฏิเสธไว้:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3243,6 +3567,102 @@ translation = "แต่ละไฟล์ตามที่นำเข้า�
 source = "Take { $name } out of the selection"
 translation = "นำ { $name } ออกจากที่เลือก"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "การเปลี่ยนนี้มีผลกับผลลัพธ์ทั้งหมด รวมถึงที่ยังไม่โหลด และย้อนกลับไม่ได้ในขั้นตอนเดียว"
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "ล้างในทั้งหมดแล้ว"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "ปิด"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "คงไว้ตามเดิม"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "ค่าต่างกัน คงไว้ตามเดิม"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "ไม่มีอะไรเปลี่ยนแปลง"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "คืนค่าเดิม"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] บันทึก { $count } การเปลี่ยนแปลง
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] อัปเดตแอสเซ็ต { $count } รายการแล้ว
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "เพิ่มแท็กให้ทั้งหมด"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $have } จาก { $count }"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "แท็ก"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "แท็กที่ใช้บ่อยที่สุดในกลุ่มนี้"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] แก้ไขแอสเซ็ต { $count } รายการ
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] แก้ไขผลลัพธ์ทั้ง { $count } รายการ
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "ยกเลิกเลือกทั้งหมด"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "เอาแท็กออกทั้งหมด แล้วเลือกเฉพาะแท็กที่จะเก็บไว้"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "เพิ่มลงในคอลเลกชัน"
@@ -3443,6 +3863,10 @@ translation = "การตั้งค่าไม่ถูกต้อง: { $
 source = "blob { $hash } not found"
 translation = "ไม่พบบล็อบ { $hash }"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "การค้นหาตามลักษณะไม่สามารถแก้ไขทั้งหมดพร้อมกันได้ ให้เลือกแอสเซ็ตแทน"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "สร้าง { $path } ไม่ได้"
@@ -3462,6 +3886,10 @@ translation = "อ่าน { $path } ไม่ได้"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "เขียนลง { $path } ไม่ได้"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "ไม่มีการเปลี่ยนแปลงนั้นในประวัติของแอสเซ็ตนี้"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4055,6 +4483,10 @@ translation = "ไม่ใช่แฮช blake3 แบบเลขฐานส
 source = "not a picture Hoard can read: { $reason }"
 translation = "ไม่ใช่ภาพที่ Hoard อ่านได้: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }" ไม่ใช่แท็ก'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "Hoard ชุดนี้สร้างโดยไม่มี { $feature }"
@@ -4398,6 +4830,10 @@ translation = "{ $name } ไม่ใช่ SoundFont ที่ MIDI ใช้�
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "ไม่มีอะไรให้ค้นหา ให้พิมพ์ชื่อแพ็ก"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } อยู่ใต้ { $tag } อยู่แล้ว จึงใส่ { $tag } ไว้ใต้แท็กนั้นไม่ได้"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4921,6 +5357,98 @@ translation = "สิ่งที่อ่านได้"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "สร้างไฟล์ zip ไม่ได้: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who } ผ่านแอป"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who } ผ่านผู้ช่วย"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "กฎ"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "บางคน"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: ล้างแล้ว (เดิมคือ { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "คำอธิบาย"
+
+[messages.history-heading]
+source = "History"
+translation = "ประวัติ"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "โหลดประวัติไม่ได้: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "กำลังโหลด…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "ยังไม่มีการเปลี่ยนแปลงที่นี่"
+
+[messages.history-revert]
+source = "Revert"
+translation = "เลิกทำ"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "เลิกทำไม่ได้: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "คืนค่าตามก่อนการเปลี่ยนแปลงนี้"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "เลิกทำแล้ว: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "ทำเครื่องหมายว่าตรวจแล้ว"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: ตั้งเป็น { $to }"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "เพิ่มแท็ก { $tag }"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "เปลี่ยนแท็ก { $tag }"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "เก็บแท็กที่แนะนำ { $tag } ไว้"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "นำแท็ก { $tag } ออก"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "ทำเครื่องหมายว่ายังไม่ตรวจ"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7232,6 +7760,17 @@ translation = "การทำงานเพิ่มเติมสำหร�
 source = "No packs match."
 translation = "ไม่มีแพ็กที่ตรงกัน"
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] แอสเซ็ต { $count } รายการมีสัญญาอนุญาตของตัวเอง: ให้ใช้ตามสัญญาอนุญาตของแพ็กด้วย
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "ชื่อแพ็ก"
@@ -7275,6 +7814,33 @@ translation = "เรียกใช้ตัวติดแท็ก LLM อี
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "เรียกใช้ตัวติดแท็กออฟไลน์อีกครั้ง"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "ตอนนี้"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "จะอ่านจากหน้าเมื่อบันทึก"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "เหมือนกัน"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "จากร้านค้า"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] กรอก { $count } ช่อง
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7672,6 +8238,14 @@ translation = "ซ้ำ เหมือนกัน คล้าย ย่อ�
 source = "Dark theme: { $name }"
 translation = "ธีมมืด: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "แก้ไข { $count } รายการที่เลือก"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "เปลี่ยนจำนวนมาก แท็ก หมวดหมู่ ใบอนุญาต คะแนน"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "รายการโปรด"
@@ -7771,6 +8345,14 @@ translation = "ไม่มีรายการที่ตรงกับ “{
 [messages.palette-packs]
 source = "Packs"
 translation = "แพ็ก"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "วางแท็กที่คัดลอกไว้ลงใน { $count } รายการที่เลือก"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7896,10 +8478,6 @@ translation = "Hoard ใช้โปรเซสเซอร์ { $hoard } แ�
 source = "Couldn’t read the profiler: { $error }"
 translation = "อ่านโปรไฟเลอร์ไม่ได้: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "หน่วยความจำ"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "ช้าที่สุด 5%"
@@ -7939,6 +8517,22 @@ translation = "รอขณะที่เครือข่ายรับส�
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "ไฟล์ของอินเทอร์เฟซเอง"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } จาก { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "สูงสุด"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard ใช้ RAM อยู่ { $hoard } และใช้สูงสุด { $peak } ในสิบนาทีที่ผ่านมา"
 
 [messages.profiler-request-count]
 source = """
@@ -8013,6 +8607,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "ไม่มีงานใดทำงานในเบื้องหลัง"
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "เปลี่ยน { $name } ไม่ได้: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10259,6 +10857,14 @@ translation = "แสดงช่องสีเดียว"
 source = "Close"
 translation = "ปิด"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "คัดลอกแท็กของมัน"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "แก้ไขรายการที่เลือก"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "ปิด ล้างการเลือก หรือปิดรายละเอียด"
@@ -10295,6 +10901,10 @@ translation = "เปิดรายละเอียด"
 source = "Command palette: search, jump, run"
 translation = "แผงคำสั่ง: ค้นหา ข้ามไป เรียกใช้"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "วางแท็กที่คัดลอกไว้ลงในรายการที่เลือก"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "เล่นหรือหยุดชั่วคราว"
@@ -10302,6 +10912,10 @@ translation = "เล่นหรือหยุดชั่วคราว"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "เล่นหรือหยุดเสียง"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "ทำเครื่องหมายว่าตรวจแล้ว หรือยกเลิก"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10330,6 +10944,10 @@ translation = "เครื่องเล่นเสียง"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "ไปต้นหรือท้าย"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "เพิ่มแท็ก"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10865,6 +11483,141 @@ translation = "ไฟล์ที่อยู่ในมากกว่าห�
 source = "Yours"
 translation = "ของคุณ"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "เก็บแท็ก { $tag } ไว้"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "เก็บแท็กที่เดามานี้ไว้เป็นแท็กของคุณเอง"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] ชื่อเดิม: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } แอสเซ็ต"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "บอกว่าแท็กนี้หมายถึงอะไร…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "คลิกเพื่อเปลี่ยน"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "แท็กนี้หมายถึงอะไร"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "ใช้ทำอะไร และอะไรอยู่ภายใต้แท็กนี้ กด Enter เพื่อบันทึก"
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "บันทึกความหมายของแท็กแล้ว"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } ถูกรวมเข้ากับ { $into } แล้ว"
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "แคบกว่า:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "ค้นหา { $tag } จะเจอแท็กเหล่านี้ด้วย"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "ใส่ไว้ใต้…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "ใส่แท็กนี้ไว้ใต้แท็กที่กว้างกว่า: ค้นหาแท็กนั้นแล้วจะเจอแท็กเหล่านี้ด้วย"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "แท็กที่กว้างกว่า เช่น ยานพาหนะ"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "นำ { $tag } ออกจากใต้ { $parent }"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } ไม่อยู่ใต้ { $parent } แล้ว"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } อยู่ใต้ { $parent } แล้ว"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "เลือกรูปภาพสำหรับแท็กนี้"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "เลือกแอสเซ็ตหนึ่งรายการเพื่อเป็นตัวแทนของแท็ก"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "ไม่มีรูปภาพ"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "แอสเซ็ตที่แสดงอยู่ไม่มีรูปภาพเลย"
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "เอารูปภาพออกแล้ว"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "ตั้งรูปภาพแล้ว"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "เปลี่ยนชื่อ…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "ชื่อใหม่"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "ตั้งชื่อใหม่ หรือใส่ชื่อแท็กอื่นเพื่อรวมเข้าด้วยกัน"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "บันทึกแท็กไม่ได้: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "แสดง { $tag }"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "อยู่ใต้"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "นำออก; ตัวติดแท็กจะไม่ใส่กลับมาอีก"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "นำแท็ก { $tag } ออก"
@@ -10884,6 +11637,18 @@ translation = "วัดจากไฟล์"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "จากตัวติดแท็กออฟไลน์"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "เดิม { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "คุณหมายถึง"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "แท็กใหม่"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11004,6 +11769,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "บันทึกเป็น"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "กว้างกว่าและแคบกว่า"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "แท็กที่ใส่ไว้ใต้แท็กที่กว้างกว่าจากหน้าแท็กของแต่ละแท็ก ค้นหาแท็กแล้วจะเจอทุกอย่างที่อยู่ใต้แท็กนั้นด้วย"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "에셋 { $count }개"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "지우기"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "추측 태그 유지"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "선택한 모든 에셋의 분류 지우기"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "규칙과 AI가 선택한 에셋에 붙인 태그를 모두 내 태그로 유지"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "에셋 { $count }개의 분류를 지웠습니다"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "선택한 에셋의 분류(비우면 지워짐)"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "분류"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "에셋 { $count }개의 분류를 { $category }(으)로 설정했습니다"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "설정"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "선택한 모든 에셋의 분류 설정"
+translation = "에셋 { $count }개의 추측 태그를 유지했습니다"
 
 [messages.app-bulk-failed]
 source = """
@@ -763,6 +739,22 @@ Couldn't change { $count ->
        *[other] those { $count } assets
     }: { $error }"""
 translation = "에셋 { $count }개를 변경하지 못했습니다: { $error }"
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "검토함으로 표시"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "선택한 에셋을 검토한 것으로 표시: 이후 규칙과 AI는 태그를 건드리지 않습니다"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "에셋 { $count }개를 검토함으로 표시했습니다"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -795,6 +787,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "에셋 { $count }개에 { $tag } 태그를 붙였습니다"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "검토 해제"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "선택한 에셋의 검토함 표시 해제"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "에셋 { $count }개의 검토함 표시를 해제했습니다"
 
 [messages.app-bulk-untagged]
 source = """
@@ -924,6 +932,18 @@ translation = "크레디트를 만들지 못했습니다: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "이 에셋들이 속한 팩의 CREDITS.md: 만든 사람, 라이선스, 요청하는 크레디트 문구"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "{ $name }(으)로 라이브러리 열기"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "라이브러리가 이 검색으로 열립니다. 클릭하면 해제합니다."
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "이 검색으로 라이브러리 열기"
+
 [messages.app-done]
 source = "Done"
 translation = "완료"
@@ -943,6 +963,14 @@ translation = "최상위 파일이나 폴더 하나하나가 각각 팩이 됩�
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "놓아서 항목 { $count }개 추가"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "편집…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "모든 항목의 태그와 필드 변경 (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1103,6 +1131,14 @@ translation = "더 불러오는 중"
 [messages.app-music]
 source = "Music"
 translation = "음악"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "검토 필요"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "아직 아무도 검토하지 않은 에셋만(다른 필터와 함께 적용)"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1296,9 +1332,36 @@ translation = "소리가 비슷한 순"
 source = "Best match"
 translation = "관련도 순"
 
+[messages.app-rated]
+source = "Rated"
+translation = "평점"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "다시 클릭하면 모든 평점 표시"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] 별 { $count }개 이상
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "{ $name }에서 제거"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "이름 바꾸기"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "{ $name }의 새 이름"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1336,6 +1399,10 @@ translation = "이름 입력"
 source = "Save search"
 translation = "검색 저장"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "새로 저장"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "이 검색을 필터의 내 항목에 보관합니다"
@@ -1356,6 +1423,14 @@ translation = "이름, 경로, 태그 검색"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }”을(를) 저장했습니다. 필터의 내 항목에 있습니다"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = '바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "“{ $name }”을(를) 업데이트했습니다"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "검색 중…"
@@ -1372,6 +1447,17 @@ translation = "선택"
 source = "Select all { $count }"
 translation = "{ $count }개 모두 선택"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] 검색 결과 { $count }개 모두 선택
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "여러 에셋을 골라서 한꺼번에 태그, 분류, 컬렉션 추가, 다운로드, 보관합니다(X 또는 Ctrl+클릭)"
@@ -1379,6 +1465,17 @@ translation = "여러 에셋을 골라서 한꺼번에 태그, 분류, 컬렉션
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count }개 선택됨"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] 검색 결과 { $count }개 선택됨
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1400,6 +1497,10 @@ translation = "정렬"
 source = "A to Z"
 translation = "A→Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "평점 높은 순"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "생성일"
@@ -1407,6 +1508,10 @@ translation = "생성일"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "큰 순"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "평점 낮은 순"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1419,6 +1524,10 @@ translation = "최신순"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "오래된 순"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "평점"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1479,6 +1588,46 @@ translation = "보조 파일 포함"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다. 스프라이트 시트의 페이지와, 팩에 별도 이미지로도 있는 그 스프라이트는 시트와 함께 표시됩니다. 팩에 여러 형식으로 있는 에셋은 Hoard가 가장 잘 읽는 형식으로 한 번만 표시됩니다."
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "태그 { $count }개를 복사했습니다"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name }: 복사할 태그가 없습니다"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "에셋 { $count }개에 이미 해당 태그가 있습니다"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "복사된 태그가 없습니다. 에셋에서 C를 눌러 태그를 복사하세요."
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "에셋 { $assets }개에 태그 { $count }개를 추가했습니다"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1551,6 +1700,14 @@ translation = "Hoard가 응답하지 않습니다: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "업데이트"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "“{ $name }” 업데이트"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "지금 선택한 내용을 이 저장된 검색에 유지"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1760,8 +1917,8 @@ source = "Animations"
 translation = "애니메이션"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "태그, 분류, 설명 변경 사항을 변형 { $count }개 모두에 적용"
+source = "Apply changes to all { $count } variants"
+translation = "변경 사항을 변형 { $count }개 모두에 적용"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1927,6 +2084,10 @@ translation = "설명 쓰기"
 source = "Asset details"
 translation = "에셋 세부 정보"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "세부 정보"
+
 [messages.asset-download]
 source = "Download"
 translation = "다운로드"
@@ -1966,6 +2127,62 @@ translation = "즐겨찾기에 추가(F)"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "즐겨찾기에 있음(F로 제거)"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "추가"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "분류"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field }을(를) 지웠습니다"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "{ $field } 편집"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "팩에서 가져옴"
+
+[messages.asset-field-license]
+source = "License"
+translation = "라이선스"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "CC0, CC-BY 4.0 같은 형식"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "필드 이름"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "필드 추가"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "평점"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "비우면 제거"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field }을(를) 저장했습니다"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "소스"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "값"
 
 [messages.asset-file]
 source = "File"
@@ -2519,6 +2736,41 @@ translation = "{ $duration } 중 { $current }"
 source = "Previous asset"
 translation = "이전 에셋"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "별 { $count }개"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "별 { $count }개로 평가했습니다"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "다시 클릭하면 평점 지우기"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "평점을 지웠습니다"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] 다시 클릭하면 별 { $count }개
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "원본 .{ $ext } 파일이 이 패키지 안에 저장되어 있어서 Hoard가 꺼냈습니다."
@@ -2570,6 +2822,34 @@ translation = "변형"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "클릭해서 이름 바꾸기"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "검토함"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "검토함 표시를 해제했습니다"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "{ $name }의 검토함 표시를 해제했습니다"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "검토함으로 표시해 규칙과 AI가 태그를 건드리지 않게 하기(R)"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "검토함으로 표시했습니다"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name }을(를) 검토함으로 표시했습니다"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "검토함: 규칙과 AI는 태그를 건드리지 않습니다. 클릭하면 표시 해제(R)"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2655,10 +2935,6 @@ translation = "{ $hex }이(가) 있는 에셋 찾기, 이 그림의 { $percent }
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, 그림의 { $percent }%. 이 색상이 있는 에셋 찾기"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "추가"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "태그 추가"
@@ -2671,9 +2947,57 @@ translation = "태그 추가, 예: mood:tense"
 source = "Removed { $tag }"
 translation = "{ $tag } 태그를 제거했습니다"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "{ $tag } 태그 되돌리기"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } 태그를 되돌렸습니다"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "{ $tag } 추가"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "태그"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "추측 { $count }개 모두 유지"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "규칙과 AI가 추측한 태그를 모두 내 태그로 유지"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "추측 태그 { $count }개를 유지했습니다"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "태그 { $count }개를 추가했습니다"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "비슷한 에셋의 태그:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "제외한 태그:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3237,6 +3561,102 @@ translation = "각 파일을 가져온 그대로, 필요한 파일과 함께 팩
 source = "Take { $name } out of the selection"
 translation = "{ $name }을(를) 선택에서 빼기"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "아직 불러오지 않은 결과를 포함해 모든 검색 결과가 변경되며, 한 번에 되돌릴 수 없습니다."
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "모든 항목에서 비움"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "닫기"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "그대로 둠"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "값이 다름, 그대로 둠"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "변경된 내용 없음"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "원래대로"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] 변경 { $count }개 저장
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] 에셋 { $count }개를 업데이트했습니다
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "모든 항목에 태그 추가"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $count }개 중 { $have }개"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "태그"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "그중 가장 많이 쓰인 태그"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] 에셋 { $count }개 편집
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] 검색 결과 { $count }개 모두 편집
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "모두 선택 해제"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "모든 태그를 제거한 다음 유지할 태그를 선택하세요"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "컬렉션에 추가"
@@ -3437,6 +3857,10 @@ translation = "잘못된 설정: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob { $hash }을(를) 찾을 수 없습니다"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "모양으로 찾은 결과는 한꺼번에 편집할 수 없습니다. 대신 에셋을 선택하세요"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "{ $path }을(를) 만들 수 없습니다"
@@ -3456,6 +3880,10 @@ translation = "{ $path }을(를) 읽을 수 없습니다"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "{ $path }에 쓸 수 없습니다"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "그 변경 사항은 이 에셋의 기록에 없습니다"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4049,6 +4477,10 @@ translation = "blake3 16진수 해시가 아닙니다"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard가 읽을 수 있는 그림이 아닙니다: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = '"{ $text }"은(는) 태그가 아닙니다'
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "이 Hoard는 { $feature } 없이 빌드되었습니다"
@@ -4392,6 +4824,10 @@ translation = "{ $name }은(는) MIDI 재생에 쓸 수 있는 SoundFont가 아�
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "검색할 내용이 없습니다. 팩 이름을 입력하세요"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent }이(가) 이미 { $tag } 아래에 있어서 { $tag }을(를) 그 아래에 넣을 수 없습니다"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4915,6 +5351,98 @@ translation = "읽어 낸 내용"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "zip을 만들지 못했습니다: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who }, 앱 이용"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who }, 어시스턴트 이용"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "규칙"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "누군가"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: 비움(이전 값 { $from })"
+
+[messages.history-field-description]
+source = "Description"
+translation = "설명"
+
+[messages.history-heading]
+source = "History"
+translation = "기록"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "기록을 불러오지 못했습니다: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "불러오는 중…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "아직 변경된 내용이 없습니다."
+
+[messages.history-revert]
+source = "Revert"
+translation = "되돌리기"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "되돌리지 못했습니다: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "이 변경으로 바뀐 내용을 되돌립니다"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "되돌림: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "검토함으로 표시"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: { $to }(으)로 설정"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "{ $tag } 태그 붙임"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "{ $tag } 태그 변경"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "제안된 { $tag } 태그 유지"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "{ $tag } 태그 뗌"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "검토 안 함으로 표시"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7223,6 +7751,17 @@ translation = "{ $name } 추가 작업"
 source = "No packs match."
 translation = "일치하는 팩이 없습니다."
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] 에셋 { $count }개에 자체 라이선스가 있음: 팩의 라이선스를 따르게 하기
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "팩 이름"
@@ -7266,6 +7805,33 @@ translation = "LLM 태거 다시 실행"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "오프라인 태거 다시 실행"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "현재"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "저장할 때 페이지에서 읽어옴"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "같음"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "스토어 내용"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] 필드 { $count }개 채우기
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7645,6 +8211,14 @@ translation = "중복 같은 비슷한 크기변경 변환 낭비 공간 duplica
 source = "Dark theme: { $name }"
 translation = "어두운 테마: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "선택한 { $count }개 편집"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "일괄 변경 태그 카테고리 라이선스 평점"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "즐겨찾기"
@@ -7744,6 +8318,14 @@ translation = "“{ $query }”과(와) 일치하는 항목이 없습니다"
 [messages.palette-packs]
 source = "Packs"
 translation = "팩"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "복사한 태그를 선택한 { $count }개에 붙여넣기"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7869,10 +8451,6 @@ translation = "Hoard는 프로세서의 { $hoard }를 사용하고 있으며, �
 source = "Couldn’t read the profiler: { $error }"
 translation = "프로파일러를 읽지 못했습니다: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "메모리"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "가장 느린 5%"
@@ -7912,6 +8490,22 @@ translation = "보낸 내용을 네트워크가 가져가기를 기다리는 시
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "인터페이스 자체 파일"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "최대"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard가 RAM을 { $hoard } 사용 중이며, 최근 10분 동안 최대 { $peak }를 사용했습니다."
 
 [messages.profiler-request-count]
 source = """
@@ -7986,6 +8580,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "백그라운드에서 실행된 작업이 없습니다."
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "{ $name }을(를) 변경하지 못했습니다: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10226,6 +10824,14 @@ translation = "채널 하나만 표시"
 source = "Close"
 translation = "닫기"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "태그 복사"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "선택 항목 편집"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "닫기, 선택 해제 또는 세부 정보 닫기"
@@ -10262,6 +10868,10 @@ translation = "세부 정보 열기"
 source = "Command palette: search, jump, run"
 translation = "명령 팔레트: 검색, 이동, 실행"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "복사한 태그를 선택 항목에 붙여넣기"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "재생 또는 일시 정지"
@@ -10269,6 +10879,10 @@ translation = "재생 또는 일시 정지"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "사운드 재생 또는 정지"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "검토함으로 표시 또는 해제"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10297,6 +10911,10 @@ translation = "사운드 플레이어"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "처음 또는 끝"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "태그 추가"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10829,6 +11447,141 @@ translation = "둘 이상의 팩에 있거나 스토어 파일 같은 이름인�
 source = "Yours"
 translation = "내 형식"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "{ $tag } 태그 유지"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "이 추측을 내 태그로 유지"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] 이전 이름: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "에셋 { $count }개"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "이 태그의 의미를 적어 보세요…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "클릭해서 변경"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "이 태그의 의미"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "어떤 용도인지, 무엇이 여기에 속하는지 적어 주세요. Enter로 저장합니다."
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "태그의 의미를 저장했습니다"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag }이(가) { $into }에 병합되었습니다."
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "하위 태그:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "{ $tag }을(를) 검색하면 이 태그도 함께 찾아요"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "아래에 넣기…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "이 태그를 더 넓은 태그 아래에 넣으세요. 그 태그를 검색하면 이 태그도 함께 찾아요"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "더 넓은 태그, 예: 탈것"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "{ $tag }을(를) { $parent } 아래에서 빼기"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag }이(가) 더 이상 { $parent } 아래에 있지 않습니다"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag }이(가) 이제 { $parent } 아래에 있습니다"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "이 태그의 이미지 고르기"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "이 태그의 에셋 중 하나를 골라 대표로 삼으세요"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "이미지 없음"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "표시된 에셋 중에 이미지가 있는 것이 없습니다."
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "이미지를 해제했습니다"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "이미지를 설정했습니다"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "이름 바꾸기…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "새 이름"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "새 이름이나, 병합할 다른 태그의 이름을 입력하세요"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "태그를 저장하지 못했습니다: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "{ $tag } 보기"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "상위 태그"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "제거합니다. 태거가 다시 붙이지 않습니다"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "{ $tag } 태그 제거"
@@ -10848,6 +11601,18 @@ translation = "파일에서 측정함"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "오프라인 태거가 붙임"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "이전 이름 { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "혹시 이것인가요"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "새 태그"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -10968,6 +11733,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "저장된 이름:"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "상위 및 하위"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "태그 페이지에서 더 넓은 태그 아래에 넣은 태그입니다. 태그를 검색하면 그 아래에 있는 모든 것도 함께 찾아요."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

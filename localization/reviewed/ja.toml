@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
+source = "629b41cab5ba273b3c1785cd319b4ef08746731288d5265ea8ebd96d22319e6d"
 translation = "5233f0609e7721ae824ccf9f7322ac9190df0638f3f2e758257bc57e3fa1c214"
 
 [messages.about-blender]
@@ -716,45 +716,21 @@ source = """
     }"""
 translation = "{ $count } 件のアセット"
 
-[messages.app-bulk-category-clear-button]
-source = "Clear"
-translation = "消去"
+[messages.app-bulk-accept]
+source = "Keep guessed tags"
+translation = "推測タグを残す"
 
-[messages.app-bulk-category-clear-title]
-source = "Clear the category of every selected asset"
-translation = "選択したすべてのアセットのカテゴリーを消去"
+[messages.app-bulk-accept-title]
+source = "Keep every tag the rules and the AI put on the selected assets as your own"
+translation = "選択したアセットにルールと AI が付けたタグをすべて自分のタグとして残す"
 
-[messages.app-bulk-category-cleared]
+[messages.app-bulk-accepted]
 source = """
-Cleared the category of { $count ->
+Kept the guessed tags on { $count ->
         [one] { $count } asset
        *[other] { $count } assets
     }"""
-translation = "{ $count } 件のアセットのカテゴリーを消去しました"
-
-[messages.app-bulk-category-label]
-source = "Category for the selected assets (empty clears it)"
-translation = "選択したアセットのカテゴリー（空にすると消去）"
-
-[messages.app-bulk-category-placeholder]
-source = "Category"
-translation = "カテゴリー"
-
-[messages.app-bulk-category-set]
-source = """
-Set the category of { $count ->
-        [one] { $count } asset
-       *[other] { $count } assets
-    } to { $category }"""
-translation = "{ $count } 件のアセットのカテゴリーを { $category } にしました"
-
-[messages.app-bulk-category-set-button]
-source = "Set"
-translation = "設定"
-
-[messages.app-bulk-category-set-title]
-source = "Set the category of every selected asset"
-translation = "選択したすべてのアセットのカテゴリーを設定"
+translation = "{ $count } 件のアセットの推測タグを残しました"
 
 [messages.app-bulk-failed]
 source = """
@@ -763,6 +739,22 @@ Couldn't change { $count ->
        *[other] those { $count } assets
     }: { $error }"""
 translation = "{ $count } 件のアセットを変更できませんでした: { $error }"
+
+[messages.app-bulk-review]
+source = "Mark reviewed"
+translation = "確認済みにする"
+
+[messages.app-bulk-review-title]
+source = "Mark the selected assets as gone over: rules and the AI leave their tags alone after this"
+translation = "選択したアセットを確認済みにします。以後、ルールと AI はタグに手を加えません"
+
+[messages.app-bulk-reviewed]
+source = """
+Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed"""
+translation = "{ $count } 件のアセットを確認済みにしました"
 
 [messages.app-bulk-tag-add]
 source = "Add"
@@ -795,6 +787,22 @@ Tagged { $count ->
        *[other] { $count } assets
     } with { $tag }"""
 translation = "{ $count } 件のアセットに { $tag } を付けました"
+
+[messages.app-bulk-unreview]
+source = "Mark not reviewed"
+translation = "未確認に戻す"
+
+[messages.app-bulk-unreview-title]
+source = "Take the reviewed mark off the selected assets"
+translation = "選択したアセットの確認済みを解除"
+
+[messages.app-bulk-unreviewed]
+source = """
+Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } 件のアセットの確認済みを解除しました"
 
 [messages.app-bulk-untagged]
 source = """
@@ -924,6 +932,18 @@ translation = "クレジットを作成できませんでした: { $error }"
 source = "CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for"
 translation = "これらの入手元パックの CREDITS.md: 作者、ライセンス、求められているクレジット表記"
 
+[messages.app-default-search-label]
+source = "Open the library to { $name }"
+translation = "{ $name } でライブラリを開く"
+
+[messages.app-default-search-on-title]
+source = "The library opens to this search. Click to stop it."
+translation = "ライブラリはこの検索で開きます。クリックで解除します。"
+
+[messages.app-default-search-title]
+source = "Open the library to this search"
+translation = "この検索でライブラリを開く"
+
 [messages.app-done]
 source = "Done"
 translation = "完了"
@@ -943,6 +963,14 @@ translation = "最上位のファイルやフォルダーは、それぞれ個�
 [messages.app-drop-items]
 source = "Drop { $count } items to add them"
 translation = "ドロップして { $count } 個の項目を追加"
+
+[messages.app-edit-selected]
+source = "Edit…"
+translation = "編集…"
+
+[messages.app-edit-selected-title]
+source = "Change the tags and fields of all of them (E)"
+translation = "すべてのタグとフィールドを変更 (E)"
 
 [messages.app-facets-fewer]
 source = "fewer"
@@ -1103,6 +1131,14 @@ translation = "さらに読み込み中"
 [messages.app-music]
 source = "Music"
 translation = "音楽"
+
+[messages.app-needs-review]
+source = "Needs review"
+translation = "要確認"
+
+[messages.app-needs-review-title]
+source = "Only assets nobody has gone over yet (goes with the other filters)"
+translation = "まだ誰も確認していないアセットのみ（ほかの絞り込みと併用できます）"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1296,9 +1332,36 @@ translation = "音が近い順"
 source = "Best match"
 translation = "一致度順"
 
+[messages.app-rated]
+source = "Rated"
+translation = "評価"
+
+[messages.app-rated-any]
+source = "Click again to show every rating"
+translation = "もう一度クリックですべての評価を表示"
+
+[messages.app-rated-min]
+source = """
+{ $count ->
+        [one] { $count } star or more
+       *[other] { $count } stars or more
+    }"""
+translation = """
+{ $count ->
+       *[other] 星 { $count } つ以上
+    }"""
+
 [messages.app-remove-from-collection]
 source = "Remove from { $name }"
 translation = "{ $name } から外す"
+
+[messages.app-rename-search]
+source = "Rename"
+translation = "名前を変更"
+
+[messages.app-rename-search-label]
+source = "New name for { $name }"
+translation = "{ $name } の新しい名前"
 
 [messages.app-resize-label]
 source = "Resize the details panel"
@@ -1336,6 +1399,10 @@ translation = "名前を付ける"
 source = "Save search"
 translation = "検索を保存"
 
+[messages.app-save-search-new]
+source = "Save as new"
+translation = "新規として保存"
+
 [messages.app-save-search-title]
 source = "Keep this search in Filters, under Yours"
 translation = "この検索をフィルターの「自分用」に残す"
@@ -1356,6 +1423,14 @@ translation = "名前、パス、タグを検索"
 source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "「{ $name }」を保存しました。フィルターの「自分用」にあります"
 
+[messages.app-search-syntax-title]
+source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
+translation = '岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて'
+
+[messages.app-search-updated]
+source = "Updated “{ $name }”"
+translation = "「{ $name }」を更新しました"
+
 [messages.app-searching]
 source = "Searching…"
 translation = "検索中…"
@@ -1372,6 +1447,17 @@ translation = "選択"
 source = "Select all { $count }"
 translation = "{ $count } 件をすべて選択"
 
+[messages.app-select-matching]
+source = """
+{ $count ->
+        [one] Select the { $count } match
+       *[other] Select all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件の検索結果をすべて選択
+    }"""
+
 [messages.app-select-title]
 source = "Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
 translation = "複数のアセットを選んで、まとめてタグ付け、分類、コレクションへの追加、ダウンロード、アーカイブを行います（X または Ctrl+クリック）"
@@ -1379,6 +1465,17 @@ translation = "複数のアセットを選んで、まとめてタグ付け、�
 [messages.app-selected]
 source = "{ $count } selected"
 translation = "{ $count } 件を選択中"
+
+[messages.app-selected-all]
+source = """
+{ $count ->
+        [one] { $count } match selected
+       *[other] All { $count } matches selected
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件の検索結果を選択中
+    }"""
 
 [messages.app-selected-label]
 source = "Selected assets"
@@ -1400,6 +1497,10 @@ translation = "並べ替え"
 source = "A to Z"
 translation = "A→Z"
 
+[messages.app-sort-best-rated-first]
+source = "Best rated first"
+translation = "評価の高い順"
+
 [messages.app-sort-created]
 source = "Created"
 translation = "作成日"
@@ -1407,6 +1508,10 @@ translation = "作成日"
 [messages.app-sort-largest-first]
 source = "Largest first"
 translation = "大きい順"
+
+[messages.app-sort-lowest-rated-first]
+source = "Lowest rated first"
+translation = "評価の低い順"
 
 [messages.app-sort-name]
 source = "Name"
@@ -1419,6 +1524,10 @@ translation = "新しい順"
 [messages.app-sort-oldest-first]
 source = "Oldest first"
 translation = "古い順"
+
+[messages.app-sort-rating]
+source = "Rating"
+translation = "評価"
 
 [messages.app-sort-size]
 source = "Size"
@@ -1479,6 +1588,46 @@ translation = "サポートファイルを含めて表示中"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF のバッファー、マテリアルライブラリ、マテリアルのマップ、1 つのモデルだけが使うマテリアル、モデルを説明するストアファイルです。それらを使うものをダウンロードすると一緒に含まれます。 スプライトシートのページと、パックに個別の画像としてもあるそのスプライトは、シートと一緒に表示されます。 パックに複数の形式であるアセットは、Hoard がいちばんよく読める形式で一度だけ表示されます。"
+
+[messages.app-tags-copied]
+source = """
+{ $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }"""
+translation = "{ $count } 個のタグをコピーしました"
+
+[messages.app-tags-copy-none]
+source = "{ $name } has no tags to copy"
+translation = "{ $name } にはコピーできるタグがありません"
+
+[messages.app-tags-paste-had]
+source = """
+{ $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }"""
+translation = "{ $count } 件のアセットにはすでにそのタグがあります"
+
+[messages.app-tags-paste-none]
+source = "No tags copied. Press C on an asset to copy its tags."
+translation = "コピーされたタグがありません。アセットで C を押すと、そのタグをコピーできます。"
+
+[messages.app-tags-pasted]
+source = """
+{ $assets ->
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
+    }"""
+translation = "{ $assets } 件のアセットに { $count } 個のタグを追加しました"
 
 [messages.app-tempo]
 source = "BPM"
@@ -1551,6 +1700,14 @@ translation = "Hoard が応答していません: { $error }"
 [messages.app-update]
 source = "Update"
 translation = "更新"
+
+[messages.app-update-search]
+source = "Update “{ $name }”"
+translation = "「{ $name }」を更新"
+
+[messages.app-update-search-title]
+source = "Keep what's chosen now in this saved search"
+translation = "現在の選択をこの保存した検索に反映する"
 
 [messages.app-update-title]
 source = "Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself."
@@ -1760,8 +1917,8 @@ source = "Animations"
 translation = "アニメーション"
 
 [messages.asset-apply-family]
-source = "Apply tag, category and description changes to all { $count } variants"
-translation = "タグ、カテゴリー、説明の変更を { $count } 個のバリエーションすべてに適用"
+source = "Apply changes to all { $count } variants"
+translation = "変更を { $count } 個のバリエーションすべてに適用"
 
 [messages.asset-archive]
 source = "Archive"
@@ -1927,6 +2084,10 @@ translation = "説明を書く"
 source = "Asset details"
 translation = "アセットの詳細"
 
+[messages.asset-details-heading]
+source = "Details"
+translation = "詳細"
+
 [messages.asset-download]
 source = "Download"
 translation = "ダウンロード"
@@ -1966,6 +2127,62 @@ translation = "お気に入りに追加（F）"
 [messages.asset-favorite-on-title]
 source = "In your favorites (F takes it out)"
 translation = "お気に入りに追加済み（F で外す）"
+
+[messages.asset-field-add]
+source = "Add"
+translation = "追加"
+
+[messages.asset-field-category]
+source = "Category"
+translation = "カテゴリー"
+
+[messages.asset-field-cleared]
+source = "Cleared { $field }"
+translation = "{ $field } を消去しました"
+
+[messages.asset-field-edit-title]
+source = "Edit { $field }"
+translation = "{ $field } を編集"
+
+[messages.asset-field-from-pack]
+source = "from the pack"
+translation = "パックから"
+
+[messages.asset-field-license]
+source = "License"
+translation = "ライセンス"
+
+[messages.asset-field-license-placeholder]
+source = "Like CC0 or CC-BY 4.0"
+translation = "CC0 や CC-BY 4.0 など"
+
+[messages.asset-field-name]
+source = "Field name"
+translation = "フィールド名"
+
+[messages.asset-field-new]
+source = "Add a field"
+translation = "フィールドを追加"
+
+[messages.asset-field-rating]
+source = "Rating"
+translation = "評価"
+
+[messages.asset-field-remove-placeholder]
+source = "Empty to remove it"
+translation = "空にすると削除"
+
+[messages.asset-field-saved]
+source = "Saved { $field }"
+translation = "{ $field } を保存しました"
+
+[messages.asset-field-source]
+source = "Source"
+translation = "ソース"
+
+[messages.asset-field-value]
+source = "Value"
+translation = "値"
 
 [messages.asset-file]
 source = "File"
@@ -2525,6 +2742,41 @@ translation = "{ $current } / { $duration }"
 source = "Previous asset"
 translation = "前のアセット"
 
+[messages.asset-rate]
+source = """
+{ $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "星 { $count } つ"
+
+[messages.asset-rated]
+source = """
+Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = "星 { $count } つに評価しました"
+
+[messages.asset-rating-clear-title]
+source = "Click again to clear the rating"
+translation = "もう一度クリックで評価を消去"
+
+[messages.asset-rating-cleared]
+source = "Cleared the rating"
+translation = "評価を消去しました"
+
+[messages.asset-rating-down-title]
+source = """
+Click again for { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }"""
+translation = """
+{ $count ->
+       *[other] もう一度クリックで星 { $count } つ
+    }"""
+
 [messages.asset-recovered]
 source = "The original .{ $ext } was stored inside this package, and Hoard pulled it out."
 translation = "元の .{ $ext } がこのパッケージ内に保存されていたので、Hoard が取り出しました。"
@@ -2576,6 +2828,34 @@ translation = "バリエーション"
 [messages.asset-rename-title]
 source = "Click to rename"
 translation = "クリックして名前を変更"
+
+[messages.asset-reviewed]
+source = "Reviewed"
+translation = "確認済み"
+
+[messages.asset-reviewed-off]
+source = "Took the reviewed mark off"
+translation = "確認済みを解除しました"
+
+[messages.asset-reviewed-off-named]
+source = "Took the reviewed mark off { $name }"
+translation = "{ $name } の確認済みを解除しました"
+
+[messages.asset-reviewed-off-title]
+source = "Mark as reviewed, so rules and the AI leave its tags alone (R)"
+translation = "確認済みにして、ルールと AI がタグに手を加えないようにする（R）"
+
+[messages.asset-reviewed-on]
+source = "Marked reviewed"
+translation = "確認済みにしました"
+
+[messages.asset-reviewed-on-named]
+source = "Marked { $name } reviewed"
+translation = "{ $name } を確認済みにしました"
+
+[messages.asset-reviewed-on-title]
+source = "Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)"
+translation = "確認済み: ルールと AI はタグに手を加えません。クリックで解除（R）"
 
 [messages.asset-role-map]
 source = "{ $role } map"
@@ -2661,10 +2941,6 @@ translation = "{ $hex } のアセットを探す（この画像の { $percent }%
 source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }、画像の { $percent }%。この色のアセットを探す"
 
-[messages.asset-tag-add]
-source = "Add"
-translation = "追加"
-
 [messages.asset-tag-add-label]
 source = "Add a tag"
 translation = "タグを追加"
@@ -2677,9 +2953,57 @@ translation = "タグを追加（例: mood:tense）"
 source = "Removed { $tag }"
 translation = "{ $tag } を外しました"
 
+[messages.asset-tag-restore-title]
+source = "Put { $tag } back"
+translation = "{ $tag } を戻す"
+
+[messages.asset-tag-restored]
+source = "Put { $tag } back"
+translation = "{ $tag } を戻しました"
+
+[messages.asset-tag-suggest-title]
+source = "Add { $tag }"
+translation = "{ $tag } を追加"
+
 [messages.asset-tags]
 source = "Tags"
 translation = "タグ"
+
+[messages.asset-tags-accept-all]
+source = """
+Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }"""
+translation = "推測 { $count } 件をすべて残す"
+
+[messages.asset-tags-accept-all-title]
+source = "Keep every tag the rules and the AI guessed as your own"
+translation = "ルールと AI が推測したタグをすべて自分のタグとして残す"
+
+[messages.asset-tags-accepted]
+source = """
+Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }"""
+translation = "推測タグ { $count } 件を残しました"
+
+[messages.asset-tags-added]
+source = """
+Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }"""
+translation = "タグ { $count } 件を追加しました"
+
+[messages.asset-tags-from-similar]
+source = "Similar ones have:"
+translation = "似たアセットのタグ:"
+
+[messages.asset-tags-rejected]
+source = "Turned down:"
+translation = "却下済み:"
 
 [messages.asset-teach]
 source = "Teach Hoard this file"
@@ -3246,6 +3570,102 @@ translation = "各ファイルを取り込んだときのまま、必要なフ�
 source = "Take { $name } out of the selection"
 translation = "{ $name } を選択から外す"
 
+[messages.bulk-edit-all-note]
+source = "This changes every match, including ones not loaded yet, and can't be undone in one step."
+translation = "未読み込みの結果を含むすべての検索結果が変更され、1 回の操作では元に戻せません。"
+
+[messages.bulk-edit-cleared]
+source = "Cleared on all"
+translation = "すべてで消去"
+
+[messages.bulk-edit-close]
+source = "Close"
+translation = "閉じる"
+
+[messages.bulk-edit-keep]
+source = "Left as is"
+translation = "変更しません"
+
+[messages.bulk-edit-mixed]
+source = "Mixed, left as is"
+translation = "値が異なります。変更しません"
+
+[messages.bulk-edit-nothing]
+source = "Nothing changed"
+translation = "変更はありません"
+
+[messages.bulk-edit-reset]
+source = "Put back as it was"
+translation = "元に戻す"
+
+[messages.bulk-edit-save]
+source = """
+{ $count ->
+        [one] Save { $count } change
+       *[other] Save { $count } changes
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件の変更を保存
+    }"""
+
+[messages.bulk-edit-saved]
+source = """
+{ $count ->
+        [one] Updated { $count } asset
+       *[other] Updated { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件のアセットを更新しました
+    }"""
+
+[messages.bulk-edit-tag-add]
+source = "Add a tag to all of them"
+translation = "すべてにタグを追加"
+
+[messages.bulk-edit-tag-count]
+source = "{ $have } of { $count }"
+translation = "{ $count } 件中 { $have } 件"
+
+[messages.bulk-edit-tags]
+source = "Tags"
+translation = "タグ"
+
+[messages.bulk-edit-tags-most-used]
+source = "The most used tags among them"
+translation = "その中でよく使われているタグ"
+
+[messages.bulk-edit-title]
+source = """
+{ $count ->
+        [one] Edit { $count } asset
+       *[other] Edit { $count } assets
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件のアセットを編集
+    }"""
+
+[messages.bulk-edit-title-all]
+source = """
+{ $count ->
+        [one] Edit { $count } match
+       *[other] Edit all { $count } matches
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件の検索結果をすべて編集
+    }"""
+
+[messages.bulk-edit-untick]
+source = "Untick all"
+translation = "すべてのチェックを外す"
+
+[messages.bulk-edit-untick-title]
+source = "Take every tag off, then tick the ones to keep"
+translation = "すべてのタグを外してから、残すものにチェックを入れます"
+
 [messages.collections-add]
 source = "Add to collection"
 translation = "コレクションに追加"
@@ -3446,6 +3866,10 @@ translation = "不正な設定: { $reason }"
 source = "blob { $hash } not found"
 translation = "blob { $hash } が見つかりません"
 
+[messages.error-bulk-by-look]
+source = "a search by look can't be edited all at once: select the assets instead"
+translation = "見た目による検索は一括で編集できません。アセットを選択してください"
+
 [messages.error-cant-create]
 source = "can't create { $path }"
 translation = "{ $path } を作成できません"
@@ -3465,6 +3889,10 @@ translation = "{ $path } を読み取れません"
 [messages.error-cant-write]
 source = "can't write to { $path }"
 translation = "{ $path } に書き込めません"
+
+[messages.error-change-not-found]
+source = "that change isn't in this asset's history"
+translation = "その変更はこのアセットの履歴にありません"
 
 [messages.error-chatgpt-canceled]
 source = "the sign-in was canceled"
@@ -4058,6 +4486,10 @@ translation = "blake3 の 16 進ハッシュではありません"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard が読める画像ではありません: { $reason }"
 
+[messages.error-not-a-tag]
+source = """"{ $text }" isn't a tag"""
+translation = "「{ $text }」はタグではありません"
+
 [messages.error-not-built]
 source = "this copy of Hoard was built without { $feature }"
 translation = "この Hoard は { $feature } なしでビルドされています"
@@ -4401,6 +4833,10 @@ translation = "{ $name } は MIDI の再生に使える SoundFont ではあり�
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
 translation = "検索するものがありません。パックの名前を入力してください"
+
+[messages.error-tag-parent-loop]
+source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
+translation = "{ $parent } はすでに { $tag } の下にあるため、{ $tag } をその下に入れることはできません"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -4932,6 +5368,98 @@ translation = "読み取る内容"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "zip を作成できませんでした: { $error }"
+
+[messages.history-by-ai]
+source = "AI"
+translation = "AI"
+
+[messages.history-by-app]
+source = "{ $who } through an app"
+translation = "{ $who }（アプリ経由）"
+
+[messages.history-by-assistant]
+source = "{ $who } through an assistant"
+translation = "{ $who }（アシスタント経由）"
+
+[messages.history-by-rule]
+source = "A rule"
+translation = "ルール"
+
+[messages.history-by-someone]
+source = "Someone"
+translation = "だれか"
+
+[messages.history-changed]
+source = "{ $field }: { $from } → { $to }"
+translation = "{ $field }: { $from } → { $to }"
+
+[messages.history-cleared]
+source = "{ $field }: cleared (was { $from })"
+translation = "{ $field }: クリア（元は { $from }）"
+
+[messages.history-field-description]
+source = "Description"
+translation = "説明"
+
+[messages.history-heading]
+source = "History"
+translation = "履歴"
+
+[messages.history-load-failed]
+source = "Couldn't load the history: { $error }"
+translation = "履歴を読み込めませんでした: { $error }"
+
+[messages.history-loading]
+source = "Loading…"
+translation = "読み込み中…"
+
+[messages.history-none]
+source = "Nothing has been changed here yet."
+translation = "ここではまだ何も変更されていません。"
+
+[messages.history-revert]
+source = "Revert"
+translation = "元に戻す"
+
+[messages.history-revert-failed]
+source = "Couldn't revert that: { $error }"
+translation = "元に戻せませんでした: { $error }"
+
+[messages.history-revert-title]
+source = "Put back what this change changed"
+translation = "この変更で変わった内容を元に戻します"
+
+[messages.history-reverted]
+source = "Reverted: { $change }"
+translation = "元に戻しました: { $change }"
+
+[messages.history-reviewed]
+source = "Marked reviewed"
+translation = "確認済みにしました"
+
+[messages.history-set]
+source = "{ $field }: set to { $to }"
+translation = "{ $field }: { $to } に設定"
+
+[messages.history-tag-added]
+source = "Tagged { $tag }"
+translation = "タグ { $tag } を付けました"
+
+[messages.history-tag-changed]
+source = "Changed the tag { $tag }"
+translation = "タグ { $tag } を変更しました"
+
+[messages.history-tag-kept]
+source = "Kept the suggested tag { $tag }"
+translation = "提案されたタグ { $tag } を残しました"
+
+[messages.history-tag-removed]
+source = "Took off { $tag }"
+translation = "タグ { $tag } を外しました"
+
+[messages.history-unreviewed]
+source = "Marked not reviewed"
+translation = "未確認にしました"
 
 [messages.hoard-arcade]
 source = "Arcade screen"
@@ -7243,6 +7771,17 @@ translation = "{ $name } のその他の操作"
 source = "No packs match."
 translation = "一致するパックはありません。"
 
+[messages.packs-own-licenses]
+source = """
+{ $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件のアセットに独自のライセンスがあります：パックのライセンスに合わせる
+    }"""
+
 [messages.packs-pack-name]
 source = "Pack name"
 translation = "パック名"
@@ -7286,6 +7825,33 @@ translation = "LLM のタグ付けを再実行"
 [messages.packs-retag-rules]
 source = "Re-run offline tagger"
 translation = "オフラインのタグ付けを再実行"
+
+[messages.packs-review-now]
+source = "Now"
+translation = "現在"
+
+[messages.packs-review-read-page]
+source = "Read from the page when you save"
+translation = "保存時にページから読み込む"
+
+[messages.packs-review-same]
+source = "Same"
+translation = "同じ"
+
+[messages.packs-review-store]
+source = "From the store"
+translation = "ストアの内容"
+
+[messages.packs-review-take]
+source = """
+{ $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件の項目を入力
+    }"""
 
 [messages.packs-save]
 source = "Save"
@@ -7683,6 +8249,14 @@ translation = "重複 同じ 似た リサイズ 変換 無駄 容量 duplicates
 source = "Dark theme: { $name }"
 translation = "ダークテーマ: { $name }"
 
+[messages.palette-edit-selected]
+source = "Edit the { $count } selected"
+translation = "選択した { $count } 件を編集"
+
+[messages.palette-edit-selected-keywords]
+source = "bulk change tags category license rating"
+translation = "一括変更 タグ カテゴリ ライセンス 評価"
+
 [messages.palette-favorites]
 source = "Favorites"
 translation = "お気に入り"
@@ -7782,6 +8356,14 @@ translation = "「{ $query }」に一致するものはありません"
 [messages.palette-packs]
 source = "Packs"
 translation = "パック"
+
+[messages.palette-paste-tags]
+source = """
+{ $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }"""
+translation = "コピーしたタグを選択中の { $count } 件に貼り付け"
 
 [messages.palette-placeholder]
 source = "Search assets, go to a pack, run a command…"
@@ -7907,10 +8489,6 @@ translation = "Hoard はプロセッサーの { $hoard } を使用しており�
 source = "Couldn’t read the profiler: { $error }"
 translation = "プロファイラーを読み取れませんでした: { $error }"
 
-[messages.profiler-memory]
-source = "Memory"
-translation = "メモリ"
-
 [messages.profiler-p95]
 source = "Slowest 5%"
 translation = "遅い方から 5%"
@@ -7950,6 +8528,22 @@ translation = "送信したデータをネットワークが受け取るまで�
 [messages.profiler-portal]
 source = "the interface’s own files"
 translation = "インターフェース自体のファイル"
+
+[messages.profiler-ram]
+source = "RAM"
+translation = "RAM"
+
+[messages.profiler-ram-of]
+source = "{ $used } of { $total }"
+translation = "{ $used } / { $total }"
+
+[messages.profiler-ram-peak]
+source = "Most"
+translation = "最大"
+
+[messages.profiler-ram-summary]
+source = "Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes."
+translation = "Hoard は RAM を { $hoard } 使用中で、直近 10 分間の最大は { $peak } です。"
 
 [messages.profiler-request-count]
 source = """
@@ -8024,6 +8618,10 @@ translation = """
 [messages.profiler-working-none]
 source = "Nothing ran in the background."
 translation = "バックグラウンドで実行されたものはありません。"
+
+[messages.projects-change-search-failed]
+source = "Couldn't change { $name }: { $error }"
+translation = "{ $name } を変更できませんでした: { $error }"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"
@@ -10270,6 +10868,14 @@ translation = "1 つのチャンネルを表示"
 source = "Close"
 translation = "閉じる"
 
+[messages.shortcuts-copy-tags]
+source = "Copy its tags"
+translation = "タグをコピー"
+
+[messages.shortcuts-edit]
+source = "Edit what's selected"
+translation = "選択中のものを編集"
+
 [messages.shortcuts-escape]
 source = "Close, clear the selection, or close the details"
 translation = "閉じる、選択を解除する、または詳細を閉じる"
@@ -10306,6 +10912,10 @@ translation = "詳細を開く"
 source = "Command palette: search, jump, run"
 translation = "コマンドパレット: 検索、移動、実行"
 
+[messages.shortcuts-paste-tags]
+source = "Paste copied tags onto what's selected"
+translation = "コピーしたタグを選択中のものに貼り付け"
+
 [messages.shortcuts-play-pause]
 source = "Play or pause"
 translation = "再生または一時停止"
@@ -10313,6 +10923,10 @@ translation = "再生または一時停止"
 [messages.shortcuts-play-sound]
 source = "Play or stop a sound"
 translation = "サウンドを再生または停止"
+
+[messages.shortcuts-reviewed]
+source = "Mark as reviewed, or not"
+translation = "確認済みにする、または解除する"
 
 [messages.shortcuts-search]
 source = "Search"
@@ -10341,6 +10955,10 @@ translation = "サウンドプレーヤー"
 [messages.shortcuts-start-end]
 source = "Start or end"
 translation = "先頭または末尾"
+
+[messages.shortcuts-tag]
+source = "Add a tag"
+translation = "タグを追加"
 
 [messages.shortcuts-this-list]
 source = "This list"
@@ -10876,6 +11494,141 @@ translation = "複数のパックにある、またはストアのファイル�
 source = "Yours"
 translation = "自分用"
 
+[messages.tag-accept]
+source = "Keep tag { $tag }"
+translation = "タグ { $tag } を残す"
+
+[messages.tag-accept-title]
+source = "Keep this guess as your own tag"
+translation = "この推測を自分のタグとして残す"
+
+[messages.tag-page-aliases]
+source = """
+{ $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }"""
+translation = """
+{ $count ->
+       *[other] 旧名: { $names }
+    }"""
+
+[messages.tag-page-count]
+source = """
+{ $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }"""
+translation = "{ $count } 件のアセット"
+
+[messages.tag-page-describe]
+source = "Say what this tag means…"
+translation = "このタグの意味を書く…"
+
+[messages.tag-page-describe-edit]
+source = "Click to change"
+translation = "クリックして変更"
+
+[messages.tag-page-describe-label]
+source = "What this tag means"
+translation = "このタグの意味"
+
+[messages.tag-page-describe-placeholder]
+source = "What it's for, what belongs under it. Enter saves."
+translation = "何のためのタグか、何が当てはまるか。Enter で保存。"
+
+[messages.tag-page-description-saved]
+source = "Saved what the tag means"
+translation = "タグの意味を保存しました"
+
+[messages.tag-page-merged]
+source = "{ $tag } was merged into { $into }."
+translation = "{ $tag } は { $into } に統合されました。"
+
+[messages.tag-page-narrower]
+source = "Narrower:"
+translation = "下位タグ:"
+
+[messages.tag-page-narrower-title]
+source = "Searching { $tag } finds these too"
+translation = "{ $tag } を検索すると、これらも見つかります"
+
+[messages.tag-page-parent-add]
+source = "Put under…"
+translation = "上位タグに入れる…"
+
+[messages.tag-page-parent-add-title]
+source = "Put this tag under a broader one: searching that one finds these too"
+translation = "このタグを広い意味のタグの下に入れます。そのタグを検索すると、これらも見つかります"
+
+[messages.tag-page-parent-placeholder]
+source = "A broader tag, like vehicle"
+translation = "上位のタグ（例: 乗り物）"
+
+[messages.tag-page-parent-remove]
+source = "Take { $tag } out from under { $parent }"
+translation = "{ $tag } を { $parent } の下から外す"
+
+[messages.tag-page-parent-removed]
+source = "{ $tag } is no longer under { $parent }"
+translation = "{ $tag } を { $parent } の下から外しました"
+
+[messages.tag-page-parent-saved]
+source = "{ $tag } is now under { $parent }"
+translation = "{ $tag } を { $parent } の下に入れました"
+
+[messages.tag-page-picture]
+source = "Pick a picture for this tag"
+translation = "このタグの画像を選ぶ"
+
+[messages.tag-page-picture-help]
+source = "Pick one of its assets to stand for it"
+translation = "このタグのアセットから 1 つ選んで代表にします"
+
+[messages.tag-page-picture-none]
+source = "No picture"
+translation = "画像なし"
+
+[messages.tag-page-picture-nothing]
+source = "None of the assets shown has a picture."
+translation = "表示中のアセットに画像のあるものはありません。"
+
+[messages.tag-page-picture-removed]
+source = "Picture taken off"
+translation = "画像を外しました"
+
+[messages.tag-page-picture-saved]
+source = "Picture set"
+translation = "画像を設定しました"
+
+[messages.tag-page-rename]
+source = "Rename…"
+translation = "名前を変更…"
+
+[messages.tag-page-rename-label]
+source = "New name"
+translation = "新しい名前"
+
+[messages.tag-page-rename-title]
+source = "Give it a new name, or the name of another tag to merge it into that one"
+translation = "新しい名前、または統合先にする別のタグの名前を入力してください"
+
+[messages.tag-page-save-failed]
+source = "Couldn't save the tag: { $error }"
+translation = "タグを保存できませんでした: { $error }"
+
+[messages.tag-page-show]
+source = "Show { $tag }"
+translation = "{ $tag } を表示"
+
+[messages.tag-page-under]
+source = "Under"
+translation = "上位タグ"
+
+[messages.tag-reject-title]
+source = "Remove it; the tagger won't put it back"
+translation = "外す。タグ付けは再び付けません"
+
 [messages.tag-remove]
 source = "Remove tag { $tag }"
 translation = "タグ { $tag } を外す"
@@ -10895,6 +11648,18 @@ translation = "ファイルから測定"
 [messages.tag-source-rule]
 source = "from the offline tagger"
 translation = "オフラインのタグ付けによる"
+
+[messages.tag-suggest-alias]
+source = "was { $alias }"
+translation = "旧称 { $alias }"
+
+[messages.tag-suggest-near]
+source = "Did you mean"
+translation = "もしかして"
+
+[messages.tag-suggest-new]
+source = "New tag"
+translation = "新しいタグ"
 
 [messages.tag-title-with-source]
 source = "{ $tag } ({ $source })"
@@ -11015,6 +11780,14 @@ translation = '{ "" }'
 [messages.tags-saved-as-before]
 source = "Saved as"
 translation = "保存名:"
+
+[messages.tags-tree-heading]
+source = "Broader and narrower"
+translation = "上位と下位"
+
+[messages.tags-tree-what]
+source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
+translation = "タグのページで上位タグの下に入れたタグです。タグを検索すると、その下にあるものもすべて見つかります。"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

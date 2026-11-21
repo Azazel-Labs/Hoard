@@ -449,7 +449,7 @@ export class ModelStage {
         // A pose saved beside the clip (Blender's "Targeting Pose") isn't one to play.
         const takes = loaded.animations.filter((c) => c.duration >= POSE_SECS)
         const list = takes.length ? takes : loaded.animations
-        list.forEach((c, i) => this.clips.set(list.length > 1 ? `${label} ${i + 1}` : label, bindClip(c, object)))
+        list.forEach((c, i) => this.clips.set(list.length > 1 ? `${label} ${i + 1}` : label, bindClip(c, object, loaded.object)))
         disposeObject(loaded.object)
       } catch {
         // A clip that won't load shouldn't break the preview.
@@ -1006,7 +1006,7 @@ export class ModelStage {
       const loaded = await loadModel(s.url, s.ext, manager)
       disposeObject(loaded.object)
       const longest = loaded.animations.reduce<THREE.AnimationClip | null>((a, c) => (!a || c.duration > a.duration ? c : a), null)
-      if (longest && !this.disposed && this.object) this.clips.set(name, bindClip(longest, this.object))
+      if (longest && !this.disposed && this.object) this.clips.set(name, bindClip(longest, this.object, loaded.object))
     } catch {
       // One that won't load just doesn't play; the next pick tries again.
     }

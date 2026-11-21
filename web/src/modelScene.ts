@@ -154,17 +154,57 @@ function boneKey(name: string): string {
   return (name.split(/[:|]/).pop() ?? name).replace(/^mixamorig\d*/i, '').trim().toLowerCase()
 }
 
+/** How long a skeleton's bones are, added up, in world units: the distance from each node to its parent, for the
+ *  nodes in `nodes` whose parent is in it too. Turning a bone doesn't change it, so a posed skeleton measures the
+ *  same as one at rest. */
+function boneLength(nodes: Map<string, THREE.Object3D>): number {
+  const at = (o: THREE.Object3D) => o.getWorldPosition(new THREE.Vector3())
+  let sum = 0
+  for (const o of nodes.values()) {
+    if (o.parent && nodes.get(o.parent.name) === o.parent) sum += at(o).distanceTo(at(o.parent))
+  }
+  return sum
+}
+
+/** The size of one unit of a node's position in world units: its parent's world scale. */
+function unitOf(o: THREE.Object3D): number {
+  const s = o.parent ? o.parent.getWorldScale(new THREE.Vector3()) : new THREE.Vector3(1, 1, 1)
+  return (Math.abs(s.x) + Math.abs(s.y) + Math.abs(s.z)) / 3
+}
+
 /** A clip from another file with its tracks renamed to `root`'s nodes: by name, else by bone name without its prefix,
- *  so an `Armature|Hips` clip moves a `mixamorig:Hips` character. A track for a node it lacks is left as it is. */
-export function bindClip(clip: THREE.AnimationClip, root: THREE.Object3D): THREE.AnimationClip {
-  const exact = new Set<string>()
-  const loose = new Map<string, string>()
+ *  so an `Armature|Hips` clip moves a `mixamorig:Hips` character. A track for a node it lacks is left as it is.
+ *
+ *  Given the clip's own file (`from`), its position keys are put in `root`'s units and to its size too: a step of
+ *  10 from an FBX in centimetres, under a node scaled by 0.01, is 10 cm on that character but would be 10 metres on
+ *  one made in metres, and a step that's a fifth of one character's height stays a fifth of a smaller one's. */
+export function bindClip(clip: THREE.AnimationClip, root: THREE.Object3D, from?: THREE.Object3D): THREE.AnimationClip {
+  const exact = new Map<string, THREE.Object3D>()
+  const loose = new Map<string, THREE.Object3D>()
   root.traverse((o) => {
     if (!o.name) return
-    exact.add(o.name)
+    exact.set(o.name, o)
     const k = boneKey(o.name)
-    if (k && !loose.has(k)) loose.set(k, o.name)
+    if (k && !loose.has(k)) loose.set(k, o)
   })
+  const counterpart = (name: string) => exact.get(name) ?? loose.get(boneKey(name))
+  // The bones both skeletons have, measured each in its own file, for how much bigger `root`'s is.
+  let ratio = 0
+  const source = new Map<string, THREE.Object3D>()
+  if (from) {
+    const target = new Map<string, THREE.Object3D>()
+    from.traverse((o) => {
+      const to = o.name ? counterpart(o.name) : undefined
+      if (to && !source.has(o.name)) {
+        source.set(o.name, o)
+        target.set(to.name, to)
+      }
+    })
+    from.updateMatrixWorld(true)
+    root.updateMatrixWorld(true)
+    const [a, b] = [boneLength(source), boneLength(target)]
+    if (a > 1e-9 && b > 1e-9) ratio = b / a
+  }
   let changed = false
   const tracks = clip.tracks.map((t) => {
     let node = ''
@@ -173,12 +213,18 @@ export function bindClip(clip: THREE.AnimationClip, root: THREE.Object3D): THREE
     } catch {
       return t
     }
-    const to = !node || exact.has(node) || !t.name.startsWith(node) ? undefined : loose.get(boneKey(node))
-    if (!to) return t
+    const toNode = !node || !t.name.startsWith(node) ? undefined : counterpart(node)
+    const to = toNode && toNode.name !== node ? toNode.name : undefined
+    // How much a position key grows going across: the size ratio, from the clip's units to `root`'s.
+    const src = source.get(node)
+    let k = ratio && src && toNode && t.name.endsWith('.position') ? (ratio * unitOf(src)) / unitOf(toNode) : 1
+    if (!Number.isFinite(k) || Math.abs(k - 1) < 1e-3) k = 1
+    if (!to && k === 1) return t
     changed = true
-    const renamed = t.clone()
-    renamed.name = to + t.name.slice(node.length)
-    return renamed
+    const bound = t.clone()
+    if (to) bound.name = to + t.name.slice(node.length)
+    if (k !== 1) bound.values = bound.values.map((v) => v * k)
+    return bound
   })
   return changed ? new THREE.AnimationClip(clip.name, clip.duration, tracks, clip.blendMode) : clip
 }

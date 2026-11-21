@@ -512,12 +512,15 @@ app-sort-name = 名稱
 app-sort-created = 建立時間
 app-sort-updated = 更新時間
 app-sort-size = 大小
+app-sort-rating = 評分
 app-sort-newest-first = 最新的在前
 app-sort-oldest-first = 最舊的在前
 app-sort-a-to-z = A 到 Z
 app-sort-z-to-a = Z 到 A
 app-sort-largest-first = 最大的在前
 app-sort-smallest-first = 最小的在前
+app-sort-best-rated-first = 評分最高的在前
+app-sort-lowest-rated-first = 評分最低的在前
 app-collection-added = 已將 { $count } 個素材加入 { $name }
 app-collection-add-failed = 無法加入收藏集：{ $error }
 app-collection-removed = 已從 { $name } 移除 { $count } 個
@@ -612,6 +615,15 @@ app-yours = 我的
 app-favorites = 最愛
 app-needs-review = 待審閱
 app-needs-review-title = 僅顯示還沒人看過的素材（可與其他篩選條件同時使用）
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = 已評
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] { $count } 顆星以上
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = 再按一下可顯示所有評分
 app-forget-search-label = 忘記已儲存的搜尋 { $name }
 app-forget-search = 忘記這個搜尋
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1614,6 +1626,11 @@ asset-rate = { $count } 顆星
 asset-rated = 已評 { $count } 顆星
 asset-rating-clear-title = 再按一下可清除評分
 asset-rating-cleared = 已清除評分
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] 再按一下可改為 { $count } 顆星
+    }
 asset-collections = 收藏集
 asset-collection-remove = 從 { $name } 移除
 asset-collection-add-another = 加入其他收藏集

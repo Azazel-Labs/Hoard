@@ -512,12 +512,15 @@ app-sort-name = Navn
 app-sort-created = Opprettet
 app-sort-updated = Oppdatert
 app-sort-size = Størrelse
+app-sort-rating = Vurdering
 app-sort-newest-first = Nyeste først
 app-sort-oldest-first = Eldste først
 app-sort-a-to-z = A til Å
 app-sort-z-to-a = Å til A
 app-sort-largest-first = Største først
 app-sort-smallest-first = Minste først
+app-sort-best-rated-first = Best vurdert først
+app-sort-lowest-rated-first = Lavest vurdert først
 app-collection-added =
     La til { $count ->
         [one] { $count } ressurs
@@ -659,6 +662,16 @@ app-yours = Dine
 app-favorites = Favoritter
 app-needs-review = Trenger gjennomgang
 app-needs-review-title = Bare ressurser ingen har gått gjennom ennå (gjelder sammen med de andre filtrene)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Vurdert
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } stjerne eller flere
+       *[other] { $count } stjerner eller flere
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Klikk igjen for å vise alle vurderinger
 app-forget-search-label = Glem det lagrede søket { $name }
 app-forget-search = Glem dette søket
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1776,6 +1789,12 @@ asset-rated =
     }
 asset-rating-clear-title = Klikk igjen for å fjerne vurderingen
 asset-rating-cleared = Fjernet vurderingen
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Klikk igjen for { $count } stjerne
+       *[other] Klikk igjen for { $count } stjerner
+    }
 asset-collections = Samlinger
 asset-collection-remove = Fjern fra { $name }
 asset-collection-add-another = Legg til i en annen

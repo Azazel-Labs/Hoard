@@ -512,12 +512,15 @@ app-sort-name = Ad
 app-sort-created = Oluşturulma
 app-sort-updated = Güncellenme
 app-sort-size = Boyut
+app-sort-rating = Puan
 app-sort-newest-first = Önce en yeni
 app-sort-oldest-first = Önce en eski
 app-sort-a-to-z = A'dan Z'ye
 app-sort-z-to-a = Z'den A'ya
 app-sort-largest-first = Önce en büyük
 app-sort-smallest-first = Önce en küçük
+app-sort-best-rated-first = Önce en yüksek puanlı
+app-sort-lowest-rated-first = Önce en düşük puanlı
 app-collection-added = { $count } varlık şuraya eklendi: { $name }
 app-collection-add-failed = Koleksiyona eklenemedi: { $error }
 app-collection-removed = { $count } öğe şuradan kaldırıldı: { $name }
@@ -631,6 +634,16 @@ app-yours = Kişisel
 app-favorites = Favoriler
 app-needs-review = İnceleme bekliyor
 app-needs-review-title = Yalnızca henüz kimsenin incelemediği varlıklar (diğer filtrelerle birlikte çalışır)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Puanlı
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } yıldız veya üzeri
+       *[other] { $count } yıldız veya üzeri
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Tüm puanları göstermek için yeniden tıklayın
 app-forget-search-label = { $name } kayıtlı aramasını unut
 app-forget-search = Bu aramayı unut
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1645,6 +1658,12 @@ asset-rate = { $count } yıldız
 asset-rated = { $count } yıldız verildi
 asset-rating-clear-title = Puanı temizlemek için yeniden tıklayın
 asset-rating-cleared = Puan temizlendi
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] { $count } yıldız için yeniden tıklayın
+       *[other] { $count } yıldız için yeniden tıklayın
+    }
 asset-collections = Koleksiyonlar
 asset-collection-remove = { $name } koleksiyonundan çıkar
 asset-collection-add-another = Başka birine ekle

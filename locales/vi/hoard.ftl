@@ -512,12 +512,15 @@ app-sort-name = Tên
 app-sort-created = Ngày tạo
 app-sort-updated = Ngày cập nhật
 app-sort-size = Kích thước
+app-sort-rating = Xếp hạng
 app-sort-newest-first = Mới nhất trước
 app-sort-oldest-first = Cũ nhất trước
 app-sort-a-to-z = A đến Z
 app-sort-z-to-a = Z đến A
 app-sort-largest-first = Lớn nhất trước
 app-sort-smallest-first = Nhỏ nhất trước
+app-sort-best-rated-first = Xếp hạng cao nhất trước
+app-sort-lowest-rated-first = Xếp hạng thấp nhất trước
 app-collection-added =
     Đã thêm { $count ->
        *[other] { $count } tài nguyên
@@ -612,6 +615,15 @@ app-yours = Của bạn
 app-favorites = Yêu thích
 app-needs-review = Cần duyệt
 app-needs-review-title = Chỉ các tài nguyên chưa ai xem qua (dùng cùng các bộ lọc khác)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Đã xếp hạng
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] Từ { $count } sao trở lên
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Nhấp lại để hiện mọi xếp hạng
 app-forget-search-label = Quên tìm kiếm đã lưu { $name }
 app-forget-search = Quên tìm kiếm này
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1611,6 +1623,11 @@ asset-rate = { $count } sao
 asset-rated = Đã xếp hạng { $count } sao
 asset-rating-clear-title = Nhấp lại để xóa xếp hạng
 asset-rating-cleared = Đã xóa xếp hạng
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] Nhấp lại để chọn { $count } sao
+    }
 asset-collections = Bộ sưu tập
 asset-collection-remove = Gỡ khỏi { $name }
 asset-collection-add-another = Thêm vào bộ khác

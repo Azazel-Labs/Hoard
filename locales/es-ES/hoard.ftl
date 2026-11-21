@@ -524,12 +524,15 @@ app-sort-name = Nombre
 app-sort-created = Creación
 app-sort-updated = Actualización
 app-sort-size = Tamaño
+app-sort-rating = Valoración
 app-sort-newest-first = Más recientes primero
 app-sort-oldest-first = Más antiguos primero
 app-sort-a-to-z = De la A a la Z
 app-sort-z-to-a = De la Z a la A
 app-sort-largest-first = Más grandes primero
 app-sort-smallest-first = Más pequeños primero
+app-sort-best-rated-first = Mejor valorados primero
+app-sort-lowest-rated-first = Peor valorados primero
 app-collection-added =
     { $count ->
         [one] Se ha añadido { $count } recurso
@@ -671,6 +674,16 @@ app-yours = Lo tuyo
 app-favorites = Favoritos
 app-needs-review = Por revisar
 app-needs-review-title = Solo los recursos que nadie ha revisado todavía (funciona junto con los otros filtros)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Valorados
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } estrella o más
+       *[other] { $count } estrellas o más
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Haz clic de nuevo para mostrar todas las valoraciones
 app-forget-search-label = Olvidar la búsqueda guardada { $name }
 app-forget-search = Olvidar esta búsqueda
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1817,6 +1830,12 @@ asset-rated =
     }
 asset-rating-clear-title = Haz clic de nuevo para borrar la valoración
 asset-rating-cleared = Se ha borrado la valoración
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Haz clic de nuevo para { $count } estrella
+       *[other] Haz clic de nuevo para { $count } estrellas
+    }
 asset-collections = Colecciones
 asset-collection-remove = Quitar de { $name }
 asset-collection-add-another = Añadir a otra

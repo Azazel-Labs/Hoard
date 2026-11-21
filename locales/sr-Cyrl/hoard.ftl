@@ -522,12 +522,15 @@ app-sort-name = Назив
 app-sort-created = Креирано
 app-sort-updated = Ажурирано
 app-sort-size = Величина
+app-sort-rating = Оцена
 app-sort-newest-first = Прво најновије
 app-sort-oldest-first = Прво најстарије
 app-sort-a-to-z = Од А до Ш
 app-sort-z-to-a = Од Ш до А
 app-sort-largest-first = Прво највеће
 app-sort-smallest-first = Прво најмање
+app-sort-best-rated-first = Прво најбоље оцењене
+app-sort-lowest-rated-first = Прво најниже оцењене
 app-collection-added =
     Додато у { $name }: { $count ->
         [one] { $count } ресурс
@@ -683,6 +686,18 @@ app-yours = Ваше
 app-favorites = Омиљени
 app-needs-review = За преглед
 app-needs-review-title = Само ресурси које још нико није прегледао (иде уз остале филтере)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Оцењено
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } звездица или више
+        [few] { $count } звездице или више
+        [many] { $count } звездица или више
+       *[other] { $count } звездице или више
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Кликните поново да прикажете све оцене
 app-forget-search-label = Заборави сачувану претрагу { $name }
 app-forget-search = Заборави ову претрагу
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1851,6 +1866,14 @@ asset-rated =
     }
 asset-rating-clear-title = Кликните поново да обришете оцену
 asset-rating-cleared = Оцена је обрисана
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Кликните поново за { $count } звездицу
+        [few] Кликните поново за { $count } звездице
+        [many] Кликните поново за { $count } звездица
+       *[other] Кликните поново за { $count } звездице
+    }
 asset-collections = Колекције
 asset-collection-remove = Уклони из { $name }
 asset-collection-add-another = Додај у другу

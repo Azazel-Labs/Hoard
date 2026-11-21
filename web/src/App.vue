@@ -144,6 +144,7 @@ function queryParams(): SearchParams {
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
       reviewed: filters.reviewed ? filters.reviewed === 'yes' : undefined,
+      rating_min: filters.ratingMin || undefined,
       hide_supporting: !prefs.showSupporting,
   }
 }
@@ -456,10 +457,11 @@ const ranking = computed(() => !!(filters.imitation || filters.similar || filter
 const rankLabel = computed(() =>
   filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : t('app-rank-match'),
 )
-/** Which way each order goes unless turned round: newest, A to Z, biggest first. */
-const SORT_UP: Record<string, boolean> = { created: false, updated: false, name: true, size: false }
+/** Which way each order goes unless turned round: newest, A to Z, biggest and best rated first. */
+const SORT_UP: Record<string, boolean> = { created: false, updated: false, name: true, size: false, rating: false }
 /**
- * What the library is in order by and which way round, from `filters.sort`: `created`, `updated`, `name` or `size`,
+ * What the library is in order by and which way round, from `filters.sort`: `created`, `updated`, `name`, `size` or
+ * `rating`,
  * with `:asc` or `:desc` after it when turned round (`new` and `old` from older links are `created` either way). Without
  * one it's best match first while there's something to match, and newest first otherwise.
  */
@@ -478,6 +480,7 @@ const sortWay = computed(() => {
   if (!o) return ''
   if (o.by === 'name') return o.up ? t('app-sort-a-to-z') : t('app-sort-z-to-a')
   if (o.by === 'size') return o.up ? t('app-sort-smallest-first') : t('app-sort-largest-first')
+  if (o.by === 'rating') return o.up ? t('app-sort-lowest-rated-first') : t('app-sort-best-rated-first')
   return o.up ? t('app-sort-oldest-first') : t('app-sort-newest-first')
 })
 
@@ -1500,6 +1503,7 @@ const commands = computed<Command[]>(() => {
                 <option value="updated">{{ t('app-sort-updated') }}</option>
                 <option value="name">{{ t('app-sort-name') }}</option>
                 <option value="size">{{ t('app-sort-size') }}</option>
+                <option value="rating">{{ t('app-sort-rating') }}</option>
               </select>
             </label>
             <button

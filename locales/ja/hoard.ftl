@@ -512,12 +512,15 @@ app-sort-name = 名前
 app-sort-created = 作成日
 app-sort-updated = 更新日
 app-sort-size = サイズ
+app-sort-rating = 評価
 app-sort-newest-first = 新しい順
 app-sort-oldest-first = 古い順
 app-sort-a-to-z = A→Z
 app-sort-z-to-a = Z→A
 app-sort-largest-first = 大きい順
 app-sort-smallest-first = 小さい順
+app-sort-best-rated-first = 評価の高い順
+app-sort-lowest-rated-first = 評価の低い順
 app-collection-added = { $count } 件のアセットを { $name } に追加しました
 app-collection-add-failed = コレクションに追加できませんでした: { $error }
 app-collection-removed = { $name } から { $count } 件を外しました
@@ -609,6 +612,15 @@ app-yours = 自分用
 app-favorites = お気に入り
 app-needs-review = 要確認
 app-needs-review-title = まだ誰も確認していないアセットのみ（ほかの絞り込みと併用できます）
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = 評価
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] 星 { $count } つ以上
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = もう一度クリックですべての評価を表示
 app-forget-search-label = 保存した検索 { $name } を忘れる
 app-forget-search = この検索を忘れる
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1608,6 +1620,11 @@ asset-rate = 星 { $count } つ
 asset-rated = 星 { $count } つに評価しました
 asset-rating-clear-title = もう一度クリックで評価を消去
 asset-rating-cleared = 評価を消去しました
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] もう一度クリックで星 { $count } つ
+    }
 asset-collections = コレクション
 asset-collection-remove = { $name } から外す
 asset-collection-add-another = 別のコレクションに追加

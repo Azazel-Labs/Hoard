@@ -546,6 +546,8 @@ export interface SearchParams {
   favorites?: boolean
   /** Only what's been reviewed (true), or only what hasn't (false). */
   reviewed?: boolean
+  /** Only what's rated this many stars or more. */
+  rating_min?: number
 }
 
 /** Packs and assets to archive, restore or delete for good. */

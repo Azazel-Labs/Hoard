@@ -47,6 +47,8 @@ const editor = computed(() => mayEdit())
 const renaming = ref<number | null>(null)
 const newName = ref('')
 const vSelect = { mounted: (el: HTMLInputElement) => el.select() }
+/** The star the pointer is over in Rated, to show what choosing it would keep. */
+const hoverStars = ref(0)
 function startRename(s: SavedSearch) {
   newName.value = s.name
   renaming.value = s.id
@@ -147,6 +149,27 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
             <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" stroke-dasharray="2.4 2" /><path d="m5.4 8.2 1.8 1.8 3.4-3.7" /></svg>
             <span class="cname">{{ t('app-needs-review') }}</span>
           </button>
+        </li>
+        <li class="rated">
+          <!-- At least this many stars; the stars chosen, chosen again, shows every rating. Goes with the other filters. -->
+          <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 13h11M4 10V8M8 10V4.5M12 10V6.5" /></svg>
+          <span id="rated-label" class="cname">{{ t('app-rated') }}</span>
+          <span class="minstars" role="group" aria-labelledby="rated-label" @mouseleave="hoverStars = 0">
+            <button
+              v-for="n in 5"
+              :key="n"
+              type="button"
+              class="minstar"
+              :class="{ on: n <= (hoverStars || filters.ratingMin) }"
+              :aria-pressed="n === filters.ratingMin"
+              :aria-label="t('app-rated-min', { count: n })"
+              :title="n === filters.ratingMin ? t('app-rated-any') : t('app-rated-min', { count: n })"
+              @mouseenter="hoverStars = n"
+              @click="filters.ratingMin = n === filters.ratingMin ? 0 : n"
+            >
+              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
+            </button>
+          </span>
         </li>
         <li v-for="s in mine.searches" :key="s.id" class="saved">
           <form v-if="renaming === s.id" class="rename" @submit.prevent="rename(s)">
@@ -320,6 +343,15 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
 @media (hover: none) { .collections .forget { opacity: 1; } }
 .collections .kinds .opens[aria-pressed='true'] { opacity: 1; color: var(--accent); background: none; box-shadow: none; }
 .rename { flex: 1; min-width: 0; }
+.rated { display: flex; align-items: center; gap: 0.55rem; padding: 0.1rem 0.3rem 0.1rem 0.45rem; font-size: var(--step--1); }
+.minstars { display: inline-flex; margin-left: auto; }
+.kinds .minstar { width: auto; padding: 0.2rem 0.15rem; color: var(--faint); line-height: 0; border-radius: 4px; }
+.kinds .minstar:hover, .kinds .minstar[aria-pressed='true'] { background: none; box-shadow: none; }
+.collections .minstar svg { color: inherit; fill: none; transition: fill var(--dur-1), color var(--dur-1), scale var(--dur-2) var(--ease-pop); }
+.minstar.on { color: var(--star); }
+.minstar.on svg { fill: currentColor; }
+.minstar:hover svg { scale: 1.15; }
+.minstar:focus-visible { outline: 2px solid var(--accent); }
 .rename .field { width: 100%; padding: 0.2rem 0.45rem; font-size: var(--step--1); }
 .facet-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .facet {

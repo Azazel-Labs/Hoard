@@ -512,12 +512,15 @@ app-sort-name = ชื่อ
 app-sort-created = วันที่สร้าง
 app-sort-updated = วันที่อัปเดต
 app-sort-size = ขนาด
+app-sort-rating = คะแนน
 app-sort-newest-first = ใหม่สุดก่อน
 app-sort-oldest-first = เก่าสุดก่อน
 app-sort-a-to-z = A ถึง Z
 app-sort-z-to-a = Z ถึง A
 app-sort-largest-first = ใหญ่สุดก่อน
 app-sort-smallest-first = เล็กสุดก่อน
+app-sort-best-rated-first = คะแนนสูงสุดก่อน
+app-sort-lowest-rated-first = คะแนนต่ำสุดก่อน
 app-collection-added = เพิ่ม { $count } แอสเซ็ตลงใน { $name } แล้ว
 app-collection-add-failed = เพิ่มลงในคอลเลกชันไม่ได้: { $error }
 app-collection-removed = นำ { $count } รายการออกจาก { $name } แล้ว
@@ -609,6 +612,15 @@ app-yours = ของคุณ
 app-favorites = รายการโปรด
 app-needs-review = ต้องตรวจ
 app-needs-review-title = เฉพาะแอสเซ็ตที่ยังไม่มีใครตรวจ (ใช้ร่วมกับตัวกรองอื่นได้)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = ให้คะแนน
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] { $count } ดาวขึ้นไป
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = คลิกอีกครั้งเพื่อแสดงทุกคะแนน
 app-forget-search-label = ลืมการค้นหาที่บันทึกไว้ { $name }
 app-forget-search = ลืมการค้นหานี้
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1608,6 +1620,11 @@ asset-rate = { $count } ดาว
 asset-rated = ให้ { $count } ดาว
 asset-rating-clear-title = คลิกอีกครั้งเพื่อล้างคะแนน
 asset-rating-cleared = ล้างคะแนนแล้ว
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] คลิกอีกครั้งเพื่อให้ { $count } ดาว
+    }
 asset-collections = คอลเลกชัน
 asset-collection-remove = นำออกจาก { $name }
 asset-collection-add-another = เพิ่มลงในคอลเลกชันอื่น

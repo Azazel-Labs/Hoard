@@ -512,12 +512,15 @@ app-sort-name = Nama
 app-sort-created = Dibuat
 app-sort-updated = Diperbarui
 app-sort-size = Ukuran
+app-sort-rating = Peringkat
 app-sort-newest-first = Terbaru dulu
 app-sort-oldest-first = Terlama dulu
 app-sort-a-to-z = A ke Z
 app-sort-z-to-a = Z ke A
 app-sort-largest-first = Terbesar dulu
 app-sort-smallest-first = Terkecil dulu
+app-sort-best-rated-first = Peringkat tertinggi dulu
+app-sort-lowest-rated-first = Peringkat terendah dulu
 app-collection-added = { $count } aset ditambahkan ke { $name }
 app-collection-add-failed = Tidak dapat menambahkan ke koleksi: { $error }
 app-collection-removed = { $count } dikeluarkan dari { $name }
@@ -621,6 +624,15 @@ app-yours = Milik Anda
 app-favorites = Favorit
 app-needs-review = Perlu ditinjau
 app-needs-review-title = Hanya aset yang belum pernah ditinjau siapa pun (berlaku bersama filter lain)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Diberi peringkat
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] { $count } bintang ke atas
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Klik lagi untuk menampilkan semua peringkat
 app-forget-search-label = Lupakan pencarian tersimpan { $name }
 app-forget-search = Lupakan pencarian ini
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1640,6 +1652,11 @@ asset-rated =
     }
 asset-rating-clear-title = Klik lagi untuk menghapus peringkat
 asset-rating-cleared = Peringkat dikosongkan
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] Klik lagi untuk { $count } bintang
+    }
 asset-collections = Koleksi
 asset-collection-remove = Keluarkan dari { $name }
 asset-collection-add-another = Tambahkan ke koleksi lain

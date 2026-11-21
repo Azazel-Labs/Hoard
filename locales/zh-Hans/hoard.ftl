@@ -512,12 +512,15 @@ app-sort-name = 名称
 app-sort-created = 创建时间
 app-sort-updated = 更新时间
 app-sort-size = 大小
+app-sort-rating = 评分
 app-sort-newest-first = 最新优先
 app-sort-oldest-first = 最早优先
 app-sort-a-to-z = A 到 Z
 app-sort-z-to-a = Z 到 A
 app-sort-largest-first = 最大优先
 app-sort-smallest-first = 最小优先
+app-sort-best-rated-first = 评分最高优先
+app-sort-lowest-rated-first = 评分最低优先
 app-collection-added = 已将 { $count } 个资源添加到 { $name }
 app-collection-add-failed = 无法添加到合集：{ $error }
 app-collection-removed = 已从 { $name } 中移除 { $count } 个
@@ -612,6 +615,15 @@ app-yours = 我的
 app-favorites = 收藏
 app-needs-review = 待审阅
 app-needs-review-title = 仅显示还没人看过的资源（可与其他筛选条件同时使用）
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = 已评
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] { $count } 星及以上
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = 再次点击可显示所有评分
 app-forget-search-label = 忘记已保存的搜索 { $name }
 app-forget-search = 忘记此搜索
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1611,6 +1623,11 @@ asset-rate = { $count } 星
 asset-rated = 已评 { $count } 星
 asset-rating-clear-title = 再次点击可清除评分
 asset-rating-cleared = 已清除评分
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] 再次点击可改为 { $count } 星
+    }
 asset-collections = 合集
 asset-collection-remove = 从 { $name } 中移除
 asset-collection-add-another = 添加到其他合集

@@ -823,7 +823,8 @@ pub struct SearchQuery {
     #[serde(default)]
     pub ext: Option<String>,
     /// Best match first (default; newest first without a text, color or similar query), or "created", "updated",
-    /// "name" or "size", each its usual way round (newest, A to Z, biggest first) or with ":asc" or ":desc" after it.
+    /// "name", "size" or "rating", each its usual way round (newest, A to Z, biggest and best rated first) or with
+    /// ":asc" or ":desc" after it.
     /// "new" and "old" are "created" and "created:asc".
     #[serde(default)]
     pub sort: Option<String>,
@@ -871,6 +872,9 @@ pub struct SearchQuery {
     /// Only what a person has said is right (`true`), or only what they haven't yet (`false`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reviewed: Option<bool>,
+    /// Only what's rated this many stars (1 to 5) or more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rating_min: Option<u8>,
     /// Only this account's favorites. Set by the server for whoever asks, never sent.
     #[serde(skip)]
     pub favorites_of: Option<i64>,

@@ -520,12 +520,15 @@ app-sort-name = Nimi
 app-sort-created = Luotu
 app-sort-updated = Päivitetty
 app-sort-size = Koko
+app-sort-rating = Arvosana
 app-sort-newest-first = Uusimmat ensin
 app-sort-oldest-first = Vanhimmat ensin
 app-sort-a-to-z = A–Ö
 app-sort-z-to-a = Ö–A
 app-sort-largest-first = Suurimmat ensin
 app-sort-smallest-first = Pienimmät ensin
+app-sort-best-rated-first = Parhaat arvosanat ensin
+app-sort-lowest-rated-first = Heikoimmat arvosanat ensin
 app-collection-added =
     { $count ->
         [one] Lisättiin { $count } resurssi kokoelmaan { $name }
@@ -671,6 +674,16 @@ app-yours = Omat
 app-favorites = Suosikit
 app-needs-review = Tarkistettavat
 app-needs-review-title = Vain resurssit, joita kukaan ei ole vielä käynyt läpi (toimii muiden suodattimien kanssa)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Arvioidut
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } tähti tai enemmän
+       *[other] { $count } tähteä tai enemmän
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Napsauta uudelleen nähdäksesi kaikki arvosanat
 app-forget-search-label = Unohda tallennettu haku { $name }
 app-forget-search = Unohda tämä haku
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1824,6 +1837,12 @@ asset-rated =
     }
 asset-rating-clear-title = Napsauta uudelleen tyhjentääksesi arvosanan
 asset-rating-cleared = Arvosana tyhjennetty
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Napsauta uudelleen: { $count } tähti
+       *[other] Napsauta uudelleen: { $count } tähteä
+    }
 asset-collections = Kokoelmat
 asset-collection-remove = Poista kokoelmasta { $name }
 asset-collection-add-another = Lisää toiseen

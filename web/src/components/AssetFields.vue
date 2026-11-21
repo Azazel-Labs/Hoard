@@ -101,7 +101,8 @@ function onBlur(e: FocusEvent) {
 
 async function rate(n: number) {
   const was = props.asset.rating ?? 0
-  const rating = n === was ? 0 : n
+  // The stars it has, chosen again, take it down one: twice on five makes three, and once on one clears it.
+  const rating = n === was ? n - 1 : n
   if (!(await props.save({ rating }))) return
   showOk(rating ? t('asset-rated', { count: rating }) : t('asset-rating-cleared'), {
     label: t('asset-undo'),
@@ -185,7 +186,7 @@ const shown = computed(() => props.editor || rows.value.length || fields.value.l
               :disabled="!editor"
               :aria-pressed="n === asset.rating"
               :aria-label="t('asset-rate', { count: n })"
-              :title="n === asset.rating ? t('asset-rating-clear-title') : t('asset-rate', { count: n })"
+              :title="n !== asset.rating ? t('asset-rate', { count: n }) : n > 1 ? t('asset-rating-down-title', { count: n - 1 }) : t('asset-rating-clear-title')"
               @mouseenter="editor && (hoverRating = n)"
               @click="rate(n)"
             >

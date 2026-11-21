@@ -512,12 +512,15 @@ app-sort-name = Naam
 app-sort-created = Geskep
 app-sort-updated = Bygewerk
 app-sort-size = Grootte
+app-sort-rating = Gradering
 app-sort-newest-first = Nuutste eerste
 app-sort-oldest-first = Oudste eerste
 app-sort-a-to-z = A tot Z
 app-sort-z-to-a = Z tot A
 app-sort-largest-first = Grootste eerste
 app-sort-smallest-first = Kleinste eerste
+app-sort-best-rated-first = Beste gegradeer eerste
+app-sort-lowest-rated-first = Laagste gegradeer eerste
 app-collection-added =
     { $count ->
         [one] { $count } bate
@@ -659,6 +662,16 @@ app-yours = Joune
 app-favorites = Gunstelinge
 app-needs-review = Moet nagegaan word
 app-needs-review-title = Net bates wat nog niemand nagegaan het nie (werk saam met die ander filters)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Gegradeer
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } ster of meer
+       *[other] { $count } sterre of meer
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Klik weer om elke gradering te wys
 app-forget-search-label = Vergeet die gestoorde soektog { $name }
 app-forget-search = Vergeet hierdie soektog
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1774,6 +1787,12 @@ asset-rated =
     }
 asset-rating-clear-title = Klik weer om die gradering skoon te maak
 asset-rating-cleared = Gradering skoongemaak
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Klik weer vir { $count } ster
+       *[other] Klik weer vir { $count } sterre
+    }
 asset-collections = Versamelings
 asset-collection-remove = Verwyder uit { $name }
 asset-collection-add-another = Voeg by nog een

@@ -520,12 +520,15 @@ app-sort-name = Όνομα
 app-sort-created = Δημιουργία
 app-sort-updated = Ενημέρωση
 app-sort-size = Μέγεθος
+app-sort-rating = Βαθμολογία
 app-sort-newest-first = Νεότερα πρώτα
 app-sort-oldest-first = Παλαιότερα πρώτα
 app-sort-a-to-z = Α έως Ω
 app-sort-z-to-a = Ω έως Α
 app-sort-largest-first = Μεγαλύτερα πρώτα
 app-sort-smallest-first = Μικρότερα πρώτα
+app-sort-best-rated-first = Υψηλότερη βαθμολογία πρώτα
+app-sort-lowest-rated-first = Χαμηλότερη βαθμολογία πρώτα
 app-collection-added =
     { $count ->
         [one] Προστέθηκε { $count } στοιχείο στη συλλογή { $name }
@@ -675,6 +678,16 @@ app-yours = Δικά σας
 app-favorites = Αγαπημένα
 app-needs-review = Προς έλεγχο
 app-needs-review-title = Μόνο στοιχεία που δεν τα έχει ελέγξει κανείς ακόμη (λειτουργεί μαζί με τα άλλα φίλτρα)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Βαθμολογημένα
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } αστέρι και άνω
+       *[other] { $count } αστέρια και άνω
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Κάντε ξανά κλικ για να δείτε όλες τις βαθμολογίες
 app-forget-search-label = Ξεχάστε την αποθηκευμένη αναζήτηση { $name }
 app-forget-search = Ξεχάστε αυτή την αναζήτηση
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1824,6 +1837,12 @@ asset-rated =
     }
 asset-rating-clear-title = Κάντε ξανά κλικ για εκκαθάριση της βαθμολογίας
 asset-rating-cleared = Η βαθμολογία εκκαθαρίστηκε
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Κάντε ξανά κλικ για { $count } αστέρι
+       *[other] Κάντε ξανά κλικ για { $count } αστέρια
+    }
 asset-collections = Συλλογές
 asset-collection-remove = Αφαίρεση από τη συλλογή { $name }
 asset-collection-add-another = Προσθήκη σε άλλη

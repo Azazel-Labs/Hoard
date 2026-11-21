@@ -63,6 +63,9 @@ pub(super) struct AssetsParams {
     /// Only what's been reviewed, or only what hasn't.
     #[serde(default)]
     reviewed: Option<bool>,
+    /// Only what's rated this many stars or more.
+    #[serde(default)]
+    rating_min: Option<u8>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -89,6 +92,7 @@ impl From<AssetsParams> for SearchQuery {
             key: p.key,
             compatible_keys: p.compatible_keys.unwrap_or(false),
             reviewed: p.reviewed,
+            rating_min: p.rating_min,
             favorites_of: None,
         }
     }

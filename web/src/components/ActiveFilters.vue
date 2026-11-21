@@ -35,6 +35,7 @@ async function startNaming() {
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
     filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
     heardNoise.value ? t('app-imitation-heard') : filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
+    filters.ratingMin && `${'★'.repeat(filters.ratingMin)}+`,
     tempoLabel.value && `${tempoLabel.value} BPM`, chosenKey.value && keyName(chosenKey.value),
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
@@ -67,6 +68,7 @@ async function updateBasis() {
     <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
     <TagChip v-if="filters.favorites" tag="your:favorites" removable @remove="filters.favorites = false" />
     <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
+    <TagChip v-if="filters.ratingMin" :tag="`rated:${'★'.repeat(filters.ratingMin)}+`" removable @remove="filters.ratingMin = 0" />
     <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
     <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
     <TagChip v-if="filters.imitation" :tag="`sounds-like:${heardNoise ? t('app-imitation-heard') : filters.imitation}`" removable @remove="filters.imitation = ''" />

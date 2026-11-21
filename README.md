@@ -604,7 +604,9 @@ turned. Downloads stay as they were made.
 **Searching.** The search box finds what has every word you type, each as the start of a word (`rock` finds
 "rocks"). `rock or stone` finds either, `-moss` leaves out anything with "moss" in it, and `"dry moss"` finds those
 words together as they are. A tag searches as itself: `-set:forest` leaves out that set. Image and sound search look
-for the words without the marks. A search can be saved under a name in the Filters column, renamed there, updated
+for the words without the marks. Your own fields are searched by name and value (`desert` finds an asset whose biome
+is desert). The library can be put in order by rating, best first, and Rated in the Filters column narrows it to
+what has at least the stars you pick. A search can be saved under a name in the Filters column, renamed there, updated
 with what you've changed since, and made what the library opens to.
 
 **Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to

@@ -512,12 +512,15 @@ app-sort-name = Név
 app-sort-created = Létrehozva
 app-sort-updated = Frissítve
 app-sort-size = Méret
+app-sort-rating = Értékelés
 app-sort-newest-first = Legújabb elöl
 app-sort-oldest-first = Legrégebbi elöl
 app-sort-a-to-z = A–Z
 app-sort-z-to-a = Z–A
 app-sort-largest-first = Legnagyobb elöl
 app-sort-smallest-first = Legkisebb elöl
+app-sort-best-rated-first = Legjobbra értékelt elöl
+app-sort-lowest-rated-first = Legrosszabbra értékelt elöl
 app-collection-added = { $count } asset hozzáadva ehhez a gyűjteményhez: { $name }
 app-collection-add-failed = Nem sikerült hozzáadni a gyűjteményhez: { $error }
 app-collection-removed = { $count } eltávolítva ebből a gyűjteményből: { $name }
@@ -643,6 +646,16 @@ app-yours = Saját
 app-favorites = Kedvencek
 app-needs-review = Átnézésre vár
 app-needs-review-title = Csak azok az assetek, amelyeket még senki nem nézett át (a többi szűrővel együtt működik)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Értékelt
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] legalább { $count } csillag
+       *[other] legalább { $count } csillag
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Kattintson újra az összes értékelés megjelenítéséhez
 app-forget-search-label = Mentett keresés elfelejtése: { $name }
 app-forget-search = Keresés elfelejtése
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1677,6 +1690,12 @@ asset-rated =
     }
 asset-rating-clear-title = Kattintson újra az értékelés törléséhez
 asset-rating-cleared = Értékelés törölve
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Kattintson újra: { $count } csillag
+       *[other] Kattintson újra: { $count } csillag
+    }
 asset-collections = Gyűjtemények
 asset-collection-remove = Eltávolítás innen: { $name }
 asset-collection-add-another = Hozzáadás máshoz

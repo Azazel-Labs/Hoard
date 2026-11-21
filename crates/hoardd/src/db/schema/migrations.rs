@@ -985,4 +985,6 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      CREATE TABLE tag_parents (tag TEXT NOT NULL, parent TEXT NOT NULL, PRIMARY KEY (tag, parent)) WITHOUT ROWID;
      CREATE INDEX tag_parents_parent ON tag_parents(parent);
      ALTER TABLE saved_searches ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0;",
+    // 95: the library can be put in order by rating, best first, and narrowed to what's rated well enough.
+    "CREATE INDEX assets_rating ON assets(rating);",
 ];

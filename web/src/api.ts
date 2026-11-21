@@ -156,6 +156,7 @@ export const api = {
     if (p.compatible_keys) qs.set('compatible_keys', 'true')
     if (p.favorites) qs.set('favorites', 'true')
     if (p.reviewed !== undefined) qs.set('reviewed', String(p.reviewed))
+    if (p.rating_min) qs.set('rating_min', String(p.rating_min))
     return request<SearchResult>(`/api/assets?${qs}`, { signal }).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),

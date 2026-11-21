@@ -264,6 +264,10 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     if let Some(reviewed) = q.reviewed {
         f.clauses.push(if reviewed { "a.reviewed_at IS NOT NULL" } else { "a.reviewed_at IS NULL" }.to_owned());
     }
+    if let Some(stars) = q.rating_min.filter(|n| *n > 0) {
+        f.clauses.push("a.rating >= ?".to_owned());
+        f.params.push(SqlValue::Integer(i64::from(stars.min(5))));
+    }
     music_filter(q, &mut f);
     f.clauses.push(
         match (q.archived, q.pack.as_deref().is_some_and(|p| !p.is_empty())) {
@@ -467,8 +471,9 @@ pub(crate) struct SearchPage {
     pub(crate) folders: Vec<Facet>,
 }
 
-/// The order a `sort` asks for, or `None` for best match first: `created`, `updated`, `name` or `size`, each in its
-/// usual direction (newest, A to Z, biggest first) or with `:asc` or `:desc` after it. `new` and `old`, which links
+/// The order a `sort` asks for, or `None` for best match first: `created`, `updated`, `name`, `size` or `rating`, each
+/// in its usual direction (newest, A to Z, biggest and best rated first) or with `:asc` or `:desc` after it. What
+/// isn't rated comes last either way. `new` and `old`, which links
 /// and saved searches made before may hold, are `created` and `created:asc`.
 fn chosen_order(sort: Option<&str>) -> Option<&'static str> {
     let (by, dir) = match sort? {
@@ -495,6 +500,8 @@ fn chosen_order(sort: Option<&str>) -> Option<&'static str> {
         ("name", false) => "a.name COLLATE NOCASE DESC",
         ("size", false) => "b.size DESC",
         ("size", true) => "b.size ASC",
+        ("rating", false) => "a.rating IS NULL, a.rating DESC, a.created_at DESC",
+        ("rating", true) => "a.rating IS NULL, a.rating ASC, a.created_at DESC",
         _ => return None,
     })
 }
@@ -874,7 +881,9 @@ mod tests {
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
                ('a', 'p1', 'm', 'a.png', 'Bark', 'png', 'texture', '2026-01-01', '2026-03-01'),
                ('b', 'p1', 'l', 'b.png', 'apple', 'png', 'texture', '2026-02-01', '2026-02-01'),
-               ('c', 'p1', 's', 'c.png', 'Cliff', 'png', 'texture', '2026-03-01', '2026-03-02');",
+               ('c', 'p1', 's', 'c.png', 'Cliff', 'png', 'texture', '2026-03-01', '2026-03-02');
+             UPDATE assets SET rating = 3 WHERE id = 'a';
+             UPDATE assets SET rating = 5 WHERE id = 'c';",
         )
         .unwrap();
         let ids = |sort: &str| {
@@ -891,6 +900,9 @@ mod tests {
             ("name:desc", "cab"),
             ("size", "bac"),
             ("size:asc", "cab"),
+            // What isn't rated comes last either way.
+            ("rating", "cab"),
+            ("rating:asc", "acb"),
             // As links and saved searches made before have them.
             ("new", "cba"),
             ("old", "abc"),
@@ -1017,6 +1029,40 @@ mod tests {
         assert_eq!(found("-rock"), "c,d");
         assert_eq!(found(r#""rock dry""#), "");
         assert_eq!(found(r#""dry rock""#), "b");
+    }
+
+    #[test]
+    fn assets_are_found_by_their_own_fields_and_by_how_well_they_are_rated() {
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at, rating) VALUES
+               ('a', 'p1', 'h', 'a.png', 'cactus', 'png', 'texture', 'x', 'x', 4),
+               ('b', 'p1', 'h', 'b.png', 'boulder', 'png', 'texture', 'x', 'x', 2),
+               ('c', 'p1', 'h', 'c.png', 'shrub', 'png', 'texture', 'x', 'x', NULL);
+             INSERT INTO asset_fields (asset_id, key, value) VALUES
+               ('a', 'biome', 'desert'), ('b', 'biome', 'tundra'), ('c', 'artist', 'Mara Quill');",
+        )
+        .unwrap();
+        for id in ["a", "b", "c"] {
+            crate::db::reindex_asset(&conn, id).unwrap();
+        }
+        let found = |q: SearchQuery| {
+            let mut ids = search(&conn, &q, false).unwrap().items.into_iter().map(|a| a.id).collect::<Vec<_>>();
+            ids.sort();
+            ids.join(",")
+        };
+        let text = |t: &str| SearchQuery { q: Some(t.into()), ..Default::default() };
+        assert_eq!(found(text("desert")), "a");
+        assert_eq!(found(text("biome")), "a,b");
+        assert_eq!(found(text("quill")), "c");
+        let rated = |n: u8| SearchQuery { rating_min: Some(n), ..Default::default() };
+        assert_eq!(found(rated(4)), "a");
+        assert_eq!(found(rated(2)), "a,b");
+        assert_eq!(found(SearchQuery { rating_min: Some(3), ..text("biome") }), "a");
+        // 0 is no filter at all.
+        assert_eq!(found(rated(0)), "a,b,c");
     }
 
     #[test]

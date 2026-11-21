@@ -17,6 +17,8 @@ export const filters = reactive({
   project: '',
   /** Only what's been gone over (`yes`) or not yet (`no`); `''` for both. Goes with any other filter. */
   reviewed: '' as '' | 'yes' | 'no',
+  /** Only what's rated this many stars or more; 0 for any. */
+  ratingMin: 0,
   /** Assets that look like this one, most alike first. */
   similar: null as Named | null,
   /** Assets with much of this color (hex), most of it first. */
@@ -36,12 +38,12 @@ export const NO_MUSIC = { bpmMin: '', bpmMax: '', key: '' } as const
 
 /** Anything narrowing the library at all. */
 export const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project || filters.reviewed ||
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project || filters.reviewed || filters.ratingMin ||
     filters.bpmMin !== '' || filters.bpmMax !== '' || filters.key),
 )
 /** Back to the whole library (the order chosen stays). */
 export function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', reviewed: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', reviewed: '', ratingMin: 0, similar: null, color: '', imitation: '', ...NO_MUSIC })
 }
 
 /** How a noise made into the microphone travels as `imitation` (its shape, as the server measured it). */
@@ -63,6 +65,7 @@ export const filterSources = [
   () => filters.favorites,
   () => filters.project,
   () => filters.reviewed,
+  () => filters.ratingMin,
   () => filters.bpmMin,
   () => filters.bpmMax,
   () => filters.key,
@@ -74,7 +77,7 @@ export function filterPlace(): string {
   return [
     filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.folder, filters.collection?.id,
     filters.similar?.id, filters.color, filters.imitation, filters.favorites, filters.project, filters.reviewed,
-    filters.bpmMin, filters.bpmMax, filters.key, filters.mixKeys,
+    filters.ratingMin, filters.bpmMin, filters.bpmMax, filters.key, filters.mixKeys,
   ].join('|')
 }
 
@@ -104,6 +107,8 @@ export function readFilters(search: string) {
   filters.project = u.get('project') ?? ''
   const rev = u.get('rev')
   filters.reviewed = rev === '1' ? 'yes' : rev === '0' ? 'no' : ''
+  const stars = Number(u.get('stars'))
+  filters.ratingMin = Number.isInteger(stars) && stars >= 1 && stars <= 5 ? stars : 0
 }
 
 /** The filters as a query string: what goes in the address, and what a saved search keeps. */
@@ -137,6 +142,7 @@ export function filterQuery(): string {
   if (filters.favorites) u.set('fav', '1')
   if (filters.project) u.set('project', filters.project)
   if (filters.reviewed) u.set('rev', filters.reviewed === 'yes' ? '1' : '0')
+  if (filters.ratingMin) u.set('stars', String(filters.ratingMin))
   return u.toString()
 }
 

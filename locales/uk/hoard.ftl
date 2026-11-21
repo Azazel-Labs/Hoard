@@ -530,12 +530,15 @@ app-sort-name = Назва
 app-sort-created = Створено
 app-sort-updated = Оновлено
 app-sort-size = Розмір
+app-sort-rating = Оцінка
 app-sort-newest-first = Спершу нові
 app-sort-oldest-first = Спершу старі
 app-sort-a-to-z = Від А до Я
 app-sort-z-to-a = Від Я до А
 app-sort-largest-first = Спершу найбільші
 app-sort-smallest-first = Спершу найменші
+app-sort-best-rated-first = Спершу найвище оцінені
+app-sort-lowest-rated-first = Спершу найнижче оцінені
 app-collection-added =
     { $count ->
         [one] Додано { $count } ресурс
@@ -706,6 +709,18 @@ app-yours = Ваше
 app-favorites = Обране
 app-needs-review = Потребує перегляду
 app-needs-review-title = Лише ресурси, які ще ніхто не переглядав (працює разом з іншими фільтрами)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Оцінені
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } зірка і більше
+        [few] { $count } зірки і більше
+        [many] { $count } зірок і більше
+       *[other] { $count } зірки і більше
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Клацніть ще раз, щоб показати всі оцінки
 app-forget-search-label = Забути збережений пошук { $name }
 app-forget-search = Забути цей пошук
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1988,6 +2003,14 @@ asset-rated =
     }
 asset-rating-clear-title = Клацніть ще раз, щоб очистити оцінку
 asset-rating-cleared = Оцінку очищено
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Клацніть ще раз: { $count } зірка
+        [few] Клацніть ще раз: { $count } зірки
+        [many] Клацніть ще раз: { $count } зірок
+       *[other] Клацніть ще раз: { $count } зірки
+    }
 asset-collections = Колекції
 asset-collection-remove = Вилучити з { $name }
 asset-collection-add-another = Додати до іншої

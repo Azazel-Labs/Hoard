@@ -527,12 +527,15 @@ app-sort-name = Název
 app-sort-created = Vytvořeno
 app-sort-updated = Upraveno
 app-sort-size = Velikost
+app-sort-rating = Hodnocení
 app-sort-newest-first = Od nejnovějších
 app-sort-oldest-first = Od nejstarších
 app-sort-a-to-z = A až Z
 app-sort-z-to-a = Z až A
 app-sort-largest-first = Od největších
 app-sort-smallest-first = Od nejmenších
+app-sort-best-rated-first = Od nejlépe hodnocených
+app-sort-lowest-rated-first = Od nejhůře hodnocených
 app-collection-added =
     { $count ->
         [one] Přidán { $count } asset
@@ -693,6 +696,17 @@ app-yours = Vaše
 app-favorites = Oblíbené
 app-needs-review = Ke kontrole
 app-needs-review-title = Jen assety, které zatím nikdo nezkontroloval (funguje spolu s ostatními filtry)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Hodnocené
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } hvězdička a více
+        [few] { $count } hvězdičky a více
+       *[other] { $count } hvězdiček a více
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Dalším kliknutím zobrazíte všechna hodnocení
 app-forget-search-label = Zapomenout uložené hledání { $name }
 app-forget-search = Zapomenout toto hledání
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1905,6 +1919,13 @@ asset-rated =
     }
 asset-rating-clear-title = Dalším kliknutím hodnocení zrušíte
 asset-rating-cleared = Hodnocení zrušeno
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Klikněte znovu pro { $count } hvězdičku
+        [few] Klikněte znovu pro { $count } hvězdičky
+       *[other] Klikněte znovu pro { $count } hvězdiček
+    }
 asset-collections = Kolekce
 asset-collection-remove = Odebrat z { $name }
 asset-collection-add-another = Přidat do další

@@ -512,12 +512,15 @@ app-sort-name = Nome
 app-sort-created = Criação
 app-sort-updated = Atualização
 app-sort-size = Tamanho
+app-sort-rating = Avaliação
 app-sort-newest-first = Mais recentes primeiro
 app-sort-oldest-first = Mais antigos primeiro
 app-sort-a-to-z = De A a Z
 app-sort-z-to-a = De Z a A
 app-sort-largest-first = Maiores primeiro
 app-sort-smallest-first = Menores primeiro
+app-sort-best-rated-first = Mais bem avaliados primeiro
+app-sort-lowest-rated-first = Menos bem avaliados primeiro
 app-collection-added =
     { $count ->
         [one] { $count } asset adicionado
@@ -659,6 +662,16 @@ app-yours = Seus
 app-favorites = Favoritos
 app-needs-review = Precisa de revisão
 app-needs-review-title = Só assets que ninguém revisou ainda (combina com os outros filtros)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Avaliados
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } estrela ou mais
+       *[other] { $count } estrelas ou mais
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Clique de novo para mostrar todas as avaliações
 app-forget-search-label = Esquecer a busca salva { $name }
 app-forget-search = Esquecer esta busca
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1780,6 +1793,12 @@ asset-rated =
     }
 asset-rating-clear-title = Clique de novo para limpar a avaliação
 asset-rating-cleared = Avaliação limpa
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Clique de novo para { $count } estrela
+       *[other] Clique de novo para { $count } estrelas
+    }
 asset-collections = Coleções
 asset-collection-remove = Remover de { $name }
 asset-collection-add-another = Adicionar a outra

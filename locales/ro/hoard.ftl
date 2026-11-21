@@ -527,12 +527,15 @@ app-sort-name = Nume
 app-sort-created = Data creării
 app-sort-updated = Data actualizării
 app-sort-size = Dimensiune
+app-sort-rating = Evaluare
 app-sort-newest-first = Cele mai noi primele
 app-sort-oldest-first = Cele mai vechi primele
 app-sort-a-to-z = De la A la Z
 app-sort-z-to-a = De la Z la A
 app-sort-largest-first = Cele mai mari primele
 app-sort-smallest-first = Cele mai mici primele
+app-sort-best-rated-first = Cele mai bine evaluate primele
+app-sort-lowest-rated-first = Cele mai slab evaluate primele
 app-collection-added =
     { $count ->
         [one] S-a adăugat { $count } resursă în { $name }
@@ -695,6 +698,17 @@ app-yours = Ale dvs.
 app-favorites = Favorite
 app-needs-review = De verificat
 app-needs-review-title = Doar resursele pe care nu le-a verificat încă nimeni (merge împreună cu celelalte filtre)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Evaluate
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } stea sau mai multe
+        [few] { $count } stele sau mai multe
+       *[other] { $count } de stele sau mai multe
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Faceți din nou clic pentru a afișa toate evaluările
 app-forget-search-label = Uitați căutarea salvată { $name }
 app-forget-search = Uitați această căutare
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1912,6 +1926,13 @@ asset-rated =
     }
 asset-rating-clear-title = Faceți din nou clic pentru a șterge evaluarea
 asset-rating-cleared = Evaluarea a fost ștearsă
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Faceți din nou clic pentru { $count } stea
+        [few] Faceți din nou clic pentru { $count } stele
+       *[other] Faceți din nou clic pentru { $count } de stele
+    }
 asset-collections = Colecții
 asset-collection-remove = Eliminați din { $name }
 asset-collection-add-another = Adăugați în alta

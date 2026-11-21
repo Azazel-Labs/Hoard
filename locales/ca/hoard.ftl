@@ -512,12 +512,15 @@ app-sort-name = Nom
 app-sort-created = Creació
 app-sort-updated = Actualització
 app-sort-size = Mida
+app-sort-rating = Valoració
 app-sort-newest-first = Primer els més recents
 app-sort-oldest-first = Primer els més antics
 app-sort-a-to-z = De la A a la Z
 app-sort-z-to-a = De la Z a la A
 app-sort-largest-first = Primer els més grans
 app-sort-smallest-first = Primer els més petits
+app-sort-best-rated-first = Primer les més ben valorades
+app-sort-lowest-rated-first = Primer les pitjor valorades
 app-collection-added =
     { $count ->
         [one] S'ha afegit { $count } recurs a { $name }
@@ -659,6 +662,16 @@ app-yours = Vostres
 app-favorites = Preferits
 app-needs-review = Per revisar
 app-needs-review-title = Només els recursos que ningú no ha revisat encara (funciona amb els altres filtres)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Valorats
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } estrella o més
+       *[other] { $count } estrelles o més
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Feu clic un altre cop per mostrar totes les valoracions
 app-forget-search-label = Oblida la cerca desada { $name }
 app-forget-search = Oblida aquesta cerca
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1780,6 +1793,12 @@ asset-rated =
     }
 asset-rating-clear-title = Feu clic un altre cop per esborrar la valoració
 asset-rating-cleared = S'ha esborrat la valoració
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Feu clic un altre cop per a { $count } estrella
+       *[other] Feu clic un altre cop per a { $count } estrelles
+    }
 asset-collections = Col·leccions
 asset-collection-remove = Treu de { $name }
 asset-collection-add-another = Afegeix a una altra

@@ -512,12 +512,15 @@ app-sort-name = 이름
 app-sort-created = 생성일
 app-sort-updated = 수정일
 app-sort-size = 크기
+app-sort-rating = 평점
 app-sort-newest-first = 최신순
 app-sort-oldest-first = 오래된 순
 app-sort-a-to-z = A→Z
 app-sort-z-to-a = Z→A
 app-sort-largest-first = 큰 순
 app-sort-smallest-first = 작은 순
+app-sort-best-rated-first = 평점 높은 순
+app-sort-lowest-rated-first = 평점 낮은 순
 app-collection-added = 에셋 { $count }개를 { $name }에 추가했습니다
 app-collection-add-failed = 컬렉션에 추가하지 못했습니다: { $error }
 app-collection-removed = { $name }에서 { $count }개를 제거했습니다
@@ -609,6 +612,15 @@ app-yours = 내 항목
 app-favorites = 즐겨찾기
 app-needs-review = 검토 필요
 app-needs-review-title = 아직 아무도 검토하지 않은 에셋만(다른 필터와 함께 적용)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = 평점
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+       *[other] 별 { $count }개 이상
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = 다시 클릭하면 모든 평점 표시
 app-forget-search-label = 저장된 검색 { $name } 잊기
 app-forget-search = 이 검색 잊기
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1587,6 +1599,11 @@ asset-rate = 별 { $count }개
 asset-rated = 별 { $count }개로 평가했습니다
 asset-rating-clear-title = 다시 클릭하면 평점 지우기
 asset-rating-cleared = 평점을 지웠습니다
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+       *[other] 다시 클릭하면 별 { $count }개
+    }
 asset-collections = 컬렉션
 asset-collection-remove = { $name }에서 제거
 asset-collection-add-another = 다른 컬렉션에 추가

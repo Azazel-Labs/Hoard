@@ -524,12 +524,15 @@ app-sort-name = Nazwa
 app-sort-created = Data utworzenia
 app-sort-updated = Data aktualizacji
 app-sort-size = Rozmiar
+app-sort-rating = Ocena
 app-sort-newest-first = Najpierw najnowsze
 app-sort-oldest-first = Najpierw najstarsze
 app-sort-a-to-z = Od A do Z
 app-sort-z-to-a = Od Z do A
 app-sort-largest-first = Najpierw największe
 app-sort-smallest-first = Najpierw najmniejsze
+app-sort-best-rated-first = Najpierw najlepiej oceniane
+app-sort-lowest-rated-first = Najpierw najgorzej oceniane
 app-collection-added =
     Dodano { $count ->
         [one] { $count } zasób
@@ -699,6 +702,18 @@ app-yours = Moje
 app-favorites = Ulubione
 app-needs-review = Do sprawdzenia
 app-needs-review-title = Tylko zasoby, których nikt jeszcze nie przejrzał (działa razem z innymi filtrami)
+# A filter in the Filters column: only assets with at least as many stars as the one picked beside it.
+app-rated = Ocenione
+# Each of the five stars beside Rated, and what picking it keeps.
+app-rated-min =
+    { $count ->
+        [one] { $count } gwiazdka lub więcej
+        [few] { $count } gwiazdki lub więcej
+        [many] { $count } gwiazdek lub więcej
+       *[other] { $count } gwiazdki lub więcej
+    }
+# The star picked now, which picked again shows assets of any rating.
+app-rated-any = Kliknij ponownie, aby pokazać wszystkie oceny
 app-forget-search-label = Zapomnij zapisane wyszukiwanie { $name }
 app-forget-search = Zapomnij to wyszukiwanie
 # Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
@@ -1935,6 +1950,14 @@ asset-rated =
     }
 asset-rating-clear-title = Kliknij ponownie, aby wyczyścić ocenę
 asset-rating-cleared = Wyczyszczono ocenę
+# An asset's rating: the star it has now, clicked again, takes it down to one fewer.
+asset-rating-down-title =
+    { $count ->
+        [one] Kliknij ponownie, aby ustawić { $count } gwiazdkę
+        [few] Kliknij ponownie, aby ustawić { $count } gwiazdki
+        [many] Kliknij ponownie, aby ustawić { $count } gwiazdek
+       *[other] Kliknij ponownie, aby ustawić { $count } gwiazdki
+    }
 asset-collections = Kolekcje
 asset-collection-remove = Usuń z { $name }
 asset-collection-add-another = Dodaj do innej

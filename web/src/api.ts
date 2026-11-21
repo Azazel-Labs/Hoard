@@ -347,6 +347,13 @@ export const api = {
   tokens: () => request<{ tokens: AccessToken[] }>('/api/admin/tokens'),
   makeToken: (name: string, role: Role) =>
     post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name, role }),
+  /** Let a token do more or less; the token itself stays the same. */
+  setTokenRole: (id: number, role: Role) =>
+    request<void>(`/api/admin/tokens/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role }),
+    }),
   revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
   projects: () => request<{ projects: Project[] }>('/api/projects'),
   usage: (items: UsageItems) => post<{ projects: ProjectUse[] }>('/api/usage', items),

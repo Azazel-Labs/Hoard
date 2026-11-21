@@ -5,7 +5,7 @@ use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::routing::{get, post};
 use axum::{Extension, Json, Router};
-use rusqlite::params;
+use rusqlite::{OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
@@ -24,7 +24,7 @@ pub(crate) fn account_router() -> Router<AppState> {
     Router::new()
         .route("/api/auth/password", post(change_password))
         .route("/api/admin/tokens", get(list_tokens).post(create_token))
-        .route("/api/admin/tokens/{id}", axum::routing::delete(delete_token))
+        .route("/api/admin/tokens/{id}", axum::routing::delete(delete_token).patch(patch_token))
 }
 
 /// Behind [`require_admin`].
@@ -187,7 +187,7 @@ async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Wh
     let only = owner_filter(&who)?;
     let tokens = db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(
-            "SELECT t.id, t.name, t.created_at, t.last_used_at, u.username, t.role
+            "SELECT t.id, t.name, t.created_at, t.last_used_at, u.username, t.role, u.role
                FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by
               WHERE ?1 IS NULL OR t.created_by = ?1 ORDER BY t.created_at DESC",
         )?;
@@ -200,6 +200,8 @@ async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Wh
                     "last_used_at": r.get::<_, Option<String>>(3)?,
                     "created_by": r.get::<_, Option<String>>(4)?,
                     "role": Role::stored(&r.get::<_, String>(5)?).as_str(),
+                    // The most it can be given, and the most it can do whatever it was given.
+                    "maker_role": Role::stored(&r.get::<_, Option<String>>(6)?.unwrap_or_default()).as_str(),
                 }))
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -242,6 +244,50 @@ async fn create_token(
     })
     .await?;
     Ok(Json(json!({ "id": id, "name": name, "token": token, "role": role.as_str() })))
+}
+
+#[derive(Deserialize)]
+struct TokenChange {
+    role: String,
+}
+
+/// Let a token do more or less. The token itself isn't shown again or changed, so whatever uses it carries on, with
+/// the new role from its next request. Never more than the one changing it can do, nor the account that made it.
+async fn patch_token(
+    State(state): State<AppState>,
+    Extension(who): Extension<Who>,
+    Path(id): Path<i64>,
+    Json(body): Json<TokenChange>,
+) -> ApiResult<StatusCode> {
+    let only = owner_filter(&who)?;
+    let role = Role::requested(Some(&body.role), Role::View)?;
+    if role > who.role() {
+        return Err(AppError::forbidden(tr!("error-token-role")));
+    }
+    let changed = db::call(&state.pool, move |c| {
+        let tx = c.transaction()?;
+        let maker: Option<String> = tx
+            .query_row(
+                "SELECT u.role FROM access_tokens t JOIN users u ON u.id = t.created_by
+                  WHERE t.id = ?1 AND (?2 IS NULL OR t.created_by = ?2)",
+                params![id, only],
+                |r| r.get(0),
+            )
+            .optional()?;
+        let Some(maker) = maker else { return Ok(None) };
+        if role > Role::stored(&maker) {
+            return Ok(Some(false));
+        }
+        tx.execute("UPDATE access_tokens SET role = ?2 WHERE id = ?1", params![id, role.as_str()])?;
+        tx.commit()?;
+        Ok(Some(true))
+    })
+    .await?;
+    match changed {
+        None => Err(AppError::not_found(tr!("error-token-not-found"))),
+        Some(false) => Err(AppError::forbidden(tr!("error-token-role"))),
+        Some(true) => Ok(StatusCode::NO_CONTENT),
+    }
 }
 
 async fn delete_token(

@@ -132,6 +132,26 @@ test.describe('account', () => {
     }
   })
 
+  test('what a token can do is changed from its row, without showing the token again', async ({ page, api }) => {
+    const name = `E2E token ${unique()}`
+    const made = (await (await api.post('/api/admin/tokens', { data: { name, role: 'edit' } })).json()) as { id: number; token: string }
+    try {
+      await page.goto('/#settings/account')
+      const role = page.getByLabel(`What ${name} can do`)
+      await expect(role).toHaveValue('edit')
+      await role.selectOption('view')
+      await expect(role).toHaveValue('view')
+      await expect(role).toBeEnabled()
+      const { tokens } = (await (await api.get('/api/admin/tokens')).json()) as { tokens: { id: number; role: string }[] }
+      expect(tokens.find((t) => t.id === made.id)?.role).toBe('view')
+      await expect(page.getByText(made.token)).toHaveCount(0)
+      const shown = await page.locator('input').evaluateAll((els, tok) => els.some((e) => (e as HTMLInputElement).value === tok), made.token)
+      expect(shown, 'the token isn’t in any field').toBe(false)
+    } finally {
+      await api.delete(`/api/admin/tokens/${made.id}`)
+    }
+  })
+
   test('on plain http, Copy falls back to a selected textarea', async ({ page, api }) => {
     await pretendPlainHttp(page)
     const name = `E2E token ${unique()}`
@@ -187,14 +207,15 @@ test.describe('account', () => {
         expect((await looker.ctx.get('/api/admin/users')).status()).toBe(403)
         // Its own tokens, but none that can do more than it can.
         expect((await looker.ctx.post('/api/admin/tokens', { data: { name: 'too much', role: 'edit' } })).status()).toBe(403)
-        const lookToken = (await (await looker.ctx.post('/api/admin/tokens', { data: { name: 'engine' } })).json()) as { token: string; role: string }
+        const lookToken = (await (await looker.ctx.post('/api/admin/tokens', { data: { name: 'engine' } })).json()) as { id: number; token: string; role: string }
         expect(lookToken.role).toBe('view')
 
         expect((await changer.ctx.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(200)
         expect((await changer.ctx.get('/api/admin/settings')).status()).toBe(403)
         expect((await changer.ctx.post('/api/archive/purge', { data: {} })).status()).toBe(403)
         expect((await changer.ctx.patch(`/api/admin/users/${looker.id}`, { data: { role: 'admin' } })).status()).toBe(403)
-        const changeToken = ((await (await changer.ctx.post('/api/admin/tokens', { data: { name: 'worker' } })).json()) as { token: string }).token
+        const worker = (await (await changer.ctx.post('/api/admin/tokens', { data: { name: 'worker' } })).json()) as { id: number; token: string }
+        const changeToken = worker.token
 
         // Each sees only their own tokens; an admin sees everyone's.
         const names = async (ctx: APIRequestContext) =>
@@ -207,6 +228,21 @@ test.describe('account', () => {
         expect((await looking.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(403)
         const working = await bearer(changeToken)
         expect((await working.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(200)
+
+        // A token can be given less and more again, never more than its maker or whoever changes it can do.
+        const tokenRole = (ctx: APIRequestContext, id: number, role: string) => ctx.patch(`/api/admin/tokens/${id}`, { data: { role } })
+        expect((await tokenRole(changer.ctx, worker.id, 'view')).status()).toBe(204)
+        expect((await working.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(403)
+        expect((await tokenRole(changer.ctx, worker.id, 'edit')).status()).toBe(204)
+        expect((await working.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(200)
+        expect((await tokenRole(changer.ctx, worker.id, 'admin')).status()).toBe(403)
+        expect((await tokenRole(looker.ctx, lookToken.id, 'edit')).status()).toBe(403)
+        expect((await tokenRole(api, lookToken.id, 'edit')).status(), 'more than the one who made it').toBe(403)
+        expect((await tokenRole(looker.ctx, worker.id, 'view')).status(), 'someone else’s').toBe(404)
+        expect((await tokenRole(working, worker.id, 'view')).status(), 'a token changing tokens').toBe(403)
+        expect((await tokenRole(api, worker.id, 'view')).status(), 'an admin, anyone’s').toBe(204)
+        expect((await working.patch(`/api/assets/${asset.id}`, tag)).status()).toBe(403)
+        expect((await tokenRole(api, worker.id, 'edit')).status()).toBe(204)
 
         // Given a lesser role, the account's tokens have it too. Nobody changes their own.
         expect((await api.patch(`/api/admin/users/${changer.id}`, { data: { role: 'view' } })).ok()).toBe(true)

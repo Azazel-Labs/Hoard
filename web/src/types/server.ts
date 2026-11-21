@@ -200,6 +200,8 @@ export interface AccessToken {
   last_used_at: string | null
   created_by: string | null
   role: Role
+  /** The account that made it: the most it can be given, and the most it can do whatever it was given. */
+  maker_role: Role
 }
 
 /** A finished (or interrupted) run of a maintenance task. */

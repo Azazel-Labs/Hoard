@@ -1543,7 +1543,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST | `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout` | the first account; signing in and out |
 | POST 🔒 | `/api/auth/password` | change your password |
 | GET 🔒, POST 🔒 | `/api/admin/tokens` | your access tokens (an admin sees all), or make one: `{name, role?}` (it defaults to yours) |
-| DELETE 🔒 | `/api/admin/tokens/{id}` | revoke one |
+| PATCH 🔒, DELETE 🔒 | `/api/admin/tokens/{id}` | change what one can do, `{role}` (up to what you and the account that made it can; the token itself stays the same), or revoke it |
 | GET 🔒, POST 🔒 | `/api/admin/users` | accounts, or add one: `{username, password, role?, source?}` (role `view`, `edit`, the default, or `admin`; source `internal`, the default, or `ldap` or `oauth` with no password); admins only |
 | GET 🔒, PUT 🔒 | `/api/admin/auth` | Settings → Authentication, and the OAuth redirect address; secrets are never sent back, and left empty they're kept; admins only |
 | POST 🔒 | `/api/admin/auth/ldap/test`, `/api/admin/auth/oauth/discover` | test an LDAP setup (`{kind, config, username?, password?}`); read a provider's addresses from its issuer (`{issuer}`); admins only |

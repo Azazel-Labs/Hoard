@@ -37,11 +37,11 @@ const SOURCES = computed<{ id: AccountSource; label: string }[]>(() => {
   ]
 })
 const sourceWord = (s: AccountSource) => (s === 'ldap' ? t('account-source-word-directory') : s === 'oauth' ? 'OAuth' : '')
-/** What a token may be given: up to what you can do. */
-const tokenRoles = computed(() => {
-  const all = ROLES()
-  return all.slice(0, all.findIndex((r) => r.id === myRole.value) + 1)
-})
+const rank = (r: Role) => ROLES().findIndex((x) => x.id === r)
+const least = (a: Role, b: Role) => (rank(a) <= rank(b) ? a : b)
+/** What a token may be given: up to what you can do, and what the account that made it can. */
+const rolesUpTo = (most: Role) => ROLES().slice(0, rank(most) + 1)
+const tokenRoles = computed(() => rolesUpTo(myRole.value))
 
 async function load() {
   try {
@@ -151,6 +151,9 @@ async function copyToken() {
   if (!made.value) return
   if (await copyText(made.value.token)) showOk(t('account-copied'))
   else showError(t('account-copy-token-failed'))
+}
+async function setTokenRole(tok: AccessToken, role: Role) {
+  if (await run(t('account-role-failed', { name: tok.name }), () => api.setTokenRole(tok.id, role))) await load()
 }
 async function revoke(tok: AccessToken) {
   const ok = await confirmDialog({
@@ -335,11 +338,24 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
       <ul v-if="tokens?.length" class="list">
         <li v-for="tok in tokens" :key="tok.id">
           <span class="name">{{ tok.name }}</span>
-          <small>{{ roleLabel(tok.role) }} · {{
+          <small>{{
             tok.created_by
               ? t('account-token-meta-by', { made: day(tok.created_at), by: tok.created_by, used: day(tok.last_used_at) })
               : t('account-token-meta', { made: day(tok.created_at), used: day(tok.last_used_at) })
           }}</small>
+          <!-- What it can do now: a token never does more than the account that made it, even one given more before
+               that account was given less. Only one choice: no choosing. -->
+          <span v-if="rank(least(myRole, tok.maker_role)) === 0" class="role">{{ roleLabel(least(tok.role, tok.maker_role)) }}</span>
+          <select
+            v-else
+            class="field role"
+            :value="least(tok.role, tok.maker_role)"
+            :disabled="busy"
+            :aria-label="t('account-what-can-do', { name: tok.name })"
+            @change="setTokenRole(tok, ($event.target as HTMLSelectElement).value as Role)"
+          >
+            <option v-for="r in rolesUpTo(least(myRole, tok.maker_role))" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+          </select>
           <button type="button" class="btn ghost" :disabled="busy" @click="revoke(tok)">{{ t('account-revoke') }}</button>
         </li>
       </ul>

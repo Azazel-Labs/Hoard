@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::time::Duration;
 
 use anyhow::Result;
-use futures_util::{StreamExt, stream};
+use futures_util::{FutureExt, StreamExt, stream};
 use hoard_core::PackStatus;
 use rusqlite::params;
 
@@ -128,60 +128,69 @@ async fn run(state: &AppState, job: db::JobRow) {
     };
     let activity = crate::activity::start(kind, job_label(&job.kind, pack_name.as_deref()), job.pack_id.as_deref());
 
-    let result: Result<()> = match job.kind.as_str() {
-        INGEST => {
-            let auto_name = job.payload.get("auto_name").and_then(serde_json::Value::as_bool).unwrap_or(false);
-            let pid = pack_id.clone();
-            let done = blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name)).await;
-            if done.is_ok() {
-                crate::context::fill_store_text(state, &pack_id).await;
-                crate::store_lookup::start(state).await;
-            }
-            done
-        }
-        RETAG => {
-            let then_llm = job.payload.get("then_llm").and_then(serde_json::Value::as_bool).unwrap_or(false);
-            // Just some of the pack's assets: files changed where they sit in a watched folder.
-            let only: Option<HashSet<String>> =
-                job.payload.get("assets").and_then(|a| serde_json::from_value(a.clone()).ok());
-            blocking(state, move |s, rt| {
-                ingest::retag_pack(s, rt, &pack_id, only.as_ref())?;
-                let conn = s.pool.get()?;
-                if only.is_some() {
-                    // A changed model is converted again.
-                    crate::convert::maybe_enqueue(s, &conn, &pack_id)?;
+    // A job that panics is a job failed, not a worker gone with its job left running.
+    let work = async {
+        match job.kind.as_str() {
+            INGEST => {
+                let auto_name = job.payload.get("auto_name").and_then(serde_json::Value::as_bool).unwrap_or(false);
+                let pid = pack_id.clone();
+                let done = blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name)).await;
+                if done.is_ok() {
+                    crate::context::fill_store_text(state, &pack_id).await;
+                    crate::store_lookup::start(state).await;
                 }
-                ingest::finish_rules_stage(s, &conn, &pack_id, then_llm)
-            })
-            .await
-        }
-        LLM_TAG => llm::tag_pack(state, &pack_id).await,
-        CONVERT => crate::convert::convert_pack(state, &pack_id).await,
-        UNREAL => {
-            let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
-            crate::extract::convert_pack(state, &pack_id, req).await.map(|_| ())
-        }
-        REFORMAT => {
-            let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
-            crate::reformat::run_job(state, &pack_id, req).await
-        }
-        SCAN => match job.payload.get("location").and_then(serde_json::Value::as_i64) {
-            Some(loc) => {
-                let full = job.payload.get("full").and_then(serde_json::Value::as_bool).unwrap_or(true);
-                blocking(state, move |s, _| crate::scan::scan(s, loc, full).map(|_| ())).await
+                done
             }
-            None => Err(anyhow::anyhow!("scan job without a location")),
-        },
-        RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
-        LOOKS => crate::looks::run_job(state).await,
-        SOUNDS => crate::sounds::run_job(state).await,
-        EMBED => crate::clip::run_job(state).await,
-        HEAR => crate::clap::run_job(state).await,
-        MATERIALS => blocking(state, move |s, rt| crate::materials::run_job(s, rt, &pack_id)).await,
-        READ_FILES => read_files(state, &pack_id).await,
-        STORE_LOOKUP => crate::store_lookup::run(state, &activity).await,
-        other => Err(anyhow::anyhow!("unknown job kind {other}")),
+            RETAG => {
+                let then_llm = job.payload.get("then_llm").and_then(serde_json::Value::as_bool).unwrap_or(false);
+                // Just some of the pack's assets: files changed where they sit in a watched folder.
+                let only: Option<HashSet<String>> =
+                    job.payload.get("assets").and_then(|a| serde_json::from_value(a.clone()).ok());
+                blocking(state, move |s, rt| {
+                    ingest::retag_pack(s, rt, &pack_id, only.as_ref())?;
+                    let conn = s.pool.get()?;
+                    if only.is_some() {
+                        // A changed model is converted again.
+                        crate::convert::maybe_enqueue(s, &conn, &pack_id)?;
+                    }
+                    ingest::finish_rules_stage(s, &conn, &pack_id, then_llm)
+                })
+                .await
+            }
+            LLM_TAG => llm::tag_pack(state, &pack_id).await,
+            CONVERT => crate::convert::convert_pack(state, &pack_id).await,
+            UNREAL => {
+                let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
+                crate::extract::convert_pack(state, &pack_id, req).await.map(|_| ())
+            }
+            REFORMAT => {
+                let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
+                crate::reformat::run_job(state, &pack_id, req).await
+            }
+            SCAN => match job.payload.get("location").and_then(serde_json::Value::as_i64) {
+                Some(loc) => {
+                    let full = job.payload.get("full").and_then(serde_json::Value::as_bool).unwrap_or(true);
+                    blocking(state, move |s, _| crate::scan::scan(s, loc, full).map(|_| ())).await
+                }
+                None => Err(anyhow::anyhow!("scan job without a location")),
+            },
+            RELOCATE => {
+                crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await
+            }
+            LOOKS => crate::looks::run_job(state).await,
+            SOUNDS => crate::sounds::run_job(state).await,
+            EMBED => crate::clip::run_job(state).await,
+            HEAR => crate::clap::run_job(state).await,
+            MATERIALS => blocking(state, move |s, rt| crate::materials::run_job(s, rt, &pack_id)).await,
+            READ_FILES => read_files(state, &pack_id).await,
+            STORE_LOOKUP => crate::store_lookup::run(state, &activity).await,
+            other => Err(anyhow::anyhow!("unknown job kind {other}")),
+        }
     };
+    let result: Result<()> = std::panic::AssertUnwindSafe(work)
+        .catch_unwind()
+        .await
+        .unwrap_or_else(|_| Err(anyhow::anyhow!("the {} job panicked", job.kind)));
 
     let (error, retry, pack_update) = match &result {
         Ok(()) => (None, None, None),
@@ -204,10 +213,19 @@ async fn run(state: &AppState, job: db::JobRow) {
     };
     let id = job.id;
     let pack_id = job.pack_id.clone();
+    let kind = job.kind.clone();
     let res = db::call(&state.pool, move |c| {
         db::finish_job(c, id, error.as_deref(), retry)?;
-        if let (Some(pid), Some((status, msg))) = (pack_id, pack_update) {
-            db::set_pack_status(c, &pid, status, Some(&msg))?;
+        match (pack_id, pack_update) {
+            (Some(pid), Some((status, msg))) => db::set_pack_status(c, &pid, status, Some(&msg))?,
+            // Nothing left to finish its pack (this was the last step, and it failed, or forgot to): it's ready.
+            (Some(pid), None) if retry.is_none() => {
+                let note = error.as_deref().map(|e| format!("{kind} stopped: {e}"));
+                if db::settle_packs(c, Some(&pid), note.as_deref())? > 0 {
+                    tracing::warn!(pack = %pid, kind = %kind, "a job left its pack unfinished; it's ready as it is");
+                }
+            }
+            _ => {}
         }
         Ok(())
     })

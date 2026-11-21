@@ -226,6 +226,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     let effective = settings.get();
     let blobs = BlobStore::open(&cfg, pool.clone(), effective.s3.clone())?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
+    db::settle_packs(&*pool.get()?, None, None)?;
     maintenance::mark_interrupted(&*pool.get()?)?;
     analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
     analyze::set_thumb_quality(effective.thumb_quality);

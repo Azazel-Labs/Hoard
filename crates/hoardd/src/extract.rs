@@ -248,10 +248,18 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, mut req: Reque
     for (n, (id, path, hash)) in todo.iter().enumerate() {
         crate::activity::job_progress(jobs::UNREAL, Some(pack_id), n, todo.len(), "packages");
         let local = work.join(format!("{n}.uasset"));
-        state.blobs.download_to(hash, &local).await?;
-        let l = local.clone();
-        let (outcome, mut origin) = crate::heavy::run("unreal", move || convert_file(&l)).await?;
+        // A package whose file is missing, or that the reader trips over, is that one package failed: the rest of the
+        // pack is still converted, and the pack carries on to its tagging.
+        let converted = match state.blobs.download_to(hash, &local).await {
+            Ok(()) => {
+                let l = local.clone();
+                crate::heavy::run("unreal", move || convert_file(&l)).await
+            }
+            Err(e) => Err(e),
+        };
         tokio::fs::remove_file(&local).await.ok();
+        let (outcome, mut origin) =
+            converted.unwrap_or_else(|e| (Outcome::Failed(format!("{e:#}")), Origin::default()));
         let class = origin.class.clone();
         let id2 = id.clone();
         match outcome {

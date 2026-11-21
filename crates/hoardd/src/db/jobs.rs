@@ -100,7 +100,72 @@ pub(crate) fn finish_job(conn: &Connection, id: i64, error: Option<&str>, retry_
     Ok(())
 }
 
+/// Packs left being read or tagged with no job left to finish them (`pack`, or every one) are ready: a job that failed
+/// partway (an Unreal conversion, say) used to leave its pack "LLM is tagging" for good, with its menu greyed out.
+/// What's done of it is usable, and it can be read or tagged again from there; `note` says why, when there's a reason.
+/// A watched folder's scan reads its packs itself, so none is touched while a scan or a move is waiting or running.
+pub(crate) fn settle_packs(conn: &Connection, pack: Option<&str>, note: Option<&str>) -> Result<usize> {
+    let settled = conn.execute(
+        "UPDATE packs SET status = 'ready', error = COALESCE(?2, error)
+          WHERE status IN ('ingesting', 'analyzing') AND (?1 IS NULL OR id = ?1)
+            AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'))
+            AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind IN (?3, ?4) AND j.status IN ('queued', 'running'))",
+        params![pack, note, crate::jobs::SCAN, crate::jobs::RELOCATE],
+    )?;
+    if pack.is_none() && settled > 0 {
+        tracing::info!(packs = settled, "packs left unfinished by a job that stopped are ready as they are");
+    }
+    Ok(settled)
+}
+
 /// After a crash, anything left `running` gets another go.
 pub(crate) fn requeue_stale_jobs(conn: &Connection) -> Result<usize> {
     Ok(conn.execute("UPDATE jobs SET status = 'queued' WHERE status = 'running'", [])?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_pack_with_no_job_left_to_finish_it_is_ready() {
+        let conn = crate::db::test_library();
+        conn.execute_batch(
+            "INSERT INTO packs (id, name, status, created_at) VALUES
+               ('stuck', 'Stuck', 'analyzing', 'x'), ('reading', 'Reading', 'ingesting', 'x'),
+               ('tagging', 'Tagging', 'analyzing', 'x'), ('done', 'Done', 'ready', 'x'),
+               ('broken', 'Broken', 'failed', 'x'), ('sent', 'Sent', 'uploading', 'x');
+             INSERT INTO jobs (kind, pack_id, payload, status, run_after, created_at, updated_at) VALUES
+               ('unreal', 'stuck', '{}', 'failed', 'x', 'x', 'x'),
+               ('ingest', 'reading', '{}', 'running', 'x', 'x', 'x'),
+               ('llm_tag', 'tagging', '{}', 'queued', 'x', 'x', 'x');",
+        )
+        .unwrap();
+        let status = |id: &str| -> (String, Option<String>) {
+            conn.query_row("SELECT status, error FROM packs WHERE id = ?1", [id], |r| Ok((r.get(0)?, r.get(1)?)))
+                .unwrap()
+        };
+        // Only its own pack, after a job.
+        assert_eq!(settle_packs(&conn, Some("done"), Some("no")).unwrap(), 0);
+        assert_eq!(settle_packs(&conn, Some("stuck"), Some("unreal stopped: bad package")).unwrap(), 1);
+        assert_eq!(status("stuck"), ("ready".into(), Some("unreal stopped: bad package".into())));
+        // Every pack, at start: those with a job waiting or running, and those not being read, are left as they are.
+        conn.execute("UPDATE packs SET status = 'analyzing', error = NULL WHERE id = 'stuck'", []).unwrap();
+        // Not while a watched folder's scan may be reading packs of its own.
+        conn.execute(
+            "INSERT INTO jobs (kind, payload, status, run_after, created_at, updated_at)
+             VALUES (?1, '{}', 'queued', 'x', 'x', 'x')",
+            [crate::jobs::SCAN],
+        )
+        .unwrap();
+        assert_eq!(settle_packs(&conn, None, None).unwrap(), 0);
+        conn.execute("UPDATE jobs SET status = 'done' WHERE kind = ?1", [crate::jobs::SCAN]).unwrap();
+        assert_eq!(settle_packs(&conn, None, None).unwrap(), 1);
+        assert_eq!(status("stuck"), ("ready".into(), None));
+        for (id, want) in
+            [("reading", "ingesting"), ("tagging", "analyzing"), ("broken", "failed"), ("sent", "uploading")]
+        {
+            assert_eq!(status(id).0, want, "{id}");
+        }
+    }
 }

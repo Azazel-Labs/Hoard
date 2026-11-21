@@ -10214,12 +10214,76 @@ source = "Unreal packages"
 translation = "Πακέτα Unreal"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Κατεβάζει τον επεξεργαστή Linux x86-64 της Epic. Απαιτεί συνδεδεμένη πρόσβαση GitHub και δεκάδες GB στον δίσκο."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Κατεβάζει τον επεξεργαστή Linux x86-64 της Epic, μία φορά, στον φάκελο εργαλείων του Hoard. Καταλαμβάνει δεκάδες GB στον δίσκο και απαιτεί έναν λογαριασμό GitHub στον οποίο η Epic έχει δώσει πρόσβαση (βλ. Σύνδεση GitHub)."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Εγκαθιστά το Unreal Editor για τη διεργασία εξαγωγής. Εκτελέστε την ξεχωριστά για εξαγωγή πόρων."
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "Σύνδεση GitHub"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "Να ξεχαστεί"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "Η σύνδεση GitHub ξεχάστηκε"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "Σε αυτόν τον διακομιστή δόθηκε επίσης δική του σύνδεση (GHCR_TOKEN_FILE ή DOCKER_CONFIG)· χρησιμοποιείται όταν δεν έχει αποθηκευτεί καμία εδώ."
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "Αποθήκευση σύνδεσης"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "Η σύνδεση GitHub αποθηκεύτηκε· γίνεται νέα προσπάθεια λήψης"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "Εισαγάγετε εδώ το όνομα χρήστη σας στο GitHub και το διακριτικό και, στη συνέχεια, επιλέξτε «Αυτόματο»."
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "Αποδεχτείτε την πρόσκληση στον οργανισμό EpicGames που σας στέλνει το GitHub με email (μπορεί να χρειαστούν λίγα λεπτά για να φτάσει)."
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "Συνδέστε τον λογαριασμό σας GitHub με τον λογαριασμό σας Epic Games."
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "Πώς να τους συνδέσετε"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "Δημιουργήστε ένα διακριτικό GitHub (classic) με επιλεγμένο μόνο το read:packages."
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "Δημιουργία διακριτικού"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "Διακριτικό"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "Αποθηκεύτηκε (πληκτρολογήστε νέο για να το αντικαταστήσετε)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "Όνομα χρήστη GitHub"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Η Epic δημοσιεύει τον επεξεργαστή Linux ως ιδιωτική εικόνα στο μητρώο πακέτων του GitHub (ghcr.io), και το Hoard τον κατεβάζει από εκεί με το crane, που συνοδεύει το Hoard. Το GitHub τον δίνει μόνο σε λογαριασμούς στους οποίους η Epic έχει δώσει πρόσβαση, οπότε το Hoard χρειάζεται έναν για να τον κατεβάσει. Το Hoard φυλάσσει το διακριτικό μαζί με τις άλλες ρυθμίσεις του και δεν το χρησιμοποιεί για τίποτε άλλο."
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

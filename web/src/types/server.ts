@@ -394,6 +394,8 @@ export interface Settings {
   blender: ToolSetting
   unreal: ToolSetting
   unreal_image: OptionSetting<string>
+  /** Who Epic's private Unreal Editor images are downloaded as; the token itself is never sent back. */
+  unreal_github: { user: string; has_token: boolean; from_server: boolean }
   ffmpeg: ToolSetting
   unreal_convert: { value: UnrealConvert; default: UnrealConvert; saved: boolean }
   llm: {
@@ -566,6 +568,8 @@ export interface SettingsPatch {
   blender?: string | null
   unreal?: string | null
   unreal_image?: string | null
+  ghcr_user?: string | null
+  ghcr_token?: string | null
   ffmpeg?: string | null
   unreal_convert?: UnrealConvert | null
   llm_url?: string | null

@@ -9970,12 +9970,76 @@ source = "Unreal packages"
 translation = "Unreal 套件"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "下載 Epic 的 Linux x86-64 編輯器。需要已連結的 GitHub 存取權限及數十 GB 的磁碟空間。"
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "將 Epic 的 Linux x86-64 編輯器一次性下載到 Hoard 的工具資料夾。它會佔用數十 GB 的磁碟空間，並需要一個 Epic 已允許加入的 GitHub 帳號（請見「GitHub 登入」）。"
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "為匯出工作程序安裝 Unreal Editor。請另外執行該程序以匯出資源。"
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "GitHub 登入"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "忘記"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "已忘記 GitHub 登入資訊"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "這台伺服器另外設定了自己的登入資訊（GHCR_TOKEN_FILE 或 DOCKER_CONFIG）；此處未儲存登入資訊時會使用它。"
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "儲存登入資訊"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "已儲存 GitHub 登入資訊；正在重試下載"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "在此輸入你的 GitHub 使用者名稱和權杖，然後選擇「自動」。"
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "接受 GitHub 以電子郵件寄來的 EpicGames 組織邀請（可能需要幾分鐘才會收到）。"
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "將你的 GitHub 帳號連結到你的 Epic Games 帳號。"
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "如何連結"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "建立一個只勾選 read:packages 的 GitHub 權杖（classic）。"
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "建立權杖"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "權杖"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "已儲存（輸入新的權杖即可取代）"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "GitHub 使用者名稱"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic 將 Linux 版編輯器以私人映像檔的形式發布在 GitHub 的套件登錄（ghcr.io）上，Hoard 使用 Hoard 內附的 crane 從那裡下載。GitHub 只會提供給 Epic 已允許加入的帳號，因此 Hoard 需要一個帳號來下載。Hoard 會將權杖與其他設定一起保存，不會用於其他任何用途。"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

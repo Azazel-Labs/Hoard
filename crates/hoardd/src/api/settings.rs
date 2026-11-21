@@ -84,6 +84,12 @@ fn settings_json_sync(state: &AppState) -> Value {
             &now.unreal, &cfg.unreal, saved.unreal.is_some(), &crate::unreal_editor::describe(), crate::unreal_editor::can_download() && crate::tools::editor_downloads(cfg),
         ),
         "unreal_image": option(&now.unreal_image, &cfg.unreal_image, saved.unreal_image.is_some()),
+        // Who Epic's images are downloaded as. The token is never sent back, only whether there is one.
+        "unreal_github": {
+            "user": saved.ghcr_user.as_deref().unwrap_or(""),
+            "has_token": saved.ghcr_token.as_deref().is_some_and(|t| !t.trim().is_empty()),
+            "from_server": std::env::var_os("GHCR_TOKEN_FILE").is_some() || std::env::var_os("DOCKER_CONFIG").is_some(),
+        },
         "unreal_convert": {
             "value": now.unreal_convert,
             "default": cfg.unreal_convert,
@@ -332,10 +338,11 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
     if before.blender != after.blender {
         crate::convert::start_blender(&state, true);
     }
-    if before.unreal != after.unreal || before.unreal_image != after.unreal_image {
+    if before.unreal != after.unreal || before.unreal_image != after.unreal_image || before.ghcr != after.ghcr {
         crate::unreal_editor::start(
             &after.unreal,
             &after.unreal_image,
+            after.ghcr.clone(),
             state.cfg.tools_dir(),
             crate::tools::editor_downloads(&state.cfg),
         );

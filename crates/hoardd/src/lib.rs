@@ -272,6 +272,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     unreal_editor::start(
         &effective.unreal,
         &effective.unreal_image,
+        effective.ghcr.clone(),
         state.cfg.tools_dir(),
         tools::editor_downloads(&state.cfg),
     );

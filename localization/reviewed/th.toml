@@ -9967,12 +9967,76 @@ source = "Unreal packages"
 translation = "แพ็กเกจ Unreal"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "ดาวน์โหลดเอดิเตอร์ Linux x86-64 ของ Epic ต้องมีสิทธิ์เข้าถึง GitHub ที่เชื่อมโยงไว้และพื้นที่ดิสก์หลายสิบ GB"
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "ดาวน์โหลดเอดิเตอร์ Linux x86-64 ของ Epic เพียงครั้งเดียวลงในโฟลเดอร์เครื่องมือของ Hoard ใช้พื้นที่ดิสก์หลายสิบ GB และต้องมีบัญชี GitHub ที่ Epic อนุญาตแล้ว (ดูการลงชื่อเข้าใช้ GitHub)"
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "ติดตั้ง Unreal Editor สำหรับกระบวนการส่งออก เรียกใช้กระบวนการแยกต่างหากเพื่อส่งออกแอสเซ็ต"
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "การลงชื่อเข้าใช้ GitHub"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "ลืม"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "ลืมการลงชื่อเข้าใช้ GitHub แล้ว"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "เซิร์ฟเวอร์นี้ได้รับการลงชื่อเข้าใช้ของตัวเองด้วย (GHCR_TOKEN_FILE หรือ DOCKER_CONFIG) ซึ่งจะใช้เมื่อไม่มีการบันทึกไว้ที่นี่"
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "บันทึกการลงชื่อเข้าใช้"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "บันทึกการลงชื่อเข้าใช้ GitHub แล้ว กำลังลองดาวน์โหลดอีกครั้ง"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "ป้อนชื่อผู้ใช้ GitHub และโทเค็นที่นี่ แล้วเลือก “อัตโนมัติ”"
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "ตอบรับคำเชิญเข้าร่วมองค์กร EpicGames ที่ GitHub ส่งมาทางอีเมล (อาจใช้เวลาสักครู่กว่าจะมาถึง)"
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "เชื่อมโยงบัญชี GitHub ของคุณกับบัญชี Epic Games ของคุณ"
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "วิธีเชื่อมโยง"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "สร้างโทเค็น GitHub (classic) โดยเลือกเฉพาะ read:packages"
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "สร้างโทเค็น"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "โทเค็น"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "บันทึกแล้ว (พิมพ์โทเค็นใหม่เพื่อแทนที่)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "ชื่อผู้ใช้ GitHub"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic เผยแพร่เอดิเตอร์สำหรับ Linux เป็นอิมเมจส่วนตัวบนรีจิสทรีแพ็กเกจของ GitHub (ghcr.io) และ Hoard ดาวน์โหลดจากที่นั่นด้วย crane ซึ่งมาพร้อมกับ Hoard GitHub ให้เฉพาะบัญชีที่ Epic อนุญาตแล้วเท่านั้น Hoard จึงต้องใช้บัญชีหนึ่งในการดาวน์โหลด Hoard เก็บโทเค็นไว้กับการตั้งค่าอื่นๆ และไม่ใช้ทำอย่างอื่นเลย"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

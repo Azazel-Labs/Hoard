@@ -9978,12 +9978,76 @@ source = "Unreal packages"
 translation = "Unreal パッケージ"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Epic の Linux x86-64 エディターをダウンロードします。連携済みの GitHub アクセス権と数十 GB のディスク容量が必要です。"
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Epic の Linux x86-64 エディターを一度だけ Hoard のツールフォルダーにダウンロードします。数十 GB のディスク容量と、Epic に参加を認められた GitHub アカウントが必要です（「GitHub サインイン」を参照）。"
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "エクスポートワーカー用に Unreal Editor をインストールします。アセットをエクスポートするにはワーカーを別途実行してください。"
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "GitHub サインイン"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "忘れる"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "GitHub サインインを忘れました"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "このサーバーには独自のサインインも設定されています（GHCR_TOKEN_FILE または DOCKER_CONFIG）。ここに保存されていない場合はそれが使われます。"
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "サインインを保存"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "GitHub サインインを保存しました。ダウンロードを再試行しています"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "GitHub のユーザー名とトークンをここに入力し、「自動」を選んでください。"
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "GitHub からメールで届く EpicGames 組織への招待を承諾してください（届くまで数分かかることがあります）。"
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "GitHub アカウントを Epic Games アカウントに連携してください。"
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "連携の方法"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "read:packages だけにチェックを入れた GitHub トークン（classic）を作成してください。"
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "トークンを作成"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "トークン"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "保存済み（置き換えるには新しいトークンを入力）"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "GitHub ユーザー名"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic は Linux 版エディターを GitHub のパッケージレジストリ（ghcr.io）で非公開イメージとして公開しており、Hoard は Hoard に同梱の crane を使ってそこからダウンロードします。GitHub は Epic が参加を認めたアカウントにしか渡さないため、Hoard にはダウンロードに使うアカウントが必要です。Hoard はトークンを他の設定と一緒に保存し、それ以外の用途には使いません。"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

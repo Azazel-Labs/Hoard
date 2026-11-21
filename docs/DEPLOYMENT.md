@@ -367,10 +367,19 @@ editor executable via **This program**; they never automatically download Blende
 cannot install the x86-64 editor natively. Epic publishes Linux development images; Windows runtime images do not
 contain an editor. See [Epic's image overview](https://dev.epicgames.com/documentation/unreal-engine/overview-of-containers-in-unreal-engine).
 
-Before enabling it, link your Epic and GitHub accounts and grant the GitHub token `read:packages` access. Mount a
-read-only token file readable by Hoard's service account and set `GHCR_USER` and `GHCR_TOKEN_FILE` on the container.
-Alternatively, mount the service account's existing Docker credentials and set `DOCKER_CONFIG` to their directory.
-Hoard uses crane's normal credential lookup when no token file is supplied. Tokens are never stored in portal settings.
+Epic publishes the editor as a private image on GitHub's registry (ghcr.io), which Hoard downloads with crane (it's in
+the Docker image). GitHub only hands it to accounts Epic has let in, so before enabling it:
+
+1. Link your GitHub account to your Epic Games account ([Epic's guide](https://www.unrealengine.com/en-US/ue-on-github)),
+   and accept the EpicGames organization's invitation that GitHub emails you.
+2. Make a GitHub token (classic) with only `read:packages`.
+3. Enter your GitHub user name and the token under **Settings → Tools → Unreal Editor → GitHub sign-in**. The token is
+   kept with Hoard's other settings (sealed with the system keychain in the desktop app) and never sent back to the portal.
+
+Instead of step 3, you can mount a read-only token file readable by Hoard's service account and set `GHCR_USER` and
+`GHCR_TOKEN_FILE` on the container, or mount the service account's existing Docker credentials and set `DOCKER_CONFIG`
+to their directory; these are used when no sign-in is saved in Settings, and crane's normal credential lookup after
+that.
 The Docker image includes crane, GNU tar and common loader dependencies; no Docker socket or daemon is needed inside it.
 
 The download can consume tens of GB. The merged image filesystem streams into the persistent cache; only

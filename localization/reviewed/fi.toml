@@ -10204,12 +10204,76 @@ source = "Unreal packages"
 translation = "Unreal-paketit"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Lataa Epicin Linux x86-64 -editorin. Vaatii yhdistetyn GitHub-käyttöoikeuden ja kymmeniä gigatavuja levytilaa."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Lataa Epicin Linux x86-64 -editorin kerran Hoardin työkalukansioon. Se vie kymmeniä gigatavuja levytilaa ja vaatii GitHub-tilin, jolle Epic on antanut pääsyn (katso GitHub-kirjautuminen)."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Asentaa Unreal Editorin vientityöntekijää varten. Vie aineistoa käynnistämällä työntekijä erikseen."
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "GitHub-kirjautuminen"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "Unohda"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "GitHub-kirjautuminen unohdettu"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "Tälle palvelimelle on annettu myös oma kirjautuminen (GHCR_TOKEN_FILE tai DOCKER_CONFIG); sitä käytetään, kun tänne ei ole tallennettu kirjautumista."
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "Tallenna kirjautuminen"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "GitHub-kirjautuminen tallennettu; lataus yritetään uudelleen"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "Anna tähän GitHub-käyttäjänimesi ja tunnus ja valitse sitten ”Automaattinen”."
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "Hyväksy kutsu EpicGames-organisaatioon, jonka GitHub lähettää sinulle sähköpostitse (sen saapuminen voi kestää muutaman minuutin)."
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "Yhdistä GitHub-tilisi Epic Games -tiliisi."
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "Näin yhdistät ne"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "Luo GitHub-tunnus (classic), jossa vain read:packages on valittuna."
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "Luo tunnus"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "Tunnus"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "Tallennettu (korvaa se kirjoittamalla uusi)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "GitHub-käyttäjänimi"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic julkaisee Linux-editorin yksityisenä konttikuvana GitHubin pakettirekisterissä (ghcr.io), ja Hoard lataa sen sieltä crane-työkalulla, joka tulee Hoardin mukana. GitHub luovuttaa sen vain tileille, joille Epic on antanut pääsyn, joten Hoard tarvitsee tilin, jonka nimissä se lataa sen. Hoard säilyttää tunnuksen muiden asetustensa kanssa eikä käytä sitä mihinkään muuhun."
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

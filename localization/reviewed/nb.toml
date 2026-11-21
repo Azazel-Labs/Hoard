@@ -10157,12 +10157,76 @@ source = "Unreal packages"
 translation = "Unreal-pakkefiler"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Laster ned Epics Linux x86-64-editor. Krever tilknyttet GitHub-tilgang og flere titalls GB diskplass."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Laster ned Epics Linux x86-64-editor én gang til Hoards verktøymappe. Den tar flere titalls GB diskplass og krever en GitHub-konto som Epic har sluppet inn (se GitHub-pålogging)."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Installerer Unreal Editor for eksportprosessen. Kjør prosessen separat for å eksportere ressurser."
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "GitHub-pålogging"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "Glem"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "GitHub-påloggingen er glemt"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "Denne serveren har også fått en egen pålogging (GHCR_TOKEN_FILE eller DOCKER_CONFIG); den brukes når ingen er lagret her."
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "Lagre pålogging"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "GitHub-påloggingen er lagret; prøver nedlastingen på nytt"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "Skriv inn GitHub-brukernavnet ditt og tokenet her, og velg deretter «Automatisk»."
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "Godta invitasjonen til EpicGames-organisasjonen som GitHub sender deg på e-post (det kan ta noen minutter før den kommer)."
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "Knytt GitHub-kontoen din til Epic Games-kontoen din."
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "Slik knytter du dem sammen"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "Lag et GitHub-token (classic) der bare read:packages er krysset av."
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "Lag et token"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "Token"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "Lagret (skriv inn et nytt for å erstatte det)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "GitHub-brukernavn"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic publiserer Linux-editoren som et privat image i GitHubs pakkeregister (ghcr.io), og Hoard laster det ned derfra med crane, som følger med Hoard. GitHub gir det bare til kontoer som Epic har sluppet inn, så Hoard trenger en konto å laste det ned med. Hoard lagrer tokenet sammen med de andre innstillingene sine og bruker det ikke til noe annet."
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

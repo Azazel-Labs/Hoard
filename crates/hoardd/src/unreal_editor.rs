@@ -66,7 +66,20 @@ fn digest_key(digest: &str) -> Result<&str> {
     Ok(key)
 }
 
-pub(crate) fn start(setting: &str, image: &str, tools_dir: PathBuf, allow_download: bool) {
+/// A GitHub account with access to Epic's images, and a token of it with `read:packages`.
+#[derive(Clone, PartialEq, Eq)]
+pub(crate) struct Ghcr {
+    pub(crate) user: String,
+    pub(crate) token: String,
+}
+
+impl std::fmt::Debug for Ghcr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Ghcr").field("user", &self.user).finish_non_exhaustive()
+    }
+}
+
+pub(crate) fn start(setting: &str, image: &str, ghcr: Option<Ghcr>, tools_dir: PathBuf, allow_download: bool) {
     if tools::is_off(setting) {
         SLOT.restart(Status::Off);
         return;
@@ -82,7 +95,7 @@ pub(crate) fn start(setting: &str, image: &str, tools_dir: PathBuf, allow_downlo
         let canceled = || !SLOT.current(generation);
         let result = if tools::is_auto(&setting) {
             match image_ref(&image) {
-                Ok(image) => install(&tools_dir.join("unreal"), &image, generation, &canceled).await,
+                Ok(image) => install(&tools_dir.join("unreal"), &image, ghcr.as_ref(), generation, &canceled).await,
                 Err(e) => Err(e),
             }
         } else {
@@ -180,7 +193,14 @@ fn crane(auth: Option<&Path>) -> Command {
     cmd
 }
 
-async fn login(canceled: &(dyn Fn() -> bool + Sync)) -> Result<Option<tempfile::TempDir>> {
+/// Credentials for crane, for as long as the download takes: the GitHub sign-in saved in Settings, else the token file
+/// the container was given, else none (crane looks for its own, in `DOCKER_CONFIG` or `~/.docker`).
+async fn login(ghcr: Option<&Ghcr>, canceled: &(dyn Fn() -> bool + Sync)) -> Result<Option<tempfile::TempDir>> {
+    if let Some(ghcr) = ghcr {
+        let auth = tempfile::tempdir()?;
+        std::fs::write(auth.path().join("config.json"), docker_config(ghcr).to_string())?;
+        return Ok(Some(auth));
+    }
     let Some(token_path) = std::env::var_os("GHCR_TOKEN_FILE") else {
         return Ok(None);
     };
@@ -198,7 +218,20 @@ async fn login(canceled: &(dyn Fn() -> bool + Sync)) -> Result<Option<tempfile::
     Ok(Some(auth))
 }
 
-async fn install(root: &Path, image: &str, generation: u64, canceled: &(dyn Fn() -> bool + Sync)) -> Result<Tool> {
+/// A Docker credentials file signing in to ghcr.io, as crane reads one.
+fn docker_config(ghcr: &Ghcr) -> serde_json::Value {
+    use base64::Engine as _;
+    let auth = base64::engine::general_purpose::STANDARD.encode(format!("{}:{}", ghcr.user.trim(), ghcr.token.trim()));
+    serde_json::json!({ "auths": { "ghcr.io": { "auth": auth } } })
+}
+
+async fn install(
+    root: &Path,
+    image: &str,
+    ghcr: Option<&Ghcr>,
+    generation: u64,
+    canceled: &(dyn Fn() -> bool + Sync),
+) -> Result<Tool> {
     ensure!(
         can_download(),
         "Epic's editor images are Linux x86-64 only. Run Hoard in a Linux x86-64 container, or select an installed native editor's path"
@@ -216,15 +249,14 @@ async fn install(root: &Path, image: &str, generation: u64, canceled: &(dyn Fn()
     {
         return probe(&editor, canceled).await;
     }
-    let auth = login(canceled).await?;
+    let auth = login(ghcr, canceled).await?;
     let auth_path = auth.as_ref().map(tempfile::TempDir::path);
     let digest = if let Some(digest) = cached {
         digest.trim().to_owned()
     } else {
         let mut cmd = crane(auth_path);
         cmd.args(["digest", "--platform", "linux/amd64", image]);
-        run(&mut cmd, canceled, Duration::from_secs(300)).await
-            .context("Cannot resolve Unreal image; install crane and authenticate to ghcr.io with an Epic-linked GitHub account (read:packages)")?.trim().to_owned()
+        run(&mut cmd, canceled, Duration::from_secs(300)).await.map_err(unresolved)?.trim().to_owned()
     };
     let key = digest_key(&digest)?;
     let _install_lock = lock(&root.join(format!("{key}.lock")), canceled).await?;
@@ -252,6 +284,28 @@ async fn install(root: &Path, image: &str, generation: u64, canceled: &(dyn Fn()
     std::io::Write::write_all(&mut file, digest.as_bytes())?;
     file.persist(&ref_file)?;
     Ok(tool)
+}
+
+/// Why an Unreal image couldn't be looked up, in terms of what to do about it. Epic's images are private: most often
+/// the server has no GitHub sign-in for ghcr.io at all, or has one that Epic hasn't let in.
+fn unresolved(e: anyhow::Error) -> anyhow::Error {
+    let said = format!("{e:#}");
+    let has = |words: &[&str]| words.iter().any(|w| said.contains(w));
+    let missing = e
+        .chain()
+        .any(|c| c.downcast_ref::<std::io::Error>().is_some_and(|io| io.kind() == std::io::ErrorKind::NotFound));
+    let what = if missing {
+        "Can't run crane, which downloads Unreal Editor (it comes with Hoard's Docker image)"
+    } else if has(&["No matching credentials", "UNAUTHORIZED", "authentication required"]) {
+        "Hoard downloads Unreal Editor from Epic's private images on GitHub (ghcr.io), and GitHub wants a sign-in for them that this server doesn't have. Link your GitHub account to your Epic Games account, then enter your GitHub user name and a token with read:packages under Unreal Editor in Settings → Tools"
+    } else if has(&["DENIED", "denied", "403"]) {
+        "GitHub turned down the sign-in for Epic's Unreal Editor images: the GitHub account needs to be linked to an Epic Games account, with the EpicGames organization's invitation accepted, and its token needs read:packages"
+    } else if has(&["MANIFEST_UNKNOWN", "manifest unknown", "NAME_UNKNOWN"]) {
+        "Epic has no Unreal Editor image by that version; try another (such as 5.8)"
+    } else {
+        "Can't look up Epic's Unreal Editor image"
+    };
+    e.context(what)
 }
 
 /// Stream the merged filesystem straight into tar, without an image-sized temporary archive.
@@ -340,6 +394,39 @@ mod tests {
     use super::*;
 
     #[test]
+    fn a_lookup_that_failed_says_what_to_do() {
+        let why = |crane: &str| format!("{:#}", unresolved(anyhow::anyhow!("{crane}")));
+        let signed_out = why(
+            "No matching credentials were found for \"ghcr.io\"
+Error: GET https://ghcr.io/token?scope=repository:              UNAUTHORIZED: authentication required : Process exited with exit status: 1",
+        );
+        assert!(signed_out.starts_with("Hoard downloads Unreal Editor from Epic's private images"), "{signed_out}");
+        assert!(signed_out.contains("read:packages") && !signed_out.contains("install crane"), "{signed_out}");
+        assert!(why("DENIED: requested access to the resource is denied").contains("needs to be linked to an"));
+        assert!(why("MANIFEST_UNKNOWN: manifest unknown").contains("no Unreal Editor image by that version"));
+        let gone = format!("{:#}", unresolved(std::io::Error::from(std::io::ErrorKind::NotFound).into()));
+        assert!(gone.starts_with("Can't run crane"), "{gone}");
+        assert!(why("connection reset").starts_with("Can't look up"));
+    }
+
+    #[test]
+    fn a_saved_sign_in_is_handed_to_crane_as_docker_credentials() {
+        use base64::Engine as _;
+        let ghcr = Ghcr {
+            user: " octocat ".into(),
+            token: "ghp_secret
+"
+            .into(),
+        };
+        let config = docker_config(&ghcr);
+        let auth = config["auths"]["ghcr.io"]["auth"].as_str().unwrap();
+        let plain = base64::engine::general_purpose::STANDARD.decode(auth).unwrap();
+        assert_eq!(plain, b"octocat:ghp_secret");
+        // Never in a log.
+        assert!(!format!("{ghcr:?}").contains("ghp_secret"));
+    }
+
+    #[test]
     fn image_inputs_are_epic_development_versions_or_digests() {
         assert_eq!(image_ref("5.8").unwrap(), format!("{REPO}:dev-slim-5.8"));
         assert_eq!(image_ref(" 5.8.1 ").unwrap(), format!("{REPO}:dev-slim-5.8.1"));
@@ -391,10 +478,10 @@ mod tests {
     #[tokio::test]
     async fn desktop_auto_never_starts_a_download() {
         let dir = tempfile::tempdir().unwrap();
-        start("auto", "5.8", dir.path().into(), false);
+        start("auto", "5.8", None, dir.path().into(), false);
         assert!(describe().contains("only in Docker"));
         assert!(std::fs::read_dir(dir.path()).unwrap().next().is_none());
-        start("off", "5.8", dir.path().into(), false);
+        start("off", "5.8", None, dir.path().into(), false);
         assert_eq!(describe(), "off");
     }
 

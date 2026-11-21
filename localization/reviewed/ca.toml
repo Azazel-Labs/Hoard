@@ -10159,12 +10159,76 @@ source = "Unreal packages"
 translation = "Paquets d'Unreal"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Baixa l’editor Linux x86-64 d’Epic. Requereix accés vinculat a GitHub i desenes de GB al disc."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Baixa l’editor Linux x86-64 d’Epic, una sola vegada, a la carpeta d’eines de Hoard. Ocupa desenes de GB al disc i requereix un compte de GitHub que Epic hagi admès (vegeu Inici de sessió a GitHub)."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Instal·la Unreal Editor per al procés d’exportació. Executeu-lo per separat per exportar recursos."
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "Inici de sessió a GitHub"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "Oblida"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "S’ha oblidat l’inici de sessió a GitHub"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "Aquest servidor també té un inici de sessió propi (GHCR_TOKEN_FILE o DOCKER_CONFIG); s’utilitza quan no n’hi ha cap de desat aquí."
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "Desa l’inici de sessió"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "S’ha desat l’inici de sessió a GitHub; es torna a provar la baixada"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "Introduïu aquí el vostre nom d’usuari de GitHub i el testimoni, i després trieu «Automàtic»."
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "Accepteu la invitació a l’organització EpicGames que GitHub us envia per correu (pot trigar uns minuts a arribar)."
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "Vinculeu el vostre compte de GitHub al vostre compte d’Epic Games."
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "Com vincular-los"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "Creeu un testimoni de GitHub (classic) amb només read:packages marcat."
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "Crea un testimoni"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "Testimoni"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "Desat (escriviu-ne un de nou per substituir-lo)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "Nom d’usuari de GitHub"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic publica l’editor de Linux com a imatge privada al registre de paquets de GitHub (ghcr.io), i Hoard el baixa d’allà amb crane, que ve amb Hoard. GitHub només el lliura als comptes que Epic ha admès, de manera que Hoard en necessita un per baixar-lo. Hoard desa el testimoni amb la resta de la seva configuració i no l’utilitza per a res més."
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

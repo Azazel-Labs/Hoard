@@ -95,6 +95,12 @@ pub(crate) struct Saved {
     pub(crate) unreal: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) unreal_image: Option<String>,
+    /// The GitHub account Epic's private Unreal Editor images are downloaded as, and its token (with
+    /// `read:packages`). Empty: none (`GHCR_USER` / `GHCR_TOKEN_FILE`, or crane's own sign-in, if set).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ghcr_user: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ghcr_token: Option<String>,
     /// `off`, `auto` or a path.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) ffmpeg: Option<String>,
@@ -211,8 +217,15 @@ pub(crate) struct Saved {
 }
 
 /// The saved settings that are secrets: sealed in the desktop app (see [`crate::secrets`]).
-const SECRETS: &[&str] =
-    &["llm_api_key", "clip_hosted_key", "update_hook_auth", "s3_access_key", "s3_secret_key", "s3_headers"];
+const SECRETS: &[&str] = &[
+    "llm_api_key",
+    "clip_hosted_key",
+    "update_hook_auth",
+    "s3_access_key",
+    "s3_secret_key",
+    "s3_headers",
+    "ghcr_token",
+];
 
 /// Reads a retired setting and throws it away.
 fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
@@ -226,6 +239,8 @@ pub(crate) struct Effective {
     pub(crate) blender: String,
     pub(crate) unreal: String,
     pub(crate) unreal_image: String,
+    /// Who Unreal Editor is downloaded as, when both a user and a token are saved.
+    pub(crate) ghcr: Option<crate::unreal_editor::Ghcr>,
     pub(crate) ffmpeg: String,
     pub(crate) unreal_convert: UnrealConvert,
     pub(crate) llm_url: Option<String>,
@@ -310,6 +325,11 @@ impl Saved {
             blender: self.blender.clone().unwrap_or_else(|| cfg.blender.clone()),
             unreal: self.unreal.clone().unwrap_or_else(|| cfg.unreal.clone()),
             unreal_image: self.unreal_image.clone().unwrap_or_else(|| cfg.unreal_image.clone()),
+            ghcr: match (self.ghcr_user.as_deref().and_then(non_empty), self.ghcr_token.as_deref().and_then(non_empty))
+            {
+                (Some(user), Some(token)) => Some(crate::unreal_editor::Ghcr { user, token }),
+                _ => None,
+            },
             ffmpeg: self.ffmpeg.clone().unwrap_or_else(|| cfg.ffmpeg.clone()),
             unreal_convert: self.unreal_convert.unwrap_or(cfg.unreal_convert),
             llm_url: pick(&self.llm_url, &cfg.llm_url),

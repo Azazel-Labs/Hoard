@@ -10164,12 +10164,76 @@ source = "Unreal packages"
 translation = "Paquetes de Unreal"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
-translation = "Descarga el editor Linux x86-64 de Epic. Requiere acceso vinculado a GitHub y decenas de GB en disco."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
+translation = "Descarga el editor Linux x86-64 de Epic, una sola vez, en la carpeta de herramientas de Hoard. Ocupa decenas de GB en disco y requiere una cuenta de GitHub a la que Epic haya dado acceso (consulta Inicio de sesión en GitHub)."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Instala Unreal Editor para el proceso de exportación. Ejecútalo por separado para exportar recursos."
+
+[messages.settings-unreal-github]
+source = "GitHub sign-in"
+translation = "Inicio de sesión en GitHub"
+
+[messages.settings-unreal-github-forget]
+source = "Forget"
+translation = "Olvidar"
+
+[messages.settings-unreal-github-forgotten]
+source = "GitHub sign-in forgotten"
+translation = "Se olvidó el inicio de sesión en GitHub"
+
+[messages.settings-unreal-github-from-server]
+source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
+translation = "Este servidor también recibió un inicio de sesión propio (GHCR_TOKEN_FILE o DOCKER_CONFIG); se usa cuando no hay ninguno guardado aquí."
+
+[messages.settings-unreal-github-save]
+source = "Save sign-in"
+translation = "Guardar inicio de sesión"
+
+[messages.settings-unreal-github-saved]
+source = "GitHub sign-in saved; trying the download again"
+translation = "Inicio de sesión en GitHub guardado; se está intentando la descarga de nuevo"
+
+[messages.settings-unreal-github-step-enter]
+source = "Enter your GitHub user name and the token here, then choose Automatic."
+translation = "Ingresa aquí tu nombre de usuario de GitHub y el token, y luego elige “Automático”."
+
+[messages.settings-unreal-github-step-invite]
+source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
+translation = "Acepta la invitación a la organización EpicGames que GitHub te envía por correo (puede tardar unos minutos en llegar)."
+
+[messages.settings-unreal-github-step-link]
+source = "Link your GitHub account to your Epic Games account."
+translation = "Vincula tu cuenta de GitHub con tu cuenta de Epic Games."
+
+[messages.settings-unreal-github-step-link-go]
+source = "How to link them"
+translation = "Cómo vincularlas"
+
+[messages.settings-unreal-github-step-token]
+source = "Make a GitHub token (classic) with only read:packages ticked."
+translation = "Crea un token de GitHub (classic) con solo read:packages marcado."
+
+[messages.settings-unreal-github-step-token-go]
+source = "Make a token"
+translation = "Crear un token"
+
+[messages.settings-unreal-github-token]
+source = "Token"
+translation = "Token"
+
+[messages.settings-unreal-github-token-kept]
+source = "Saved (type a new one to replace it)"
+translation = "Guardado (escribe uno nuevo para reemplazarlo)"
+
+[messages.settings-unreal-github-user]
+source = "GitHub user name"
+translation = "Nombre de usuario de GitHub"
+
+[messages.settings-unreal-github-why]
+source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
+translation = "Epic publica el editor de Linux como una imagen privada en el registro de paquetes de GitHub (ghcr.io), y Hoard lo descarga de ahí con crane, que viene incluido con Hoard. GitHub solo lo entrega a cuentas a las que Epic ha dado acceso, así que Hoard necesita una para descargarlo. Hoard guarda el token junto con el resto de su configuración y no lo usa para nada más."
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

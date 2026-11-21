@@ -74,7 +74,7 @@ pub(crate) fn tidy(c: &Connection) -> Result<Tidied> {
     if c.query_row("PRAGMA auto_vacuum", [], |r| r.get::<_, i64>(0))? == INCREMENTAL {
         let mut free = start.free;
         while free > 0 {
-            c.execute_batch(&format!("PRAGMA incremental_vacuum({ROOM_STEP});"))?;
+            give_back(c, ROOM_STEP)?;
             let now = sizes(c)?.free;
             // Nothing given back (another connection holding the room, say): leave it for the next tidy.
             if now >= free {
@@ -88,6 +88,16 @@ pub(crate) fn tidy(c: &Connection) -> Result<Tidied> {
     // Never one that waits for readers (TRUNCATE, RESTART, FULL): it holds up every write while it waits.
     c.query_row("PRAGMA wal_checkpoint(PASSIVE)", [], |_| Ok(()))?;
     Ok(Tidied { jobs, freed: start.file.saturating_sub(sizes(c)?.file) })
+}
+
+/// Gives `pages` of free room back to the disk, in one write. SQLite gives back a page each time the pragma is
+/// stepped, so it's stepped to the end: run once, as by `execute_batch`, it gave back 4 KB, and a library with 88 MB
+/// to give back took eight minutes of pauses and grew the write-ahead log to 400 MB with a write per page.
+fn give_back(c: &Connection, pages: i64) -> Result<()> {
+    let mut vacuum = c.prepare(&format!("PRAGMA incremental_vacuum({pages})"))?;
+    let mut rows = vacuum.query([])?;
+    while rows.next()?.is_some() {}
+    Ok(())
 }
 
 /// Lets the database give free room back to the disk a step at a time (see [`tidy`]). A setting SQLite only
@@ -187,10 +197,13 @@ mod tests {
             before.free > (ROOM_STEP as u64) * 4096 * 2,
             "the deleted pack left more than a step's room: {before:?}"
         );
+        give_back(&c, ROOM_STEP).unwrap();
+        let stepped = sizes(&c).unwrap();
+        assert_eq!(before.free - stepped.free, (ROOM_STEP as u64) * 4096, "a whole step's room in one go");
         let tidied = tidy(&c).unwrap();
         let after = sizes(&c).unwrap();
         assert_eq!(after.free, 0);
-        assert_eq!(tidied.freed, before.file - after.file);
+        assert_eq!(tidied.freed, stepped.file - after.file);
         assert!(after.file < before.file, "{before:?} to {after:?}");
         let found: i64 =
             c.query_row("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH 'mossy'", [], |r| r.get(0)).unwrap();

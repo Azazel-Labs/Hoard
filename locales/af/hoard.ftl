@@ -1427,6 +1427,16 @@ packs-lookup-also = Het ook gesoek na { $queries }.
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = Niks op Fab, itch.io, Kenney of OpenGameArt lyk daarna nie. Probeer minder of ander woorde.
 packs-lookup-use = Gebruik
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Nou
+packs-review-store = Van die winkel
+packs-review-same = Dieselfde
+packs-review-read-page = Word van die bladsy gelees wanneer jy stoor
+packs-review-take = { $count ->
+    [one] Vul { $count } veld in
+   *[other] Vul { $count } velde in
+}
 packs-lookup-searched = Gesoek { $date }.
 packs-lookup-again = Soek weer
 packs-lookup-again-after = .
@@ -1442,6 +1452,11 @@ packs-license-label = Lisensie
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisensievlak
 packs-license-tier-placeholder = Persoonlik, Professioneel…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } bate het sy eie lisensie: laat dit ook die pak se lisensie volg
+   *[other] { $count } bates het hul eie lisensie: laat hulle ook die pak se lisensie volg
+}
 packs-store-page = Winkelbladsy
 packs-store-text = Beskrywing van die winkel
 packs-store-text-placeholder = Plak die lysteks, of laat leeg om dit van die winkelbladsy af te haal.

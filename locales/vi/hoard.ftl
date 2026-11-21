@@ -1302,6 +1302,15 @@ packs-lookup-also = Cũng đã tìm { $queries }.
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = Không có gì trên Fab, itch.io, Kenney hay OpenGameArt trông giống gói này. Hãy thử ít từ hơn hoặc từ khác.
 packs-lookup-use = Dùng
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Hiện tại
+packs-review-store = Từ cửa hàng
+packs-review-same = Giống nhau
+packs-review-read-page = Đọc từ trang khi lưu
+packs-review-take = { $count ->
+   *[other] Điền { $count } trường
+}
 packs-lookup-searched = Đã tìm { $date }.
 packs-lookup-again = Tìm lại
 packs-lookup-again-after = .
@@ -1317,6 +1326,10 @@ packs-license-label = Giấy phép
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Hạng giấy phép
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } tài nguyên có giấy phép riêng: chuyển sang dùng giấy phép của gói
+}
 packs-store-page = Trang cửa hàng
 packs-store-text = Mô tả từ cửa hàng
 packs-store-text-placeholder = Dán nội dung trang sản phẩm, hoặc để trống để lấy từ trang cửa hàng.

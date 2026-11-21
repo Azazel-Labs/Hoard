@@ -1477,6 +1477,16 @@ packs-lookup-also = Haettiin myös: { $queries }.
 packs-lookup-quoted = ”{ $query }”
 packs-lookup-nothing = Mikään Fabissa, itch.io:ssa, Kenneyllä tai OpenGameArtissa ei näytä siltä. Kokeile vähemmän tai eri sanoja.
 packs-lookup-use = Käytä
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Nyt
+packs-review-store = Kaupasta
+packs-review-same = Sama
+packs-review-read-page = Luetaan sivulta tallennettaessa
+packs-review-take = { $count ->
+    [one] Täytä { $count } kenttä
+   *[other] Täytä { $count } kenttää
+}
 packs-lookup-searched = Haettu { $date }.
 packs-lookup-again = Hae uudelleen
 packs-lookup-again-after = .
@@ -1492,6 +1502,11 @@ packs-license-label = Lisenssi
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisenssitaso
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } resurssilla on oma lisenssi: anna sen noudattaa myös paketin lisenssiä
+   *[other] { $count } resurssilla on oma lisenssi: anna niiden noudattaa myös paketin lisenssiä
+}
 packs-store-page = Kauppasivu
 packs-store-text = Kuvaus kaupasta
 packs-store-text-placeholder = Liitä myyntisivun teksti tai jätä tyhjäksi, niin se haetaan kauppasivulta.

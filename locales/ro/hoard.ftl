@@ -1544,6 +1544,17 @@ packs-lookup-also = S-a mai căutat și { $queries }.
 packs-lookup-quoted = „{ $query }”
 packs-lookup-nothing = Nimic de pe Fab, itch.io, Kenney sau OpenGameArt nu seamănă cu el. Încercați mai puține cuvinte sau altele.
 packs-lookup-use = Folosiți
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Acum
+packs-review-store = Din magazin
+packs-review-same = La fel
+packs-review-read-page = Se citește de pe pagină la salvare
+packs-review-take = { $count ->
+    [one] Completați { $count } câmp
+    [few] Completați { $count } câmpuri
+   *[other] Completați { $count } de câmpuri
+}
 packs-lookup-searched = Căutat { $date }.
 packs-lookup-again = Căutați din nou
 packs-lookup-again-after = .
@@ -1559,6 +1570,12 @@ packs-license-label = Licență
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Nivelul licenței
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } resursă are licență proprie: aplicați-i și licența pachetului
+    [few] { $count } resurse au licență proprie: aplicați-le și licența pachetului
+   *[other] { $count } de resurse au licență proprie: aplicați-le și licența pachetului
+}
 packs-store-page = Pagina de magazin
 packs-store-text = Descrierea din magazin
 packs-store-text-placeholder = Lipiți textul anunțului sau lăsați gol pentru a-l prelua de pe pagina de magazin.

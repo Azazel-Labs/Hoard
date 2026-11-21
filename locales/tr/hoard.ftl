@@ -1332,6 +1332,15 @@ packs-lookup-also = Ayrıca arananlar: { $queries }.
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = Fab, itch.io, Kenney ya da OpenGameArt’ta buna benzeyen bir şey yok. Daha az ya da farklı sözcükler deneyin.
 packs-lookup-use = Kullan
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Şimdi
+packs-review-store = Mağazadan
+packs-review-same = Aynı
+packs-review-read-page = Kaydederken sayfadan okunur
+packs-review-take = { $count ->
+   *[other] { $count } alanı doldur
+}
 packs-lookup-searched = Arama tarihi: { $date }.
 packs-lookup-again = Yeniden ara
 packs-lookup-again-after = .
@@ -1347,6 +1356,10 @@ packs-license-label = Lisans
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisans düzeyi
 packs-license-tier-placeholder = Kişisel, Profesyonel…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } varlığın kendi lisansı var: paketin lisansını da kullansın
+}
 packs-store-page = Mağaza sayfası
 packs-store-text = Mağazadaki açıklama
 packs-store-text-placeholder = İlan metnini yapıştırın ya da mağaza sayfasından alınması için boş bırakın.

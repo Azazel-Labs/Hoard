@@ -1493,6 +1493,17 @@ packs-lookup-also = Претражено је и: { $queries }.
 packs-lookup-quoted = „{ $query }“
 packs-lookup-nothing = Ништа на Fab-у, itch.io, Kenney-ју или OpenGameArt-у не личи на њега. Пробајте с мање речи или с другим речима.
 packs-lookup-use = Користи
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Сада
+packs-review-store = Из продавнице
+packs-review-same = Исто
+packs-review-read-page = Чита се са странице при чувању
+packs-review-take = { $count ->
+    [one] Попуни { $count } поље
+    [few] Попуни { $count } поља
+   *[other] Попуни { $count } поља
+}
 packs-lookup-searched = Претражено { $date }.
 packs-lookup-again = Претражи поново
 packs-lookup-again-after = .
@@ -1508,6 +1519,12 @@ packs-license-label = Лиценца
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Ниво лиценце
 packs-license-tier-placeholder = Лична, професионална…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } ресурс има сопствену лиценцу: нека прати и лиценцу пакета
+    [few] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
+   *[other] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
+}
 packs-store-page = Страница продавнице
 packs-store-text = Опис из продавнице
 packs-store-text-placeholder = Налепите текст огласа или оставите празно да би се преузео са странице продавнице.

@@ -478,4 +478,27 @@ mod tests {
         assert!(!tags(&conn, "a1").iter().any(|t| t.0 == "stone"));
         assert!(!revert(&conn, "a2", name.id, &me()).unwrap(), "only that asset's changes");
     }
+
+    #[test]
+    fn without_a_license_file_assets_go_by_the_store_license() {
+        let conn = library();
+        conn.execute_batch(
+            "UPDATE packs SET license = NULL;
+             INSERT INTO pack_context (pack_id, store_license) VALUES ('p1', 'Fab Standard License');",
+        )
+        .unwrap();
+        let pack = |id| get_asset(&conn, id).unwrap().unwrap().pack_license;
+        assert_eq!(pack("a1").as_deref(), Some("Fab Standard License"));
+        assert_eq!(crate::db::pack_context(&conn, "p1").unwrap().own_licenses, 0);
+
+        let own = AssetPatch { license: Some("CC0".into()), ..Default::default() };
+        apply(&conn, "a2", &own, &me()).unwrap();
+        assert_eq!(crate::db::pack_context(&conn, "p1").unwrap().own_licenses, 1);
+        // Clearing its own puts it back on the pack's.
+        apply(&conn, "a2", &AssetPatch { license: Some(String::new()), ..Default::default() }, &me()).unwrap();
+        assert_eq!(crate::db::pack_context(&conn, "p1").unwrap().own_licenses, 0);
+        // The pack's own license file says it best.
+        conn.execute("UPDATE packs SET license = 'CC-BY 4.0'", []).unwrap();
+        assert_eq!(pack("a1").as_deref(), Some("CC-BY 4.0"));
+    }
 }

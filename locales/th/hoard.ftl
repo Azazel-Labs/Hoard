@@ -1296,6 +1296,15 @@ packs-lookup-also = ค้นหา { $queries } ด้วยแล้ว
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = ไม่มีสิ่งใดบน Fab, itch.io, Kenney หรือ OpenGameArt ที่ดูคล้าย ลองใช้คำให้น้อยลงหรือคำอื่น
 packs-lookup-use = ใช้
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = ตอนนี้
+packs-review-store = จากร้านค้า
+packs-review-same = เหมือนกัน
+packs-review-read-page = จะอ่านจากหน้าเมื่อบันทึก
+packs-review-take = { $count ->
+   *[other] กรอก { $count } ช่อง
+}
 packs-lookup-searched = ค้นหาเมื่อ { $date }
 packs-lookup-again = ค้นหาอีกครั้ง
 packs-lookup-again-after = { "" }
@@ -1311,6 +1320,10 @@ packs-license-label = สัญญาอนุญาต
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = ระดับสัญญาอนุญาต
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] แอสเซ็ต { $count } รายการมีสัญญาอนุญาตของตัวเอง: ให้ใช้ตามสัญญาอนุญาตของแพ็กด้วย
+}
 packs-store-page = หน้าร้านค้า
 packs-store-text = คำอธิบายจากร้านค้า
 packs-store-text-placeholder = วางข้อความในหน้าสินค้า หรือเว้นว่างไว้เพื่อดึงจากหน้าร้านค้า

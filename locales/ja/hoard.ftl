@@ -1296,6 +1296,15 @@ packs-lookup-also = { $queries } でも検索しました。
 packs-lookup-quoted = 「{ $query }」
 packs-lookup-nothing = Fab、itch.io、Kenney、OpenGameArt に似たものはありません。語句を減らすか変えてみてください。
 packs-lookup-use = 使う
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = 現在
+packs-review-store = ストアの内容
+packs-review-same = 同じ
+packs-review-read-page = 保存時にページから読み込む
+packs-review-take = { $count ->
+   *[other] { $count } 件の項目を入力
+}
 packs-lookup-searched = { $date }に検索しました。
 packs-lookup-again = もう一度検索
 packs-lookup-again-after = { "" }
@@ -1311,6 +1320,10 @@ packs-license-label = ライセンス
 packs-license-placeholder = Fab Standard License、CC BY 4.0…
 packs-license-tier-label = ライセンスの種別
 packs-license-tier-placeholder = Personal、Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } 件のアセットに独自のライセンスがあります：パックのライセンスに合わせる
+}
 packs-store-page = ストアページ
 packs-store-text = ストアの説明
 packs-store-text-placeholder = 掲載テキストを貼り付けるか、空のままにするとストアページから取得します。

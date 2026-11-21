@@ -343,6 +343,8 @@ export interface PackContext {
   store_license: string | null
   /** When the store page was found and attached automatically (read-only). */
   store_auto: string | null
+  /** How many of the pack's assets have a license of their own instead of the pack's (read-only). */
+  own_licenses?: number
 }
 
 export type PackStatus = 'uploading' | 'ingesting' | 'analyzing' | 'ready' | 'failed'

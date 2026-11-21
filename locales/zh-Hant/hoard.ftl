@@ -1302,6 +1302,15 @@ packs-lookup-also = 也搜尋了 { $queries }。
 packs-lookup-quoted = 「{ $query }」
 packs-lookup-nothing = Fab、itch.io、Kenney 或 OpenGameArt 上都沒有看起來相符的項目。請試著減少或更換關鍵字。
 packs-lookup-use = 使用
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = 目前
+packs-review-store = 來自商店
+packs-review-same = 相同
+packs-review-read-page = 儲存時從頁面讀取
+packs-review-take = { $count ->
+   *[other] 填入 { $count } 個欄位
+}
 packs-lookup-searched = 於 { $date } 搜尋。
 packs-lookup-again = 重新搜尋
 packs-lookup-again-after = 。
@@ -1317,6 +1326,10 @@ packs-license-label = 授權
 packs-license-placeholder = Fab Standard License、CC BY 4.0…
 packs-license-tier-label = 授權等級
 packs-license-tier-placeholder = 個人、專業…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } 個素材有自己的授權：改為沿用素材包的授權
+}
 packs-store-page = 商店頁面
 packs-store-text = 商店的說明
 packs-store-text-placeholder = 貼上商品頁面的文字，或留空以從商店頁面擷取。

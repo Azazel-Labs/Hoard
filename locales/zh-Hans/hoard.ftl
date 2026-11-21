@@ -1302,6 +1302,15 @@ packs-lookup-also = 还搜索了 { $queries }。
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = Fab、itch.io、Kenney 或 OpenGameArt 上没有类似的内容。请尝试更少或不同的关键词。
 packs-lookup-use = 使用
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = 当前
+packs-review-store = 来自商店
+packs-review-same = 相同
+packs-review-read-page = 保存时从页面读取
+packs-review-take = { $count ->
+   *[other] 填入 { $count } 个字段
+}
 packs-lookup-searched = 搜索于 { $date }。
 packs-lookup-again = 重新搜索
 packs-lookup-again-after = { "" }
@@ -1317,6 +1326,10 @@ packs-license-label = 许可证
 packs-license-placeholder = Fab Standard License、CC BY 4.0…
 packs-license-tier-label = 许可证级别
 packs-license-tier-placeholder = 个人版、专业版…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } 个资源有自己的许可证：改为沿用资源包的许可证
+}
 packs-store-page = 商店页面
 packs-store-text = 商店中的描述
 packs-store-text-placeholder = 粘贴商品页面的文字，或留空以从商店页面获取。

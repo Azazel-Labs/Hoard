@@ -1575,6 +1575,18 @@ packs-lookup-also = Также искали { $queries }.
 packs-lookup-quoted = «{ $query }»
 packs-lookup-nothing = На Fab, itch.io, Kenney и OpenGameArt ничего похожего нет. Попробуйте меньше слов или другие слова.
 packs-lookup-use = Выбрать
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Сейчас
+packs-review-store = Из магазина
+packs-review-same = Одинаково
+packs-review-read-page = При сохранении будет прочитано со страницы
+packs-review-take = { $count ->
+    [one] Заполнить { $count } поле
+    [few] Заполнить { $count } поля
+    [many] Заполнить { $count } полей
+   *[other] Заполнить { $count } поля
+}
 packs-lookup-searched = Искали { $date }.
 packs-lookup-again = Искать снова
 packs-lookup-again-after = .
@@ -1590,6 +1602,13 @@ packs-license-label = Лицензия
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Уровень лицензии
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] У { $count } ассета своя лицензия: переключить на лицензию пака
+    [few] У { $count } ассетов своя лицензия: переключить на лицензию пака
+    [many] У { $count } ассетов своя лицензия: переключить на лицензию пака
+   *[other] У { $count } ассета своя лицензия: переключить на лицензию пака
+}
 packs-store-page = Страница в магазине
 packs-store-text = Описание из магазина
 packs-store-text-placeholder = Вставьте текст описания или оставьте пустым, чтобы загрузить его со страницы магазина.

@@ -1430,6 +1430,16 @@ packs-lookup-also = Sökte även efter { $queries }.
 packs-lookup-quoted = ”{ $query }”
 packs-lookup-nothing = Inget på Fab, itch.io, Kenney eller OpenGameArt liknar det. Försök med färre eller andra ord.
 packs-lookup-use = Använd
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Nu
+packs-review-store = Från butiken
+packs-review-same = Samma
+packs-review-read-page = Läses från sidan när du sparar
+packs-review-take = { $count ->
+    [one] Fyll i { $count } fält
+   *[other] Fyll i { $count } fält
+}
 packs-lookup-searched = Sökte { $date }.
 packs-lookup-again = Sök igen
 packs-lookup-again-after = .
@@ -1445,6 +1455,11 @@ packs-license-label = Licens
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Licensnivå
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } resurs har egen licens: låt den också följa paketets
+   *[other] { $count } resurser har egen licens: låt dem också följa paketets
+}
 packs-store-page = Butikssida
 packs-store-text = Beskrivning från butiken
 packs-store-text-placeholder = Klistra in annonstexten, eller lämna tomt för att hämta den från butikssidan.

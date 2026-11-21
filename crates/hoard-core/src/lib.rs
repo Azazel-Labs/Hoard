@@ -597,6 +597,9 @@ pub struct PackContext {
     /// When the store page was found and attached automatically (read-only; cleared when the page is changed).
     #[serde(default)]
     pub store_auto: Option<String>,
+    /// How many of the pack's assets have a license of their own instead of the pack's (read-only).
+    #[serde(default, skip_deserializing)]
+    pub own_licenses: u32,
 }
 
 /// How two assets relate. `Texture`, `Buffer` and `Material` are hard dependencies (the file is broken

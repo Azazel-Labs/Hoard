@@ -1542,6 +1542,18 @@ packs-lookup-also = Hledáno také: { $queries }.
 packs-lookup-quoted = „{ $query }“
 packs-lookup-nothing = Na Fab, itch.io, Kenney ani OpenGameArt nic podobného není. Zkuste méně slov nebo jiná slova.
 packs-lookup-use = Použít
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Nyní
+packs-review-store = Z obchodu
+packs-review-same = Stejné
+packs-review-read-page = Při uložení se načte ze stránky
+packs-review-take = { $count ->
+    [one] Vyplnit { $count } pole
+    [few] Vyplnit { $count } pole
+    [many] Vyplnit { $count } pole
+   *[other] Vyplnit { $count } polí
+}
 packs-lookup-searched = Hledáno { $date }.
 packs-lookup-again = Hledat znovu
 packs-lookup-again-after = .
@@ -1557,6 +1569,13 @@ packs-license-label = Licence
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Úroveň licence
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } asset má vlastní licenci: ať se řídí i licencí balíčku
+    [few] { $count } assety mají vlastní licenci: ať se řídí i licencí balíčku
+    [many] { $count } assetu má vlastní licenci: ať se řídí i licencí balíčku
+   *[other] { $count } assetů má vlastní licenci: ať se řídí i licencí balíčku
+}
 packs-store-page = Stránka v obchodě
 packs-store-text = Popis z obchodu
 packs-store-text-placeholder = Vložte text nabídky, nebo nechte prázdné a načte se ze stránky obchodu.

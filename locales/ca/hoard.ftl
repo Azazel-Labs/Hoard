@@ -1433,6 +1433,16 @@ packs-lookup-also = També s'ha cercat { $queries }.
 packs-lookup-quoted = «{ $query }»
 packs-lookup-nothing = No hi ha res a Fab, itch.io, Kenney ni OpenGameArt que s'hi assembli. Proveu amb menys paraules o amb unes altres.
 packs-lookup-use = Fes-la servir
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Ara
+packs-review-store = De la botiga
+packs-review-same = Igual
+packs-review-read-page = Es llegirà de la pàgina en desar
+packs-review-take = { $count ->
+    [one] Omple { $count } camp
+   *[other] Omple { $count } camps
+}
 packs-lookup-searched = S'ha cercat el { $date }.
 packs-lookup-again = Torna a cercar
 packs-lookup-again-after = .
@@ -1448,6 +1458,11 @@ packs-license-label = Llicència
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Nivell de llicència
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } recurs té llicència pròpia: fes que segueixi també la del paquet
+   *[other] { $count } recursos tenen llicència pròpia: fes que segueixin també la del paquet
+}
 packs-store-page = Pàgina de botiga
 packs-store-text = Descripció de la botiga
 packs-store-text-placeholder = Enganxeu el text de l'anunci, o deixeu-ho buit per obtenir-lo de la pàgina de botiga.

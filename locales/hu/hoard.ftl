@@ -1344,6 +1344,15 @@ packs-lookup-also = Keresett még: { $queries }.
 packs-lookup-quoted = „{ $query }”
 packs-lookup-nothing = A Fabon, az itch.io-n, a Kenney-n és az OpenGameArton semmi sem hasonlít rá. Próbálja kevesebb vagy más szavakkal.
 packs-lookup-use = Használat
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Most
+packs-review-store = Az áruházból
+packs-review-same = Azonos
+packs-review-read-page = Mentéskor beolvassa az oldalról
+packs-review-take = { $count ->
+   *[other] { $count } mező kitöltése
+}
 packs-lookup-searched = Keresve: { $date }.
 packs-lookup-again = Keresés újra
 packs-lookup-again-after = .
@@ -1359,6 +1368,10 @@ packs-license-label = Licenc
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Licencszint
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } asset saját licenccel rendelkezik: kövesse a csomag licencét is
+}
 packs-store-page = Áruházi oldal
 packs-store-text = Leírás az áruházból
 packs-store-text-placeholder = Illessze be a hirdetés szövegét, vagy hagyja üresen, hogy az áruházi oldalról töltődjön le.

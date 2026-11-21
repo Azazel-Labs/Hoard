@@ -1607,6 +1607,18 @@ packs-lookup-also = Також шукали { $queries }.
 packs-lookup-quoted = «{ $query }»
 packs-lookup-nothing = На Fab, itch.io, Kenney та OpenGameArt немає нічого схожого. Спробуйте менше слів або інші.
 packs-lookup-use = Використати
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Зараз
+packs-review-store = З магазину
+packs-review-same = Однаково
+packs-review-read-page = Під час збереження буде прочитано зі сторінки
+packs-review-take = { $count ->
+    [one] Заповнити { $count } поле
+    [few] Заповнити { $count } поля
+    [many] Заповнити { $count } полів
+   *[other] Заповнити { $count } поля
+}
 packs-lookup-searched = Шукали { $date }.
 packs-lookup-again = Шукати знову
 packs-lookup-again-after = .
@@ -1622,6 +1634,13 @@ packs-license-label = Ліцензія
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Рівень ліцензії
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+    [few] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+    [many] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+   *[other] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+}
 packs-store-page = Сторінка магазину
 packs-store-text = Опис із магазину
 packs-store-text-placeholder = Вставте текст оголошення або залиште порожнім, щоб отримати його зі сторінки магазину.

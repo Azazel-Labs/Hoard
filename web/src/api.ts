@@ -180,7 +180,7 @@ export const api = {
     ),
   /** Take off a store page that was found automatically. */
   undoStorePage: (id: string) => request<PackContext>(`/api/packs/${id}/store/undo`, { method: 'POST' }),
-  setPackContext: (id: string, ctx: Omit<PackContext, 'readme' | 'store_auto'>) =>
+  setPackContext: (id: string, ctx: Omit<PackContext, 'readme' | 'store_auto' | 'own_licenses'>) =>
     request<PackContext>(`/api/packs/${id}/context`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

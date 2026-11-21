@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { api, type Pack, type PackContext, type StoreMatch, type StoreMatches } from '../api'
 import { formatDate, t } from '../i18n'
 
@@ -59,15 +59,56 @@ async function find(q?: string, fresh = false) {
   }
 }
 
-/** Fill the form from a match; Save fetches the page's description. */
-function useMatch(m: StoreMatch) {
-  draft.store = m.store
-  draft.store_url = m.url
-  draft.store_text = null
-  if (m.author) draft.seller = m.author
-  draft.store_license = m.license ?? null
+// A match is looked over field by field before it fills the form: what's there now beside what the store says,
+// each to take or leave. Those that differ start ticked; the description is read from the page on Save.
+type Key = 'store' | 'store_url' | 'seller' | 'store_license' | 'store_text'
+interface Row { key: Key; label: string; now: string; store: string; same: boolean }
+const review = ref<{ m: StoreMatch; take: Record<Key, boolean> } | null>(null)
+const rows = computed<Row[]>(() => {
+  const r = review.value
+  if (!r) return []
+  const text = draft.store_text?.trim() ?? ''
+  const all: Row[] = [
+    { key: 'store', label: t('packs-store'), now: draft.store ?? '', store: r.m.store, same: false },
+    { key: 'store_url', label: t('packs-store-page'), now: draft.store_url ?? '', store: r.m.url, same: false },
+    { key: 'seller', label: t('packs-seller'), now: draft.seller ?? '', store: r.m.author ?? '', same: false },
+    { key: 'store_license', label: t('packs-license-label'), now: draft.store_license ?? '', store: r.m.license ?? '', same: false },
+    {
+      key: 'store_text',
+      label: t('packs-store-text'),
+      now: text.length > 90 ? text.slice(0, 88).trimEnd() + '…' : text,
+      store: r.m.summary || t('packs-review-read-page'),
+      same: false,
+    },
+  ]
+  return all
+    .filter((x) => x.store)
+    .map((x) => ({ ...x, same: x.key !== 'store_text' && x.now.trim().toLowerCase() === x.store.trim().toLowerCase() }))
+})
+function startReview(m: StoreMatch) {
+  review.value = { m, take: { store: true, store_url: true, seller: true, store_license: true, store_text: true } }
+  const take = review.value.take
+  // What's already the same, or missing from the store, has nothing to take.
+  for (const k of Object.keys(take) as Key[]) take[k] = rows.value.some((x) => x.key === k && !x.same)
+  // A description of some other page has to go with it; one of the same page can stay.
+  take.store_text = !draft.store_text || (draft.store_url ?? '') !== m.url
+}
+const taking = computed(() => rows.value.filter((x) => !x.same && review.value?.take[x.key]).length)
+/** Fill the form with the fields ticked; Save fetches the page's description. */
+function applyReview() {
+  const r = review.value
+  if (!r) return
+  if (r.take.store) draft.store = r.m.store
+  if (r.take.store_url) draft.store_url = r.m.url
+  if (r.take.seller && r.m.author) draft.seller = r.m.author
+  if (r.take.store_license && r.m.license) draft.store_license = r.m.license
+  if (r.take.store_text) draft.store_text = null
+  review.value = null
   lookup.open = false
 }
+
+// The pack's license is every asset's, unless one has its own: Save can make those go by the pack's too.
+const allToPack = ref(false)
 
 /** The store page found automatically isn't this pack's: take it off and show the other suggestions. */
 async function notThisOne() {
@@ -87,8 +128,12 @@ function day(at: string) {
 async function save(thenRetag: boolean) {
   saving.value = true
   try {
-    const { readme: _readme, store_auto: _auto, ...ctx } = draft
+    const { readme: _readme, store_auto: _auto, own_licenses: _own, ...ctx } = draft
     Object.assign(draft, await api.setPackContext(props.pack.id, ctx))
+    if (allToPack.value && draft.own_licenses) {
+      // An asset's own license cleared goes by the pack's (each change is in its history, to revert).
+      await api.bulkAssets({ query: { pack: props.pack.id }, license: '' })
+    }
     if (thenRetag) await api.retagPack(props.pack.id, { rules: false, llm: true })
     emit('changed')
     emit('close')
@@ -143,7 +188,30 @@ async function save(thenRetag: boolean) {
               <span v-if="m.summary" class="meta clamp">{{ m.summary }}</span>
               <span v-for="w in m.why ?? []" :key="w" class="why">{{ w }}</span>
             </div>
-            <button class="btn" type="button" @click="useMatch(m)">{{ t('packs-lookup-use') }}</button>
+            <button v-if="review?.m.url !== m.url" class="btn" type="button" @click="startReview(m)">{{ t('packs-lookup-use') }}</button>
+            <div v-else class="review">
+              <table>
+                <thead>
+                  <tr><th /><th>{{ t('packs-review-now') }}</th><th>{{ t('packs-review-store') }}</th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="x in rows" :key="x.key" :class="{ same: x.same, off: !x.same && !review.take[x.key] }">
+                    <th scope="row">
+                      <label>
+                        <input v-model="review.take[x.key]" type="checkbox" :disabled="x.same" />
+                        {{ x.label }}
+                      </label>
+                    </th>
+                    <td :class="{ none: !x.now }">{{ x.now || '—' }}</td>
+                    <td>{{ x.same ? t('packs-review-same') : x.store }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="actions">
+                <button class="btn primary" type="button" :disabled="!taking" @click="applyReview()">{{ t('packs-review-take', { count: taking }) }}</button>
+                <button class="btn ghost" type="button" @click="review = null">{{ t('packs-cancel') }}</button>
+              </div>
+            </div>
           </li>
         </ul>
         <p class="hint">
@@ -171,6 +239,10 @@ async function save(thenRetag: boolean) {
       <label>{{ t('packs-license-label') }} <input v-model="draft.store_license" class="field" :placeholder="t('packs-license-placeholder')" /></label>
       <label>{{ t('packs-license-tier-label') }} <input v-model="draft.license_tier" class="field" :placeholder="t('packs-license-tier-placeholder')" /></label>
     </div>
+    <label v-if="draft.own_licenses" class="fanout">
+      <input v-model="allToPack" type="checkbox" />
+      {{ t('packs-own-licenses', { count: draft.own_licenses }) }}
+    </label>
     <label>{{ t('packs-store-page') }}
       <input v-model="draft.store_url" class="field" type="url" placeholder="https://…" />
     </label>
@@ -225,6 +297,19 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 .matches .why { color: var(--ok, var(--accent)); font-size: 0.75rem; }
 .matches .why::before { content: '✓ '; }
 .matches .clamp { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.matches li:has(.review) { flex-wrap: wrap; }
+.review { flex-basis: 100%; display: grid; gap: 0.5rem; padding: 0.6rem 0.7rem; border-radius: var(--r-tile); background: var(--raised); }
+.review table { width: 100%; border-collapse: collapse; font-size: var(--step--1); table-layout: fixed; }
+.review th, .review td { padding: 0.25rem 0.5rem 0.25rem 0; text-align: start; vertical-align: top; overflow-wrap: anywhere; }
+.review thead th { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+.review thead th:first-child { width: 34%; }
+.review tbody th { font-weight: 500; }
+.review tbody th label { flex-direction: row; align-items: center; gap: 0.45rem; color: var(--text); font-size: inherit; cursor: pointer; }
+.review td { color: var(--text); }
+.review td.none, .review .same td, .review .same th label { color: var(--faint); }
+.review .off td:last-child { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+.review tbody tr:not(.same):not(.off) td:last-child { color: var(--accent); }
+.fanout { flex-direction: row !important; align-items: center; gap: 0.45rem !important; color: var(--text) !important; cursor: pointer; }
 .find-again { align-self: flex-start; }
 .again { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; }
 .again:disabled { color: var(--muted); cursor: default; }

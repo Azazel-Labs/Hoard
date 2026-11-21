@@ -1312,6 +1312,15 @@ packs-lookup-also = Juga mencari { $queries }.
 packs-lookup-quoted = “{ $query }”
 packs-lookup-nothing = Tidak ada yang mirip di Fab, itch.io, Kenney, atau OpenGameArt. Coba kata yang lebih sedikit atau berbeda.
 packs-lookup-use = Pakai
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Sekarang
+packs-review-store = Dari toko
+packs-review-same = Sama
+packs-review-read-page = Dibaca dari halaman saat menyimpan
+packs-review-take = { $count ->
+   *[other] Isi { $count } kolom
+}
 packs-lookup-searched = Dicari { $date }.
 packs-lookup-again = Cari lagi
 packs-lookup-again-after = .
@@ -1327,6 +1336,10 @@ packs-license-label = Lisensi
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Tingkat lisensi
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+   *[other] { $count } aset punya lisensi sendiri: buat mengikuti lisensi paket juga
+}
 packs-store-page = Halaman toko
 packs-store-text = Deskripsi dari toko
 packs-store-text-placeholder = Tempel teks listingnya, atau biarkan kosong untuk mengambilnya dari halaman toko.

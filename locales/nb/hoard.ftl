@@ -1429,6 +1429,16 @@ packs-lookup-also = Søkte også etter { $queries }.
 packs-lookup-quoted = «{ $query }»
 packs-lookup-nothing = Ingenting på Fab, itch.io, Kenney eller OpenGameArt ligner. Prøv færre eller andre ord.
 packs-lookup-use = Bruk
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Nå
+packs-review-store = Fra butikken
+packs-review-same = Samme
+packs-review-read-page = Leses fra siden når du lagrer
+packs-review-take = { $count ->
+    [one] Fyll ut { $count } felt
+   *[other] Fyll ut { $count } felt
+}
 packs-lookup-searched = Søkte { $date }.
 packs-lookup-again = Søk igjen
 packs-lookup-again-after = .
@@ -1444,6 +1454,11 @@ packs-license-label = Lisens
 packs-license-placeholder = Fab Standard License, CC BY 4.0 …
 packs-license-tier-label = Lisensnivå
 packs-license-tier-placeholder = Personal, Professional …
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } ressurs har sin egen lisens: la den også følge pakkens
+   *[other] { $count } ressurser har sin egen lisens: la dem også følge pakkens
+}
 packs-store-page = Butikkside
 packs-store-text = Beskrivelse fra butikken
 packs-store-text-placeholder = Lim inn teksten fra oppføringen, eller la feltet stå tomt for å hente den fra butikksiden.

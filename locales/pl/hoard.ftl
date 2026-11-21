@@ -1560,6 +1560,18 @@ packs-lookup-also = Szukano też: { $queries }.
 packs-lookup-quoted = „{ $query }”
 packs-lookup-nothing = Nic na Fab, itch.io, Kenney ani OpenGameArt nie wygląda podobnie. Warto spróbować mniejszej liczby słów lub innych słów.
 packs-lookup-use = Użyj
+# Clicking Use on a store match lays it out field by field: what Store details has now beside what the store says,
+# each with a checkbox to take it or leave it.
+packs-review-now = Teraz
+packs-review-store = Ze sklepu
+packs-review-same = Takie samo
+packs-review-read-page = Zostanie odczytane ze strony przy zapisie
+packs-review-take = { $count ->
+    [one] Wypełnij { $count } pole
+    [few] Wypełnij { $count } pola
+    [many] Wypełnij { $count } pól
+   *[other] Wypełnij { $count } pola
+}
 packs-lookup-searched = Wyszukano { $date }.
 packs-lookup-again = Szukaj ponownie
 packs-lookup-again-after = .
@@ -1575,6 +1587,13 @@ packs-license-label = Licencja
 packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Poziom licencji
 packs-license-tier-placeholder = Personal, Professional…
+# A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
+packs-own-licenses = { $count ->
+    [one] { $count } zasób ma własną licencję: niech stosuje też licencję paczki
+    [few] { $count } zasoby mają własną licencję: niech stosują też licencję paczki
+    [many] { $count } zasobów ma własną licencję: niech stosują też licencję paczki
+   *[other] { $count } zasobu ma własną licencję: niech stosują też licencję paczki
+}
 packs-store-page = Strona w sklepie
 packs-store-text = Opis ze sklepu
 packs-store-text-placeholder = Można wkleić tekst oferty albo zostawić puste, by pobrać go ze strony sklepu.

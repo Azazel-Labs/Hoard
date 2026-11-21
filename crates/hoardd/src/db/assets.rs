@@ -121,8 +121,14 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
         asset.formats.push(crate::formats::clip_option());
     }
     asset.family = family(conn, &asset.id)?;
+    // The pack's own license file, or else the license its store sells it under.
     asset.pack_license = conn
-        .query_row("SELECT NULLIF(trim(license), '') FROM packs WHERE id = ?1", [&asset.pack_id], |r| r.get(0))
+        .query_row(
+            "SELECT COALESCE(NULLIF(trim(p.license), ''), NULLIF(trim(c.store_license), ''))
+             FROM packs p LEFT JOIN pack_context c ON c.pack_id = p.id WHERE p.id = ?1",
+            [&asset.pack_id],
+            |r| r.get(0),
+        )
         .optional()?
         .flatten();
     let mut stmt = conn.prepare("SELECT key, value FROM asset_fields WHERE asset_id = ?1 ORDER BY key")?;
@@ -211,7 +217,7 @@ pub(crate) fn family_ids(conn: &Connection, id: &str) -> Result<Vec<String>> {
 }
 
 pub(crate) fn pack_context(conn: &Connection, pack_id: &str) -> Result<hoard_core::PackContext> {
-    Ok(conn
+    let mut ctx = conn
         .query_row(
             "SELECT store, store_url, store_text, license_tier, readme, seller, store_license,
                     json_extract(store_auto, '$.at')
@@ -227,11 +233,18 @@ pub(crate) fn pack_context(conn: &Connection, pack_id: &str) -> Result<hoard_cor
                     seller: r.get(5)?,
                     store_license: r.get(6)?,
                     store_auto: r.get(7)?,
+                    own_licenses: 0,
                 })
             },
         )
         .optional()?
-        .unwrap_or_default())
+        .unwrap_or_default();
+    ctx.own_licenses = conn.query_row(
+        "SELECT count(*) FROM assets WHERE pack_id = ?1 AND archived_at IS NULL AND NULLIF(trim(license), '') IS NOT NULL",
+        [pack_id],
+        |r| r.get(0),
+    )?;
+    Ok(ctx)
 }
 
 /// Outgoing and incoming links for one asset.

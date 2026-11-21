@@ -1696,6 +1696,34 @@ asset-origin-hoard = Hoard ју је прочитао из пакета { $date 
 asset-origin-hoard-notes = Hoard ју је прочитао из пакета { $date } ({ $notes }).
 asset-origin-download = Преузми оригинални .{ $ext }
 asset-origin-discarded = Оригинални пакет је одбачен након претварања.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Историја
+history-loading = Учитавање…
+history-none = Овде још ништа није промењено.
+history-load-failed = Историја није могла да се учита: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = ВИ
+history-by-rule = Правило
+history-by-someone = Неко
+history-by-app = { $who } преко апликације
+history-by-assistant = { $who } преко асистента
+history-field-description = Опис
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Додата ознака { $tag }
+history-tag-removed = Уклоњена ознака { $tag }
+history-tag-kept = Задржана предложена ознака { $tag }
+history-tag-changed = Промењена ознака { $tag }
+history-reviewed = Означено као прегледано
+history-unreviewed = Означено као непрегледано
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: постављено на { $to }
+history-cleared = { $field }: обрисано (било је { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Опозови
+history-revert-title = Врати оно што је ова измена променила
+history-reverted = Опозвано: { $change }
+history-revert-failed = Није могло да се опозове: { $error }
 asset-details = Детаљи ресурса
 asset-in-pack = у
 asset-previous = Претходни ресурс

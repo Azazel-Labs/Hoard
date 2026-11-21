@@ -1674,6 +1674,34 @@ asset-origin-hoard = Το Hoard το διάβασε από το πακέτο σ�
 asset-origin-hoard-notes = Το Hoard το διάβασε από το πακέτο στις { $date } ({ $notes }).
 asset-origin-download = Λήψη του αρχικού .{ $ext }
 asset-origin-discarded = Το αρχικό πακέτο απορρίφθηκε μετά τη μετατροπή.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Ιστορικό
+history-loading = Φόρτωση…
+history-none = Δεν έχει αλλάξει τίποτα εδώ ακόμη.
+history-load-failed = Δεν ήταν δυνατή η φόρτωση του ιστορικού: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Ένας κανόνας
+history-by-someone = Κάποιος
+history-by-app = { $who } μέσω εφαρμογής
+history-by-assistant = { $who } μέσω βοηθού
+history-field-description = Περιγραφή
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Προστέθηκε η ετικέτα { $tag }
+history-tag-removed = Αφαιρέθηκε η ετικέτα { $tag }
+history-tag-kept = Διατηρήθηκε η προτεινόμενη ετικέτα { $tag }
+history-tag-changed = Άλλαξε η ετικέτα { $tag }
+history-reviewed = Επισημάνθηκε ως ελεγμένο
+history-unreviewed = Επισημάνθηκε ως μη ελεγμένο
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: ορίστηκε σε { $to }
+history-cleared = { $field }: εκκαθαρίστηκε (ήταν { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Αναίρεση
+history-revert-title = Επαναφορά αυτού που άλλαξε αυτή η αλλαγή
+history-reverted = Αναιρέθηκε: { $change }
+history-revert-failed = Δεν ήταν δυνατή η αναίρεση: { $error }
 asset-details = Λεπτομέρειες στοιχείου
 asset-in-pack = στο
 asset-previous = Προηγούμενο στοιχείο

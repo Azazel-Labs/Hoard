@@ -1451,6 +1451,34 @@ asset-origin-hoard = { $date }에 Hoard가 패키지에서 읽어 냈습니다.
 asset-origin-hoard-notes = { $date }에 Hoard가 패키지에서 읽어 냈습니다({ $notes }).
 asset-origin-download = 원본 .{ $ext } 다운로드
 asset-origin-discarded = 원본 패키지는 변환 후 버렸습니다.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = 기록
+history-loading = 불러오는 중…
+history-none = 아직 변경된 내용이 없습니다.
+history-load-failed = 기록을 불러오지 못했습니다: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = 규칙
+history-by-someone = 누군가
+history-by-app = { $who }, 앱 이용
+history-by-assistant = { $who }, 어시스턴트 이용
+history-field-description = 설명
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = { $tag } 태그 붙임
+history-tag-removed = { $tag } 태그 뗌
+history-tag-kept = 제안된 { $tag } 태그 유지
+history-tag-changed = { $tag } 태그 변경
+history-reviewed = 검토함으로 표시
+history-unreviewed = 검토 안 함으로 표시
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: { $to }(으)로 설정
+history-cleared = { $field }: 비움(이전 값 { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = 되돌리기
+history-revert-title = 이 변경으로 바뀐 내용을 되돌립니다
+history-reverted = 되돌림: { $change }
+history-revert-failed = 되돌리지 못했습니다: { $error }
 asset-details = 에셋 세부 정보
 asset-in-pack = ·
 asset-previous = 이전 에셋

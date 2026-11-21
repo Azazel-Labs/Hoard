@@ -1827,6 +1827,34 @@ asset-origin-hoard = Hoard read it out of the package on { $date }.
 asset-origin-hoard-notes = Hoard read it out of the package on { $date } ({ $notes }).
 asset-origin-download = Download the original .{ $ext }
 asset-origin-discarded = The original package was discarded after conversion.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = History
+history-loading = Loading…
+history-none = Nothing has been changed here yet.
+history-load-failed = Couldn't load the history: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = A rule
+history-by-someone = Someone
+history-by-app = { $who } through an app
+history-by-assistant = { $who } through an assistant
+history-field-description = Description
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Tagged { $tag }
+history-tag-removed = Took off { $tag }
+history-tag-kept = Kept the suggested tag { $tag }
+history-tag-changed = Changed the tag { $tag }
+history-reviewed = Marked reviewed
+history-unreviewed = Marked not reviewed
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: set to { $to }
+history-cleared = { $field }: cleared (was { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Revert
+history-revert-title = Put back what this change changed
+history-reverted = Reverted: { $change }
+history-revert-failed = Couldn't revert that: { $error }
 asset-details = Asset details
 # Between an asset's category and its pack's name at the top of the panel: "texture in Forest Pack".
 asset-in-pack = in

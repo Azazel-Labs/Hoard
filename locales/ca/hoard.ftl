@@ -1630,6 +1630,34 @@ asset-origin-hoard = Hoard el va extreure del paquet el { $date }.
 asset-origin-hoard-notes = Hoard el va extreure del paquet el { $date } ({ $notes }).
 asset-origin-download = Baixa el .{ $ext } original
 asset-origin-discarded = El paquet original es va descartar després de la conversió.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historial
+history-loading = S'està carregant…
+history-none = Encara no s'hi ha canviat res.
+history-load-failed = No s'ha pogut carregar l'historial: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = IA
+history-by-rule = Una regla
+history-by-someone = Algú
+history-by-app = { $who } mitjançant una aplicació
+history-by-assistant = { $who } mitjançant un assistent
+history-field-description = Descripció
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Etiqueta { $tag } afegida
+history-tag-removed = Etiqueta { $tag } treta
+history-tag-kept = Etiqueta suggerida { $tag } conservada
+history-tag-changed = Etiqueta { $tag } canviada
+history-reviewed = Marcat com a revisat
+history-unreviewed = Marcat com a no revisat
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: establert a { $to }
+history-cleared = { $field }: esborrat (era { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Desfés
+history-revert-title = Torna a deixar el que aquest canvi va modificar
+history-reverted = S'ha desfet: { $change }
+history-revert-failed = No s'ha pogut desfer: { $error }
 asset-details = Detalls del recurs
 asset-in-pack = a
 asset-previous = Recurs anterior

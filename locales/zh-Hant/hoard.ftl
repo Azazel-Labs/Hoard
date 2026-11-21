@@ -1478,6 +1478,34 @@ asset-origin-hoard = Hoard 於 { $date } 從套件中讀出了它。
 asset-origin-hoard-notes = Hoard 於 { $date } 從套件中讀出了它（{ $notes }）。
 asset-origin-download = 下載原始 .{ $ext }
 asset-origin-discarded = 原始套件已在轉換後捨棄。
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = 歷史記錄
+history-loading = 載入中…
+history-none = 這裡還沒有任何變更。
+history-load-failed = 無法載入歷史記錄：{ $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = 規則
+history-by-someone = 某人
+history-by-app = { $who }（透過應用程式）
+history-by-assistant = { $who }（透過助理）
+history-field-description = 描述
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = 加上了標籤 { $tag }
+history-tag-removed = 移除了標籤 { $tag }
+history-tag-kept = 保留了建議的標籤 { $tag }
+history-tag-changed = 變更了標籤 { $tag }
+history-reviewed = 標記為已審核
+history-unreviewed = 標記為未審核
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }：設為 { $to }
+history-cleared = { $field }：已清除（原為 { $from }）
+history-changed = { $field }：{ $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = 復原
+history-revert-title = 還原此變更所改動的內容
+history-reverted = 已復原：{ $change }
+history-revert-failed = 無法復原：{ $error }
 asset-details = 素材詳細資訊
 asset-in-pack = 位於
 asset-previous = 上一個素材

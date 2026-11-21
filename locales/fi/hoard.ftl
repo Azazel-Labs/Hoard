@@ -1674,6 +1674,34 @@ asset-origin-hoard = Hoard luki sen paketista { $date }.
 asset-origin-hoard-notes = Hoard luki sen paketista { $date } ({ $notes }).
 asset-origin-download = Lataa alkuperäinen .{ $ext }-tiedosto
 asset-origin-discarded = Alkuperäinen paketti hylättiin muunnoksen jälkeen.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historia
+history-loading = Ladataan…
+history-none = Täällä ei ole vielä muutettu mitään.
+history-load-failed = Historian lataus epäonnistui: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = Tekoäly
+history-by-rule = Sääntö
+history-by-someone = Joku
+history-by-app = { $who } sovelluksen kautta
+history-by-assistant = { $who } avustajan kautta
+history-field-description = Kuvaus
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Lisätty tunniste { $tag }
+history-tag-removed = Poistettu tunniste { $tag }
+history-tag-kept = Säilytetty ehdotettu tunniste { $tag }
+history-tag-changed = Muutettu tunnistetta { $tag }
+history-reviewed = Merkitty tarkistetuksi
+history-unreviewed = Merkitty tarkistamattomaksi
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: asetettu arvoon { $to }
+history-cleared = { $field }: tyhjennetty (oli { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Kumoa
+history-revert-title = Palauta se, mitä tämä muutos muutti
+history-reverted = Kumottu: { $change }
+history-revert-failed = Kumoaminen epäonnistui: { $error }
 asset-details = Resurssin tiedot
 asset-in-pack = paketissa
 asset-previous = Edellinen resurssi

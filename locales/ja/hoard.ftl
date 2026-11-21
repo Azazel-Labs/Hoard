@@ -1472,6 +1472,34 @@ asset-origin-hoard = Hoard が { $date } にパッケージから読み出しま
 asset-origin-hoard-notes = Hoard が { $date } にパッケージから読み出しました（{ $notes }）。
 asset-origin-download = 元の .{ $ext } をダウンロード
 asset-origin-discarded = 元のパッケージは変換後に破棄されました。
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = 履歴
+history-loading = 読み込み中…
+history-none = ここではまだ何も変更されていません。
+history-load-failed = 履歴を読み込めませんでした: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = ルール
+history-by-someone = だれか
+history-by-app = { $who }（アプリ経由）
+history-by-assistant = { $who }（アシスタント経由）
+history-field-description = 説明
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = タグ { $tag } を付けました
+history-tag-removed = タグ { $tag } を外しました
+history-tag-kept = 提案されたタグ { $tag } を残しました
+history-tag-changed = タグ { $tag } を変更しました
+history-reviewed = 確認済みにしました
+history-unreviewed = 未確認にしました
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: { $to } に設定
+history-cleared = { $field }: クリア（元は { $from }）
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = 元に戻す
+history-revert-title = この変更で変わった内容を元に戻します
+history-reverted = 元に戻しました: { $change }
+history-revert-failed = 元に戻せませんでした: { $error }
 asset-details = アセットの詳細
 asset-in-pack = ·
 asset-previous = 前のアセット

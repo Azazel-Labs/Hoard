@@ -1475,6 +1475,34 @@ asset-origin-hoard = Hoard đã đọc tệp này ra từ package vào { $date }
 asset-origin-hoard-notes = Hoard đã đọc tệp này ra từ package vào { $date } ({ $notes }).
 asset-origin-download = Tải xuống tệp .{ $ext } gốc
 asset-origin-discarded = Package gốc đã bị bỏ sau khi chuyển đổi.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Lịch sử
+history-loading = Đang tải…
+history-none = Chưa có gì thay đổi ở đây.
+history-load-failed = Không thể tải lịch sử: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Một quy tắc
+history-by-someone = Ai đó
+history-by-app = { $who } qua một ứng dụng
+history-by-assistant = { $who } qua một trợ lý
+history-field-description = Mô tả
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Đã thêm thẻ { $tag }
+history-tag-removed = Đã bỏ thẻ { $tag }
+history-tag-kept = Đã giữ thẻ được gợi ý { $tag }
+history-tag-changed = Đã đổi thẻ { $tag }
+history-reviewed = Đã đánh dấu là đã xem xét
+history-unreviewed = Đã đánh dấu là chưa xem xét
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: đặt thành { $to }
+history-cleared = { $field }: đã xóa (trước đó là { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Hoàn tác
+history-revert-title = Khôi phục lại như trước thay đổi này
+history-reverted = Đã hoàn tác: { $change }
+history-revert-failed = Không thể hoàn tác: { $error }
 asset-details = Chi tiết tài nguyên
 asset-in-pack = trong
 asset-previous = Tài nguyên trước

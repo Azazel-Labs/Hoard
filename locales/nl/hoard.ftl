@@ -1624,6 +1624,34 @@ asset-origin-hoard = Hoard heeft het uit de package gelezen op { $date }.
 asset-origin-hoard-notes = Hoard heeft het uit de package gelezen op { $date } ({ $notes }).
 asset-origin-download = Het originele .{ $ext } downloaden
 asset-origin-discarded = De originele package is na de conversie weggegooid.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Geschiedenis
+history-loading = Laden…
+history-none = Hier is nog niets gewijzigd.
+history-load-failed = De geschiedenis kon niet worden geladen: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Een regel
+history-by-someone = Iemand
+history-by-app = { $who } via een app
+history-by-assistant = { $who } via een assistent
+history-field-description = Beschrijving
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Tag { $tag } toegevoegd
+history-tag-removed = Tag { $tag } verwijderd
+history-tag-kept = Voorgestelde tag { $tag } behouden
+history-tag-changed = Tag { $tag } gewijzigd
+history-reviewed = Gemarkeerd als beoordeeld
+history-unreviewed = Gemarkeerd als niet beoordeeld
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: ingesteld op { $to }
+history-cleared = { $field }: gewist (was { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Ongedaan maken
+history-revert-title = Zet terug wat deze wijziging veranderde
+history-reverted = Ongedaan gemaakt: { $change }
+history-revert-failed = Dat kon niet ongedaan worden gemaakt: { $error }
 asset-details = Assetdetails
 asset-in-pack = in
 asset-previous = Vorige asset

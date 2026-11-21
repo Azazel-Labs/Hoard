@@ -1529,6 +1529,34 @@ asset-origin-hoard = A Hoard olvasta ki a csomagfájlból ekkor: { $date }.
 asset-origin-hoard-notes = A Hoard olvasta ki a csomagfájlból ekkor: { $date } ({ $notes }).
 asset-origin-download = Az eredeti .{ $ext } letöltése
 asset-origin-discarded = Az eredeti csomagfájl az átalakítás után el lett vetve.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Előzmények
+history-loading = Betöltés…
+history-none = Itt még nem változott semmi.
+history-load-failed = Nem sikerült betölteni az előzményeket: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = MI
+history-by-rule = Egy szabály
+history-by-someone = Valaki
+history-by-app = { $who } egy alkalmazáson keresztül
+history-by-assistant = { $who } egy asszisztensen keresztül
+history-field-description = Leírás
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Címke hozzáadva: { $tag }
+history-tag-removed = Címke eltávolítva: { $tag }
+history-tag-kept = Javasolt címke megtartva: { $tag }
+history-tag-changed = Címke módosítva: { $tag }
+history-reviewed = Átnézettnek jelölve
+history-unreviewed = Nem átnézettnek jelölve
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: beállítva erre: { $to }
+history-cleared = { $field }: törölve (ez volt: { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Visszavonás
+history-revert-title = A módosítás előtti állapot visszaállítása
+history-reverted = Visszavonva: { $change }
+history-revert-failed = Nem sikerült visszavonni: { $error }
 asset-details = Asset részletei
 asset-in-pack = ·
 asset-previous = Előző asset

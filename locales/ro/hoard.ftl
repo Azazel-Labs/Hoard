@@ -1752,6 +1752,34 @@ asset-origin-hoard = Hoard l-a extras din pachet pe { $date }.
 asset-origin-hoard-notes = Hoard l-a extras din pachet pe { $date } ({ $notes }).
 asset-origin-download = Descărcați originalul .{ $ext }
 asset-origin-discarded = Pachetul original a fost eliminat după conversie.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Istoric
+history-loading = Se încarcă…
+history-none = Încă nu s-a modificat nimic aici.
+history-load-failed = Istoricul nu a putut fi încărcat: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = O regulă
+history-by-someone = Cineva
+history-by-app = { $who } printr-o aplicație
+history-by-assistant = { $who } printr-un asistent
+history-field-description = Descriere
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Etichetă adăugată: { $tag }
+history-tag-removed = Etichetă eliminată: { $tag }
+history-tag-kept = Etichetă sugerată păstrată: { $tag }
+history-tag-changed = Etichetă modificată: { $tag }
+history-reviewed = Marcat ca verificat
+history-unreviewed = Marcat ca neverificat
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: setat la { $to }
+history-cleared = { $field }: golit (era { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Anulați
+history-revert-title = Readuce ce a schimbat această modificare
+history-reverted = Anulat: { $change }
+history-revert-failed = Nu s-a putut anula: { $error }
 asset-details = Detaliile resursei
 asset-in-pack = în
 asset-previous = Resursa anterioară

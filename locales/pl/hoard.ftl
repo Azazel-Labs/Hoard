@@ -1775,6 +1775,34 @@ asset-origin-hoard = Odczytany z pakietu przez Hoard { $date }.
 asset-origin-hoard-notes = Odczytany z pakietu przez Hoard { $date } ({ $notes }).
 asset-origin-download = Pobierz oryginalny plik .{ $ext }
 asset-origin-discarded = Oryginalny pakiet został odrzucony po konwersji.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historia
+history-loading = Wczytywanie…
+history-none = Nic tu jeszcze nie zmieniono.
+history-load-failed = Nie udało się wczytać historii: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Reguła
+history-by-someone = Ktoś
+history-by-app = { $who } przez aplikację
+history-by-assistant = { $who } przez asystenta
+history-field-description = Opis
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Dodano tag { $tag }
+history-tag-removed = Usunięto tag { $tag }
+history-tag-kept = Zachowano sugerowany tag { $tag }
+history-tag-changed = Zmieniono tag { $tag }
+history-reviewed = Oznaczono jako sprawdzone
+history-unreviewed = Oznaczono jako niesprawdzone
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: ustawiono na { $to }
+history-cleared = { $field }: wyczyszczono (było { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Cofnij
+history-revert-title = Przywróć to, co zmieniła ta zmiana
+history-reverted = Cofnięto: { $change }
+history-revert-failed = Nie udało się tego cofnąć: { $error }
 asset-details = Szczegóły zasobu
 asset-in-pack = w
 asset-previous = Poprzedni zasób

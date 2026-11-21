@@ -1475,6 +1475,34 @@ asset-origin-hoard = 由 Hoard 于 { $date } 从包中读出。
 asset-origin-hoard-notes = 由 Hoard 于 { $date } 从包中读出（{ $notes }）。
 asset-origin-download = 下载原始 .{ $ext }
 asset-origin-discarded = 原始包已在转换后丢弃。
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = 历史记录
+history-loading = 正在加载…
+history-none = 这里还没有任何更改。
+history-load-failed = 无法加载历史记录：{ $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = 规则
+history-by-someone = 某人
+history-by-app = { $who }（通过应用）
+history-by-assistant = { $who }（通过助手）
+history-field-description = 描述
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = 添加了标签 { $tag }
+history-tag-removed = 移除了标签 { $tag }
+history-tag-kept = 保留了建议的标签 { $tag }
+history-tag-changed = 更改了标签 { $tag }
+history-reviewed = 标记为已审核
+history-unreviewed = 标记为未审核
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }：设为 { $to }
+history-cleared = { $field }：已清空（原为 { $from }）
+history-changed = { $field }：{ $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = 撤销
+history-revert-title = 恢复此更改所改动的内容
+history-reverted = 已撤销：{ $change }
+history-revert-failed = 无法撤销：{ $error }
 asset-details = 资源详情
 asset-in-pack = 来自
 asset-previous = 上一个资源

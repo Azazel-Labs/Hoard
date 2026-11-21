@@ -1626,6 +1626,34 @@ asset-origin-hoard = Hoard læste den ud af Unreal-pakken den { $date }.
 asset-origin-hoard-notes = Hoard læste den ud af Unreal-pakken den { $date } ({ $notes }).
 asset-origin-download = Download den originale .{ $ext }
 asset-origin-discarded = Den originale Unreal-pakke blev kasseret efter konverteringen.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historik
+history-loading = Indlæser…
+history-none = Der er ikke ændret noget her endnu.
+history-load-failed = Kunne ikke indlæse historikken: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = En regel
+history-by-someone = Nogen
+history-by-app = { $who } via en app
+history-by-assistant = { $who } via en assistent
+history-field-description = Beskrivelse
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Tagget { $tag }
+history-tag-removed = Fjernede { $tag }
+history-tag-kept = Beholdt det foreslåede tag { $tag }
+history-tag-changed = Ændrede tagget { $tag }
+history-reviewed = Markeret som gennemgået
+history-unreviewed = Markeret som ikke gennemgået
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: sat til { $to }
+history-cleared = { $field }: ryddet (var { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Fortryd
+history-revert-title = Sæt det tilbage, som denne ændring ændrede
+history-reverted = Fortrudt: { $change }
+history-revert-failed = Kunne ikke fortryde det: { $error }
 asset-details = Asset-detaljer
 asset-in-pack = i
 asset-previous = Forrige asset

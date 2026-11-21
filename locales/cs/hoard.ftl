@@ -1748,6 +1748,34 @@ asset-origin-hoard = Hoard ho vyčetl ze souboru Unrealu { $date }.
 asset-origin-hoard-notes = Hoard ho vyčetl ze souboru Unrealu { $date } ({ $notes }).
 asset-origin-download = Stáhnout původní .{ $ext }
 asset-origin-discarded = Původní soubor Unrealu byl po převodu zahozen.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historie
+history-loading = Načítání…
+history-none = Zatím tu nic nebylo změněno.
+history-load-failed = Historii se nepodařilo načíst: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Pravidlo
+history-by-someone = Někdo
+history-by-app = { $who } přes aplikaci
+history-by-assistant = { $who } přes asistenta
+history-field-description = Popis
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Přidán štítek { $tag }
+history-tag-removed = Odebrán štítek { $tag }
+history-tag-kept = Ponechán navržený štítek { $tag }
+history-tag-changed = Změněn štítek { $tag }
+history-reviewed = Označeno jako zkontrolované
+history-unreviewed = Označeno jako nezkontrolované
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: nastaveno na { $to }
+history-cleared = { $field }: vymazáno (bylo { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Vrátit
+history-revert-title = Vrátit, co tato změna změnila
+history-reverted = Vráceno: { $change }
+history-revert-failed = Tuto změnu se nepodařilo vrátit: { $error }
 asset-details = Podrobnosti assetu
 asset-in-pack = v
 asset-previous = Předchozí asset

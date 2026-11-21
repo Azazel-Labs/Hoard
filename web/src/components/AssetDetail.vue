@@ -11,6 +11,7 @@ import AssetLinks from './AssetLinks.vue'
 import AssetDescriptions from './AssetDescriptions.vue'
 import AssetFields from './AssetFields.vue'
 import TagInput from './TagInput.vue'
+import AssetHistory from './AssetHistory.vue'
 import AssetOrigin from './AssetOrigin.vue'
 import AudioPreview from './AudioPreview.vue'
 import DownloadAs from './DownloadAs.vue'
@@ -771,6 +772,8 @@ onBeforeUnmount(() => unswipe())
         </dd>
       </dl>
     </section>
+
+    <AssetHistory :asset="asset" :editor="editor" @updated="(a) => emit('updated', a)" />
 
     <footer>
       <div class="get">

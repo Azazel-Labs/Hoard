@@ -1509,6 +1509,34 @@ asset-origin-hoard = Hoard bunu { $date } tarihinde paketin içinden okudu.
 asset-origin-hoard-notes = Hoard bunu { $date } tarihinde paketin içinden okudu ({ $notes }).
 asset-origin-download = Özgün .{ $ext } dosyasını indir
 asset-origin-discarded = Özgün paket dönüştürmeden sonra silindi.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Geçmiş
+history-loading = Yükleniyor…
+history-none = Burada henüz bir şey değiştirilmedi.
+history-load-failed = Geçmiş yüklenemedi: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = Yapay zekâ
+history-by-rule = Bir kural
+history-by-someone = Biri
+history-by-app = { $who }, bir uygulama aracılığıyla
+history-by-assistant = { $who }, bir asistan aracılığıyla
+history-field-description = Açıklama
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = { $tag } etiketi eklendi
+history-tag-removed = { $tag } etiketi kaldırıldı
+history-tag-kept = Önerilen { $tag } etiketi korundu
+history-tag-changed = { $tag } etiketi değiştirildi
+history-reviewed = İncelendi olarak işaretlendi
+history-unreviewed = İncelenmedi olarak işaretlendi
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: { $to } olarak ayarlandı
+history-cleared = { $field }: temizlendi (önceki: { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Geri al
+history-revert-title = Bu değişikliğin değiştirdiğini eski haline getir
+history-reverted = Geri alındı: { $change }
+history-revert-failed = Geri alınamadı: { $error }
 asset-details = Varlık ayrıntıları
 asset-in-pack = ·
 asset-previous = Önceki varlık

@@ -1626,6 +1626,34 @@ asset-origin-hoard = Hoard leste den ut av pakkefilen { $date }.
 asset-origin-hoard-notes = Hoard leste den ut av pakkefilen { $date } ({ $notes }).
 asset-origin-download = Last ned den opprinnelige .{ $ext }-filen
 asset-origin-discarded = Den opprinnelige pakkefilen ble forkastet etter konverteringen.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Historikk
+history-loading = Laster inn…
+history-none = Ingenting er endret her ennå.
+history-load-failed = Kunne ikke laste inn historikken: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = En regel
+history-by-someone = Noen
+history-by-app = { $who } via en app
+history-by-assistant = { $who } via en assistent
+history-field-description = Beskrivelse
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = La til taggen { $tag }
+history-tag-removed = Fjernet taggen { $tag }
+history-tag-kept = Beholdt den foreslåtte taggen { $tag }
+history-tag-changed = Endret taggen { $tag }
+history-reviewed = Markert som gjennomgått
+history-unreviewed = Markert som ikke gjennomgått
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: satt til { $to }
+history-cleared = { $field }: tømt (var { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Angre
+history-revert-title = Sett tilbake det denne endringen endret
+history-reverted = Angret: { $change }
+history-revert-failed = Kunne ikke angre det: { $error }
 asset-details = Ressursdetaljer
 asset-in-pack = i
 asset-previous = Forrige ressurs

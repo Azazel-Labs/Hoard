@@ -1472,6 +1472,34 @@ asset-origin-hoard = Hoard อ่านออกมาจากแพ็กเ�
 asset-origin-hoard-notes = Hoard อ่านออกมาจากแพ็กเกจเมื่อ { $date } ({ $notes })
 asset-origin-download = ดาวน์โหลดไฟล์ .{ $ext } ต้นฉบับ
 asset-origin-discarded = แพ็กเกจต้นฉบับถูกทิ้งไปหลังการแปลง
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = ประวัติ
+history-loading = กำลังโหลด…
+history-none = ยังไม่มีการเปลี่ยนแปลงที่นี่
+history-load-failed = โหลดประวัติไม่ได้: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = กฎ
+history-by-someone = บางคน
+history-by-app = { $who } ผ่านแอป
+history-by-assistant = { $who } ผ่านผู้ช่วย
+history-field-description = คำอธิบาย
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = เพิ่มแท็ก { $tag }
+history-tag-removed = นำแท็ก { $tag } ออก
+history-tag-kept = เก็บแท็กที่แนะนำ { $tag } ไว้
+history-tag-changed = เปลี่ยนแท็ก { $tag }
+history-reviewed = ทำเครื่องหมายว่าตรวจแล้ว
+history-unreviewed = ทำเครื่องหมายว่ายังไม่ตรวจ
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: ตั้งเป็น { $to }
+history-cleared = { $field }: ล้างแล้ว (เดิมคือ { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = เลิกทำ
+history-revert-title = คืนค่าตามก่อนการเปลี่ยนแปลงนี้
+history-reverted = เลิกทำแล้ว: { $change }
+history-revert-failed = เลิกทำไม่ได้: { $error }
 asset-details = รายละเอียดแอสเซ็ต
 asset-in-pack = ใน
 asset-previous = แอสเซ็ตก่อนหน้า

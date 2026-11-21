@@ -1492,6 +1492,34 @@ asset-origin-hoard = Hoard membacanya dari paket Unreal pada { $date }.
 asset-origin-hoard-notes = Hoard membacanya dari paket Unreal pada { $date } ({ $notes }).
 asset-origin-download = Unduh .{ $ext } asli
 asset-origin-discarded = Paket Unreal asli dibuang setelah dikonversi.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Riwayat
+history-loading = Memuat…
+history-none = Belum ada yang diubah di sini.
+history-load-failed = Tidak dapat memuat riwayat: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = AI
+history-by-rule = Sebuah aturan
+history-by-someone = Seseorang
+history-by-app = { $who } melalui aplikasi
+history-by-assistant = { $who } melalui asisten
+history-field-description = Deskripsi
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Tag { $tag } ditambahkan
+history-tag-removed = Tag { $tag } dilepas
+history-tag-kept = Tag usulan { $tag } dipertahankan
+history-tag-changed = Tag { $tag } diubah
+history-reviewed = Ditandai sudah ditinjau
+history-unreviewed = Ditandai belum ditinjau
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: diatur ke { $to }
+history-cleared = { $field }: dikosongkan (sebelumnya { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Urungkan
+history-revert-title = Kembalikan seperti sebelum perubahan ini
+history-reverted = Diurungkan: { $change }
+history-revert-failed = Tidak dapat mengurungkan: { $error }
 asset-details = Detail aset
 asset-in-pack = di
 asset-previous = Aset sebelumnya

@@ -1816,6 +1816,34 @@ asset-origin-hoard = Hoard витягнув його з пакунка { $date }
 asset-origin-hoard-notes = Hoard витягнув його з пакунка { $date } ({ $notes }).
 asset-origin-download = Завантажити оригінальний .{ $ext }
 asset-origin-discarded = Оригінальний пакунок видалено після перетворення.
+# An asset's history, a section near the bottom of its details: each change made to it, the latest first.
+history-heading = Історія
+history-loading = Завантаження…
+history-none = Тут ще нічого не змінювали.
+history-load-failed = Не вдалося завантажити історію: { $error }
+# Who made a group of changes. $who is a person's name.
+history-by-ai = ШІ
+history-by-rule = Правило
+history-by-someone = Хтось
+history-by-app = { $who } через застосунок
+history-by-assistant = { $who } через асистента
+history-field-description = Опис
+# One change to a tag. "Kept" is a person accepting a tag the AI or a rule suggested.
+history-tag-added = Додано тег { $tag }
+history-tag-removed = Знято тег { $tag }
+history-tag-kept = Залишено запропонований тег { $tag }
+history-tag-changed = Змінено тег { $tag }
+history-reviewed = Позначено як перевірене
+history-unreviewed = Позначено як неперевірене
+# One change to a field. $field is its name (Name, Category, Rating…), $from and $to what it was and became.
+history-set = { $field }: встановлено { $to }
+history-cleared = { $field }: очищено (було { $from })
+history-changed = { $field }: { $from } → { $to }
+# Beside each change, for those who can edit: puts back what it was before that change.
+history-revert = Скасувати
+history-revert-title = Повернути те, що змінила ця зміна
+history-reverted = Скасовано: { $change }
+history-revert-failed = Не вдалося скасувати: { $error }
 asset-details = Відомості про ресурс
 asset-in-pack = у
 asset-previous = Попередній ресурс

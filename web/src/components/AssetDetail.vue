@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  api, bundleUrl, fileUrl, liteUrl, thumbUrl, type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
+  api, bundleUrl, fileUrl, liteUrl, thumbUrl, type Asset, type Collection, type CollectionRef, type ProjectUse,
 } from '../api'
 import { humanBytes } from '../format'
 import { looksAlike } from '../kinds'
@@ -10,6 +10,7 @@ import { playableUrl } from '../player'
 import AssetLinks from './AssetLinks.vue'
 import AssetDescriptions from './AssetDescriptions.vue'
 import AssetFields from './AssetFields.vue'
+import TagInput from './TagInput.vue'
 import AssetOrigin from './AssetOrigin.vue'
 import AudioPreview from './AudioPreview.vue'
 import DownloadAs from './DownloadAs.vue'
@@ -181,8 +182,6 @@ const hasViews = computed(() => props.asset.derivatives.includes('views'))
 
 const editingName = ref(false)
 const nameEl = ref<HTMLElement | null>(null)
-const newTag = ref('')
-const suggestions = ref<Facet[]>([])
 const copied = ref('')
 /** The full-screen viewer that's open, if any. */
 const inspecting = ref<ViewerKind | ''>('')
@@ -401,29 +400,15 @@ function onNameKey(e: KeyboardEvent) {
   }
 }
 
-async function addTag() {
-  const tag = newTag.value.trim()
-  if (!tag) return
-  newTag.value = ''
-  suggestions.value = []
-  await patch({ add_tags: [tag] })
+async function addTags(tags: string[]) {
+  if (!(await patch({ add_tags: tags })) || tags.length < 2) return
+  showOk(t('asset-tags-added', { count: tags.length }), { label: t('asset-undo'), run: () => void patch({ remove_tags: tags }) })
 }
-
-let suggestTimer: ReturnType<typeof setTimeout> | undefined
-watch(newTag, (v) => {
-  clearTimeout(suggestTimer)
-  if (v.trim().length < 2) {
-    suggestions.value = []
-    return
-  }
-  suggestTimer = setTimeout(async () => {
-    try {
-      suggestions.value = await api.tags(v.trim().toLowerCase())
-    } catch {
-      suggestions.value = []
-    }
-  }, 150)
-})
+/** Backspace in the empty tag box takes the last tag off (with Undo). */
+function removeLastTag() {
+  const last = visibleTags.value.at(-1)
+  if (last) void removeTag(last.tag)
+}
 
 // On a phone the panel covers the screen: swipe it away to the right.
 const root = ref<HTMLElement | null>(null)
@@ -658,14 +643,16 @@ onBeforeUnmount(() => unswipe())
           @click="restoreTag(tag)"
         >{{ tag }}</button>
       </p>
-      <form v-if="editor" class="addtag" @submit.prevent="addTag">
+      <div v-if="editor" class="addtag">
         <label class="visually-hidden" for="new-tag">{{ t('asset-tag-add-label') }}</label>
-        <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" :placeholder="t('asset-tag-add-placeholder')" autocomplete="off" />
-        <datalist id="tag-suggestions">
-          <option v-for="s in suggestions" :key="s.value" :value="s.value">{{ s.count }}</option>
-        </datalist>
-        <button class="btn" type="submit" :disabled="!newTag.trim()">{{ t('asset-tag-add') }}</button>
-      </form>
+        <TagInput
+          id="new-tag"
+          :have="asset.tags.map((x) => x.tag)"
+          :placeholder="t('asset-tag-add-placeholder')"
+          @add="addTags"
+          @remove-last="removeLastTag"
+        />
+      </div>
       <label v-if="family && editor" class="animcheck familycheck">
         <input v-model="applyToFamily" type="checkbox" /> {{ t('asset-apply-family', { count: family.size }) }}
       </label>

@@ -811,6 +811,7 @@ shortcuts-play-sound = Tocar ou parar um som
 shortcuts-select = Selecionar ou desmarcar
 shortcuts-favorite = Adicionar aos favoritos ou tirar deles
 shortcuts-reviewed = Marcar como revisado ou não
+shortcuts-tag = Adicionar uma tag
 shortcuts-key-click = clique
 shortcuts-select-range = Selecionar um intervalo
 shortcuts-select-all = Selecionar tudo o que é mostrado
@@ -841,6 +842,12 @@ tag-remove = Remover a tag { $tag }
 tag-accept = Manter a tag { $tag }
 tag-accept-title = Manter este palpite como tag sua
 tag-reject-title = Remover; o gerador de tags não vai recolocá-la
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nova tag
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Você quis dizer
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = era { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1507,6 +1514,11 @@ asset-copy-blocked = Não foi possível copiar: o navegador bloqueou
 asset-save-error = Não foi possível salvar: { $error }
 asset-tag-removed = { $tag } removida
 asset-tag-restored = { $tag } recolocada
+asset-tags-added =
+    { $count ->
+        [one] { $count } tag adicionada
+       *[other] { $count } tags adicionadas
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } palpite mantido
@@ -1585,7 +1597,6 @@ asset-more = Mais
 asset-tags = Tags
 asset-tag-add-label = Adicionar uma tag
 asset-tag-add-placeholder = Adicione uma tag, por exemplo mood:tense
-asset-tag-add = Adicionar
 asset-apply-family = Aplicar as mudanças a todas as { $count } variantes
 asset-tags-accept-all =
     Manter { $count ->

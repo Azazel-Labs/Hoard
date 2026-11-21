@@ -775,6 +775,7 @@ shortcuts-play-sound = Putar atau hentikan suara
 shortcuts-select = Pilih atau batalkan pilihan
 shortcuts-favorite = Tambahkan ke atau keluarkan dari favorit Anda
 shortcuts-reviewed = Tandai sudah ditinjau, atau tidak
+shortcuts-tag = Tambah tag
 shortcuts-key-click = klik
 shortcuts-select-range = Pilih rentang
 shortcuts-select-all = Pilih semua yang ditampilkan
@@ -805,6 +806,12 @@ tag-remove = Hapus tag { $tag }
 tag-accept = Pertahankan tag { $tag }
 tag-accept-title = Pertahankan tebakan ini sebagai tag Anda sendiri
 tag-reject-title = Lepas; pemberi tag tidak akan memasangnya lagi
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Tag baru
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Maksud Anda
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = dulu { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1393,6 +1400,7 @@ asset-copy-blocked = Tidak dapat menyalin: browser memblokirnya
 asset-save-error = Tidak dapat menyimpan: { $error }
 asset-tag-removed = { $tag } dihapus
 asset-tag-restored = { $tag } dipasang kembali
+asset-tags-added = { $count } tag ditambahkan
 asset-tags-accepted =
     { $count ->
         [one] { $count } tag tebakan dipertahankan
@@ -1471,7 +1479,6 @@ asset-more = Selengkapnya
 asset-tags = Tag
 asset-tag-add-label = Tambahkan tag
 asset-tag-add-placeholder = Tambahkan tag, mis. mood:tense
-asset-tag-add = Tambah
 asset-apply-family = Terapkan perubahan ke semua { $count } varian
 asset-tags-accept-all =
     { $count ->

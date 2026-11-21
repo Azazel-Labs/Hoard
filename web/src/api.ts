@@ -4,7 +4,7 @@ import { language } from './i18n'
 import type {
   ArchiveCount, ArchiveItems, Asset, AssetKind, AssetPatch, BulkEdit, Change, Collection, ConversionPreview, ConversionRules,
   ConversionStatus, CopyGroups, CreditsRequest, Facet, Facing, FolderListing, LibraryStats, Pack, PackContext,
-  Project, ProjectUse, SavedSearch, SearchParams, SearchResult, SheetData, Stats, StoreMatches, ThumbSource,
+  Project, ProjectUse, SavedSearch, SearchParams, SearchResult, SheetData, Stats, StoreMatches, TagSuggestions, ThumbSource,
   ThumbUpload, UnrealPackStatus, UsageItems,
 } from './types/library'
 import type {
@@ -215,6 +215,8 @@ export const api = {
     }),
   /** Categories in use, most used first. */
   categories: () => request<Facet[]>('/api/categories'),
+  /** Tags to offer while someone types one (see TagInput). */
+  suggestTags: (q: string, limit = 12) => request<TagSuggestions>(`/api/tags/suggest?q=${encodeURIComponent(q)}&limit=${limit}`),
   tags: (prefix: string) => request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(prefix)}&limit=12`),
   /** Every tag in use containing `q`, most used first. */
   allTags: (q: string, limit = 2000) =>

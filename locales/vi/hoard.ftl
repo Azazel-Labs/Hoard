@@ -766,6 +766,7 @@ shortcuts-play-sound = Phát hoặc dừng âm thanh
 shortcuts-select = Chọn hoặc bỏ chọn
 shortcuts-favorite = Thêm vào hoặc bỏ khỏi mục yêu thích
 shortcuts-reviewed = Đánh dấu đã duyệt, hoặc bỏ đánh dấu
+shortcuts-tag = Thêm thẻ
 shortcuts-key-click = nhấp
 shortcuts-select-range = Chọn một dải
 shortcuts-select-all = Chọn mọi thứ đang hiện
@@ -796,6 +797,12 @@ tag-remove = Bỏ thẻ { $tag }
 tag-accept = Giữ thẻ { $tag }
 tag-accept-title = Giữ phỏng đoán này làm thẻ của riêng bạn
 tag-reject-title = Bỏ thẻ; bộ gắn thẻ sẽ không thêm lại
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Thẻ mới
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Ý bạn là
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = trước là { $alias }
 
 ## Hoạt động nền
 
@@ -1380,6 +1387,7 @@ asset-copy-blocked = Không thể sao chép: trình duyệt đã chặn
 asset-save-error = Không thể lưu: { $error }
 asset-tag-removed = Đã bỏ { $tag }
 asset-tag-restored = Đã đặt lại { $tag }
+asset-tags-added = Đã thêm { $count } thẻ
 asset-tags-accepted = Đã giữ { $count } thẻ phỏng đoán
 asset-reviewed = Đã duyệt
 asset-reviewed-on-title = Đã duyệt: quy tắc và AI không đụng đến thẻ của nó. Nhấp để bỏ dấu (R)
@@ -1454,7 +1462,6 @@ asset-more = Thêm
 asset-tags = Thẻ
 asset-tag-add-label = Thêm thẻ
 asset-tag-add-placeholder = Thêm thẻ, ví dụ mood:tense
-asset-tag-add = Thêm
 asset-apply-family = Áp dụng thay đổi cho cả { $count } biến thể
 asset-tags-accept-all = Giữ cả { $count } phỏng đoán
 asset-tags-accept-all-title = Giữ mọi thẻ mà quy tắc và AI đã đoán làm thẻ của riêng bạn

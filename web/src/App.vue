@@ -897,6 +897,24 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'r' && focused && mayEdit()) {
     void toggleReviewed(focused)
   }
+  if (e.key === 't' && focused && mayEdit()) {
+    e.preventDefault()
+    void focusTagBox(focused)
+  }
+}
+
+/** Put the cursor in an asset's tag box (the `t` key), opening it first when it isn't. */
+async function focusTagBox(a: Asset) {
+  if (selected.value?.id !== a.id) void openAsset(a)
+  // The panel may still be sliding in or loading: wait for the box, up to a second.
+  for (let i = 0; i < 60; i++) {
+    const box = selected.value?.id === a.id ? document.querySelector<HTMLInputElement>('.detail-pane #new-tag') : null
+    if (box) {
+      box.focus()
+      return
+    }
+    await new Promise(requestAnimationFrame)
+  }
 }
 
 /** Mark one asset gone over, or not (the `r` key), with Undo. */

@@ -779,6 +779,7 @@ shortcuts-play-sound = Hang lejátszása vagy leállítása
 shortcuts-select = Kijelölés vagy kijelölés megszüntetése
 shortcuts-favorite = Hozzáadás a kedvencekhez vagy eltávolítás onnan
 shortcuts-reviewed = Megjelölés átnézettként, vagy a jelölés levétele
+shortcuts-tag = Címke hozzáadása
 shortcuts-key-click = kattintás
 shortcuts-select-range = Tartomány kijelölése
 shortcuts-select-all = Minden látható kijelölése
@@ -809,6 +810,12 @@ tag-remove = Címke eltávolítása: { $tag }
 tag-accept = A(z) { $tag } címke megtartása
 tag-accept-title = A tipp megtartása saját címkeként
 tag-reject-title = Eltávolítás; a címkéző nem teszi vissza
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Új címke
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Erre gondolt
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = korábban { $alias }
 
 ## Tevékenységjelző
 
@@ -1398,6 +1405,11 @@ asset-copy-blocked = Nem sikerült másolni: a böngésző letiltotta
 asset-save-error = Nem sikerült menteni: { $error }
 asset-tag-removed = Eltávolítva: { $tag }
 asset-tag-restored = Visszatéve: { $tag }
+asset-tags-added =
+    Hozzáadva: { $count ->
+        [one] { $count } címke
+       *[other] { $count } címke
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } tippelt címke megtartva
@@ -1476,7 +1488,6 @@ asset-more = Több
 asset-tags = Címkék
 asset-tag-add-label = Címke hozzáadása
 asset-tag-add-placeholder = Címke hozzáadása, pl. mood:tense
-asset-tag-add = Hozzáadás
 asset-apply-family = A módosítások alkalmazása mindegyik változatra ({ $count })
 asset-tags-accept-all =
     { $count ->

@@ -828,6 +828,7 @@ shortcuts-play-sound = Пусти или заустави звук
 shortcuts-select = Изабери или поништи избор
 shortcuts-favorite = Додај у омиљене или уклони из њих
 shortcuts-reviewed = Означи као прегледано или не
+shortcuts-tag = Додај ознаку
 shortcuts-key-click = клик
 shortcuts-select-range = Изабери опсег
 shortcuts-select-all = Изабери све приказано
@@ -858,6 +859,12 @@ tag-remove = Уклони ознаку { $tag }
 tag-accept = Задржи ознаку { $tag }
 tag-accept-title = Задржи ову претпоставку као своју ознаку
 tag-reject-title = Уклони; означивач је неће вратити
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Нова ознака
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Да ли сте мислили
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = раније { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1556,6 +1563,12 @@ asset-copy-blocked = Копирање није успело: прегледач 
 asset-save-error = Чување није успело: { $error }
 asset-tag-removed = Уклоњено: { $tag }
 asset-tag-restored = Ознака { $tag } је враћена
+asset-tags-added =
+    Додато: { $count ->
+        [one] { $count } ознака
+        [few] { $count } ознаке
+       *[other] { $count } ознака
+    }
 asset-tags-accepted =
     Задржано: { $count ->
         [one] { $count } претпостављена ознака
@@ -1635,7 +1648,6 @@ asset-more = Више
 asset-tags = Ознаке
 asset-tag-add-label = Додај ознаку
 asset-tag-add-placeholder = Додајте ознаку, нпр. mood:tense
-asset-tag-add = Додај
 asset-apply-family = Примени измене на све варијанте ({ $count })
 asset-tags-accept-all =
     Задржи све: { $count ->

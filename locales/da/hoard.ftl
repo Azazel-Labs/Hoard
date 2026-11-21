@@ -811,6 +811,7 @@ shortcuts-play-sound = Afspil eller stop en lyd
 shortcuts-select = Vælg eller fravælg
 shortcuts-favorite = Føj til eller fjern fra dine favoritter
 shortcuts-reviewed = Markér som gennemgået, eller ej
+shortcuts-tag = Tilføj et tag
 shortcuts-key-click = klik
 shortcuts-select-range = Vælg et område
 shortcuts-select-all = Vælg alt viste
@@ -841,6 +842,12 @@ tag-remove = Fjern tagget { $tag }
 tag-accept = Behold tagget { $tag }
 tag-accept-title = Behold dette gæt som dit eget tag
 tag-reject-title = Fjern det; taggeren sætter det ikke tilbage
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nyt tag
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Mente du
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = var { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1503,6 +1510,11 @@ asset-copy-blocked = Kunne ikke kopiere: browseren blokerede det
 asset-save-error = Kunne ikke gemme: { $error }
 asset-tag-removed = Fjernede { $tag }
 asset-tag-restored = Satte { $tag } tilbage
+asset-tags-added =
+    Tilføjede { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }
 asset-tags-accepted =
     Beholdt { $count ->
         [one] { $count } gættet tag
@@ -1581,7 +1593,6 @@ asset-more = Mere
 asset-tags = Tags
 asset-tag-add-label = Tilføj et tag
 asset-tag-add-placeholder = Tilføj et tag, f.eks. mood:tense
-asset-tag-add = Tilføj
 asset-apply-family = Anvend ændringer på alle { $count } varianter
 asset-tags-accept-all =
     { $count ->

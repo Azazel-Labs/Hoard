@@ -391,6 +391,20 @@ export interface Facing {
 
 export interface Facet { value: string; count: number }
 
+/** A tag offered while typing one; `alias` is the old name typed, when the tag is what it was merged into. */
+export interface TagSuggestion { tag: string; count: number; alias?: string }
+/** What `/api/tags/suggest` offers for what's typed into a tag box. */
+export interface TagSuggestions {
+  /** The best match first, grouped by how well they match and then by how much they're used. */
+  matches: TagSuggestion[]
+  /** What's typed as it would be saved; null for nothing that makes a tag. */
+  normalized: string | null
+  /** The tag it would land on is in use already. */
+  exists: boolean
+  /** When it'd be a new tag: tags in use it's probably meant to be. */
+  near: TagSuggestion[]
+}
+
 export interface SearchResult {
   items: Asset[]
   total: number

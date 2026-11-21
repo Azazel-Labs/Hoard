@@ -811,6 +811,7 @@ shortcuts-play-sound = Een geluid afspelen of stoppen
 shortcuts-select = Selecteren of deselecteren
 shortcuts-favorite = Aan je favorieten toevoegen of eruit halen
 shortcuts-reviewed = Markeren als nagekeken of niet
+shortcuts-tag = Een tag toevoegen
 shortcuts-key-click = klik
 shortcuts-select-range = Een reeks selecteren
 shortcuts-select-all = Alles wat getoond wordt selecteren
@@ -841,6 +842,12 @@ tag-remove = Tag { $tag } verwijderen
 tag-accept = Tag { $tag } behouden
 tag-accept-title = Deze suggestie als je eigen tag behouden
 tag-reject-title = Verwijderen; de tagger zet hem niet terug
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nieuwe tag
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Bedoelde je
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = was { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1501,6 +1508,11 @@ asset-copy-blocked = Kon niet kopiëren: de browser blokkeerde het
 asset-save-error = Kon niet opslaan: { $error }
 asset-tag-removed = { $tag } verwijderd
 asset-tag-restored = { $tag } teruggezet
+asset-tags-added =
+    Toegevoegd: { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } voorgestelde tag
@@ -1579,7 +1591,6 @@ asset-more = Meer
 asset-tags = Tags
 asset-tag-add-label = Een tag toevoegen
 asset-tag-add-placeholder = Voeg een tag toe, bijv. mood:tense
-asset-tag-add = Toevoegen
 asset-apply-family = Wijzigingen toepassen op alle { $count } varianten
 asset-tags-accept-all =
     { $count ->

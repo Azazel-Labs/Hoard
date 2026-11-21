@@ -763,6 +763,7 @@ shortcuts-play-sound = เล่นหรือหยุดเสียง
 shortcuts-select = เลือกหรือยกเลิกการเลือก
 shortcuts-favorite = เพิ่มหรือนำออกจากรายการโปรด
 shortcuts-reviewed = ทำเครื่องหมายว่าตรวจแล้ว หรือยกเลิก
+shortcuts-tag = เพิ่มแท็ก
 shortcuts-key-click = คลิก
 shortcuts-select-range = เลือกเป็นช่วง
 shortcuts-select-all = เลือกทุกรายการที่แสดง
@@ -793,6 +794,12 @@ tag-remove = นำแท็ก { $tag } ออก
 tag-accept = เก็บแท็ก { $tag } ไว้
 tag-accept-title = เก็บแท็กที่เดามานี้ไว้เป็นแท็กของคุณเอง
 tag-reject-title = นำออก; ตัวติดแท็กจะไม่ใส่กลับมาอีก
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = แท็กใหม่
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = คุณหมายถึง
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = เดิม { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1377,6 +1384,7 @@ asset-copy-blocked = คัดลอกไม่ได้: เบราว์เ
 asset-save-error = บันทึกไม่ได้: { $error }
 asset-tag-removed = นำ { $tag } ออกแล้ว
 asset-tag-restored = ใส่ { $tag } กลับแล้ว
+asset-tags-added = เพิ่มแท็กแล้ว { $count } รายการ
 asset-tags-accepted = เก็บแท็กที่เดาไว้ { $count } แท็ก
 asset-reviewed = ตรวจแล้ว
 asset-reviewed-on-title = ตรวจแล้ว: กฎและ AI จะไม่แตะแท็กของแอสเซ็ตนี้ คลิกเพื่อเอาเครื่องหมายออก (R)
@@ -1451,7 +1459,6 @@ asset-more = เพิ่มเติม
 asset-tags = แท็ก
 asset-tag-add-label = เพิ่มแท็ก
 asset-tag-add-placeholder = เพิ่มแท็ก เช่น mood:tense
-asset-tag-add = เพิ่ม
 asset-apply-family = ใช้การเปลี่ยนแปลงกับรูปแบบย่อยทั้ง { $count } รายการ
 asset-tags-accept-all = เก็บแท็กที่เดาทั้ง { $count } แท็ก
 asset-tags-accept-all-title = เก็บทุกแท็กที่กฎและ AI เดาไว้เป็นแท็กของคุณเอง

@@ -921,6 +921,7 @@ shortcuts-play-sound = Play or stop a sound
 shortcuts-select = Select or deselect
 shortcuts-favorite = Add to or take out of your favorites
 shortcuts-reviewed = Mark as reviewed, or not
+shortcuts-tag = Add a tag
 # Shown as a key after Shift: Shift-click.
 shortcuts-key-click = click
 shortcuts-select-range = Select a range
@@ -953,6 +954,12 @@ tag-remove = Remove tag { $tag }
 tag-accept = Keep tag { $tag }
 tag-accept-title = Keep this guess as your own tag
 tag-reject-title = Remove it; the tagger won't put it back
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = New tag
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Did you mean
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = was { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1701,6 +1708,11 @@ asset-copy-blocked = Couldn’t copy: the browser blocked it
 asset-save-error = Couldn't save: { $error }
 asset-tag-removed = Removed { $tag }
 asset-tag-restored = Put { $tag } back
+asset-tags-added =
+    Added { $count ->
+        [one] { $count } tag
+       *[other] { $count } tags
+    }
 asset-tags-accepted =
     Kept { $count ->
         [one] { $count } guessed tag
@@ -1788,7 +1800,6 @@ asset-more = More
 asset-tags = Tags
 asset-tag-add-label = Add a tag
 asset-tag-add-placeholder = Add a tag, e.g. mood:tense
-asset-tag-add = Add
 asset-apply-family = Apply changes to all { $count } variants
 asset-tags-accept-all =
     Keep all { $count ->

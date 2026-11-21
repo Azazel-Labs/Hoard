@@ -831,6 +831,7 @@ shortcuts-play-sound = Toista tai pysäytä ääni
 shortcuts-select = Valitse tai poista valinta
 shortcuts-favorite = Lisää suosikkeihin tai poista niistä
 shortcuts-reviewed = Merkitse tarkistetuksi tai poista merkintä
+shortcuts-tag = Lisää tunniste
 shortcuts-key-click = napsautus
 shortcuts-select-range = Valitse alue
 shortcuts-select-all = Valitse kaikki näytetyt
@@ -861,6 +862,12 @@ tag-remove = Poista tunniste { $tag }
 tag-accept = Säilytä tunniste { $tag }
 tag-accept-title = Säilytä tämä arvaus omana tunnisteenasi
 tag-reject-title = Poista se; tunnistelija ei lisää sitä takaisin
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Uusi tunniste
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Tarkoititko
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = ennen { $alias }
 
 ## Taustatoiminta
 
@@ -1551,6 +1558,11 @@ asset-copy-blocked = Kopiointi epäonnistui: selain esti sen
 asset-save-error = Tallennus epäonnistui: { $error }
 asset-tag-removed = Tunniste { $tag } poistettu
 asset-tag-restored = Tunniste { $tag } palautettu
+asset-tags-added =
+    Lisättiin { $count ->
+        [one] { $count } tunniste
+       *[other] { $count } tunnistetta
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } arvattu tunniste säilytetty
@@ -1629,7 +1641,6 @@ asset-more = Lisää
 asset-tags = Tunnisteet
 asset-tag-add-label = Lisää tunniste
 asset-tag-add-placeholder = Lisää tunniste, esim. mood:tense
-asset-tag-add = Lisää
 asset-apply-family = Käytä muutoksia kaikkiin { $count } muunnelmaan
 asset-tags-accept-all =
     { $count ->

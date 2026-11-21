@@ -819,6 +819,7 @@ shortcuts-play-sound = Riproduci o ferma un suono
 shortcuts-select = Seleziona o deseleziona
 shortcuts-favorite = Aggiungi ai preferiti o togli dai preferiti
 shortcuts-reviewed = Segna come rivisto o non rivisto
+shortcuts-tag = Aggiungi un tag
 shortcuts-key-click = clic
 shortcuts-select-range = Seleziona un intervallo
 shortcuts-select-all = Seleziona tutto ciò che è mostrato
@@ -849,6 +850,12 @@ tag-remove = Rimuovi il tag { $tag }
 tag-accept = Tieni il tag { $tag }
 tag-accept-title = Tieni questo suggerimento come tag tuo
 tag-reject-title = Rimuovilo; il tagger non lo rimetterà
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nuovo tag
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Intendevi
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = era { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1515,6 +1522,11 @@ asset-copy-blocked = Impossibile copiare: il browser l'ha bloccato
 asset-save-error = Impossibile salvare: { $error }
 asset-tag-removed = { $tag } rimosso
 asset-tag-restored = { $tag } rimesso
+asset-tags-added =
+    Aggiunti { $count ->
+        [one] { $count } tag
+       *[other] { $count } tag
+    }
 asset-tags-accepted =
     { $count ->
         [one] Tenuto { $count } tag suggerito
@@ -1593,7 +1605,6 @@ asset-more = Altro
 asset-tags = Tag
 asset-tag-add-label = Aggiungi un tag
 asset-tag-add-placeholder = Aggiungi un tag, ad es. mood:tense
-asset-tag-add = Aggiungi
 asset-apply-family = Applica le modifiche a tutte le { $count } varianti
 asset-tags-accept-all =
     { $count ->

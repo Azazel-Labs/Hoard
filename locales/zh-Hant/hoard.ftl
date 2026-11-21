@@ -766,6 +766,7 @@ shortcuts-play-sound = 播放或停止音效
 shortcuts-select = 選取或取消選取
 shortcuts-favorite = 加入或移出最愛
 shortcuts-reviewed = 標記為已審閱或取消
+shortcuts-tag = 新增標籤
 shortcuts-key-click = 按一下
 shortcuts-select-range = 選取範圍
 shortcuts-select-all = 選取所有顯示的項目
@@ -796,6 +797,12 @@ tag-remove = 移除標籤 { $tag }
 tag-accept = 保留標籤 { $tag }
 tag-accept-title = 將這個推測保留為你自己的標籤
 tag-reject-title = 移除它；自動標記不會再加回來
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = 新標籤
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = 你是不是想找
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = 原名 { $alias }
 
 ## 背景活動
 
@@ -1383,6 +1390,7 @@ asset-copy-blocked = 無法複製：瀏覽器已封鎖
 asset-save-error = 無法儲存：{ $error }
 asset-tag-removed = 已移除 { $tag }
 asset-tag-restored = 已恢復 { $tag }
+asset-tags-added = 已新增 { $count } 個標籤
 asset-tags-accepted = 已保留 { $count } 個推測標籤
 asset-reviewed = 已審閱
 asset-reviewed-on-title = 已審閱：規則和 AI 不再更動它的標籤。按一下可取消標記（R）
@@ -1457,7 +1465,6 @@ asset-more = 更多
 asset-tags = 標籤
 asset-tag-add-label = 新增標籤
 asset-tag-add-placeholder = 新增標籤，例如 mood:tense
-asset-tag-add = 新增
 asset-apply-family = 將變更套用到全部 { $count } 個變體
 asset-tags-accept-all = 保留全部 { $count } 個推測
 asset-tags-accept-all-title = 將規則和 AI 推測的所有標籤保留為你自己的標籤

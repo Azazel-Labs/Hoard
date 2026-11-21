@@ -671,8 +671,6 @@ fn keep_ranked(key: String, writes: u64, found: &Arc<Vec<i64>>) {
     kept.push((key, writes, Arc::clone(found)));
 }
 
-/// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
-/// those containing it.
 /// The categories assets in the library have, the most used first.
 pub(crate) fn category_counts(conn: &Connection, limit: u32) -> Result<Vec<Facet>> {
     let mut stmt = conn.prepare(&format!(
@@ -683,6 +681,8 @@ pub(crate) fn category_counts(conn: &Connection, limit: u32) -> Result<Vec<Facet
     Ok(rows.collect::<rusqlite::Result<_>>()?)
 }
 
+/// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
+/// those containing it.
 pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit: u32) -> Result<Vec<Facet>> {
     // Read before counting, so a write while counting leaves them stale.
     let writes = super::writes();

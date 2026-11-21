@@ -865,6 +865,7 @@ shortcuts-play-sound = Проиграть или остановить звук
 shortcuts-select = Выбрать или снять выбор
 shortcuts-favorite = Добавить в избранное или убрать из него
 shortcuts-reviewed = Отметить как просмотренное или снять отметку
+shortcuts-tag = Добавить тег
 shortcuts-key-click = щелчок
 shortcuts-select-range = Выбрать диапазон
 shortcuts-select-all = Выбрать всё показанное
@@ -895,6 +896,12 @@ tag-remove = Убрать тег { $tag }
 tag-accept = Оставить тег { $tag }
 tag-accept-title = Оставить эту догадку как свой тег
 tag-reject-title = Убрать; теггер не вернёт его
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Новый тег
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Вы имели в виду
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = раньше { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1643,6 +1650,13 @@ asset-copy-blocked = Не удалось скопировать: браузер 
 asset-save-error = Не удалось сохранить: { $error }
 asset-tag-removed = Тег { $tag } убран
 asset-tag-restored = Тег { $tag } возвращён
+asset-tags-added =
+    Добавлено: { $count ->
+        [one] { $count } тег
+        [few] { $count } тега
+        [many] { $count } тегов
+       *[other] { $count } тега
+    }
 asset-tags-accepted =
     Оставлено: { $count ->
         [one] { $count } предложенный тег
@@ -1729,7 +1743,6 @@ asset-more = Больше
 asset-tags = Теги
 asset-tag-add-label = Добавить тег
 asset-tag-add-placeholder = Добавьте тег, например mood:tense
-asset-tag-add = Добавить
 asset-apply-family = Применить изменения ко всем вариантам ({ $count })
 asset-tags-accept-all =
     Оставить все: { $count ->

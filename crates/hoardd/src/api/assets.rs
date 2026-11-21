@@ -340,6 +340,23 @@ pub(super) async fn tags(State(state): State<AppState>, Query(p): Query<TagParam
     Ok(Json(json!(rows)))
 }
 
+#[derive(Debug, Deserialize)]
+pub(super) struct SuggestParams {
+    #[serde(default)]
+    q: String,
+    limit: Option<usize>,
+}
+
+/// Tags to offer while someone types one: matches (old names of merged tags lead to what they became), and tags in
+/// use a new one is probably meant to be.
+pub(super) async fn suggest_tags(
+    State(state): State<AppState>,
+    Query(p): Query<SuggestParams>,
+) -> ApiResult<Json<db::TagSuggestions>> {
+    let limit = p.limit.unwrap_or(12).min(50);
+    Ok(Json(db::call(&state.pool, move |c| db::suggest_tags(c, &p.q, limit)).await?))
+}
+
 /// The categories in the library, the most used first, for picking one.
 pub(super) async fn categories(State(state): State<AppState>) -> ApiResult<Json<Vec<hoard_core::Facet>>> {
     Ok(Json(db::call(&state.pool, |c| db::category_counts(c, 500)).await?))

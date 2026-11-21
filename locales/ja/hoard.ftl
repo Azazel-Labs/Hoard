@@ -763,6 +763,7 @@ shortcuts-play-sound = サウンドを再生または停止
 shortcuts-select = 選択または選択解除
 shortcuts-favorite = お気に入りに追加、またはお気に入りから外す
 shortcuts-reviewed = 確認済みにする、または解除する
+shortcuts-tag = タグを追加
 shortcuts-key-click = クリック
 shortcuts-select-range = 範囲を選択
 shortcuts-select-all = 表示中のものをすべて選択
@@ -793,6 +794,12 @@ tag-remove = タグ { $tag } を外す
 tag-accept = タグ { $tag } を残す
 tag-accept-title = この推測を自分のタグとして残す
 tag-reject-title = 外す。タグ付けは再び付けません
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = 新しいタグ
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = もしかして
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = 旧称 { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1377,6 +1384,7 @@ asset-copy-blocked = コピーできませんでした: ブラウザーにブロ
 asset-save-error = 保存できませんでした: { $error }
 asset-tag-removed = { $tag } を外しました
 asset-tag-restored = { $tag } を戻しました
+asset-tags-added = タグ { $count } 件を追加しました
 asset-tags-accepted = 推測タグ { $count } 件を残しました
 asset-reviewed = 確認済み
 asset-reviewed-on-title = 確認済み: ルールと AI はタグに手を加えません。クリックで解除（R）
@@ -1451,7 +1459,6 @@ asset-more = 続きを表示
 asset-tags = タグ
 asset-tag-add-label = タグを追加
 asset-tag-add-placeholder = タグを追加（例: mood:tense）
-asset-tag-add = 追加
 asset-apply-family = 変更を { $count } 個のバリエーションすべてに適用
 asset-tags-accept-all = 推測 { $count } 件をすべて残す
 asset-tags-accept-all-title = ルールと AI が推測したタグをすべて自分のタグとして残す

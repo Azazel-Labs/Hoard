@@ -763,6 +763,7 @@ shortcuts-play-sound = 사운드 재생 또는 정지
 shortcuts-select = 선택 또는 선택 해제
 shortcuts-favorite = 즐겨찾기에 추가 또는 제거
 shortcuts-reviewed = 검토함으로 표시 또는 해제
+shortcuts-tag = 태그 추가
 shortcuts-key-click = 클릭
 shortcuts-select-range = 범위 선택
 shortcuts-select-all = 표시된 모든 항목 선택
@@ -793,6 +794,12 @@ tag-remove = { $tag } 태그 제거
 tag-accept = { $tag } 태그 유지
 tag-accept-title = 이 추측을 내 태그로 유지
 tag-reject-title = 제거합니다. 태거가 다시 붙이지 않습니다
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = 새 태그
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = 혹시 이것인가요
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = 이전 이름 { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1356,6 +1363,7 @@ asset-copy-blocked = 복사하지 못했습니다: 브라우저가 막았습니�
 asset-save-error = 저장하지 못했습니다: { $error }
 asset-tag-removed = { $tag } 태그를 제거했습니다
 asset-tag-restored = { $tag } 태그를 되돌렸습니다
+asset-tags-added = 태그 { $count }개를 추가했습니다
 asset-tags-accepted = 추측 태그 { $count }개를 유지했습니다
 asset-reviewed = 검토함
 asset-reviewed-on-title = 검토함: 규칙과 AI는 태그를 건드리지 않습니다. 클릭하면 표시 해제(R)
@@ -1430,7 +1438,6 @@ asset-more = 더 보기
 asset-tags = 태그
 asset-tag-add-label = 태그 추가
 asset-tag-add-placeholder = 태그 추가, 예: mood:tense
-asset-tag-add = 추가
 asset-apply-family = 변경 사항을 변형 { $count }개 모두에 적용
 asset-tags-accept-all = 추측 { $count }개 모두 유지
 asset-tags-accept-all-title = 규칙과 AI가 추측한 태그를 모두 내 태그로 유지

@@ -766,6 +766,7 @@ shortcuts-play-sound = 播放或停止声音
 shortcuts-select = 选择或取消选择
 shortcuts-favorite = 加入或移出收藏
 shortcuts-reviewed = 标记为已审阅或取消
+shortcuts-tag = 添加标签
 shortcuts-key-click = 单击
 shortcuts-select-range = 选择范围
 shortcuts-select-all = 选择显示的全部内容
@@ -796,6 +797,12 @@ tag-remove = 移除标签 { $tag }
 tag-accept = 保留标签 { $tag }
 tag-accept-title = 将此推测保留为你自己的标签
 tag-reject-title = 移除它；自动标记不会再加回来
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = 新标签
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = 你是不是想找
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = 原名 { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1380,6 +1387,7 @@ asset-copy-blocked = 无法复制：浏览器阻止了此操作
 asset-save-error = 无法保存：{ $error }
 asset-tag-removed = 已移除 { $tag }
 asset-tag-restored = 已恢复 { $tag }
+asset-tags-added = 已添加 { $count } 个标签
 asset-tags-accepted = 已保留 { $count } 个推测标签
 asset-reviewed = 已审阅
 asset-reviewed-on-title = 已审阅：规则和 AI 不再改动它的标签。点击取消标记（R）
@@ -1454,7 +1462,6 @@ asset-more = 更多
 asset-tags = 标签
 asset-tag-add-label = 添加标签
 asset-tag-add-placeholder = 添加标签，例如 mood:tense
-asset-tag-add = 添加
 asset-apply-family = 将更改应用到全部 { $count } 个变体
 asset-tags-accept-all = 保留全部 { $count } 个推测
 asset-tags-accept-all-title = 将规则和 AI 推测的所有标签保留为你自己的标签

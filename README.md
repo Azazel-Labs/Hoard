@@ -1401,6 +1401,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST | `/api/credits` | credits for `packs` (ids or names), `collections`, asset `ids` and `selections` (manifest requests); `?format=md` for `CREDITS.md` |
 | GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |
 | GET | `/api/tags?prefix=` | tag autocomplete (`anywhere=true` matches inside names, for Settings → Tags) |
+| GET | `/api/tags/suggest?q=` | what the tag box offers for what's typed: matches (an old, merged name leads to the tag it became), whether it's a tag in use, and tags in use a new one looks like |
 | POST 🔒 | `/api/tags/merge` | `{from: [...], into}`: retag those assets and remember the old names |
 | GET, DELETE 🔒 | `/api/tags/aliases` | merged-away names; `DELETE ?tag=` allows one again |
 

@@ -831,6 +831,7 @@ shortcuts-play-sound = Αναπαραγωγή ή διακοπή ήχου
 shortcuts-select = Επιλογή ή αποεπιλογή
 shortcuts-favorite = Προσθήκη ή αφαίρεση από τα αγαπημένα σας
 shortcuts-reviewed = Σήμανση ως ελεγμένο ή όχι
+shortcuts-tag = Προσθήκη ετικέτας
 shortcuts-key-click = κλικ
 shortcuts-select-range = Επιλογή εύρους
 shortcuts-select-all = Επιλογή όλων όσων εμφανίζονται
@@ -861,6 +862,12 @@ tag-remove = Αφαίρεση ετικέτας { $tag }
 tag-accept = Διατήρηση ετικέτας { $tag }
 tag-accept-title = Διατήρηση αυτής της εικασίας ως δική σας ετικέτα
 tag-reject-title = Αφαίρεση· ο μηχανισμός ετικετών δεν θα την ξαναβάλει
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Νέα ετικέτα
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Εννοούσατε
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = πρώην { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1551,6 +1558,11 @@ asset-copy-blocked = Δεν ήταν δυνατή η αντιγραφή: το π
 asset-save-error = Δεν ήταν δυνατή η αποθήκευση: { $error }
 asset-tag-removed = Αφαιρέθηκε η ετικέτα { $tag }
 asset-tag-restored = Η ετικέτα { $tag } τοποθετήθηκε ξανά
+asset-tags-added =
+    Προστέθηκαν { $count ->
+        [one] { $count } ετικέτα
+       *[other] { $count } ετικέτες
+    }
 asset-tags-accepted =
     { $count ->
         [one] Διατηρήθηκε { $count } εικαζόμενη ετικέτα
@@ -1629,7 +1641,6 @@ asset-more = Περισσότερα
 asset-tags = Ετικέτες
 asset-tag-add-label = Προσθήκη ετικέτας
 asset-tag-add-placeholder = Προσθέστε ετικέτα, π.χ. mood:tense
-asset-tag-add = Προσθήκη
 asset-apply-family = Εφαρμογή των αλλαγών και στις { $count } παραλλαγές
 asset-tags-accept-all =
     { $count ->

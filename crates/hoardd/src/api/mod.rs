@@ -140,6 +140,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}/lottie.json", get(crate::lottie::asset_lottie))
         .route("/api/blobs/{hash}", get(files::blob))
         .route("/api/tags", get(assets::tags))
+        .route("/api/tags/suggest", get(assets::suggest_tags))
         .route("/api/categories", get(assets::categories))
         .route("/api/manifest", post(bundles::manifest))
         .route("/api/credits", post(crate::credits::credits))

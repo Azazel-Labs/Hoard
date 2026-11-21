@@ -848,6 +848,7 @@ shortcuts-play-sound = Přehrát nebo zastavit zvuk
 shortcuts-select = Vybrat nebo zrušit výběr
 shortcuts-favorite = Přidat do oblíbených nebo z nich odebrat
 shortcuts-reviewed = Označit jako zkontrolované, nebo ne
+shortcuts-tag = Přidat štítek
 shortcuts-key-click = klik
 shortcuts-select-range = Vybrat rozsah
 shortcuts-select-all = Vybrat vše zobrazené
@@ -878,6 +879,12 @@ tag-remove = Odebrat štítek { $tag }
 tag-accept = Ponechat štítek { $tag }
 tag-accept-title = Ponechat tento odhad jako vlastní štítek
 tag-reject-title = Odebrat; štítkovač ho nevrátí
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nový štítek
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Měli jste na mysli
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = dříve { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1612,6 +1619,13 @@ asset-copy-blocked = Nepodařilo se zkopírovat: prohlížeč to zablokoval
 asset-save-error = Nepodařilo se uložit: { $error }
 asset-tag-removed = Odebráno: { $tag }
 asset-tag-restored = Štítek { $tag } vrácen
+asset-tags-added =
+    Přidáno: { $count ->
+        [one] { $count } štítek
+        [few] { $count } štítky
+        [many] { $count } štítku
+       *[other] { $count } štítků
+    }
 asset-tags-accepted =
     Ponecháno: { $count ->
         [one] { $count } odhadnutý štítek
@@ -1691,7 +1705,6 @@ asset-more = Více
 asset-tags = Štítky
 asset-tag-add-label = Přidat štítek
 asset-tag-add-placeholder = Přidejte štítek, např. mood:tense
-asset-tag-add = Přidat
 asset-apply-family = Použít změny na všechny varianty ({ $count })
 asset-tags-accept-all =
     { $count ->

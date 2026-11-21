@@ -853,6 +853,7 @@ shortcuts-play-sound = Redarea sau oprirea unui sunet
 shortcuts-select = Selectare sau deselectare
 shortcuts-favorite = Adăugare la favorite sau scoatere din favorite
 shortcuts-reviewed = Marcare ca verificat sau nu
+shortcuts-tag = Adăugarea unei etichete
 shortcuts-key-click = clic
 shortcuts-select-range = Selectarea unui interval
 shortcuts-select-all = Selectarea a tot ce este afișat
@@ -883,6 +884,12 @@ tag-remove = Eliminați eticheta { $tag }
 tag-accept = Păstrați eticheta { $tag }
 tag-accept-title = Păstrați această presupunere ca etichetă proprie
 tag-reject-title = Eliminați-o; etichetatorul nu o va pune la loc
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Etichetă nouă
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Ați vrut să spuneți
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = înainte { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1620,6 +1627,12 @@ asset-copy-blocked = Nu s-a putut copia: browserul a blocat copierea
 asset-save-error = Nu s-a putut salva: { $error }
 asset-tag-removed = S-a eliminat { $tag }
 asset-tag-restored = { $tag } a fost pusă la loc
+asset-tags-added =
+    Adăugate: { $count ->
+        [one] { $count } etichetă
+        [few] { $count } etichete
+       *[other] { $count } de etichete
+    }
 asset-tags-accepted =
     { $count ->
         [one] S-a păstrat { $count } etichetă presupusă
@@ -1704,7 +1717,6 @@ asset-more = Mai mult
 asset-tags = Etichete
 asset-tag-add-label = Adăugați o etichetă
 asset-tag-add-placeholder = Adăugați o etichetă, de ex. mood:tense
-asset-tag-add = Adăugați
 asset-apply-family = Aplicați modificările la toate cele { $count } variante
 asset-tags-accept-all =
     { $count ->

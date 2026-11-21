@@ -827,6 +827,7 @@ shortcuts-play-sound = Lire ou arrêter un son
 shortcuts-select = Sélectionner ou désélectionner
 shortcuts-favorite = Ajouter aux favoris ou en retirer
 shortcuts-reviewed = Marquer comme revue ou non
+shortcuts-tag = Ajouter une étiquette
 shortcuts-key-click = clic
 shortcuts-select-range = Sélectionner une plage
 shortcuts-select-all = Tout sélectionner parmi ce qui est affiché
@@ -857,6 +858,12 @@ tag-remove = Retirer l’étiquette { $tag }
 tag-accept = Garder l’étiquette { $tag }
 tag-accept-title = Garder cette suggestion comme étiquette personnelle
 tag-reject-title = La retirer ; l’étiqueteur ne la remettra pas
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nouvelle étiquette
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Vouliez-vous dire
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = était { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1531,6 +1538,11 @@ asset-copy-blocked = Copie impossible : le navigateur l’a bloquée
 asset-save-error = Impossible d’enregistrer : { $error }
 asset-tag-removed = Étiquette { $tag } retirée
 asset-tag-restored = Étiquette { $tag } remise
+asset-tags-added =
+    { $count ->
+        [one] { $count } étiquette ajoutée
+       *[other] { $count } étiquettes ajoutées
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } étiquette suggérée conservée
@@ -1609,7 +1621,6 @@ asset-more = Plus
 asset-tags = Étiquettes
 asset-tag-add-label = Ajouter une étiquette
 asset-tag-add-placeholder = Ajoutez une étiquette, par ex. mood:tense
-asset-tag-add = Ajouter
 asset-apply-family = Appliquer les modifications aux { $count } variantes
 asset-tags-accept-all =
     { $count ->

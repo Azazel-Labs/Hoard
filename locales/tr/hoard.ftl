@@ -767,6 +767,7 @@ shortcuts-play-sound = Bir sesi çal ya da durdur
 shortcuts-select = Seç ya da seçimi kaldır
 shortcuts-favorite = Favorilere ekle ya da favorilerden çıkar
 shortcuts-reviewed = İncelendi olarak işaretle ya da işareti kaldır
+shortcuts-tag = Etiket ekle
 shortcuts-key-click = tıklama
 shortcuts-select-range = Bir aralık seç
 shortcuts-select-all = Gösterilen her şeyi seç
@@ -797,6 +798,12 @@ tag-remove = { $tag } etiketini kaldır
 tag-accept = { $tag } etiketini tut
 tag-accept-title = Bu tahmini kendi etiketiniz olarak tutun
 tag-reject-title = Kaldırın; etiketleyici geri eklemez
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Yeni etiket
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Şunu mu demek istediniz
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = eskiden { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1386,6 +1393,7 @@ asset-copy-blocked = Kopyalanamadı: tarayıcı engelledi
 asset-save-error = Kaydedilemedi: { $error }
 asset-tag-removed = Kaldırıldı: { $tag }
 asset-tag-restored = { $tag } geri eklendi
+asset-tags-added = { $count } etiket eklendi
 asset-tags-accepted = { $count } tahmin edilen etiket tutuldu
 asset-reviewed = İncelendi
 asset-reviewed-on-title = İncelendi: kurallar ve yapay zekâ etiketlerine dokunmaz. İşareti kaldırmak için tıklayın (R)
@@ -1460,7 +1468,6 @@ asset-more = Daha fazla
 asset-tags = Etiketler
 asset-tag-add-label = Etiket ekle
 asset-tag-add-placeholder = Bir etiket ekleyin, ör. mood:tense
-asset-tag-add = Ekle
 asset-apply-family = Değişiklikleri { $count } varyantın tümüne uygula
 asset-tags-accept-all = { $count } tahminin tümünü tut
 asset-tags-accept-all-title = Kuralların ve yapay zekânın tahmin ettiği her etiketi kendi etiketiniz olarak tutun

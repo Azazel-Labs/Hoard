@@ -811,6 +811,7 @@ shortcuts-play-sound = Speel of stop 'n klank
 shortcuts-select = Kies of ontkies
 shortcuts-favorite = Voeg by of haal uit jou gunstelinge
 shortcuts-reviewed = Merk as nagegaan, of nie
+shortcuts-tag = Voeg 'n etiket by
 shortcuts-key-click = klik
 shortcuts-select-range = Kies 'n reeks
 shortcuts-select-all = Kies alles wat gewys word
@@ -841,6 +842,12 @@ tag-remove = Verwyder etiket { $tag }
 tag-accept = Hou etiket { $tag }
 tag-accept-title = Hou hierdie raaiskoot as jou eie etiket
 tag-reject-title = Verwyder dit; die etiketteerder sit dit nie terug nie
+# In the list offered while typing a tag: before a tag nobody has used yet, which adding will create.
+tag-suggest-new = Nuwe etiket
+# Heading over tags in use that look like the new one typed (a plural, another spelling, a typo).
+tag-suggest-near = Bedoel jy
+# After a tag offered because what was typed is an old name that was merged into it.
+tag-suggest-alias = was { $alias }
 
 ## ActivityIndicator.vue
 
@@ -1501,6 +1508,11 @@ asset-copy-blocked = Kon nie kopieer nie: die blaaier het dit geblokkeer
 asset-save-error = Kon nie stoor nie: { $error }
 asset-tag-removed = { $tag } verwyder
 asset-tag-restored = { $tag } teruggesit
+asset-tags-added =
+    { $count ->
+        [one] { $count } etiket bygevoeg
+       *[other] { $count } etikette bygevoeg
+    }
 asset-tags-accepted =
     { $count ->
         [one] { $count } geraaide etiket behou
@@ -1579,7 +1591,6 @@ asset-more = Meer
 asset-tags = Etikette
 asset-tag-add-label = Voeg 'n etiket by
 asset-tag-add-placeholder = Voeg 'n etiket by, bv. mood:tense
-asset-tag-add = Voeg by
 asset-apply-family = Pas veranderinge op al { $count } variante toe
 asset-tags-accept-all =
     { $count ->

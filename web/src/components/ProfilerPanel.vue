@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Settings → Performance's profiler: the last ten minutes of Hoard, asked for every two seconds while the page is on
 // screen (the server keeps them in memory; see its profiler.rs). Processor use as two lines, Hoard's and the whole
-// machine's; what was running as lanes; and the time spent serving requests as stacked bars, split into the
+// machine's; Hoard's RAM as a line on a scale of its own (the machine's would flatten it); what was running as lanes; and the time spent serving requests as stacked bars, split into the
 // database, the disk, sending and everything else, with a table by route. Every chart has its numbers on hover and
 // in words beside it, so color is never the only label.
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
@@ -16,6 +16,7 @@ const BUCKET_MS = 10_000
 const LEFT = 44
 const RIGHT = 8
 const CPU_H = 150
+const RAM_H = 120
 const REQ_H = 150
 const AXIS = 20
 const LANE_H = 28
@@ -125,6 +126,50 @@ const tipAt = (px: number) =>
   px > width.value / 2
     ? { left: `${px - 12}px`, transform: 'translateX(-100%)' }
     : { left: `${px + 12}px`, transform: 'none' }
+
+// ---- RAM -----------------------------------------------------------------------------------------------------
+
+/** The scale's top: a round number of bytes above Hoard's most, so the line fills the chart whatever its size. */
+const ramMax = computed(() => {
+  const most = Math.max(64 * 2 ** 20, ...samples.value.map((s) => s.memory))
+  const unit = most >= 2 ** 30 ? 2 ** 30 : 2 ** 20
+  const step = 10 ** Math.floor(Math.log10(most / unit)) * unit
+  return [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].map((m) => m * step).find((v) => v >= most * 1.1) ?? most
+})
+const ramY = (v: number) => 8 + (1 - Math.min(v, ramMax.value) / ramMax.value) * (RAM_H - 8 - AXIS)
+/** Hoard's RAM as a line and the area under it, broken like the processor's where samples are missing. */
+const ramPaths = computed(() => {
+  let d = ''
+  let area = ''
+  let run: ProfileSample[] = []
+  const close = () => {
+    if (!run.length) return
+    const pts = run.map((s) => `${x(s.at).toFixed(1)},${ramY(s.memory).toFixed(1)}`)
+    d += `M${pts.join('L')}`
+    const base = ramY(0).toFixed(1)
+    area += `M${x(run[0].at).toFixed(1)},${base}L${pts.join('L')}L${x(run.at(-1)!.at).toFixed(1)},${base}Z`
+    run = []
+  }
+  let last = -Infinity
+  for (const s of samples.value) {
+    if (s.at - last > 3500) close()
+    run.push(s)
+    last = s.at
+  }
+  close()
+  return { d, area }
+})
+const ramPeak = computed(() => Math.max(0, ...samples.value.map((s) => s.memory)))
+const machineRam = (s: ProfileSample) =>
+  s.total ? t('profiler-ram-of', { used: humanBytes(s.used), total: humanBytes(s.total) }) : ''
+
+const ramHover = ref<ProfileSample | null>(null)
+function hoverRam(e: PointerEvent) {
+  const at = atOf(across(e))
+  let best: ProfileSample | null = null
+  for (const s of samples.value) if (!best || Math.abs(s.at - at) < Math.abs(best.at - at)) best = s
+  ramHover.value = best && Math.abs(best.at - at) < 5000 ? best : null
+}
 
 // ---- Working on ----------------------------------------------------------------------------------------------
 
@@ -297,7 +342,6 @@ const routeSplitText = (r: Route) => {
         <li>
           <i class="sw machine" aria-hidden="true" />{{ t('profiler-cpu-machine') }} <b>{{ pct(latest!.machine) }}</b>
         </li>
-        <li class="aside">{{ t('profiler-memory') }} <b>{{ humanBytes(latest!.memory) }}</b></li>
       </ul>
       <div class="chart">
         <svg
@@ -327,9 +371,49 @@ const routeSplitText = (r: Route) => {
           <strong>{{ clockSecs(cpuHover.at) }}</strong>
           <span><i class="sw hoard" />{{ t('profiler-cpu-hoard') }}<b>{{ pct(cpuHover.hoard) }}</b></span>
           <span><i class="sw machine" />{{ t('profiler-cpu-machine') }}<b>{{ pct(cpuHover.machine) }}</b></span>
-          <span>{{ t('profiler-memory') }}<b>{{ humanBytes(cpuHover.memory) }}</b></span>
+          <span>{{ t('profiler-ram') }}<b>{{ humanBytes(cpuHover.memory) }}</b></span>
           <span>{{ t('profiler-serving') }}<b>{{ formatNumber(cpuHover.serving) }}</b></span>
           <em v-for="r in cpuHover.running" :key="r.label">{{ r.label }}</em>
+        </div>
+      </div>
+
+      <h4>{{ t('profiler-ram') }}</h4>
+      <ul class="legend">
+        <li><i class="sw hoard" aria-hidden="true" />{{ t('profiler-cpu-hoard') }} <b>{{ humanBytes(latest!.memory) }}</b></li>
+        <li>{{ t('profiler-ram-peak') }} <b>{{ humanBytes(ramPeak) }}</b></li>
+        <li v-if="latest!.total" class="aside">
+          {{ t('profiler-cpu-machine') }} <b>{{ machineRam(latest!) }}</b>
+        </li>
+      </ul>
+      <div class="chart">
+        <svg
+          :width="width"
+          :height="RAM_H"
+          role="img"
+          :aria-label="t('profiler-ram-summary', { hoard: humanBytes(latest!.memory), peak: humanBytes(ramPeak) })"
+          @pointermove="hoverRam"
+          @pointerleave="ramHover = null"
+        >
+          <g class="grid">
+            <template v-for="v in [0, ramMax / 2, ramMax]" :key="v">
+              <line :x1="LEFT" :x2="width - RIGHT" :y1="ramY(v)" :y2="ramY(v)" />
+              <text :x="LEFT - 6" :y="ramY(v) + 4" text-anchor="end">{{ v ? humanBytes(v) : 0 }}</text>
+            </template>
+            <text v-for="at in ticks" :key="at" :x="x(at)" :y="RAM_H - 4" text-anchor="middle">{{ clock(at) }}</text>
+          </g>
+          <path class="area" :d="ramPaths.area" />
+          <path class="ln hoard" :d="ramPaths.d" />
+          <g v-if="ramHover">
+            <line class="cross" :x1="x(ramHover.at)" :x2="x(ramHover.at)" :y1="8" :y2="RAM_H - AXIS" />
+            <circle class="dot hoard" :cx="x(ramHover.at)" :cy="ramY(ramHover.memory)" r="4" />
+          </g>
+        </svg>
+        <div v-if="ramHover" class="tip" :style="tipAt(x(ramHover.at))" aria-hidden="true">
+          <strong>{{ clockSecs(ramHover.at) }}</strong>
+          <span><i class="sw hoard" />{{ t('profiler-cpu-hoard') }}<b>{{ humanBytes(ramHover.memory) }}</b></span>
+          <span v-if="ramHover.total">
+            <i class="sw machine" />{{ t('profiler-cpu-machine') }}<b>{{ machineRam(ramHover) }}</b>
+          </span>
         </div>
       </div>
 
@@ -482,6 +566,7 @@ svg { display: block; overflow: visible; touch-action: pan-y; }
 .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .ln.hoard { stroke: var(--accent); }
 .ln.machine { stroke: var(--muted); }
+.area { fill: color-mix(in srgb, var(--accent) 14%, transparent); }
 .cross { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 3 3; }
 .dot { stroke: var(--card, var(--panel)); stroke-width: 2; }
 .dot.hoard { fill: var(--accent); }

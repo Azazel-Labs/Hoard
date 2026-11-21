@@ -4,13 +4,15 @@ import type { TextureNames } from '../texnames'
 import type { AssetKind, ConversionRules } from './library'
 
 /** One second of the server, for the profiler: processor use in percent of every core (Hoard's and the whole
- *  machine's), Hoard's memory in bytes, requests in progress, and what was running. Times are Unix milliseconds. */
+ *  machine's), Hoard's RAM and the machine's (in use, and all it has) in bytes, requests in progress, and what was running. Times are Unix milliseconds. */
 export interface ProfileSample {
   seq: number
   at: number
   hoard: number
   machine: number
   memory: number
+  used: number
+  total: number
   serving: number
   running: { kind: string; label: string }[]
 }

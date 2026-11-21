@@ -39,8 +39,11 @@ pub(crate) struct Sample {
     /// Percent of every core together: Hoard's process, and the whole machine (Hoard included).
     hoard: f32,
     machine: f32,
-    /// Hoard's memory, in bytes.
+    /// Hoard's RAM, in bytes.
     memory: u64,
+    /// The whole machine's RAM in use, and all it has, in bytes.
+    used: u64,
+    total: u64,
     /// Requests being served then.
     serving: u32,
     /// What was running then (jobs, conversions, zips).
@@ -246,7 +249,7 @@ fn push_sample(sample: Sample) {
     });
 }
 
-/// Sample the processors, Hoard's memory and what's running, once a second, on a thread of its own.
+/// Sample the processors, RAM and what's running, once a second, on a thread of its own.
 pub(crate) fn start() {
     let spawned = std::thread::Builder::new().name("profiler".into()).spawn(|| {
         use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System};
@@ -260,6 +263,7 @@ pub(crate) fn start() {
         let pid = sysinfo::get_current_pid().ok();
         let refresh = |sys: &mut System| {
             sys.refresh_cpu_usage();
+            sys.refresh_memory();
             if let Some(pid) = pid {
                 sys.refresh_processes_specifics(
                     ProcessesToUpdate::Some(&[pid]),
@@ -286,6 +290,8 @@ pub(crate) fn start() {
                 hoard: hoard.clamp(0.0, 100.0),
                 machine: sys.global_cpu_usage().clamp(0.0, 100.0),
                 memory,
+                used: sys.used_memory(),
+                total: sys.total_memory(),
                 serving: SERVING.load(Ordering::Relaxed),
                 running,
             });

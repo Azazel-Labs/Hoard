@@ -3081,7 +3081,12 @@ profiler-cpu-hoard = Hoard
 profiler-cpu-machine = Whole machine
 # Read out for the processor chart; $hoard and $machine are percentages like "12%".
 profiler-cpu-summary = Hoard is using { $hoard } of the processors, and the whole machine { $machine }.
-profiler-memory = Memory
+profiler-ram = RAM
+profiler-ram-peak = Most
+# The whole machine's RAM: $used and $total are sizes like "12.3 GB".
+profiler-ram-of = { $used } of { $total }
+# Read out for the RAM chart; $hoard and $peak are sizes like "489 MB".
+profiler-ram-summary = Hoard is using { $hoard } of RAM, and used at most { $peak } in the last ten minutes.
 profiler-serving = Requests in progress
 profiler-working = Working on
 profiler-working-none = Nothing ran in the background.

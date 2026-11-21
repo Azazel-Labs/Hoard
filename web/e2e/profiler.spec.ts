@@ -8,7 +8,8 @@ test.describe('profiler', () => {
     await expect(panel.getByRole('img', { name: /^Hoard is using .+ of the processors/ })).toBeVisible({
       timeout: 10_000,
     })
-    await expect(panel.getByText('Whole machine')).toBeVisible()
+    // The machine's share of the processors, and its RAM.
+    await expect(panel.getByText('Whole machine')).toHaveCount(2)
 
     // Requests are recorded by route, with their time split up. (Other tests running alongside fill the table's top
     // routes, so these are checked in what the panel reads rather than looked for in the table.)
@@ -36,7 +37,7 @@ test.describe('profiler', () => {
     await expect(panel.getByRole('img', { name: /\d+ requests · Database \d+% · Disk/ })).toBeVisible()
 
     // Hovering the processor chart reads out that second.
-    const cpu = panel.getByRole('img', { name: /^Hoard is using/ })
+    const cpu = panel.getByRole('img', { name: /^Hoard is using .+ of the processors/ })
     const box = (await cpu.boundingBox())!
     await page.mouse.move(box.x + box.width - 12, box.y + box.height / 2)
     await expect(panel.getByText('Requests in progress')).toBeVisible()

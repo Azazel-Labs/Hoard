@@ -65,13 +65,13 @@ function when(at: string): string {
   return Number.isNaN(d.getTime()) ? at : formatDate(d, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-const FIELDS: Record<string, string> = {
-  name: 'asset-name',
-  category: 'asset-field-category',
-  description: 'history-field-description',
-  license: 'asset-field-license',
-  source_url: 'asset-field-source',
-  rating: 'asset-field-rating',
+const FIELDS: Record<string, () => string> = {
+  name: () => t('asset-name'),
+  category: () => t('asset-field-category'),
+  description: () => t('history-field-description'),
+  license: () => t('asset-field-license'),
+  source_url: () => t('asset-field-source'),
+  rating: () => t('asset-field-rating'),
 }
 const short = (s: string) => (s.length > 60 ? s.slice(0, 57).trimEnd() + '…' : s)
 const stars = (n: string | null) => (n ? '★'.repeat(Math.min(5, Number(n) || 0)) : '')
@@ -88,7 +88,7 @@ function describe(c: Change): string {
     return t('history-tag-changed', { tag })
   }
   if (c.field === 'reviewed') return c.new ? t('history-reviewed') : t('history-unreviewed')
-  const field = c.field.startsWith('field:') ? c.field.slice(6) : t(FIELDS[c.field] ?? c.field)
+  const field = c.field.startsWith('field:') ? c.field.slice(6) : (FIELDS[c.field]?.() ?? c.field)
   const show = (v: string | null) => (c.field === 'rating' ? stars(v) : short(v ?? ''))
   if (!c.old) return t('history-set', { field, to: show(c.new) })
   if (!c.new) return t('history-cleared', { field, from: show(c.old) })

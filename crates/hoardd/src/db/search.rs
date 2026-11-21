@@ -1453,7 +1453,7 @@ mod tests {
             let pages: i64 = conn.query_row("PRAGMA page_count", [], |r| r.get(0)).unwrap();
             let free: i64 = conn.query_row("PRAGMA freelist_count", [], |r| r.get(0)).unwrap();
             let fts: i64 = conn.query_row("SELECT count(*) FROM assets_fts_data", [], |r| r.get(0)).unwrap();
-            let wal = std::fs::metadata(path.with_extension("db-wal")).map(|m| m.len()).unwrap_or(0);
+            let wal = std::fs::metadata(path.with_extension("db-wal")).map_or(0, |m| m.len());
             println!(
                 "  [{label}] file {} MB, {} MB free in it, wal {} MB, search index {fts} rows",
                 pages * 4096 / 1_000_000,

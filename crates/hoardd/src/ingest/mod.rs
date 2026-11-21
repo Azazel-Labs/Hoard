@@ -489,6 +489,26 @@ fn fetch_dependencies(state: &AppState, rt: &Handle, id: &str, dir: &Path) -> Re
     Ok(())
 }
 
+/// The license named by these stored license files, fetched into `work` to be read.
+fn license_of<'a>(
+    state: &AppState,
+    rt: &Handle,
+    work: &Path,
+    hashes: impl Iterator<Item = &'a str>,
+) -> Result<Option<&'static str>> {
+    let mut texts = Vec::new();
+    for (n, hash) in hashes.enumerate() {
+        let local = work.join(format!("license-{n}.txt"));
+        rt.block_on(state.blobs.download_to(hash, &local))?;
+        texts.push(local);
+    }
+    let found = license_in(&texts);
+    for t in &texts {
+        fs::remove_file(t).ok();
+    }
+    Ok(found)
+}
+
 /// Analyze a pack's files again and redo their rule tags. `only`: just these assets (files changed where they sit in a
 /// watched folder), with the rest of the pack still read for its license and its texture sets.
 pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Option<&HashSet<String>>) -> Result<()> {
@@ -527,19 +547,8 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
 
     let origins = crate::extract::pack_origins(&conn, pack_id)?;
     // The license comes first, from just the license files: every file's tags carry it.
-    let license = {
-        let mut texts = Vec::new();
-        for (n, r) in rows.iter().filter(|r| tagger::is_license_file(&r.rel)).enumerate() {
-            let local = work.join(format!("license-{n}.txt"));
-            rt.block_on(state.blobs.download_to(&r.hash, &local))?;
-            texts.push(local);
-        }
-        let found = license_in(&texts);
-        for t in &texts {
-            fs::remove_file(t).ok();
-        }
-        found
-    };
+    let license =
+        license_of(state, rt, &work, rows.iter().filter(|r| tagger::is_license_file(&r.rel)).map(|r| r.hash.as_str()))?;
     let sets = MapSets::new(
         rows.iter()
             .filter(|r| r.kind == AssetKind::Texture.as_str() || could_be_texture(&r.rel))

@@ -1019,7 +1019,7 @@ async function toggleReviewed(a: Asset) {
     }
   }
   if (await set(to)) {
-    showOk(t(to ? 'asset-reviewed-on-named' : 'asset-reviewed-off-named', { name: a.name }), { label: t('asset-undo'), run: () => void set(!to) })
+    showOk(to ? t('asset-reviewed-on-named', { name: a.name }) : t('asset-reviewed-off-named', { name: a.name }), { label: t('asset-undo'), run: () => void set(!to) })
   }
 }
 

@@ -74,10 +74,10 @@ pub(crate) fn apply(tx: &Connection, id: &str, patch: &AssetPatch, actor: &Actor
 
     // Its own: the name, rating, whether it's reviewed and its fields.
     if let Some(name) = patch.name.as_deref().map(|s| clip(s, 300)).filter(|s| !s.is_empty()) {
-        log.set_column(id, "name", Some(name))?;
+        log.set_column(id, "name", Some(&name))?;
     }
     if let Some(r) = patch.rating {
-        log.set_column(id, "rating", (r > 0).then(|| r.min(5).to_string()))?;
+        log.set_column(id, "rating", (r > 0).then(|| r.min(5).to_string()).as_deref())?;
     }
     if let Some(on) = patch.reviewed {
         log.set_reviewed(id, on)?;
@@ -85,7 +85,7 @@ pub(crate) fn apply(tx: &Connection, id: &str, patch: &AssetPatch, actor: &Actor
     for (key, value) in &patch.fields {
         let key = clip(key, FIELD_NAME_MAX);
         if !key.is_empty() {
-            log.set_field(id, &key, Some(clip(value, TEXT_MAX)).filter(|v| !v.is_empty()))?;
+            log.set_field(id, &key, Some(clip(value, TEXT_MAX)).filter(|v| !v.is_empty()).as_deref())?;
         }
     }
 
@@ -101,7 +101,7 @@ pub(crate) fn apply(tx: &Connection, id: &str, patch: &AssetPatch, actor: &Actor
     for target in &targets {
         for (col, value) in &shared {
             if let Some(v) = value {
-                log.set_column(target, col, Some(v.clone()).filter(|v| !v.is_empty()))?;
+                log.set_column(target, col, Some(v.as_str()).filter(|v| !v.is_empty()))?;
             }
         }
         for t in &add {
@@ -162,11 +162,11 @@ pub(crate) fn revert(tx: &Connection, asset_id: &str, change_id: i64, actor: &Ac
     if let Some(tag) = field.strip_prefix("tag:") {
         log.set_tag(asset_id, tag, old.as_deref())?;
     } else if let Some(key) = field.strip_prefix("field:") {
-        log.set_field(asset_id, key, old)?;
+        log.set_field(asset_id, key, old.as_deref())?;
     } else if field == "reviewed" {
         log.set_reviewed(asset_id, old.is_some())?;
     } else if COLUMNS.iter().any(|(c, _)| *c == field) {
-        log.set_column(asset_id, &field, old)?;
+        log.set_column(asset_id, &field, old.as_deref())?;
     }
     if log.touched(asset_id) {
         tx.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![asset_id, at])?;
@@ -209,24 +209,24 @@ impl Log<'_> {
         self.touched.contains(id)
     }
 
-    fn set_column(&mut self, id: &str, col: &str, new: Option<String>) -> Result<()> {
+    fn set_column(&mut self, id: &str, col: &str, new: Option<&str>) -> Result<()> {
         let Some(&(col, protects)) = COLUMNS.iter().find(|(c, _)| *c == col) else { return Ok(()) };
         let old: Option<String> =
             self.tx.query_row(&format!("SELECT CAST({col} AS TEXT) FROM assets WHERE id = ?1"), [id], |r| r.get(0))?;
         // A name can't be cleared.
-        if old == new || (col == "name" && new.is_none()) {
+        if old.as_deref() == new || (col == "name" && new.is_none()) {
             return Ok(());
         }
-        let value = match (col, &new) {
+        let value = match (col, new) {
             ("rating", Some(n)) => rusqlite::types::Value::Integer(n.parse().unwrap_or(0)),
-            (_, Some(s)) => rusqlite::types::Value::Text(s.clone()),
+            (_, Some(s)) => rusqlite::types::Value::Text(s.to_owned()),
             (_, None) => rusqlite::types::Value::Null,
         };
         self.tx.execute(
             &format!("UPDATE assets SET {col} = ?2, human_edited = human_edited OR ?3 WHERE id = ?1"),
             params![id, value, protects],
         )?;
-        self.record(id, col, old.as_deref(), new.as_deref())
+        self.record(id, col, old.as_deref(), new)
     }
 
     /// Reviewing an asset also keeps the automatic passes from renaming or recategorising it.
@@ -244,17 +244,17 @@ impl Log<'_> {
         self.record(id, "reviewed", old.as_deref(), new.as_deref())
     }
 
-    fn set_field(&mut self, id: &str, key: &str, new: Option<String>) -> Result<()> {
+    fn set_field(&mut self, id: &str, key: &str, new: Option<&str>) -> Result<()> {
         let old: Option<String> = self
             .tx
             .query_row("SELECT value FROM asset_fields WHERE asset_id = ?1 AND key = ?2", params![id, key], |r| {
                 r.get(0)
             })
             .optional()?;
-        if old == new {
+        if old.as_deref() == new {
             return Ok(());
         }
-        match &new {
+        match new {
             Some(v) => self.tx.execute(
                 "INSERT INTO asset_fields (asset_id, key, value) VALUES (?1, ?2, ?3)
                  ON CONFLICT (asset_id, key) DO UPDATE SET value = excluded.value",
@@ -262,7 +262,7 @@ impl Log<'_> {
             )?,
             None => self.tx.execute("DELETE FROM asset_fields WHERE asset_id = ?1 AND key = ?2", params![id, key])?,
         };
-        self.record(id, &format!("field:{key}"), old.as_deref(), new.as_deref())
+        self.record(id, &format!("field:{key}"), old.as_deref(), new)
     }
 
     /// The tag as it's kept: a tag merged into another is that one.
@@ -412,7 +412,7 @@ mod tests {
         apply(&conn, "a1", &back, &me()).unwrap();
         let rock = get_asset(&conn, "a1").unwrap().unwrap().tags.into_iter().find(|t| t.tag == "rock").unwrap();
         assert_eq!((rock.source, rock.confidence), (TagSource::Ai, 0.8), "back as it was");
-        assert!(get_asset(&conn, "a1").unwrap().unwrap().rejected_tags.is_empty());
+        assert_eq!(get_asset(&conn, "a1").unwrap().unwrap().rejected_tags, Vec::<String>::new());
     }
 
     #[test]

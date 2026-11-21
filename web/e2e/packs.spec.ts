@@ -156,7 +156,10 @@ test.describe('packs page', () => {
 
     await page.getByRole('button', { name: 'Store details' }).click()
     await expect(page.getByLabel('Search the stores for')).toHaveValue(name)
+    // Use lays the match out field by field first; what differs is ticked, and filling in takes it.
     await page.getByRole('button', { name: 'Use', exact: true }).click()
+    await expect(page.getByRole('checkbox', { name: 'Seller' })).toBeChecked()
+    await page.getByRole('button', { name: /^Fill in \d+ fields?$/ }).click()
     await expect(page.getByLabel('Seller')).toHaveValue('Some Seller')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByLabel('Seller')).toHaveCount(0)

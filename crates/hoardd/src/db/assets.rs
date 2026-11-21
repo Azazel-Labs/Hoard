@@ -47,7 +47,7 @@ pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         license: r.get(24)?,
         source_url: r.get(25)?,
         pack_license: None,
-        fields: Default::default(),
+        fields: std::collections::BTreeMap::new(),
         rejected_tags: Vec::new(),
         links: Vec::new(),
         linked_from: Vec::new(),

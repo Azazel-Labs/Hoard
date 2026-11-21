@@ -37,6 +37,8 @@ error-bulk-by-look = ulkonäköhakua ei voi muokata kerralla: valitse assetit se
 error-too-many-items = liian monta kohdetta yhdessä pyynnössä
 error-not-a-hash = ei ole blake3-heksatiiviste
 error-merge-into-tag = into-kohteen on oltava tunniste
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" ei ole tunniste
 error-nothing-to-merge = ei yhdistettävää
 error-selection-size = anna 1–{ $max } resurssin tunnistetta
 error-collection-needs-name = kokoelma tarvitsee nimen
@@ -2386,6 +2388,38 @@ tags-browse = Selaa
 tags-merged-heading = Yhdistetyt tunnisteet
 tags-merged-what = Kun tunnistelijat ehdottavat jotakin näistä vanhoista nimistä, resurssi saa tunnisteen, johon se yhdistettiin.
 tags-allow-old = Salli vanha nimi uudelleen
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } resurssi
+       *[other] { $count } resurssia
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Vanha nimi: { $names }
+       *[other] Vanhat nimet: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } yhdistettiin tunnisteeseen { $into }.
+tag-page-show = Näytä { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Kerro, mitä tämä tunniste tarkoittaa…
+tag-page-describe-label = Mitä tämä tunniste tarkoittaa
+tag-page-describe-placeholder = Mihin se on tarkoitettu, mitä sen alle kuuluu. Enter tallentaa.
+tag-page-describe-edit = Muuta napsauttamalla
+tag-page-description-saved = Tunnisteen merkitys tallennettu
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Valitse kuva tälle tunnisteelle
+tag-page-picture-help = Valitse yksi sen resursseista edustamaan sitä
+tag-page-picture-nothing = Yhdelläkään näytetyistä resursseista ei ole kuvaa.
+tag-page-picture-none = Ei kuvaa
+tag-page-picture-saved = Kuva asetettu
+tag-page-picture-removed = Kuva poistettu
+tag-page-rename = Nimeä uudelleen…
+tag-page-rename-title = Anna sille uusi nimi tai toisen tunnisteen nimi, niin se yhdistetään siihen
+tag-page-rename-label = Uusi nimi
+tag-page-save-failed = Tunnistetta ei voitu tallentaa: { $error }
 
 ## Kirjaston tilastot
 

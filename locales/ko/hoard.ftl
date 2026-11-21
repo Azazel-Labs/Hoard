@@ -37,6 +37,8 @@ error-bulk-by-look = 모양으로 찾은 결과는 한꺼번에 편집할 수 �
 error-too-many-items = 한 번의 요청에 항목이 너무 많습니다
 error-not-a-hash = blake3 16진수 해시가 아닙니다
 error-merge-into-tag = into는 태그여야 합니다
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }"은(는) 태그가 아닙니다
 error-nothing-to-merge = 병합할 것이 없습니다
 error-selection-size = 에셋 ID를 1개에서 { $max }개 사이로 지정하세요
 error-collection-needs-name = 컬렉션에는 이름이 필요합니다
@@ -2078,6 +2080,33 @@ tags-browse = 둘러보기
 tags-merged-heading = 병합된 태그
 tags-merged-what = 태거가 이 옛 이름 중 하나를 내놓으면, 에셋에는 병합된 태그가 붙습니다.
 tags-allow-old = 옛 이름 다시 허용
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = 에셋 { $count }개
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] 이전 이름: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag }이(가) { $into }에 병합되었습니다.
+tag-page-show = { $tag } 보기
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = 이 태그의 의미를 적어 보세요…
+tag-page-describe-label = 이 태그의 의미
+tag-page-describe-placeholder = 어떤 용도인지, 무엇이 여기에 속하는지 적어 주세요. Enter로 저장합니다.
+tag-page-describe-edit = 클릭해서 변경
+tag-page-description-saved = 태그의 의미를 저장했습니다
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = 이 태그의 이미지 고르기
+tag-page-picture-help = 이 태그의 에셋 중 하나를 골라 대표로 삼으세요
+tag-page-picture-nothing = 표시된 에셋 중에 이미지가 있는 것이 없습니다.
+tag-page-picture-none = 이미지 없음
+tag-page-picture-saved = 이미지를 설정했습니다
+tag-page-picture-removed = 이미지를 해제했습니다
+tag-page-rename = 이름 바꾸기…
+tag-page-rename-title = 새 이름이나, 병합할 다른 태그의 이름을 입력하세요
+tag-page-rename-label = 새 이름
+tag-page-save-failed = 태그를 저장하지 못했습니다: { $error }
 
 ## LibraryStats.vue
 

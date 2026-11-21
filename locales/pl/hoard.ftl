@@ -37,6 +37,8 @@ error-bulk-by-look = wyszukiwania według wyglądu nie można edytować naraz: z
 error-too-many-items = zbyt wiele elementów w jednym żądaniu
 error-not-a-hash = to nie jest skrót blake3 w zapisie szesnastkowym
 error-merge-into-tag = into musi być tagiem
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = „{ $text }” nie jest tagiem
 error-nothing-to-merge = nic do scalenia
 error-selection-size = należy podać od 1 do { $max } identyfikatorów zasobów
 error-collection-needs-name = kolekcja musi mieć nazwę
@@ -2530,6 +2532,42 @@ tags-browse = Przeglądaj
 tags-merged-heading = Scalone tagi
 tags-merged-what = Gdy tagowanie wymyśli jedną z tych starych nazw, zasób dostanie tag, w który ją scalono.
 tags-allow-old = Zezwól znów na starą nazwę
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } zasób
+        [few] { $count } zasoby
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Dawna nazwa: { $names }
+        [few] Dawne nazwy: { $names }
+        [many] Dawne nazwy: { $names }
+       *[other] Dawne nazwy: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = Tag { $tag } został scalony z { $into }.
+tag-page-show = Pokaż { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Napisz, co oznacza ten tag…
+tag-page-describe-label = Co oznacza ten tag
+tag-page-describe-placeholder = Do czego służy, co do niego należy. Enter zapisuje.
+tag-page-describe-edit = Kliknij, aby zmienić
+tag-page-description-saved = Zapisano znaczenie tagu
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Wybierz obraz dla tego tagu
+tag-page-picture-help = Wybierz jeden z jego zasobów, który będzie go reprezentować
+tag-page-picture-nothing = Żaden z wyświetlanych zasobów nie ma obrazu.
+tag-page-picture-none = Bez obrazu
+tag-page-picture-saved = Ustawiono obraz
+tag-page-picture-removed = Usunięto obraz
+tag-page-rename = Zmień nazwę…
+tag-page-rename-title = Nadaj mu nową nazwę albo podaj nazwę innego tagu, z którym ma zostać scalony
+tag-page-rename-label = Nowa nazwa
+tag-page-save-failed = Nie udało się zapisać tagu: { $error }
 
 ## LibraryStats.vue
 

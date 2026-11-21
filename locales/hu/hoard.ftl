@@ -37,6 +37,8 @@ error-bulk-by-look = a megjelenés szerinti keresés nem szerkeszthető egyszerr
 error-too-many-items = túl sok elem egy kérésben
 error-not-a-hash = nem blake3 hexadecimális hash
 error-merge-into-tag = az into értéke csak címke lehet
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = A(z) „{ $text }” nem címke
 error-nothing-to-merge = nincs mit összevonni
 error-selection-size = adjon meg 1 és { $max } közötti számú asset-azonosítót
 error-collection-needs-name = a gyűjteménynek nevet kell adni
@@ -2175,6 +2177,33 @@ tags-browse = Böngészés
 tags-merged-heading = Összevont címkék
 tags-merged-what = Ha a címkézők valamelyik régi nevet adnák, az asset azt a címkét kapja, amelybe összevonták.
 tags-allow-old = A régi név újbóli engedélyezése
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } asset
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] Régi név: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = A(z) { $tag } összevonásra került ide: { $into }.
+tag-page-show = { $tag } megjelenítése
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Írja le, mit jelent ez a címke…
+tag-page-describe-label = Mit jelent ez a címke
+tag-page-describe-placeholder = Mire való, mi tartozik alá. Az Enter ment.
+tag-page-describe-edit = Kattintson a módosításhoz
+tag-page-description-saved = A címke jelentése elmentve
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Válasszon képet ehhez a címkéhez
+tag-page-picture-help = Válassza ki az egyik assetjét, amely képviseli
+tag-page-picture-nothing = A megjelenített assetek egyikének sincs képe.
+tag-page-picture-none = Nincs kép
+tag-page-picture-saved = Kép beállítva
+tag-page-picture-removed = Kép eltávolítva
+tag-page-rename = Átnevezés…
+tag-page-rename-title = Adjon neki új nevet, vagy egy másik címke nevét, hogy abba összevonja
+tag-page-rename-label = Új név
+tag-page-save-failed = Nem sikerült menteni a címkét: { $error }
 
 ## Könyvtárstatisztika
 

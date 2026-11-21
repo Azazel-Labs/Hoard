@@ -69,6 +69,14 @@ pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> 
             "INSERT INTO tag_aliases (tag, into_tag) VALUES (?1, ?2) ON CONFLICT (tag) DO UPDATE SET into_tag = excluded.into_tag",
             params![old, into],
         )?;
+        // What the old name said about itself goes along, unless the tag it joins already says it.
+        tx.execute(
+            "INSERT INTO tag_info (tag, description, image_id) SELECT ?2, description, image_id FROM tag_info WHERE tag = ?1
+             ON CONFLICT (tag) DO UPDATE SET description = COALESCE(tag_info.description, excluded.description),
+                                             image_id = COALESCE(tag_info.image_id, excluded.image_id)",
+            params![old, into],
+        )?;
+        tx.execute("DELETE FROM tag_info WHERE tag = ?1", [old])?;
     }
     tx.execute("DELETE FROM tag_aliases WHERE tag = ?1", [into])?;
     // Packs keep their (AI-given) tags as a JSON list.
@@ -95,6 +103,67 @@ pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> 
     }
     tx.commit()?;
     Ok(touched.len())
+}
+
+/// What a tag's page shows: how much has it, what it means and the picture that stands for it, and its old names.
+#[derive(Debug, Default, PartialEq, serde::Serialize)]
+pub(crate) struct TagInfo {
+    pub tag: String,
+    /// How many assets have it, as the tag counts say.
+    pub count: u64,
+    pub description: Option<String>,
+    /// The asset whose picture stands for the tag.
+    pub image_id: Option<String>,
+    /// Old names merged into it.
+    pub aliases: Vec<String>,
+    /// When `tag` is itself an old name: the tag it was merged into.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merged_into: Option<String>,
+}
+
+/// The longest description a tag keeps.
+pub(crate) const TAG_DESCRIPTION_MAX: usize = 4000;
+
+pub(crate) fn tag_info(conn: &Connection, tag: &str) -> Result<TagInfo> {
+    let merged_into: Option<String> =
+        conn.query_row("SELECT into_tag FROM tag_aliases WHERE tag = ?1", [tag], |r| r.get(0)).optional()?;
+    let (description, image_id): (Option<String>, Option<String>) = conn
+        .query_row("SELECT description, image_id FROM tag_info WHERE tag = ?1", [tag], |r| Ok((r.get(0)?, r.get(1)?)))
+        .optional()?
+        .unwrap_or_default();
+    // A picture whose asset was deleted stands for nothing.
+    let image_id = match image_id {
+        Some(id) if conn.query_row("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)", [&id], |r| r.get(0))? => {
+            Some(id)
+        }
+        _ => None,
+    };
+    let count =
+        super::tag_counts(conn, tag, false, u32::MAX)?.into_iter().find(|f| f.value == tag).map_or(0, |f| f.count);
+    let mut stmt = conn.prepare("SELECT tag FROM tag_aliases WHERE into_tag = ?1 ORDER BY tag")?;
+    let aliases = stmt.query_map([tag], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+    Ok(TagInfo { tag: tag.to_owned(), count, description, image_id, aliases, merged_into })
+}
+
+/// Say what a tag means, or which asset's picture stands for it. `None` leaves either as it is; an empty one clears
+/// it.
+pub(crate) fn set_tag_info(
+    conn: &Connection,
+    tag: &str,
+    description: Option<&str>,
+    image_id: Option<&str>,
+) -> Result<()> {
+    let given = |s: &str| Some(s.trim()).filter(|s| !s.is_empty()).map(str::to_owned);
+    conn.execute("INSERT INTO tag_info (tag) VALUES (?1) ON CONFLICT (tag) DO NOTHING", [tag])?;
+    if let Some(d) = description {
+        let d: String = d.chars().take(TAG_DESCRIPTION_MAX).collect();
+        conn.execute("UPDATE tag_info SET description = ?2 WHERE tag = ?1", params![tag, given(&d)])?;
+    }
+    if let Some(id) = image_id {
+        conn.execute("UPDATE tag_info SET image_id = ?2 WHERE tag = ?1", params![tag, given(id)])?;
+    }
+    conn.execute("DELETE FROM tag_info WHERE tag = ?1 AND description IS NULL AND image_id IS NULL", [tag])?;
+    Ok(())
 }
 
 /// Tags merged into others: (old name, the tag it became).
@@ -236,6 +305,45 @@ mod tests {
     use super::*;
     use crate::db::{get_asset, get_pack, open, search};
     use hoard_core::SearchQuery;
+
+    #[test]
+    fn a_tag_says_what_it_means_and_keeps_it_through_a_merge() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let mut conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x');
+             INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p1', 'Forest', 'ready', '[]', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.png', 'a1', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES ('a1', 'rocks', 'human', 1.0);",
+        )
+        .unwrap();
+        set_tag_info(&conn, "rocks", Some("  Loose stones  "), Some("a1")).unwrap();
+        set_tag_info(&conn, "stone", Some("Building stone"), None).unwrap();
+        let info = tag_info(&conn, "rocks").unwrap();
+        assert_eq!(
+            (info.count, info.description.as_deref(), info.image_id.as_deref()),
+            (1, Some("Loose stones"), Some("a1"))
+        );
+
+        // The tag it joins keeps its own description and takes the picture it lacked; the old name says where it went.
+        merge_tags(&mut conn, &["rocks".to_owned()], "stone").unwrap();
+        let info = tag_info(&conn, "stone").unwrap();
+        assert_eq!(info.description.as_deref(), Some("Building stone"));
+        assert_eq!(info.image_id.as_deref(), Some("a1"));
+        assert_eq!(info.aliases, vec!["rocks".to_owned()]);
+        assert_eq!(info.count, 1);
+        assert_eq!(tag_info(&conn, "rocks").unwrap().merged_into.as_deref(), Some("stone"));
+
+        // Clearing both forgets the tag's row; a deleted picture stands for nothing.
+        set_tag_info(&conn, "stone", Some(""), None).unwrap();
+        conn.execute("DELETE FROM assets WHERE id = 'a1'", []).unwrap();
+        assert_eq!(tag_info(&conn, "stone").unwrap().image_id, None);
+        set_tag_info(&conn, "stone", None, Some("")).unwrap();
+        let rows: i64 = conn.query_row("SELECT COUNT(*) FROM tag_info", [], |r| r.get(0)).unwrap();
+        assert_eq!(rows, 0);
+    }
 
     #[test]
     fn merged_tags_stay_merged() {

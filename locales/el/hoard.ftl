@@ -37,6 +37,8 @@ error-bulk-by-look = μια αναζήτηση κατά εμφάνιση δεν 
 error-too-many-items = υπερβολικά πολλά αντικείμενα σε ένα αίτημα
 error-not-a-hash = δεν είναι δεκαεξαδικό hash blake3
 error-merge-into-tag = το into πρέπει να είναι ετικέτα
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = Το «{ $text }» δεν είναι ετικέτα
 error-nothing-to-merge = τίποτα προς συγχώνευση
 error-selection-size = δώστε από 1 έως { $max } αναγνωριστικά στοιχείων
 error-collection-needs-name = μια συλλογή χρειάζεται όνομα
@@ -2391,6 +2393,38 @@ tags-browse = Περιήγηση
 tags-merged-heading = Συγχωνευμένες ετικέτες
 tags-merged-what = Όταν οι μηχανισμοί ετικετών προτείνουν ένα από αυτά τα παλιά ονόματα, το στοιχείο παίρνει την ετικέτα στην οποία συγχωνεύτηκε.
 tags-allow-old = Να επιτραπεί ξανά το παλιό όνομα
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } στοιχείο
+       *[other] { $count } στοιχεία
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Παλιό όνομα: { $names }
+       *[other] Παλιά ονόματα: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = Η ετικέτα { $tag } συγχωνεύθηκε στην { $into }.
+tag-page-show = Εμφάνιση της { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Πείτε τι σημαίνει αυτή η ετικέτα…
+tag-page-describe-label = Τι σημαίνει αυτή η ετικέτα
+tag-page-describe-placeholder = Σε τι χρησιμεύει, τι ανήκει σε αυτήν. Το Enter αποθηκεύει.
+tag-page-describe-edit = Κάντε κλικ για αλλαγή
+tag-page-description-saved = Αποθηκεύτηκε η σημασία της ετικέτας
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Επιλέξτε εικόνα για αυτή την ετικέτα
+tag-page-picture-help = Επιλέξτε ένα από τα στοιχεία της για να την αντιπροσωπεύει
+tag-page-picture-nothing = Κανένα από τα εμφανιζόμενα στοιχεία δεν έχει εικόνα.
+tag-page-picture-none = Χωρίς εικόνα
+tag-page-picture-saved = Η εικόνα ορίστηκε
+tag-page-picture-removed = Η εικόνα αφαιρέθηκε
+tag-page-rename = Μετονομασία…
+tag-page-rename-title = Δώστε της νέο όνομα ή το όνομα άλλης ετικέτας για να συγχωνευθεί σε αυτήν
+tag-page-rename-label = Νέο όνομα
+tag-page-save-failed = Δεν ήταν δυνατή η αποθήκευση της ετικέτας: { $error }
 
 ## LibraryStats.vue
 

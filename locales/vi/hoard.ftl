@@ -37,6 +37,8 @@ error-bulk-by-look = không thể sửa cùng lúc kết quả tìm theo hình t
 error-too-many-items = quá nhiều mục trong một yêu cầu
 error-not-a-hash = không phải mã băm blake3 dạng hex
 error-merge-into-tag = into phải là một thẻ
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" không phải là thẻ
 error-nothing-to-merge = không có gì để gộp
 error-selection-size = hãy đưa từ 1 đến { $max } id tài nguyên
 error-collection-needs-name = bộ sưu tập cần có tên
@@ -2102,6 +2104,33 @@ tags-browse = Duyệt
 tags-merged-heading = Thẻ đã gộp
 tags-merged-what = Khi các bộ gắn thẻ đưa ra một trong những tên cũ này, tài nguyên sẽ nhận thẻ mà tên đó đã được gộp vào.
 tags-allow-old = Cho phép lại tên cũ
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } tài nguyên
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] Tên cũ: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } đã được gộp vào { $into }.
+tag-page-show = Hiện { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Cho biết thẻ này có nghĩa là gì…
+tag-page-describe-label = Thẻ này có nghĩa là gì
+tag-page-describe-placeholder = Dùng để làm gì, những gì thuộc về thẻ. Nhấn Enter để lưu.
+tag-page-describe-edit = Nhấp để thay đổi
+tag-page-description-saved = Đã lưu ý nghĩa của thẻ
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Chọn ảnh cho thẻ này
+tag-page-picture-help = Chọn một tài nguyên của thẻ để làm ảnh đại diện
+tag-page-picture-nothing = Không tài nguyên nào đang hiện có ảnh.
+tag-page-picture-none = Không có ảnh
+tag-page-picture-saved = Đã đặt ảnh
+tag-page-picture-removed = Đã bỏ ảnh
+tag-page-rename = Đổi tên…
+tag-page-rename-title = Đặt tên mới, hoặc tên của một thẻ khác để gộp vào thẻ đó
+tag-page-rename-label = Tên mới
+tag-page-save-failed = Không lưu được thẻ: { $error }
 
 ## Thống kê thư viện
 

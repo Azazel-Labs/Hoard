@@ -37,6 +37,8 @@ error-bulk-by-look = การค้นหาตามลักษณะไม�
 error-too-many-items = รายการในคำขอเดียวมากเกินไป
 error-not-a-hash = ไม่ใช่แฮช blake3 แบบเลขฐานสิบหก
 error-merge-into-tag = into ต้องเป็นแท็ก
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" ไม่ใช่แท็ก
 error-nothing-to-merge = ไม่มีอะไรให้รวม
 error-selection-size = ระบุ ID แอสเซ็ตตั้งแต่ 1 ถึง { $max } รายการ
 error-collection-needs-name = คอลเลกชันต้องมีชื่อ
@@ -2105,6 +2107,33 @@ tags-browse = เรียกดู
 tags-merged-heading = แท็กที่รวมแล้ว
 tags-merged-what = เมื่อตัวติดแท็กเสนอชื่อเก่าเหล่านี้ แอสเซ็ตจะได้แท็กที่ชื่อนั้นถูกรวมเข้าไปแทน
 tags-allow-old = อนุญาตชื่อเก่าอีกครั้ง
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } แอสเซ็ต
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] ชื่อเดิม: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } ถูกรวมเข้ากับ { $into } แล้ว
+tag-page-show = แสดง { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = บอกว่าแท็กนี้หมายถึงอะไร…
+tag-page-describe-label = แท็กนี้หมายถึงอะไร
+tag-page-describe-placeholder = ใช้ทำอะไร และอะไรอยู่ภายใต้แท็กนี้ กด Enter เพื่อบันทึก
+tag-page-describe-edit = คลิกเพื่อเปลี่ยน
+tag-page-description-saved = บันทึกความหมายของแท็กแล้ว
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = เลือกรูปภาพสำหรับแท็กนี้
+tag-page-picture-help = เลือกแอสเซ็ตหนึ่งรายการเพื่อเป็นตัวแทนของแท็ก
+tag-page-picture-nothing = แอสเซ็ตที่แสดงอยู่ไม่มีรูปภาพเลย
+tag-page-picture-none = ไม่มีรูปภาพ
+tag-page-picture-saved = ตั้งรูปภาพแล้ว
+tag-page-picture-removed = เอารูปภาพออกแล้ว
+tag-page-rename = เปลี่ยนชื่อ…
+tag-page-rename-title = ตั้งชื่อใหม่ หรือใส่ชื่อแท็กอื่นเพื่อรวมเข้าด้วยกัน
+tag-page-rename-label = ชื่อใหม่
+tag-page-save-failed = บันทึกแท็กไม่ได้: { $error }
 
 ## LibraryStats.vue
 

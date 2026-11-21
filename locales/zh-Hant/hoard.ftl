@@ -37,6 +37,8 @@ error-bulk-by-look = 依外觀搜尋的結果無法一次全部編輯：請改�
 error-too-many-items = 單次請求的項目太多
 error-not-a-hash = 不是 blake3 十六進位雜湊值
 error-merge-into-tag = into 必須是標籤
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = 「{ $text }」不是標籤
 error-nothing-to-merge = 沒有可合併的項目
 error-selection-size = 請提供 1 到 { $max } 個素材 ID
 error-collection-needs-name = 收藏集需要名稱
@@ -2108,6 +2110,33 @@ tags-browse = 瀏覽
 tags-merged-heading = 已合併的標籤
 tags-merged-what = 當標記器產生這些舊名稱之一時，素材會改為加上它被合併到的標籤。
 tags-allow-old = 再次允許使用舊名稱
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } 個素材
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] 舊名稱：{ $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } 已合併為 { $into }。
+tag-page-show = 顯示 { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = 說說這個標籤是什麼意思…
+tag-page-describe-label = 這個標籤的意思
+tag-page-describe-placeholder = 用來做什麼、哪些內容屬於它。按 Enter 儲存。
+tag-page-describe-edit = 點一下即可修改
+tag-page-description-saved = 已儲存標籤的意思
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = 為這個標籤挑一張圖片
+tag-page-picture-help = 挑一個它的素材作為代表
+tag-page-picture-nothing = 目前顯示的素材都沒有圖片。
+tag-page-picture-none = 沒有圖片
+tag-page-picture-saved = 已設定圖片
+tag-page-picture-removed = 已移除圖片
+tag-page-rename = 重新命名…
+tag-page-rename-title = 幫它取個新名稱，或輸入另一個標籤的名稱，把它合併過去
+tag-page-rename-label = 新名稱
+tag-page-save-failed = 無法儲存標籤：{ $error }
 
 ## 素材庫統計
 

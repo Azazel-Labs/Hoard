@@ -37,6 +37,8 @@ error-bulk-by-look = 按外观搜索的结果无法一次全部编辑：请改�
 error-too-many-items = 一次请求中的条目过多
 error-not-a-hash = 不是 blake3 十六进制哈希
 error-merge-into-tag = into 必须是标签
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = “{ $text }”不是标签
 error-nothing-to-merge = 没有可合并的内容
 error-selection-size = 请提供 1 到 { $max } 个资源 ID
 error-collection-needs-name = 合集需要一个名称
@@ -2102,6 +2104,33 @@ tags-browse = 浏览
 tags-merged-heading = 已合并的标签
 tags-merged-what = 当标注器给出这些旧名称之一时，资源会得到它被合并到的那个标签。
 tags-allow-old = 重新允许旧名称
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } 个资源
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] 旧名称：{ $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } 已合并为 { $into }。
+tag-page-show = 显示 { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = 说说这个标签是什么意思…
+tag-page-describe-label = 这个标签的含义
+tag-page-describe-placeholder = 用来做什么，哪些内容属于它。按 Enter 保存。
+tag-page-describe-edit = 点击修改
+tag-page-description-saved = 已保存标签的含义
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = 为这个标签选一张图片
+tag-page-picture-help = 选一个它的资源作为代表
+tag-page-picture-nothing = 当前显示的资源都没有图片。
+tag-page-picture-none = 无图片
+tag-page-picture-saved = 已设置图片
+tag-page-picture-removed = 已移除图片
+tag-page-rename = 重命名…
+tag-page-rename-title = 给它起个新名称，或输入另一个标签的名称，把它合并过去
+tag-page-rename-label = 新名称
+tag-page-save-failed = 无法保存标签：{ $error }
 
 ## LibraryStats.vue
 

@@ -405,6 +405,20 @@ export interface TagSuggestions {
   near: TagSuggestion[]
 }
 
+/** What a tag's page shows (`/api/tags/info`). */
+export interface TagInfo {
+  tag: string
+  /** How many assets have it. */
+  count: number
+  description: string | null
+  /** The asset whose picture stands for the tag. */
+  image_id: string | null
+  /** Old names merged into it. */
+  aliases: string[]
+  /** When the tag asked for is an old name: the tag it was merged into. */
+  merged_into?: string
+}
+
 export interface SearchResult {
   items: Asset[]
   total: number

@@ -42,6 +42,8 @@ error-bulk-by-look = a search by look can't be edited all at once: select the as
 error-too-many-items = too many items in one request
 error-not-a-hash = not a blake3 hex hash
 error-merge-into-tag = into must be a tag
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" isn't a tag
 error-nothing-to-merge = nothing to merge
 error-selection-size = give between 1 and { $max } asset ids
 error-collection-needs-name = a collection needs a name
@@ -2613,6 +2615,38 @@ tags-browse = Browse
 tags-merged-heading = Merged tags
 tags-merged-what = When the taggers come up with one of these old names, the asset gets the tag it was merged into.
 tags-allow-old = Allow the old name again
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Old name: { $names }
+       *[other] Old names: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } was merged into { $into }.
+tag-page-show = Show { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Say what this tag means…
+tag-page-describe-label = What this tag means
+tag-page-describe-placeholder = What it's for, what belongs under it. Enter saves.
+tag-page-describe-edit = Click to change
+tag-page-description-saved = Saved what the tag means
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Pick a picture for this tag
+tag-page-picture-help = Pick one of its assets to stand for it
+tag-page-picture-nothing = None of the assets shown has a picture.
+tag-page-picture-none = No picture
+tag-page-picture-saved = Picture set
+tag-page-picture-removed = Picture taken off
+tag-page-rename = Rename…
+tag-page-rename-title = Give it a new name, or the name of another tag to merge it into that one
+tag-page-rename-label = New name
+tag-page-save-failed = Couldn't save the tag: { $error }
 
 ## LibraryStats.vue
 

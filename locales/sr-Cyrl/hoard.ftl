@@ -37,6 +37,8 @@ error-bulk-by-look = претрага по изгледу не може се и�
 error-too-many-items = превише ставки у једном захтеву
 error-not-a-hash = ово није blake3 хеш у хексадецималном облику
 error-merge-into-tag = into мора бити ознака
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = „{ $text }“ није ознака
 error-nothing-to-merge = нема шта да се споји
 error-selection-size = наведите између 1 и { $max } ID-ова ресурса
 error-collection-needs-name = колекција мора имати назив
@@ -2422,6 +2424,40 @@ tags-browse = Прегледај
 tags-merged-heading = Спојене ознаке
 tags-merged-what = Када означивачи предложе неки од ових старих назива, ресурс добија ознаку у коју је стари назив спојен.
 tags-allow-old = Поново дозволи стари назив
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурса
+       *[other] { $count } ресурса
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Старо име: { $names }
+        [few] Стара имена: { $names }
+       *[other] Стара имена: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = Ознака { $tag } је спојена у { $into }.
+tag-page-show = Прикажи { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Напишите шта ова ознака значи…
+tag-page-describe-label = Шта ова ознака значи
+tag-page-describe-placeholder = За шта служи, шта јој припада. Enter чува.
+tag-page-describe-edit = Кликните да промените
+tag-page-description-saved = Значење ознаке је сачувано
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Изаберите слику за ову ознаку
+tag-page-picture-help = Изаберите један од њених ресурса који ће је представљати
+tag-page-picture-nothing = Ниједан од приказаних ресурса нема слику.
+tag-page-picture-none = Без слике
+tag-page-picture-saved = Слика је постављена
+tag-page-picture-removed = Слика је уклоњена
+tag-page-rename = Преименуј…
+tag-page-rename-title = Дајте јој ново име или име друге ознаке да се споји са њом
+tag-page-rename-label = Ново име
+tag-page-save-failed = Није могуће сачувати ознаку: { $error }
 
 ## LibraryStats.vue
 

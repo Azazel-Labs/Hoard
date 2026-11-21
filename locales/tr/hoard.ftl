@@ -37,6 +37,8 @@ error-bulk-by-look = görünüme göre arama tek seferde düzenlenemez: bunun ye
 error-too-many-items = tek istekte çok fazla öğe var
 error-not-a-hash = bu bir blake3 onaltılık özeti değil
 error-merge-into-tag = into bir etiket olmalı
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" bir etiket değil
 error-nothing-to-merge = birleştirilecek bir şey yok
 error-selection-size = 1 ile { $max } arasında varlık kimliği verin
 error-collection-needs-name = bir koleksiyonun adı olmalı
@@ -2147,6 +2149,33 @@ tags-browse = Göz at
 tags-merged-heading = Birleştirilen etiketler
 tags-merged-what = Etiketleyiciler bu eski adlardan birini bulduğunda varlık, bu adın birleştirildiği etiketi alır.
 tags-allow-old = Eski ada yeniden izin ver
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } varlık
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] Eski ad: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag }, { $into } ile birleştirildi.
+tag-page-show = { $tag } etiketini göster
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Bu etiketin ne anlama geldiğini yazın…
+tag-page-describe-label = Bu etiketin anlamı
+tag-page-describe-placeholder = Ne için olduğu, hangilerinin buraya ait olduğu. Enter kaydeder.
+tag-page-describe-edit = Değiştirmek için tıklayın
+tag-page-description-saved = Etiketin anlamı kaydedildi
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Bu etiket için bir resim seçin
+tag-page-picture-help = Onu temsil etmesi için varlıklarından birini seçin
+tag-page-picture-nothing = Gösterilen varlıkların hiçbirinde resim yok.
+tag-page-picture-none = Resim yok
+tag-page-picture-saved = Resim ayarlandı
+tag-page-picture-removed = Resim kaldırıldı
+tag-page-rename = Yeniden adlandır…
+tag-page-rename-title = Ona yeni bir ad verin ya da birleştirileceği başka bir etiketin adını yazın
+tag-page-rename-label = Yeni ad
+tag-page-save-failed = Etiket kaydedilemedi: { $error }
 
 ## LibraryStats.vue
 

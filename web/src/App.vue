@@ -27,6 +27,7 @@ import FilterSidebar from './components/FilterSidebar.vue'
 import PackPanel from './components/PackPanel.vue'
 import MicButton from './components/MicButton.vue'
 import FolderBar from './components/FolderBar.vue'
+import TagHeader from './components/TagHeader.vue'
 import NothingHere from './components/NothingHere.vue'
 import ThemeSwitch from './components/ThemeSwitch.vue'
 import UiLayer from './components/UiLayer.vue'
@@ -69,6 +70,10 @@ const collections = ref<Collection[]>([])
 const slots = shallowRef<(Asset | undefined)[]>([])
 /** The results that have arrived, in order. */
 const items = computed(() => slots.value.filter((a): a is Asset => !!a))
+/** The one tag being browsed, whose page shows above the results. */
+const singleTag = computed(() =>
+  filters.tags.length === 1 && !filters.similar && !filters.color && !filters.imitation ? filters.tags[0] : '',
+)
 const total = ref(0)
 const supportingHidden = ref(0)
 /** The folders in the one being browsed, with how many matches each holds. */
@@ -1510,6 +1515,13 @@ const commands = computed<Command[]>(() => {
           </template>
         </p>
 
+        <TagHeader
+          v-if="singleTag"
+          :tag="singleTag"
+          :candidates="items.slice(0, 48)"
+          @show="(tag) => (filters.tags = [tag])"
+          @changed="runSearch({ keep: true })"
+        />
         <FolderBar :folders="folders" />
 
         <NothingHere

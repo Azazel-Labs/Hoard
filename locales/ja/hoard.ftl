@@ -37,6 +37,8 @@ error-bulk-by-look = 見た目による検索は一括で編集できません�
 error-too-many-items = 1 回のリクエストの項目が多すぎます
 error-not-a-hash = blake3 の 16 進ハッシュではありません
 error-merge-into-tag = into はタグでなければなりません
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = 「{ $text }」はタグではありません
 error-nothing-to-merge = 統合するものがありません
 error-selection-size = アセット ID を 1～{ $max } 個指定してください
 error-collection-needs-name = コレクションには名前が必要です
@@ -2102,6 +2104,33 @@ tags-browse = 閲覧
 tags-merged-heading = 統合したタグ
 tags-merged-what = タグ付けでこれらの古い名前が出てきたときは、統合先のタグがアセットに付きます。
 tags-allow-old = 古い名前を再び許可
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } 件のアセット
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] 旧名: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } は { $into } に統合されました。
+tag-page-show = { $tag } を表示
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = このタグの意味を書く…
+tag-page-describe-label = このタグの意味
+tag-page-describe-placeholder = 何のためのタグか、何が当てはまるか。Enter で保存。
+tag-page-describe-edit = クリックして変更
+tag-page-description-saved = タグの意味を保存しました
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = このタグの画像を選ぶ
+tag-page-picture-help = このタグのアセットから 1 つ選んで代表にします
+tag-page-picture-nothing = 表示中のアセットに画像のあるものはありません。
+tag-page-picture-none = 画像なし
+tag-page-picture-saved = 画像を設定しました
+tag-page-picture-removed = 画像を外しました
+tag-page-rename = 名前を変更…
+tag-page-rename-title = 新しい名前、または統合先にする別のタグの名前を入力してください
+tag-page-rename-label = 新しい名前
+tag-page-save-failed = タグを保存できませんでした: { $error }
 
 ## LibraryStats.vue
 

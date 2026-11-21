@@ -37,6 +37,8 @@ error-bulk-by-look = o căutare după aspect nu poate fi editată deodată: sele
 error-too-many-items = prea multe elemente într-o singură cerere
 error-not-a-hash = nu este un hash blake3 hexazecimal
 error-merge-into-tag = into trebuie să fie o etichetă
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = „{ $text }” nu este o etichetă
 error-nothing-to-merge = nimic de unit
 error-selection-size = dați între 1 și { $max } ID-uri de resurse
 error-collection-needs-name = o colecție are nevoie de un nume
@@ -2519,6 +2521,40 @@ tags-browse = Răsfoiți
 tags-merged-heading = Etichete unite
 tags-merged-what = Când etichetatorii propun unul dintre aceste nume vechi, resursa primește eticheta în care a fost unit.
 tags-allow-old = Permiteți din nou numele vechi
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } resursă
+        [few] { $count } resurse
+       *[other] { $count } de resurse
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Nume vechi: { $names }
+        [few] Nume vechi: { $names }
+       *[other] Nume vechi: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } a fost unită cu { $into }.
+tag-page-show = Afișați { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Spuneți ce înseamnă această etichetă…
+tag-page-describe-label = Ce înseamnă această etichetă
+tag-page-describe-placeholder = Pentru ce e, ce se încadrează aici. Enter salvează.
+tag-page-describe-edit = Faceți clic pentru a schimba
+tag-page-description-saved = Semnificația etichetei a fost salvată
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Alegeți o imagine pentru această etichetă
+tag-page-picture-help = Alegeți una dintre resursele ei care s-o reprezinte
+tag-page-picture-nothing = Niciuna dintre resursele afișate nu are imagine.
+tag-page-picture-none = Fără imagine
+tag-page-picture-saved = Imaginea a fost setată
+tag-page-picture-removed = Imaginea a fost scoasă
+tag-page-rename = Redenumiți…
+tag-page-rename-title = Dați-i un nume nou sau numele altei etichete, ca să fie unită cu aceasta
+tag-page-rename-label = Nume nou
+tag-page-save-failed = Eticheta nu a putut fi salvată: { $error }
 
 ## LibraryStats.vue
 

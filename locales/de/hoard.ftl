@@ -37,6 +37,8 @@ error-bulk-by-look = eine Suche nach Aussehen lässt sich nicht auf einmal bearb
 error-too-many-items = zu viele Einträge in einer Anfrage
 error-not-a-hash = kein blake3-Hash in Hexadezimalschreibweise
 error-merge-into-tag = into muss ein Tag sein
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = „{ $text }“ ist kein Tag
 error-nothing-to-merge = nichts zum Zusammenführen
 error-selection-size = geben Sie zwischen 1 und { $max } Asset-IDs an
 error-collection-needs-name = eine Sammlung braucht einen Namen
@@ -2325,6 +2327,38 @@ tags-browse = Durchsuchen
 tags-merged-heading = Zusammengeführte Tags
 tags-merged-what = Wenn die Tagger auf einen dieser alten Namen kommen, bekommt das Asset das Tag, in das er zusammengeführt wurde.
 tags-allow-old = Alten Namen wieder zulassen
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } Asset
+       *[other] { $count } Assets
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Alter Name: { $names }
+       *[other] Alte Namen: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } wurde mit { $into } zusammengeführt.
+tag-page-show = { $tag } anzeigen
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Beschreiben Sie, was dieses Tag bedeutet …
+tag-page-describe-label = Was dieses Tag bedeutet
+tag-page-describe-placeholder = Wofür es gedacht ist, was dazugehört. Enter speichert.
+tag-page-describe-edit = Zum Ändern klicken
+tag-page-description-saved = Bedeutung des Tags gespeichert
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Bild für dieses Tag auswählen
+tag-page-picture-help = Eines seiner Assets als Bild auswählen
+tag-page-picture-nothing = Keines der angezeigten Assets hat ein Bild.
+tag-page-picture-none = Kein Bild
+tag-page-picture-saved = Bild festgelegt
+tag-page-picture-removed = Bild entfernt
+tag-page-rename = Umbenennen …
+tag-page-rename-title = Geben Sie ihm einen neuen Namen oder den Namen eines anderen Tags, um es damit zusammenzuführen
+tag-page-rename-label = Neuer Name
+tag-page-save-failed = Das Tag konnte nicht gespeichert werden: { $error }
 
 ## LibraryStats.vue
 

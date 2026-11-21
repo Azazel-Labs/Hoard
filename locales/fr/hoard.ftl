@@ -37,6 +37,8 @@ error-bulk-by-look = une recherche par apparence ne peut pas être modifiée d'u
 error-too-many-items = trop d’éléments dans une seule requête
 error-not-a-hash = ce n’est pas un hachage blake3 en hexadécimal
 error-merge-into-tag = into doit être une étiquette
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = « { $text } » n'est pas une étiquette
 error-nothing-to-merge = rien à fusionner
 error-selection-size = indiquez entre 1 et { $max } identifiants de ressources
 error-collection-needs-name = une collection doit avoir un nom
@@ -2359,6 +2361,38 @@ tags-browse = Parcourir
 tags-merged-heading = Étiquettes fusionnées
 tags-merged-what = Quand les étiqueteurs proposent l’un de ces anciens noms, la ressource reçoit l’étiquette dans laquelle il a été fusionné.
 tags-allow-old = Autoriser de nouveau l’ancien nom
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } ressource
+       *[other] { $count } ressources
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Ancien nom : { $names }
+       *[other] Anciens noms : { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } a été fusionnée en { $into }.
+tag-page-show = Afficher { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Dites ce que signifie cette étiquette…
+tag-page-describe-label = Ce que signifie cette étiquette
+tag-page-describe-placeholder = À quoi elle sert, ce qui en relève. Entrée enregistre.
+tag-page-describe-edit = Cliquez pour modifier
+tag-page-description-saved = Signification de l'étiquette enregistrée
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Choisir une image pour cette étiquette
+tag-page-picture-help = Choisissez une de ses ressources pour la représenter
+tag-page-picture-nothing = Aucune des ressources affichées n'a d'image.
+tag-page-picture-none = Aucune image
+tag-page-picture-saved = Image définie
+tag-page-picture-removed = Image retirée
+tag-page-rename = Renommer…
+tag-page-rename-title = Donnez-lui un nouveau nom, ou le nom d'une autre étiquette pour la fusionner avec celle-ci
+tag-page-rename-label = Nouveau nom
+tag-page-save-failed = Impossible d'enregistrer l'étiquette : { $error }
 
 ## LibraryStats.vue
 

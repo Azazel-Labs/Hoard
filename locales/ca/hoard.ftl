@@ -37,6 +37,8 @@ error-bulk-by-look = una cerca per aspecte no es pot editar tota alhora: selecci
 error-too-many-items = massa elements en una sola sol·licitud
 error-not-a-hash = no és un hash blake3 hexadecimal
 error-merge-into-tag = into ha de ser una etiqueta
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = «{ $text }» no és una etiqueta
 error-nothing-to-merge = no hi ha res a fusionar
 error-selection-size = indiqueu entre 1 i { $max } identificadors de recurs
 error-collection-needs-name = una col·lecció necessita un nom
@@ -2331,6 +2333,38 @@ tags-browse = Explora
 tags-merged-heading = Etiquetes fusionades
 tags-merged-what = Quan els etiquetadors proposen un d'aquests noms antics, el recurs rep l'etiqueta a la qual es va fusionar.
 tags-allow-old = Torna a permetre el nom antic
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } recurs
+       *[other] { $count } recursos
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Nom antic: { $names }
+       *[other] Noms antics: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } s'ha fusionat amb { $into }.
+tag-page-show = Mostra { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Digueu què vol dir aquesta etiqueta…
+tag-page-describe-label = Què vol dir aquesta etiqueta
+tag-page-describe-placeholder = Per a què serveix i què hi pertany. Enter desa.
+tag-page-describe-edit = Feu clic per canviar-ho
+tag-page-description-saved = S'ha desat què vol dir l'etiqueta
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Trieu una imatge per a aquesta etiqueta
+tag-page-picture-help = Trieu un dels seus recursos perquè la representi
+tag-page-picture-nothing = Cap dels recursos mostrats té imatge.
+tag-page-picture-none = Sense imatge
+tag-page-picture-saved = Imatge definida
+tag-page-picture-removed = Imatge treta
+tag-page-rename = Canvia el nom…
+tag-page-rename-title = Poseu-li un nom nou, o el nom d'una altra etiqueta per fusionar-la amb aquella
+tag-page-rename-label = Nom nou
+tag-page-save-failed = No s'ha pogut desar l'etiqueta: { $error }
 
 ## LibraryStats.vue
 

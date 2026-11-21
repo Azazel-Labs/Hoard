@@ -382,6 +382,54 @@ pub(super) async fn merge_tags(State(state): State<AppState>, Json(m): Json<Merg
     Ok(Json(json!({ "into": into, "assets": assets })))
 }
 
+#[derive(Deserialize)]
+pub(super) struct TagInfoParams {
+    tag: String,
+}
+
+/// A tag as it is written down: lower case, words joined by dashes.
+fn a_tag(text: &str) -> Result<String, AppError> {
+    hoard_core::normalize_tag(text).ok_or_else(|| AppError::bad_request(tr!("error-not-a-tag", text = text)))
+}
+
+/// What a tag's page shows: how many have it, what it means, its picture and its old names.
+pub(super) async fn tag_info(
+    State(state): State<AppState>,
+    Query(p): Query<TagInfoParams>,
+) -> ApiResult<Json<db::TagInfo>> {
+    let tag = a_tag(&p.tag)?;
+    Ok(Json(db::call(&state.pool, move |c| db::tag_info(c, &tag)).await?))
+}
+
+#[derive(Deserialize)]
+pub(super) struct SetTagInfo {
+    tag: String,
+    /// Left out leaves it; empty clears it.
+    description: Option<String>,
+    /// The asset whose picture stands for the tag. Left out leaves it; empty clears it.
+    image_id: Option<String>,
+}
+
+/// Say what a tag means, or pick the asset whose picture stands for it.
+pub(super) async fn set_tag_info(
+    State(state): State<AppState>,
+    Json(b): Json<SetTagInfo>,
+) -> ApiResult<Json<db::TagInfo>> {
+    let tag = a_tag(&b.tag)?;
+    let info = db::call(&state.pool, move |c| {
+        if let Some(id) = b.image_id.as_deref().filter(|id| !id.trim().is_empty()) {
+            let found: bool = c.query_row("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)", [id], |r| r.get(0))?;
+            if !found {
+                return Ok(None);
+            }
+        }
+        db::set_tag_info(c, &tag, b.description.as_deref(), b.image_id.as_deref())?;
+        db::tag_info(c, &tag).map(Some)
+    })
+    .await?;
+    info.map(Json).ok_or_else(|| AppError::not_found(tr!("error-asset-gone")))
+}
+
 pub(super) async fn tag_aliases(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     let rows = db::call(&state.pool, |c| db::tag_aliases(c)).await?;
     Ok(Json(json!(rows.into_iter().map(|(tag, into)| json!({ "tag": tag, "into": into })).collect::<Vec<_>>())))

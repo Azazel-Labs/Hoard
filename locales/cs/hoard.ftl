@@ -37,6 +37,8 @@ error-bulk-by-look = hledání podle vzhledu nelze upravit najednou: vyberte ass
 error-too-many-items = příliš mnoho položek v jednom požadavku
 error-not-a-hash = toto není hexadecimální hash blake3
 error-merge-into-tag = into musí být štítek
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = „{ $text }“ není štítek
 error-nothing-to-merge = není co sloučit
 error-selection-size = zadejte 1 až { $max } ID assetů
 error-collection-needs-name = kolekce potřebuje název
@@ -2509,6 +2511,42 @@ tags-browse = Procházet
 tags-merged-heading = Sloučené štítky
 tags-merged-what = Když štítkovače přijdou s některým z těchto starých názvů, asset dostane štítek, do kterého byl sloučen.
 tags-allow-old = Znovu povolit starý název
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } asset
+        [few] { $count } assety
+        [many] { $count } assetu
+       *[other] { $count } assetů
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Starý název: { $names }
+        [few] Staré názvy: { $names }
+        [many] Staré názvy: { $names }
+       *[other] Staré názvy: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = Štítek { $tag } byl sloučen do { $into }.
+tag-page-show = Zobrazit { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Napište, co tento štítek znamená…
+tag-page-describe-label = Co tento štítek znamená
+tag-page-describe-placeholder = K čemu slouží a co pod něj patří. Enter uloží.
+tag-page-describe-edit = Kliknutím změníte
+tag-page-description-saved = Význam štítku byl uložen
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Vyberte obrázek pro tento štítek
+tag-page-picture-help = Vyberte jeden z jeho assetů, který ho bude zastupovat
+tag-page-picture-nothing = Žádný ze zobrazených assetů nemá obrázek.
+tag-page-picture-none = Bez obrázku
+tag-page-picture-saved = Obrázek nastaven
+tag-page-picture-removed = Obrázek odebrán
+tag-page-rename = Přejmenovat…
+tag-page-rename-title = Dejte mu nový název, nebo název jiného štítku, do kterého se sloučí
+tag-page-rename-label = Nový název
+tag-page-save-failed = Štítek se nepodařilo uložit: { $error }
 
 ## LibraryStats.vue
 

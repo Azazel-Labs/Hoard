@@ -37,6 +37,8 @@ error-bulk-by-look = пошук за виглядом не можна зміни
 error-too-many-items = забагато елементів в одному запиті
 error-not-a-hash = це не хеш blake3 у шістнадцятковому вигляді
 error-merge-into-tag = into має бути тегом
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = «{ $text }» не є тегом
 error-nothing-to-merge = немає чого об’єднувати
 error-selection-size = вкажіть від 1 до { $max } ідентифікаторів ресурсів
 error-collection-needs-name = колекції потрібна назва
@@ -2612,6 +2614,42 @@ tags-browse = Переглянути
 tags-merged-heading = Об’єднані теги
 tags-merged-what = Коли тегувальники пропонують одну з цих старих назв, ресурс отримує тег, у який її об’єднано.
 tags-allow-old = Знову дозволити стару назву
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурси
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Стара назва: { $names }
+        [few] Старі назви: { $names }
+        [many] Старі назви: { $names }
+       *[other] Старі назви: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } об’єднано з { $into }.
+tag-page-show = Показати { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Напишіть, що означає цей тег…
+tag-page-describe-label = Що означає цей тег
+tag-page-describe-placeholder = Для чого він, що до нього належить. Enter зберігає.
+tag-page-describe-edit = Натисніть, щоб змінити
+tag-page-description-saved = Значення тега збережено
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Вибрати зображення для цього тега
+tag-page-picture-help = Виберіть один з його ресурсів, який його представлятиме
+tag-page-picture-nothing = Жоден із показаних ресурсів не має зображення.
+tag-page-picture-none = Без зображення
+tag-page-picture-saved = Зображення встановлено
+tag-page-picture-removed = Зображення прибрано
+tag-page-rename = Перейменувати…
+tag-page-rename-title = Дайте йому нову назву або назву іншого тега, щоб об’єднати з ним
+tag-page-rename-label = Нова назва
+tag-page-save-failed = Не вдалося зберегти тег: { $error }
 
 ## LibraryStats.vue
 

@@ -37,6 +37,8 @@ error-bulk-by-look = et søk etter utseende kan ikke redigeres samlet: velg ress
 error-too-many-items = for mange elementer i én forespørsel
 error-not-a-hash = ikke en blake3-hash i heks
 error-merge-into-tag = into må være en tagg
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = «{ $text }» er ikke en tagg
 error-nothing-to-merge = ingenting å slå sammen
 error-selection-size = oppgi mellom 1 og { $max } ressurs-ID-er
 error-collection-needs-name = en samling må ha et navn
@@ -2327,6 +2329,38 @@ tags-browse = Bla gjennom
 tags-merged-heading = Sammenslåtte tagger
 tags-merged-what = Når taggerne kommer opp med et av disse gamle navnene, får ressursen taggen den ble slått sammen til.
 tags-allow-old = Tillat det gamle navnet igjen
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } ressurs
+       *[other] { $count } ressurser
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Gammelt navn: { $names }
+       *[other] Gamle navn: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } ble slått sammen med { $into }.
+tag-page-show = Vis { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Skriv hva denne taggen betyr…
+tag-page-describe-label = Hva denne taggen betyr
+tag-page-describe-placeholder = Hva den er til, og hva som hører inn under den. Enter lagrer.
+tag-page-describe-edit = Klikk for å endre
+tag-page-description-saved = Lagret hva taggen betyr
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Velg et bilde til denne taggen
+tag-page-picture-help = Velg en av ressursene dens som skal representere den
+tag-page-picture-nothing = Ingen av ressursene som vises har et bilde.
+tag-page-picture-none = Ingen bilde
+tag-page-picture-saved = Bilde satt
+tag-page-picture-removed = Bilde fjernet
+tag-page-rename = Gi nytt navn…
+tag-page-rename-title = Gi den et nytt navn, eller navnet på en annen tagg for å slå den sammen med den
+tag-page-rename-label = Nytt navn
+tag-page-save-failed = Kunne ikke lagre taggen: { $error }
 
 ## LibraryStats.vue
 

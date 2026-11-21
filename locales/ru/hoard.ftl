@@ -37,6 +37,8 @@ error-bulk-by-look = поиск по виду нельзя изменить це
 error-too-many-items = слишком много элементов в одном запросе
 error-not-a-hash = это не шестнадцатеричный хеш blake3
 error-merge-into-tag = into должен быть тегом
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = «{ $text }» не является тегом
 error-nothing-to-merge = нечего объединять
 error-selection-size = укажите от 1 до { $max } id ассетов
 error-collection-needs-name = у коллекции должно быть название
@@ -2569,6 +2571,42 @@ tags-browse = Открыть
 tags-merged-heading = Объединённые теги
 tags-merged-what = Когда разметчики придумывают одно из этих старых названий, ассет получает тег, с которым оно было объединено.
 tags-allow-old = Снова разрешить старое название
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } ассет
+        [few] { $count } ассета
+        [many] { $count } ассетов
+       *[other] { $count } ассета
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Старое название: { $names }
+        [few] Старые названия: { $names }
+        [many] Старые названия: { $names }
+       *[other] Старые названия: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } объединён с { $into }.
+tag-page-show = Показать { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Напишите, что означает этот тег…
+tag-page-describe-label = Что означает этот тег
+tag-page-describe-placeholder = Для чего он нужен, что к нему относится. Enter сохраняет.
+tag-page-describe-edit = Нажмите, чтобы изменить
+tag-page-description-saved = Значение тега сохранено
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Выбрать картинку для этого тега
+tag-page-picture-help = Выберите один из его ассетов, который будет его представлять
+tag-page-picture-nothing = Ни у одного из показанных ассетов нет картинки.
+tag-page-picture-none = Без картинки
+tag-page-picture-saved = Картинка задана
+tag-page-picture-removed = Картинка убрана
+tag-page-rename = Переименовать…
+tag-page-rename-title = Дайте ему новое название или название другого тега, чтобы объединить с ним
+tag-page-rename-label = Новое название
+tag-page-save-failed = Не удалось сохранить тег: { $error }
 
 ## LibraryStats.vue
 

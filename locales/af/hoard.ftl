@@ -37,6 +37,8 @@ error-bulk-by-look = 'n soektog volgens voorkoms kan nie alles op een slag gewys
 error-too-many-items = te veel items in een versoek
 error-not-a-hash = nie 'n blake3-hekshash nie
 error-merge-into-tag = into moet 'n etiket wees
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" is nie 'n etiket nie
 error-nothing-to-merge = niks om saam te voeg nie
 error-selection-size = gee tussen 1 en { $max } bate-ID's
 error-collection-needs-name = 'n versameling het 'n naam nodig
@@ -2325,6 +2327,38 @@ tags-browse = Blaai
 tags-merged-heading = Saamgevoegde etikette
 tags-merged-what = Wanneer die etiketteerders met een van hierdie ou name vorendag kom, kry die bate die etiket waarin dit saamgevoeg is.
 tags-allow-old = Laat die ou naam weer toe
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count =
+    { $count ->
+        [one] { $count } baat
+       *[other] { $count } bates
+    }
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+        [one] Ou naam: { $names }
+       *[other] Ou name: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } is saamgevoeg met { $into }.
+tag-page-show = Wys { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Sê wat hierdie etiket beteken…
+tag-page-describe-label = Wat hierdie etiket beteken
+tag-page-describe-placeholder = Waarvoor dit is, wat daaronder hoort. Enter stoor.
+tag-page-describe-edit = Klik om te verander
+tag-page-description-saved = Wat die etiket beteken, is gestoor
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Kies 'n prent vir hierdie etiket
+tag-page-picture-help = Kies een van sy bates om dit voor te stel
+tag-page-picture-nothing = Geen van die bates wat gewys word het 'n prent nie.
+tag-page-picture-none = Geen prent
+tag-page-picture-saved = Prent gestel
+tag-page-picture-removed = Prent verwyder
+tag-page-rename = Hernoem…
+tag-page-rename-title = Gee dit 'n nuwe naam, of die naam van 'n ander etiket om dit daarmee saam te voeg
+tag-page-rename-label = Nuwe naam
+tag-page-save-failed = Kon nie die etiket stoor nie: { $error }
 
 ## LibraryStats.vue
 

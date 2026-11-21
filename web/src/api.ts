@@ -4,7 +4,7 @@ import { language } from './i18n'
 import type {
   ArchiveCount, ArchiveItems, Asset, AssetKind, AssetPatch, BulkEdit, Change, Collection, ConversionPreview, ConversionRules,
   ConversionStatus, CopyGroups, CreditsRequest, Facet, Facing, FolderListing, LibraryStats, Pack, PackContext,
-  Project, ProjectUse, SavedSearch, SearchParams, SearchResult, SheetData, Stats, StoreMatches, TagSuggestions, ThumbSource,
+  Project, ProjectUse, SavedSearch, SearchParams, SearchResult, SheetData, Stats, StoreMatches, TagInfo, TagSuggestions, ThumbSource,
   ThumbUpload, UnrealPackStatus, UsageItems,
 } from './types/library'
 import type {
@@ -223,6 +223,15 @@ export const api = {
     request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(q)}&anywhere=true&limit=${limit}`),
   /** Fold tags into one; a single tag into a new name renames it. */
   mergeTags: (from: string[], into: string) => post<{ into: string; assets: number }>('/api/tags/merge', { from, into }),
+  /** A tag's page: how many have it, what it means, its picture and its old names. */
+  tagInfo: (tag: string) => request<TagInfo>(`/api/tags/info?tag=${encodeURIComponent(tag)}`),
+  /** Say what a tag means, or pick the asset whose picture stands for it (empty clears either). */
+  setTagInfo: (body: { tag: string; description?: string; image_id?: string }) =>
+    request<TagInfo>('/api/tags/info', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
   tagAliases: () => request<{ tag: string; into: string }[]>('/api/tags/aliases'),
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),

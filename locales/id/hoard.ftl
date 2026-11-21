@@ -37,6 +37,8 @@ error-bulk-by-look = pencarian berdasarkan tampilan tidak bisa diedit sekaligus:
 error-too-many-items = terlalu banyak item dalam satu permintaan
 error-not-a-hash = bukan hash hex blake3
 error-merge-into-tag = into harus berupa tag
+# A tag asked about isn't one: $text is what was given.
+error-not-a-tag = "{ $text }" bukan tag
 error-nothing-to-merge = tidak ada yang perlu digabungkan
 error-selection-size = berikan antara 1 dan { $max } ID aset
 error-collection-needs-name = koleksi perlu nama
@@ -2134,6 +2136,33 @@ tags-browse = Telusuri
 tags-merged-heading = Tag yang digabungkan
 tags-merged-what = Saat pemberi tag menghasilkan salah satu nama lama ini, aset mendapat tag tujuan penggabungannya.
 tags-allow-old = Izinkan nama lama lagi
+# A tag's own page, above the results while that one tag is browsed. How many assets have it.
+tag-page-count = { $count } aset
+# Old names merged into the tag ($names, separated by commas).
+tag-page-aliases =
+    { $count ->
+       *[other] Nama lama: { $names }
+    }
+# Browsing a tag that was merged into another.
+tag-page-merged = { $tag } digabungkan ke { $into }.
+tag-page-show = Tampilkan { $tag }
+# Shown to people who edit when the tag says nothing yet; clicking it lets them write what it means.
+tag-page-describe = Jelaskan arti tag ini…
+tag-page-describe-label = Arti tag ini
+tag-page-describe-placeholder = Untuk apa tag ini, apa yang termasuk di dalamnya. Enter untuk menyimpan.
+tag-page-describe-edit = Klik untuk mengubah
+tag-page-description-saved = Arti tag disimpan
+# The tag's picture: one of its assets stands for it.
+tag-page-picture = Pilih gambar untuk tag ini
+tag-page-picture-help = Pilih salah satu asetnya untuk mewakilinya
+tag-page-picture-nothing = Tidak ada aset yang ditampilkan yang memiliki gambar.
+tag-page-picture-none = Tanpa gambar
+tag-page-picture-saved = Gambar diatur
+tag-page-picture-removed = Gambar dihapus
+tag-page-rename = Ganti nama…
+tag-page-rename-title = Beri nama baru, atau nama tag lain untuk menggabungkannya ke tag itu
+tag-page-rename-label = Nama baru
+tag-page-save-failed = Tidak dapat menyimpan tag: { $error }
 
 ## LibraryStats.vue
 

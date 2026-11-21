@@ -1426,21 +1426,45 @@ translation = "Пријави се"
 source = "Sort"
 translation = "Сортирање"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Највеће"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "Од А до Ш"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Креирано"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Прво највеће"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Назив"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Најновије"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Прво најновије"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Најстарије"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Прво најстарије"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Величина"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Прво најмање"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Ажурирано"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Од Ш до А"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7473,9 +7497,13 @@ translation = "Редослед"
 source = "Most assets first"
 translation = "Прво они с највише ресурса"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "По називу"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Број ресурса"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Прво они с најмање ресурса"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7488,6 +7516,10 @@ translation = "Прво најстарији"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Прво највећи"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Прво најмањи"
 
 [messages.packs-state]
 source = "Status"

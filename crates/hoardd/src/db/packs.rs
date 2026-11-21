@@ -10,7 +10,8 @@ use super::now;
 
 const PACK_COLS: &str = "p.id, p.name, p.status, p.source, p.license, p.description, p.tags, p.error,
     p.files_done, p.files_total, p.created_at, c.store, c.store_url, c.license_tier,
-    p.archived_at, p.model_turn, p.model_tilt";
+    p.archived_at, p.model_turn, p.model_tilt,
+    COALESCE((SELECT MAX(a.updated_at) FROM assets a WHERE a.pack_id = p.id), p.created_at)";
 
 fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
     let tags: String = r.get(6)?;
@@ -26,6 +27,7 @@ fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
         files_done: r.get::<_, i64>(8)? as u64,
         files_total: r.get::<_, i64>(9)? as u64,
         created_at: r.get(10)?,
+        updated_at: r.get(17)?,
         asset_count: 0,
         total_bytes: 0,
         jobs_pending: 0,
@@ -485,5 +487,36 @@ mod tests {
         let (ids, kinds) = cover(&conn, "p").unwrap();
         assert_eq!(ids, ["m1", "t1", "s1", "m2"]);
         assert_eq!(kinds, ["model", "texture", "audio", "model"]);
+    }
+
+    /// A pack was updated when any of its assets last was; one with none yet, when it came.
+    #[test]
+    fn a_pack_was_updated_when_its_assets_last_were() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('p1', 'Forest', 'ready', '2026-01-01T00:00:00Z'), ('p2', 'Empty', 'ready', '2026-02-01T00:00:00Z');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h', 'a1.wav', 'a1', 'wav', 'audio', '2026-01-01T00:00:00Z', '2026-03-05T00:00:00Z'),
+               ('a2', 'p1', 'h', 'a2.wav', 'a2', 'wav', 'audio', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');",
+        )
+        .unwrap();
+        let updated = |id: &str| get_pack(&conn, id).unwrap().unwrap().updated_at;
+        assert_eq!(updated("p1"), "2026-03-05T00:00:00Z");
+        assert_eq!(updated("p2"), "2026-02-01T00:00:00Z");
+        let listed: Vec<_> = list_packs(&conn, Packs::Library).unwrap().into_iter().map(|p| p.updated_at).collect();
+        assert_eq!(listed, ["2026-02-01T00:00:00Z", "2026-03-05T00:00:00Z"]);
+        // Each pack's is looked up in an index, not by reading all its assets.
+        let plan: Vec<String> = conn
+            .prepare("EXPLAIN QUERY PLAN SELECT MAX(a.updated_at) FROM assets a WHERE a.pack_id = 'p1'")
+            .unwrap()
+            .query_map([], |r| r.get(3))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert!(plan.iter().any(|p| p.contains("assets_pack_updated")), "{plan:?}");
     }
 }

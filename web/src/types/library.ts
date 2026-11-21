@@ -348,6 +348,8 @@ export interface Pack {
   files_total: number
   jobs_pending: number
   created_at: string
+  /** When any of its assets last changed, or `created_at` while it has none. */
+  updated_at: string
   store: string | null
   store_url: string | null
   license_tier: string | null

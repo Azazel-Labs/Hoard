@@ -1436,21 +1436,45 @@ translation = "Σύνδεση"
 source = "Sort"
 translation = "Ταξινόμηση"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Μεγαλύτερα"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "Α έως Ω"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Δημιουργία"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Μεγαλύτερα πρώτα"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Όνομα"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Νεότερα"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Νεότερα πρώτα"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Παλαιότερα"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Παλαιότερα πρώτα"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Μέγεθος"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Μικρότερα πρώτα"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Ενημέρωση"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Ω έως Α"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7477,9 +7501,13 @@ translation = "Σειρά"
 source = "Most assets first"
 translation = "Περισσότερα στοιχεία πρώτα"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Κατά όνομα"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Πλήθος στοιχείων"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Λιγότερα στοιχεία πρώτα"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7492,6 +7520,10 @@ translation = "Παλαιότερα πρώτα"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Μεγαλύτερα πρώτα"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Μικρότερα πρώτα"
 
 [messages.packs-state]
 source = "Status"

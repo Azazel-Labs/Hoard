@@ -64,7 +64,26 @@ const kind = ref<AssetKind | ''>('')
 const state = ref<'' | 'working' | 'failed' | 'untagged' | 'unlicensed'>('')
 /** A store's name, `none` for packs with no store page, or empty for any. */
 const store = ref('')
-const sort = ref<'new' | 'old' | 'name' | 'size' | 'assets'>('new')
+type PackSort = 'created' | 'updated' | 'name' | 'size' | 'assets'
+/** Which way round each order usually goes: names A to Z, everything else most first. */
+const SORT_UP: Record<PackSort, boolean> = { created: false, updated: false, name: true, size: false, assets: false }
+const sort = ref<PackSort>('created')
+const sortUp = ref(false)
+// Another order starts its usual way round.
+watch(sort, (by) => (sortUp.value = SORT_UP[by]))
+const sortWay = computed(() => {
+  const up = sortUp.value
+  switch (sort.value) {
+    case 'name':
+      return up ? t('app-sort-a-to-z') : t('app-sort-z-to-a')
+    case 'size':
+      return up ? t('packs-sort-smallest') : t('packs-sort-size')
+    case 'assets':
+      return up ? t('packs-sort-fewest') : t('packs-sort-assets')
+    default:
+      return up ? t('packs-sort-old') : t('packs-sort-new')
+  }
+})
 const working = (p: Pack) => p.status === 'uploading' || p.status === 'ingesting' || p.status === 'analyzing'
 
 /** Kinds some pack has, most common first, for the kind chips. */
@@ -98,20 +117,22 @@ const shown = computed(() => {
     const hay = [p.name, p.store, p.license, p.license_tier, p.description, ...p.tags].filter(Boolean).join(' ').toLowerCase()
     return words.every((w) => hay.includes(w))
   })
-  const by: Record<typeof sort.value, (a: Pack, b: Pack) => number> = {
-    new: (a, b) => b.created_at.localeCompare(a.created_at),
-    old: (a, b) => a.created_at.localeCompare(b.created_at),
+  // Each ascending; turned round for the other way.
+  const by: Record<PackSort, (a: Pack, b: Pack) => number> = {
+    created: (a, b) => a.created_at.localeCompare(b.created_at),
+    updated: (a, b) => (a.updated_at || a.created_at).localeCompare(b.updated_at || b.created_at),
     name: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }),
-    size: (a, b) => b.total_bytes - a.total_bytes,
-    assets: (a, b) => b.asset_count - a.asset_count,
+    size: (a, b) => a.total_bytes - b.total_bytes,
+    assets: (a, b) => a.asset_count - b.asset_count,
   }
-  return list.sort(by[sort.value])
+  const cmp = by[sort.value]
+  return list.sort(sortUp.value ? cmp : (a, b) => cmp(b, a))
 })
 
 // Rows go into the page a batch at a time as the list scrolls, so a library of thousands of packs opens at once.
 const BATCH = 40
 const limit = ref(BATCH)
-watch([query, kind, state, store, sort], () => (limit.value = BATCH))
+watch([query, kind, state, store, sort, sortUp], () => (limit.value = BATCH))
 const rendered = computed(() => shown.value.slice(0, limit.value))
 const moreEl = ref<HTMLElement | null>(null)
 let moreObserver: IntersectionObserver | undefined
@@ -348,12 +369,18 @@ async function archive(p: Pack) {
         <input id="pack-q" v-model="query" class="field" type="search" :placeholder="t('packs-find-placeholder')" />
         <label class="visually-hidden" for="pack-sort">{{ t('packs-sort') }}</label>
         <select id="pack-sort" v-model="sort" class="field narrow">
-          <option value="new">{{ t('packs-sort-new') }}</option>
-          <option value="old">{{ t('packs-sort-old') }}</option>
-          <option value="name">{{ t('packs-sort-name') }}</option>
-          <option value="size">{{ t('packs-sort-size') }}</option>
-          <option value="assets">{{ t('packs-sort-assets') }}</option>
+          <option value="created">{{ t('app-sort-created') }}</option>
+          <option value="updated">{{ t('app-sort-updated') }}</option>
+          <option value="name">{{ t('app-sort-name') }}</option>
+          <option value="size">{{ t('app-sort-size') }}</option>
+          <option value="assets">{{ t('packs-sort-count') }}</option>
         </select>
+        <button type="button" class="btn ghost sort-way" :title="sortWay" :aria-label="sortWay" @click="sortUp = !sortUp">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path v-if="sortUp" d="M5 13V3M2.5 5.5 5 3l2.5 2.5M9.5 4h4M9.5 8h3M9.5 12h1.5" />
+            <path v-else d="M5 3v10M2.5 10.5 5 13l2.5-2.5M9.5 4h1.5M9.5 8h3M9.5 12h4" />
+          </svg>
+        </button>
       </div>
       <div class="filters">
         <div v-if="kindsPresent.length > 1" class="chips" role="group" :aria-label="t('packs-with-kind')">
@@ -589,6 +616,7 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 .finder .find { margin: 0; flex-wrap: nowrap; }
 .finder .find .field { flex: 1 1 auto; max-width: 30rem; }
 .finder .find .narrow, .filters .narrow { flex: none; width: auto; }
+.finder .sort-way { flex: none; padding: 0.4em; color: var(--muted); }
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .chip {

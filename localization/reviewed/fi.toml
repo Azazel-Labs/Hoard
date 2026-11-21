@@ -1428,21 +1428,45 @@ translation = "Kirjaudu sisään"
 source = "Sort"
 translation = "Lajittelu"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Suurimmat"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A–Ö"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Luotu"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Suurimmat ensin"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Nimi"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Uusimmat"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Uusimmat ensin"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Vanhimmat"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Vanhimmat ensin"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Koko"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Pienimmät ensin"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Päivitetty"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Ö–A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7459,9 +7483,13 @@ translation = "Järjestys"
 source = "Most assets first"
 translation = "Eniten resursseja ensin"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Nimen mukaan"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Resurssien määrä"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Vähiten resursseja ensin"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7474,6 +7502,10 @@ translation = "Vanhimmat ensin"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Suurimmat ensin"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Pienimmät ensin"
 
 [messages.packs-state]
 source = "Status"

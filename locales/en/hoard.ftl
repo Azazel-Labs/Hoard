@@ -571,10 +571,19 @@ app-rank-color = Most of the color
 app-rank-match = Best match
 app-rank-imitation = Sounds most like it
 app-sort = Sort
-app-sort-newest = Newest
 app-sort-name = Name
-app-sort-largest = Largest
-app-sort-oldest = Oldest
+# Sort options: when each asset came into the library, and when it last changed (its file, name, tags or
+# description, by a person or by Hoard).
+app-sort-created = Created
+app-sort-updated = Updated
+app-sort-size = Size
+# The button beside the sort that turns the order round, named for the way it goes now.
+app-sort-newest-first = Newest first
+app-sort-oldest-first = Oldest first
+app-sort-a-to-z = A to Z
+app-sort-z-to-a = Z to A
+app-sort-largest-first = Largest first
+app-sort-smallest-first = Smallest first
 app-collection-added =
     Added { $count ->
         [one] { $count } asset
@@ -1353,12 +1362,17 @@ packs-packs = Packs
 packs-empty = No packs yet. Drop a zip or a folder anywhere on this page to add one.
 packs-find = Find a pack
 packs-find-placeholder = Find a pack by name, store, license or tag
+# The packs' orders reuse the library's (app-sort-*), plus how many assets each has. The button beside it
+# that turns the order round is named for the way it goes now: packs-sort-new/-old for either date,
+# packs-sort-size/-smallest, packs-sort-assets/-fewest.
 packs-sort = Order
 packs-sort-new = Newest first
 packs-sort-old = Oldest first
-packs-sort-name = By name
 packs-sort-size = Biggest first
 packs-sort-assets = Most assets first
+packs-sort-count = Asset count
+packs-sort-smallest = Smallest first
+packs-sort-fewest = Fewest assets first
 # Label for a row of asset kind chips that filter the packs.
 packs-with-kind = Packs with
 packs-state = Status

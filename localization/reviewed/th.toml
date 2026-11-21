@@ -1396,21 +1396,45 @@ translation = "ลงชื่อเข้าใช้"
 source = "Sort"
 translation = "เรียง"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "ใหญ่สุด"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A ถึง Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "วันที่สร้าง"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "ใหญ่สุดก่อน"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "ชื่อ"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "ใหม่สุด"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "ใหม่สุดก่อน"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "เก่าสุด"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "เก่าสุดก่อน"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "ขนาด"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "เล็กสุดก่อน"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "วันที่อัปเดต"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z ถึง A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7280,9 +7304,13 @@ translation = "ลำดับ"
 source = "Most assets first"
 translation = "แอสเซ็ตมากสุดก่อน"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "ตามชื่อ"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "จำนวนแอสเซ็ต"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "แอสเซ็ตน้อยสุดก่อน"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7295,6 +7323,10 @@ translation = "เก่าสุดก่อน"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "ใหญ่สุดก่อน"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "เล็กสุดก่อน"
 
 [messages.packs-state]
 source = "Status"

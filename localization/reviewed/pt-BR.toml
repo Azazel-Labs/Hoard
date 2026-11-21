@@ -1428,21 +1428,45 @@ translation = "Entrar"
 source = "Sort"
 translation = "Ordenar"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Maiores"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "De A a Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Criação"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Maiores primeiro"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Nome"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Mais recentes"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Mais recentes primeiro"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Mais antigos"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Mais antigos primeiro"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Tamanho"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Menores primeiro"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Atualização"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "De Z a A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7431,9 +7455,13 @@ translation = "Ordem"
 source = "Most assets first"
 translation = "Mais assets primeiro"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Por nome"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Número de assets"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Menos assets primeiro"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7446,6 +7474,10 @@ translation = "Mais antigos primeiro"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Maiores primeiro"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Menores primeiro"
 
 [messages.packs-state]
 source = "Status"

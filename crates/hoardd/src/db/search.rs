@@ -382,6 +382,38 @@ pub(crate) struct SearchPage {
     pub(crate) folders: Vec<Facet>,
 }
 
+/// The order a `sort` asks for, or `None` for best match first: `created`, `updated`, `name` or `size`, each in its
+/// usual direction (newest, A to Z, biggest first) or with `:asc` or `:desc` after it. `new` and `old`, which links
+/// and saved searches made before may hold, are `created` and `created:asc`.
+fn chosen_order(sort: Option<&str>) -> Option<&'static str> {
+    let (by, dir) = match sort? {
+        "new" => ("created", None),
+        "old" => ("created", Some("asc")),
+        s => match s.split_once(':') {
+            Some((by, dir)) => (by, Some(dir)),
+            None => (s, None),
+        },
+    };
+    let up = match dir {
+        None => by == "name",
+        Some("asc") => true,
+        Some("desc") => false,
+        Some(_) => return None,
+    };
+    // Each is read in order from an index, either way (assets_created, assets_updated, assets_name).
+    Some(match (by, up) {
+        ("created", false) => "a.created_at DESC, a.path ASC",
+        ("created", true) => "a.created_at ASC, a.path DESC",
+        ("updated", false) => "a.updated_at DESC, a.path ASC",
+        ("updated", true) => "a.updated_at ASC, a.path DESC",
+        ("name", true) => "a.name COLLATE NOCASE ASC",
+        ("name", false) => "a.name COLLATE NOCASE DESC",
+        ("size", false) => "b.size DESC",
+        ("size", true) => "b.size ASC",
+        _ => return None,
+    })
+}
+
 pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> Result<SearchPage> {
     search_ranked(conn, q, with_facets, None)
 }
@@ -424,13 +456,12 @@ pub(crate) fn search_ranked(
     let where_sql = f.where_sql();
     // Only the sizes are needed to put the page in order: the rest of each asset is read once it's on the page, not for
     // everything the search finds.
-    let blobs = if q.sort.as_deref() == Some("size") { "JOIN blobs b ON b.hash = a.blob_hash" } else { "" };
+    let chosen = chosen_order(q.sort.as_deref());
+    let blobs =
+        if chosen.is_some_and(|o| o.starts_with("b.size")) { "JOIN blobs b ON b.hash = a.blob_hash" } else { "" };
 
-    let order = match q.sort.as_deref() {
-        Some("name") => "a.name COLLATE NOCASE ASC",
-        Some("size") => "b.size DESC",
-        Some("old") => "a.created_at ASC, a.path ASC",
-        Some("new") => "a.created_at DESC, a.path ASC",
+    let order = match chosen {
+        Some(o) => o,
         // A word match counts about as much as a fairly close look.
         _ if look.is_some_and(|l| l.blend) && f.ranked => {
             "(CASE WHEN f.asset_id IS NULL THEN 0.0 ELSE 0.25 END + COALESCE(lr.score, 0.0)) DESC, f.rank IS NULL, f.rank, a.id"
@@ -726,6 +757,44 @@ mod tests {
             )
             .unwrap();
         assert_eq!(counted(60), (2, vec![("texture".to_owned(), 2)]));
+    }
+
+    #[test]
+    fn the_library_goes_in_order_by_when_assets_came_or_changed_either_way() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('s', 1, 'x'), ('m', 2, 'x'), ('l', 3, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a', 'p1', 'm', 'a.png', 'Bark', 'png', 'texture', '2026-01-01', '2026-03-01'),
+               ('b', 'p1', 'l', 'b.png', 'apple', 'png', 'texture', '2026-02-01', '2026-02-01'),
+               ('c', 'p1', 's', 'c.png', 'Cliff', 'png', 'texture', '2026-03-01', '2026-03-02');",
+        )
+        .unwrap();
+        let ids = |sort: &str| {
+            let q = SearchQuery { sort: Some(sort.into()), ..Default::default() };
+            search(&conn, &q, false).unwrap().items.into_iter().map(|a| a.id).collect::<String>()
+        };
+        for (sort, ids_in_order) in [
+            ("created", "cba"),
+            ("created:asc", "abc"),
+            ("updated", "cab"),
+            ("updated:desc", "cab"),
+            ("updated:asc", "bac"),
+            ("name", "bac"),
+            ("name:desc", "cab"),
+            ("size", "bac"),
+            ("size:asc", "cab"),
+            // As links and saved searches made before have them.
+            ("new", "cba"),
+            ("old", "abc"),
+            // Anything else is the usual order.
+            ("created:sideways", "cba"),
+        ] {
+            assert_eq!(ids(sort), ids_in_order, "{sort}");
+        }
     }
 
     #[test]

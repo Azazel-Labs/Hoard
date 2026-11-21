@@ -1396,21 +1396,45 @@ translation = "Masuk"
 source = "Sort"
 translation = "Urutkan"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Terbesar"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A ke Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Dibuat"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Terbesar dulu"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Nama"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Terbaru"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Terbaru dulu"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Terlama"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Terlama dulu"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Ukuran"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Terkecil dulu"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Diperbarui"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z ke A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7281,9 +7305,13 @@ translation = "Urutan"
 source = "Most assets first"
 translation = "Aset terbanyak dulu"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Menurut nama"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Jumlah aset"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Aset tersedikit dulu"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7296,6 +7324,10 @@ translation = "Terlama dulu"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Terbesar dulu"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Terkecil dulu"
 
 [messages.packs-state]
 source = "Status"

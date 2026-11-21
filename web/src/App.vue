@@ -435,9 +435,34 @@ function findColor(hex: string) {
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
+const ranking = computed(() => !!(filters.imitation || filters.similar || filters.color || filters.q.trim()))
 const rankLabel = computed(() =>
-  filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
+  filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : t('app-rank-match'),
 )
+/** Which way each order goes unless turned round: newest, A to Z, biggest first. */
+const SORT_UP: Record<string, boolean> = { created: false, updated: false, name: true, size: false }
+/**
+ * What the library is in order by and which way round, from `filters.sort`: `created`, `updated`, `name` or `size`,
+ * with `:asc` or `:desc` after it when turned round (`new` and `old` from older links are `created` either way). Without
+ * one it's best match first while there's something to match, and newest first otherwise.
+ */
+const sortOrder = computed(() => {
+  const s = filters.sort === 'new' ? 'created' : filters.sort === 'old' ? 'created:asc' : filters.sort
+  const [by, dir] = s.split(':')
+  if (!Object.hasOwn(SORT_UP, by)) return ranking.value ? null : { by: 'created', up: false }
+  return { by, up: dir ? dir === 'asc' : SORT_UP[by] }
+})
+function setSort(by: string, up = SORT_UP[by]) {
+  filters.sort = !by ? '' : up === SORT_UP[by] ? by : `${by}:${up ? 'asc' : 'desc'}`
+}
+const sortBy = computed({ get: () => sortOrder.value?.by ?? '', set: (by: string) => setSort(by) })
+const sortWay = computed(() => {
+  const o = sortOrder.value
+  if (!o) return ''
+  if (o.by === 'name') return o.up ? t('app-sort-a-to-z') : t('app-sort-z-to-a')
+  if (o.by === 'size') return o.up ? t('app-sort-smallest-first') : t('app-sort-largest-first')
+  return o.up ? t('app-sort-oldest-first') : t('app-sort-newest-first')
+})
 
 // ------------------------------------------------------------------ collections
 
@@ -1234,16 +1259,31 @@ const commands = computed<Command[]>(() => {
             <input v-model.number="prefs.tile" type="range" min="112" max="280" step="4" />
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="currentColor" /></svg>
           </label>
-          <label class="sort">
-            <span class="visually-hidden">{{ t('app-sort') }}</span>
-            <select v-model="filters.sort" class="field">
-              <option value="">{{ rankLabel }}</option>
-              <option v-if="filters.similar || filters.color || filters.imitation" value="new">{{ t('app-sort-newest') }}</option>
-              <option value="name">{{ t('app-sort-name') }}</option>
-              <option value="size">{{ t('app-sort-largest') }}</option>
-              <option value="old">{{ t('app-sort-oldest') }}</option>
-            </select>
-          </label>
+          <div class="sort">
+            <label>
+              <span class="visually-hidden">{{ t('app-sort') }}</span>
+              <select v-model="sortBy" class="field">
+                <option v-if="ranking" value="">{{ rankLabel }}</option>
+                <option value="created">{{ t('app-sort-created') }}</option>
+                <option value="updated">{{ t('app-sort-updated') }}</option>
+                <option value="name">{{ t('app-sort-name') }}</option>
+                <option value="size">{{ t('app-sort-size') }}</option>
+              </select>
+            </label>
+            <button
+              v-if="sortOrder"
+              type="button"
+              class="btn ghost sort-way"
+              :title="sortWay"
+              :aria-label="sortWay"
+              @click="setSort(sortOrder.by, !sortOrder.up)"
+            >
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path v-if="sortOrder.up" d="M5 13V3M2.5 5.5 5 3l2.5 2.5M9.5 4h4M9.5 8h3M9.5 12h1.5" />
+                <path v-else d="M5 3v10M2.5 10.5 5 13l2.5-2.5M9.5 4h1.5M9.5 8h3M9.5 12h4" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <p v-if="supportingHidden > 0 || prefs.showSupporting" class="supporting">
@@ -1519,7 +1559,9 @@ const commands = computed<Command[]>(() => {
 .active { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; flex: 1; min-width: 0; }
 .size { display: flex; align-items: center; gap: 0.4rem; color: var(--faint); }
 .size input { width: 84px; accent-color: var(--muted); }
+.sort { display: flex; align-items: center; gap: 0.25rem; }
 .sort .field { width: auto; padding: 0.3em 0.5em; font-size: var(--step--1); }
+.sort-way { padding: 0.4em; color: var(--muted); }
 .filters-toggle { display: none; }
 .badge {
   min-width: 1.2rem; padding: 0 0.3rem; border-radius: 999px; background: var(--text); color: var(--bg);

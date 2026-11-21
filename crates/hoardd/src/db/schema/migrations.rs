@@ -940,4 +940,8 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      INSERT INTO unreal_recolour (asset_id, blob_hash)
        SELECT a.id, a.blob_hash FROM asset_origin o JOIN assets a ON a.id = o.asset_id
        WHERE o.method = 'native' AND o.class = 'Texture2D' AND lower(a.ext) = 'png';",
+    // 92: the library can be put in order by when each asset last changed, either way, as it can by when it came.
+    "CREATE INDEX assets_updated ON assets(updated_at DESC, path);",
+    // 93: and packs by when anything in them last changed, which is looked up for each pack the list shows.
+    "CREATE INDEX assets_pack_updated ON assets(pack_id, updated_at);",
 ];

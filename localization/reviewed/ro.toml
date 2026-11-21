@@ -1451,21 +1451,45 @@ translation = "Conectare"
 source = "Sort"
 translation = "Sortare"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Cele mai mari"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "De la A la Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Data creării"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Cele mai mari primele"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Nume"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Cele mai noi"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Cele mai noi primele"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Cele mai vechi"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Cele mai vechi primele"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Dimensiune"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Cele mai mici primele"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Data actualizării"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "De la Z la A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7548,9 +7572,13 @@ translation = "Ordine"
 source = "Most assets first"
 translation = "Cele mai multe resurse primele"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "După nume"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Număr de resurse"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Cele mai puține resurse primele"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7563,6 +7591,10 @@ translation = "Cele mai vechi primele"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Cele mai mari primele"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Cele mai mici primele"
 
 [messages.packs-state]
 source = "Status"

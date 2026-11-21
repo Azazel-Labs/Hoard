@@ -1400,21 +1400,45 @@ translation = "Oturum aç"
 source = "Sort"
 translation = "Sırala"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "En büyük"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A'dan Z'ye"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Oluşturulma"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Önce en büyük"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Ad"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "En yeni"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Önce en yeni"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "En eski"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Önce en eski"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Boyut"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Önce en küçük"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Güncellenme"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z'den A'ya"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7291,9 +7315,13 @@ translation = "Sıra"
 source = "Most assets first"
 translation = "Önce en çok varlık içeren"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Ada göre"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Varlık sayısı"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Önce en az varlık içeren"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7306,6 +7334,10 @@ translation = "Önce en eski"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Önce en büyük"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Önce en küçük"
 
 [messages.packs-state]
 source = "Status"

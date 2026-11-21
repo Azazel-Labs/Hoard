@@ -1399,21 +1399,45 @@ translation = "Đăng nhập"
 source = "Sort"
 translation = "Sắp xếp"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Lớn nhất"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A đến Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Ngày tạo"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Lớn nhất trước"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Tên"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Mới nhất"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Mới nhất trước"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Cũ nhất"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Cũ nhất trước"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Kích thước"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Nhỏ nhất trước"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Ngày cập nhật"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z đến A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7277,9 +7301,13 @@ translation = "Thứ tự"
 source = "Most assets first"
 translation = "Nhiều tài nguyên nhất trước"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Theo tên"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Số tài nguyên"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Ít tài nguyên nhất trước"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7292,6 +7320,10 @@ translation = "Cũ nhất trước"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Lớn nhất trước"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Nhỏ nhất trước"
 
 [messages.packs-state]
 source = "Status"

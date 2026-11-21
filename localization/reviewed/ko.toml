@@ -1396,21 +1396,45 @@ translation = "로그인"
 source = "Sort"
 translation = "정렬"
 
-[messages.app-sort-largest]
-source = "Largest"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A→Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "생성일"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
 translation = "큰 순"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "이름"
 
-[messages.app-sort-newest]
-source = "Newest"
+[messages.app-sort-newest-first]
+source = "Newest first"
 translation = "최신순"
 
-[messages.app-sort-oldest]
-source = "Oldest"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
 translation = "오래된 순"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "크기"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "작은 순"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "수정일"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z→A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7271,9 +7295,13 @@ translation = "순서"
 source = "Most assets first"
 translation = "에셋 많은 순"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "이름순"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "에셋 수"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "에셋 적은 순"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7286,6 +7314,10 @@ translation = "오래된 순"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "큰 순"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "작은 순"
 
 [messages.packs-state]
 source = "Status"

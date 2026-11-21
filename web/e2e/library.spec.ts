@@ -100,6 +100,27 @@ test.describe('library grid', () => {
     await expect(panel).toHaveCount(0)
   })
 
+  test('the order is chosen by what and turned round with the button beside it', async ({ page, seed }) => {
+    await openPack(page, seed.packs[TEXTURES], TEXTURES, '&sort=name')
+    const names = () => page.locator('.grid button.hit').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')?.split(',')[0]))
+    await expect.poll(names).toEqual(['Brick wall', 'Grass ground', 'Stone tile', 'Water surface'])
+    const way = page.locator('.sort-way')
+    await expect(way).toHaveAttribute('aria-label', 'A to Z')
+    await way.click()
+    await expect(way).toHaveAttribute('aria-label', 'Z to A')
+    await expect.poll(names).toEqual(['Water surface', 'Stone tile', 'Grass ground', 'Brick wall'])
+    await expect(page).toHaveURL(/[?&]sort=name%3Adesc/)
+
+    // Another order starts its usual way round; links from before still work.
+    const sort = page.getByRole('combobox', { name: 'Sort', exact: true })
+    await sort.selectOption({ label: 'Updated' })
+    await expect(way).toHaveAttribute('aria-label', 'Newest first')
+    await expect(page).toHaveURL(/[?&]sort=updated(&|$)/)
+    await openPack(page, seed.packs[TEXTURES], TEXTURES, '&sort=old')
+    await expect(sort).toHaveValue('created')
+    await expect(way).toHaveAttribute('aria-label', 'Oldest first')
+  })
+
   test('search finds assets by words', async ({ page }) => {
     await page.goto('/')
     const search = page.getByLabel('Search assets')

@@ -1400,21 +1400,45 @@ translation = "Bejelentkezés"
 source = "Sort"
 translation = "Rendezés"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Legnagyobb"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A–Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Létrehozva"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Legnagyobb elöl"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Név"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Legújabb"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Legújabb elöl"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Legrégebbi"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Legrégebbi elöl"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Méret"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Legkisebb elöl"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Frissítve"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z–A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7287,9 +7311,13 @@ translation = "Sorrend"
 source = "Most assets first"
 translation = "Legtöbb asset elöl"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Név szerint"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Assetek száma"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Legkevesebb asset elöl"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7302,6 +7330,10 @@ translation = "Legrégebbi elöl"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Legnagyobb elöl"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Legkisebb elöl"
 
 [messages.packs-state]
 source = "Status"

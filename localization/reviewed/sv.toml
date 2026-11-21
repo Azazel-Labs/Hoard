@@ -1428,21 +1428,45 @@ translation = "Logga in"
 source = "Sort"
 translation = "Sortera"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "Störst"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A till Ö"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "Skapad"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "Störst först"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "Namn"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "Nyast"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "Nyast först"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "Äldst"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "Äldst först"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "Storlek"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Minst först"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "Uppdaterad"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Ö till A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7428,9 +7452,13 @@ translation = "Ordning"
 source = "Most assets first"
 translation = "Flest resurser först"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "Efter namn"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Antal resurser"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Färst resurser först"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7443,6 +7471,10 @@ translation = "Äldst först"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Störst först"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Minst först"
 
 [messages.packs-state]
 source = "Status"

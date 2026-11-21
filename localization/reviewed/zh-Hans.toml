@@ -1399,21 +1399,45 @@ translation = "登录"
 source = "Sort"
 translation = "排序"
 
-[messages.app-sort-largest]
-source = "Largest"
-translation = "最大"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "A 到 Z"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "创建时间"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
+translation = "最大优先"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "名称"
 
-[messages.app-sort-newest]
-source = "Newest"
-translation = "最新"
+[messages.app-sort-newest-first]
+source = "Newest first"
+translation = "最新优先"
 
-[messages.app-sort-oldest]
-source = "Oldest"
-translation = "最早"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
+translation = "最早优先"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "大小"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "最小优先"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "更新时间"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "Z 到 A"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7291,9 +7315,13 @@ translation = "排序"
 source = "Most assets first"
 translation = "资源最多优先"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "按名称"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "资源数量"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "资源最少优先"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7306,6 +7334,10 @@ translation = "最早优先"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "最大优先"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "最小优先"
 
 [messages.packs-state]
 source = "Status"

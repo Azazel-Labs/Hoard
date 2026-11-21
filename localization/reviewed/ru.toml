@@ -1456,21 +1456,45 @@ translation = "Войти"
 source = "Sort"
 translation = "Сортировка"
 
-[messages.app-sort-largest]
-source = "Largest"
+[messages.app-sort-a-to-z]
+source = "A to Z"
+translation = "От А до Я"
+
+[messages.app-sort-created]
+source = "Created"
+translation = "По дате создания"
+
+[messages.app-sort-largest-first]
+source = "Largest first"
 translation = "Сначала большие"
 
 [messages.app-sort-name]
 source = "Name"
 translation = "По названию"
 
-[messages.app-sort-newest]
-source = "Newest"
+[messages.app-sort-newest-first]
+source = "Newest first"
 translation = "Сначала новые"
 
-[messages.app-sort-oldest]
-source = "Oldest"
+[messages.app-sort-oldest-first]
+source = "Oldest first"
 translation = "Сначала старые"
+
+[messages.app-sort-size]
+source = "Size"
+translation = "По размеру"
+
+[messages.app-sort-smallest-first]
+source = "Smallest first"
+translation = "Сначала маленькие"
+
+[messages.app-sort-updated]
+source = "Updated"
+translation = "По дате изменения"
+
+[messages.app-sort-z-to-a]
+source = "Z to A"
+translation = "От Я до А"
 
 [messages.app-split-after]
 source = '{ " " }contains { $count } folders or archives.'
@@ -7580,9 +7604,13 @@ translation = "Порядок"
 source = "Most assets first"
 translation = "Больше всего ассетов"
 
-[messages.packs-sort-name]
-source = "By name"
-translation = "По названию"
+[messages.packs-sort-count]
+source = "Asset count"
+translation = "Количество ассетов"
+
+[messages.packs-sort-fewest]
+source = "Fewest assets first"
+translation = "Меньше всего ассетов"
 
 [messages.packs-sort-new]
 source = "Newest first"
@@ -7595,6 +7623,10 @@ translation = "Сначала старые"
 [messages.packs-sort-size]
 source = "Biggest first"
 translation = "Сначала большие"
+
+[messages.packs-sort-smallest]
+source = "Smallest first"
+translation = "Сначала маленькие"
 
 [messages.packs-state]
 source = "Status"

@@ -716,6 +716,10 @@ pub struct Pack {
     #[serde(default)]
     pub license_tier: Option<String>,
     pub created_at: String,
+    /// When any of its assets last changed (a file added, replaced or read again, a name, tag or description), or
+    /// `created_at` while it has none.
+    #[serde(default)]
+    pub updated_at: String,
     /// Up to four asset ids with thumbnails, for a cover mosaic (mixed kinds where the pack has them).
     #[serde(default)]
     pub preview: Vec<String>,
@@ -793,8 +797,9 @@ pub struct SearchQuery {
     pub folder: Option<String>,
     #[serde(default)]
     pub ext: Option<String>,
-    /// Best match first (default; newest first without a text, color or similar query), or "new", "old", "name",
-    /// "size".
+    /// Best match first (default; newest first without a text, color or similar query), or "created", "updated",
+    /// "name" or "size", each its usual way round (newest, A to Z, biggest first) or with ":asc" or ":desc" after it.
+    /// "new" and "old" are "created" and "created:asc".
     #[serde(default)]
     pub sort: Option<String>,
     #[serde(default)]

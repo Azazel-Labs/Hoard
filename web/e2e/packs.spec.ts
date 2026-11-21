@@ -110,13 +110,24 @@ test.describe('packs page', () => {
     await expect(page.getByLabel('Find a pack')).toBeVisible()
   })
 
-  test('sorts by name and by asset count', async ({ page }) => {
+  test('sorts by what is chosen, turned round with the button beside it', async ({ page }) => {
     const order = page.getByLabel('Order')
-    await order.selectOption({ label: 'By name' })
-    await expect.poll(() => seededOrder(page)).toEqual([...SEEDED].sort((a, b) => a.localeCompare(b)))
-    await order.selectOption({ label: 'Most assets first' })
+    const way = page.locator('.finder .sort-way')
+    const byName = [...SEEDED].sort((a, b) => a.localeCompare(b))
+    await order.selectOption({ label: 'Name' })
+    await expect(way).toHaveAttribute('aria-label', 'A to Z')
+    await expect.poll(() => seededOrder(page)).toEqual(byName)
+    await way.click()
+    await expect(way).toHaveAttribute('aria-label', 'Z to A')
+    await expect.poll(() => seededOrder(page)).toEqual([...byName].reverse())
+    // Another order starts its usual way round.
+    await order.selectOption({ label: 'Asset count' })
+    await expect(way).toHaveAttribute('aria-label', 'Most assets first')
     await expect(packNames(page).first()).toHaveText(BIG)
-    await order.selectOption({ label: 'Oldest first' })
+    await order.selectOption({ label: 'Created' })
+    await expect(way).toHaveAttribute('aria-label', 'Newest first')
+    await way.click()
+    await expect(way).toHaveAttribute('aria-label', 'Oldest first')
     // Seeded in this order, before any test made a pack.
     await expect.poll(() => seededOrder(page)).toEqual([TEXTURES, MODELS, ZIPPED, BIG])
   })

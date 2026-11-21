@@ -63,10 +63,8 @@ async function submit() {
         {{ asset.description ? t('asset-desc-edit') : t('asset-desc-write') }}
       </button>
     </template>
-    <div v-if="asset.ai_description" class="descsrc">
-      <span class="srclabel">{{ t('asset-desc-ai') }}</span>
-      <p class="desc">{{ asset.ai_description }}</p>
-    </div>
+    <!-- No label: the cursive italic is the AI's voice (see .ai-voice). -->
+    <p v-if="asset.ai_description" class="desc ai-voice" :title="t('asset-desc-ai')"><span class="visually-hidden">{{ t('asset-desc-ai') }}: </span>{{ asset.ai_description }}</p>
     <div v-if="asset.source_description" class="descsrc">
       <span class="srclabel">{{ t('asset-desc-file') }}</span>
       <p class="desc">{{ asset.source_description }}</p>
@@ -87,7 +85,7 @@ async function submit() {
 </template>
 
 <style scoped>
-.desc { margin: 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
+.desc { position: relative; margin: 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
 .desc.mine { color: var(--text); }
 .descs { display: grid; gap: 0.6rem; justify-items: start; }
 .descsrc { display: grid; gap: 0.15rem; }

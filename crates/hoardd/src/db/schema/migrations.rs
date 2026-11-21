@@ -987,4 +987,15 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      ALTER TABLE saved_searches ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0;",
     // 95: the library can be put in order by rating, best first, and narrowed to what's rated well enough.
     "CREATE INDEX assets_rating ON assets(rating);",
+    // 96: browsing one kind newest first reads a page of that kind in order (as 77 does the library's) instead of
+    // sorting all of it (a page of the textures of 300,000 assets took 100 ms, now under one). And an index for each foreign key that had none,
+    // so deleting a pack, user, client or location doesn't read every row of the tables pointing at it.
+    "DROP INDEX assets_kind;
+     CREATE INDEX assets_kind_created ON assets (kind, created_at DESC, path);
+     CREATE INDEX import_keys_pack ON import_keys (pack_id);
+     CREATE INDEX sessions_user ON sessions (user_id);
+     CREATE INDEX access_tokens_created_by ON access_tokens (created_by);
+     CREATE INDEX oauth_grants_user ON oauth_grants (user_id);
+     CREATE INDEX oauth_grants_client ON oauth_grants (client_id);
+     CREATE INDEX issues_location ON issues (location_id);",
 ];

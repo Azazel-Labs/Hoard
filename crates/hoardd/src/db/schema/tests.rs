@@ -796,3 +796,36 @@ fn converted_assets_keep_their_originals_hash_and_old_unreal_textures_are_listed
         ["gone g", "kept k"]
     );
 }
+
+/// Deleting a row looks up the rows pointing at it in every table with a foreign key to its table: without an index
+/// on the pointing column, each one reads that whole table, so deleting a big pack took minutes, not seconds.
+#[test]
+fn every_foreign_key_has_an_index() {
+    let dir = tempfile::tempdir().unwrap();
+    let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+    let conn = pool.get().unwrap();
+    let strings = |sql: &str| -> Vec<String> {
+        conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().map(Result::unwrap).collect()
+    };
+    let tables = strings(
+        "SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND sql NOT LIKE '%VIRTUAL%'",
+    );
+    let mut missing = Vec::new();
+    for table in tables {
+        // The first column of each foreign key, and the first column of each index (the primary key's too).
+        let keys = strings(&format!(
+            "SELECT DISTINCT \"from\" || ' -> ' || \"table\" FROM pragma_foreign_key_list('{table}') WHERE seq = 0"
+        ));
+        let led: Vec<String> = strings(&format!(
+            "SELECT ii.name FROM pragma_index_list('{table}') il, pragma_index_info(il.name) ii WHERE ii.seqno = 0 AND ii.name IS NOT NULL
+             UNION SELECT name FROM pragma_table_info('{table}') WHERE pk = 1"
+        ));
+        for key in keys {
+            let column = key.split(" -> ").next().unwrap_or_default().to_owned();
+            if !led.contains(&column) {
+                missing.push(format!("{table}.{key}"));
+            }
+        }
+    }
+    assert!(missing.is_empty(), "foreign keys without an index: {missing:#?}");
+}

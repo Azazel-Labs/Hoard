@@ -591,18 +591,20 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [1] { $count ->
-            [one] Додата је { $count } ознака
-            [few] Додате су { $count } ознаке
-            [many] Додато је { $count } ознака
-           *[other] Додато је { $count } ознаке
-        }
-       *[other] { $count ->
-            [one] Додата је { $count } ознака на { $assets } ресурса
-            [few] Додате су { $count } ознаке на { $assets } ресурса
-            [many] Додато је { $count } ознака на { $assets } ресурса
-           *[other] Додато је { $count } ознаке на { $assets } ресурса
-        }
+        [1]
+            { $count ->
+                [one] Додата је { $count } ознака
+                [few] Додате су { $count } ознаке
+                [many] Додато је { $count } ознака
+               *[other] Додато је { $count } ознаке
+            }
+       *[other]
+            { $count ->
+                [one] Додата је { $count } ознака на { $assets } ресурса
+                [few] Додате су { $count } ознаке на { $assets } ресурса
+                [many] Додато је { $count } ознака на { $assets } ресурса
+               *[other] Додато је { $count } ознаке на { $assets } ресурса
+            }
     }
 app-bulk-untagged = Ознака { $tag } уклоњена је са { $count } ресурса
 app-bulk-tagged =
@@ -1530,11 +1532,12 @@ packs-review-now = Сада
 packs-review-store = Из продавнице
 packs-review-same = Исто
 packs-review-read-page = Чита се са странице при чувању
-packs-review-take = { $count ->
-    [one] Попуни { $count } поље
-    [few] Попуни { $count } поља
-   *[other] Попуни { $count } поља
-}
+packs-review-take =
+    { $count ->
+        [one] Попуни { $count } поље
+        [few] Попуни { $count } поља
+       *[other] Попуни { $count } поља
+    }
 packs-lookup-searched = Претражено { $date }.
 packs-lookup-again = Претражи поново
 packs-lookup-again-after = .
@@ -1551,11 +1554,12 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Ниво лиценце
 packs-license-tier-placeholder = Лична, професионална…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } ресурс има сопствену лиценцу: нека прати и лиценцу пакета
-    [few] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
-   *[other] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } ресурс има сопствену лиценцу: нека прати и лиценцу пакета
+        [few] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
+       *[other] { $count } ресурса имају сопствену лиценцу: нека прате и лиценцу пакета
+    }
 packs-store-page = Страница продавнице
 packs-store-text = Опис из продавнице
 packs-store-text-placeholder = Налепите текст огласа или оставите празно да би се преузео са странице продавнице.

@@ -1312,9 +1312,10 @@ packs-review-now = 현재
 packs-review-store = 스토어 내용
 packs-review-same = 같음
 packs-review-read-page = 저장할 때 페이지에서 읽어옴
-packs-review-take = { $count ->
-   *[other] 필드 { $count }개 채우기
-}
+packs-review-take =
+    { $count ->
+       *[other] 필드 { $count }개 채우기
+    }
 packs-lookup-searched = { $date }에 검색했습니다.
 packs-lookup-again = 다시 검색
 packs-lookup-again-after = .
@@ -1331,9 +1332,10 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = 라이선스 등급
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-   *[other] 에셋 { $count }개에 자체 라이선스가 있음: 팩의 라이선스를 따르게 하기
-}
+packs-own-licenses =
+    { $count ->
+       *[other] 에셋 { $count }개에 자체 라이선스가 있음: 팩의 라이선스를 따르게 하기
+    }
 packs-store-page = 스토어 페이지
 packs-store-text = 스토어 설명
 packs-store-text-placeholder = 판매 페이지의 텍스트를 붙여 넣거나, 비워 두면 스토어 페이지에서 가져옵니다.

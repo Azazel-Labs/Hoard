@@ -573,14 +573,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } címke hozzáadva
-           *[other] { $count } címke hozzáadva
-        }
-       *[other] { $count ->
-            [one] { $count } címke hozzáadva { $assets } assethez
-           *[other] { $count } címke hozzáadva { $assets } assethez
-        }
+        [one]
+            { $count ->
+                [one] { $count } címke hozzáadva
+               *[other] { $count } címke hozzáadva
+            }
+       *[other]
+            { $count ->
+                [one] { $count } címke hozzáadva { $assets } assethez
+               *[other] { $count } címke hozzáadva { $assets } assethez
+            }
     }
 app-bulk-untagged = Címke eltávolítva { $count } assetről: { $tag }
 app-bulk-tagged = { $count } asset felcímkézve ezzel: { $tag }
@@ -1379,9 +1381,10 @@ packs-review-now = Most
 packs-review-store = Az áruházból
 packs-review-same = Azonos
 packs-review-read-page = Mentéskor beolvassa az oldalról
-packs-review-take = { $count ->
-   *[other] { $count } mező kitöltése
-}
+packs-review-take =
+    { $count ->
+       *[other] { $count } mező kitöltése
+    }
 packs-lookup-searched = Keresve: { $date }.
 packs-lookup-again = Keresés újra
 packs-lookup-again-after = .
@@ -1398,9 +1401,10 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Licencszint
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-   *[other] { $count } asset saját licenccel rendelkezik: kövesse a csomag licencét is
-}
+packs-own-licenses =
+    { $count ->
+       *[other] { $count } asset saját licenccel rendelkezik: kövesse a csomag licencét is
+    }
 packs-store-page = Áruházi oldal
 packs-store-text = Leírás az áruházból
 packs-store-text-placeholder = Illessze be a hirdetés szövegét, vagy hagyja üresen, hogy az áruházi oldalról töltődjön le.

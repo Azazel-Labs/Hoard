@@ -1336,9 +1336,10 @@ packs-review-now = 目前
 packs-review-store = 來自商店
 packs-review-same = 相同
 packs-review-read-page = 儲存時從頁面讀取
-packs-review-take = { $count ->
-   *[other] 填入 { $count } 個欄位
-}
+packs-review-take =
+    { $count ->
+       *[other] 填入 { $count } 個欄位
+    }
 packs-lookup-searched = 於 { $date } 搜尋。
 packs-lookup-again = 重新搜尋
 packs-lookup-again-after = 。
@@ -1355,9 +1356,10 @@ packs-license-placeholder = Fab Standard License、CC BY 4.0…
 packs-license-tier-label = 授權等級
 packs-license-tier-placeholder = 個人、專業…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-   *[other] { $count } 個素材有自己的授權：改為沿用素材包的授權
-}
+packs-own-licenses =
+    { $count ->
+       *[other] { $count } 個素材有自己的授權：改為沿用素材包的授權
+    }
 packs-store-page = 商店頁面
 packs-store-text = 商店的說明
 packs-store-text-placeholder = 貼上商品頁面的文字，或留空以從商店頁面擷取。

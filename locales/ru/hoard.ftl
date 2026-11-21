@@ -601,18 +601,20 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [1] { $count ->
-            [one] Добавлен { $count } тег
-            [few] Добавлено { $count } тега
-            [many] Добавлено { $count } тегов
-           *[other] Добавлено { $count } тега
-        }
-       *[other] { $count ->
-            [one] Добавлен { $count } тег к { $assets } ассетам
-            [few] Добавлено { $count } тега к { $assets } ассетам
-            [many] Добавлено { $count } тегов к { $assets } ассетам
-           *[other] Добавлено { $count } тега к { $assets } ассетам
-        }
+        [1]
+            { $count ->
+                [one] Добавлен { $count } тег
+                [few] Добавлено { $count } тега
+                [many] Добавлено { $count } тегов
+               *[other] Добавлено { $count } тега
+            }
+       *[other]
+            { $count ->
+                [one] Добавлен { $count } тег к { $assets } ассетам
+                [few] Добавлено { $count } тега к { $assets } ассетам
+                [many] Добавлено { $count } тегов к { $assets } ассетам
+               *[other] Добавлено { $count } тега к { $assets } ассетам
+            }
     }
 app-bulk-untagged =
     { $count ->
@@ -1612,12 +1614,13 @@ packs-review-now = Сейчас
 packs-review-store = Из магазина
 packs-review-same = Одинаково
 packs-review-read-page = При сохранении будет прочитано со страницы
-packs-review-take = { $count ->
-    [one] Заполнить { $count } поле
-    [few] Заполнить { $count } поля
-    [many] Заполнить { $count } полей
-   *[other] Заполнить { $count } поля
-}
+packs-review-take =
+    { $count ->
+        [one] Заполнить { $count } поле
+        [few] Заполнить { $count } поля
+        [many] Заполнить { $count } полей
+       *[other] Заполнить { $count } поля
+    }
 packs-lookup-searched = Искали { $date }.
 packs-lookup-again = Искать снова
 packs-lookup-again-after = .
@@ -1634,12 +1637,13 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Уровень лицензии
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] У { $count } ассета своя лицензия: переключить на лицензию пака
-    [few] У { $count } ассетов своя лицензия: переключить на лицензию пака
-    [many] У { $count } ассетов своя лицензия: переключить на лицензию пака
-   *[other] У { $count } ассета своя лицензия: переключить на лицензию пака
-}
+packs-own-licenses =
+    { $count ->
+        [one] У { $count } ассета своя лицензия: переключить на лицензию пака
+        [few] У { $count } ассетов своя лицензия: переключить на лицензию пака
+        [many] У { $count } ассетов своя лицензия: переключить на лицензию пака
+       *[other] У { $count } ассета своя лицензия: переключить на лицензию пака
+    }
 packs-store-page = Страница в магазине
 packs-store-text = Описание из магазина
 packs-store-text-placeholder = Вставьте текст описания или оставьте пустым, чтобы загрузить его со страницы магазина.

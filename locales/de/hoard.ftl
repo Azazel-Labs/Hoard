@@ -581,14 +581,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } Tag hinzugefügt
-           *[other] { $count } Tags hinzugefügt
-        }
-       *[other] { $count ->
-            [one] { $count } Tag zu { $assets } Assets hinzugefügt
-           *[other] { $count } Tags zu { $assets } Assets hinzugefügt
-        }
+        [one]
+            { $count ->
+                [one] { $count } Tag hinzugefügt
+               *[other] { $count } Tags hinzugefügt
+            }
+       *[other]
+            { $count ->
+                [one] { $count } Tag zu { $assets } Assets hinzugefügt
+               *[other] { $count } Tags zu { $assets } Assets hinzugefügt
+            }
     }
 app-bulk-untagged =
     { $tag } von { $count ->
@@ -1462,10 +1464,11 @@ packs-review-now = Jetzt
 packs-review-store = Aus dem Store
 packs-review-same = Gleich
 packs-review-read-page = Wird beim Speichern von der Seite gelesen
-packs-review-take = { $count ->
-    [one] { $count } Feld übernehmen
-   *[other] { $count } Felder übernehmen
-}
+packs-review-take =
+    { $count ->
+        [one] { $count } Feld übernehmen
+       *[other] { $count } Felder übernehmen
+    }
 packs-lookup-searched = Gesucht am { $date }.
 packs-lookup-again = Erneut suchen
 packs-lookup-again-after = .
@@ -1482,10 +1485,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lizenzstufe
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } Asset hat eine eigene Lizenz: stattdessen die des Pakets verwenden
-   *[other] { $count } Assets haben eine eigene Lizenz: stattdessen die des Pakets verwenden
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } Asset hat eine eigene Lizenz: stattdessen die des Pakets verwenden
+       *[other] { $count } Assets haben eine eigene Lizenz: stattdessen die des Pakets verwenden
+    }
 packs-store-page = Store-Seite
 packs-store-text = Beschreibung aus dem Store
 packs-store-text-placeholder = Fügen Sie den Text des Angebots ein, oder lassen Sie das Feld leer, um ihn von der Store-Seite zu holen.

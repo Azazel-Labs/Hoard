@@ -573,14 +573,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } etiket eklendi
-           *[other] { $count } etiket eklendi
-        }
-       *[other] { $count ->
-            [one] { $count } etiket { $assets } varlığa eklendi
-           *[other] { $count } etiket { $assets } varlığa eklendi
-        }
+        [one]
+            { $count ->
+                [one] { $count } etiket eklendi
+               *[other] { $count } etiket eklendi
+            }
+       *[other]
+            { $count ->
+                [one] { $count } etiket { $assets } varlığa eklendi
+               *[other] { $count } etiket { $assets } varlığa eklendi
+            }
     }
 app-bulk-untagged = { $tag } etiketi { $count } varlıktan kaldırıldı
 app-bulk-tagged = { $count } varlığa { $tag } etiketi eklendi
@@ -1367,9 +1369,10 @@ packs-review-now = Şimdi
 packs-review-store = Mağazadan
 packs-review-same = Aynı
 packs-review-read-page = Kaydederken sayfadan okunur
-packs-review-take = { $count ->
-   *[other] { $count } alanı doldur
-}
+packs-review-take =
+    { $count ->
+       *[other] { $count } alanı doldur
+    }
 packs-lookup-searched = Arama tarihi: { $date }.
 packs-lookup-again = Yeniden ara
 packs-lookup-again-after = .
@@ -1386,9 +1389,10 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisans düzeyi
 packs-license-tier-placeholder = Kişisel, Profesyonel…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-   *[other] { $count } varlığın kendi lisansı var: paketin lisansını da kullansın
-}
+packs-own-licenses =
+    { $count ->
+       *[other] { $count } varlığın kendi lisansı var: paketin lisansını da kullansın
+    }
 packs-store-page = Mağaza sayfası
 packs-store-text = Mağazadaki açıklama
 packs-store-text-placeholder = İlan metnini yapıştırın ya da mağaza sayfasından alınması için boş bırakın.

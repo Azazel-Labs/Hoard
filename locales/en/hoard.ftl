@@ -651,14 +651,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Added { $count } tag
-           *[other] Added { $count } tags
-        }
-       *[other] { $count ->
-            [one] Added { $count } tag to { $assets } assets
-           *[other] Added { $count } tags to { $assets } assets
-        }
+        [one]
+            { $count ->
+                [one] Added { $count } tag
+               *[other] Added { $count } tags
+            }
+       *[other]
+            { $count ->
+                [one] Added { $count } tag to { $assets } assets
+               *[other] Added { $count } tags to { $assets } assets
+            }
     }
 # $tag is the tag taken off or added.
 app-bulk-untagged =
@@ -1626,10 +1628,11 @@ packs-review-now = Now
 packs-review-store = From the store
 packs-review-same = Same
 packs-review-read-page = Read from the page when you save
-packs-review-take = { $count ->
-    [one] Fill in 1 field
-   *[other] Fill in { $count } fields
-}
+packs-review-take =
+    { $count ->
+        [one] Fill in 1 field
+       *[other] Fill in { $count } fields
+    }
 # Followed by a “Search again” button, then packs-lookup-again-after.
 packs-lookup-searched = Searched { $date }.
 packs-lookup-again = Search again
@@ -1648,10 +1651,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = License tier
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] 1 asset has a license of its own: make it go by the pack's too
-   *[other] { $count } assets have a license of their own: make them go by the pack's too
-}
+packs-own-licenses =
+    { $count ->
+        [one] 1 asset has a license of its own: make it go by the pack's too
+       *[other] { $count } assets have a license of their own: make them go by the pack's too
+    }
 packs-store-page = Store page
 packs-store-text = Description from the store
 packs-store-text-placeholder = Paste the listing text, or leave empty to fetch it from the store page.

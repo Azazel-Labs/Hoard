@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } etiket bygevoeg
-           *[other] { $count } etikette bygevoeg
-        }
-       *[other] { $count ->
-            [one] { $count } etiket by { $assets } bates gevoeg
-           *[other] { $count } etikette by { $assets } bates gevoeg
-        }
+        [one]
+            { $count ->
+                [one] { $count } etiket bygevoeg
+               *[other] { $count } etikette bygevoeg
+            }
+       *[other]
+            { $count ->
+                [one] { $count } etiket by { $assets } bates gevoeg
+               *[other] { $count } etikette by { $assets } bates gevoeg
+            }
     }
 app-bulk-untagged =
     { $tag } van { $count ->
@@ -1462,10 +1464,11 @@ packs-review-now = Nou
 packs-review-store = Van die winkel
 packs-review-same = Dieselfde
 packs-review-read-page = Word van die bladsy gelees wanneer jy stoor
-packs-review-take = { $count ->
-    [one] Vul { $count } veld in
-   *[other] Vul { $count } velde in
-}
+packs-review-take =
+    { $count ->
+        [one] Vul { $count } veld in
+       *[other] Vul { $count } velde in
+    }
 packs-lookup-searched = Gesoek { $date }.
 packs-lookup-again = Soek weer
 packs-lookup-again-after = .
@@ -1482,10 +1485,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisensievlak
 packs-license-tier-placeholder = Persoonlik, Professioneel…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } bate het sy eie lisensie: laat dit ook die pak se lisensie volg
-   *[other] { $count } bates het hul eie lisensie: laat hulle ook die pak se lisensie volg
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } bate het sy eie lisensie: laat dit ook die pak se lisensie volg
+       *[other] { $count } bates het hul eie lisensie: laat hulle ook die pak se lisensie volg
+    }
 packs-store-page = Winkelbladsy
 packs-store-text = Beskrywing van die winkel
 packs-store-text-placeholder = Plak die lysteks, of laat leeg om dit van die winkelbladsy af te haal.

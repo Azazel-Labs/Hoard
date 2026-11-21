@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } tag adicionada
-           *[other] { $count } tags adicionadas
-        }
-       *[other] { $count ->
-            [one] { $count } tag adicionada a { $assets } assets
-           *[other] { $count } tags adicionadas a { $assets } assets
-        }
+        [one]
+            { $count ->
+                [one] { $count } tag adicionada
+               *[other] { $count } tags adicionadas
+            }
+       *[other]
+            { $count ->
+                [one] { $count } tag adicionada a { $assets } assets
+               *[other] { $count } tags adicionadas a { $assets } assets
+            }
     }
 app-bulk-untagged =
     { $tag } foi tirada de { $count ->
@@ -1468,10 +1470,11 @@ packs-review-now = Agora
 packs-review-store = Da loja
 packs-review-same = Igual
 packs-review-read-page = Lido da página ao salvar
-packs-review-take = { $count ->
-    [one] Preencher { $count } campo
-   *[other] Preencher { $count } campos
-}
+packs-review-take =
+    { $count ->
+        [one] Preencher { $count } campo
+       *[other] Preencher { $count } campos
+    }
 packs-lookup-searched = Buscado em { $date }.
 packs-lookup-again = Buscar de novo
 packs-lookup-again-after = .
@@ -1488,10 +1491,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Nível da licença
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } asset tem licença própria: fazer com que siga também a do pacote
-   *[other] { $count } assets têm licença própria: fazer com que sigam também a do pacote
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } asset tem licença própria: fazer com que siga também a do pacote
+       *[other] { $count } assets têm licença própria: fazer com que sigam também a do pacote
+    }
 packs-store-page = Página da loja
 packs-store-text = Descrição da loja
 packs-store-text-placeholder = Cole o texto do anúncio, ou deixe vazio para buscá-lo na página da loja.

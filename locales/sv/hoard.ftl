@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Lade till { $count } tagg
-           *[other] Lade till { $count } taggar
-        }
-       *[other] { $count ->
-            [one] Lade till { $count } tagg på { $assets } resurser
-           *[other] Lade till { $count } taggar på { $assets } resurser
-        }
+        [one]
+            { $count ->
+                [one] Lade till { $count } tagg
+               *[other] Lade till { $count } taggar
+            }
+       *[other]
+            { $count ->
+                [one] Lade till { $count } tagg på { $assets } resurser
+               *[other] Lade till { $count } taggar på { $assets } resurser
+            }
     }
 app-bulk-untagged =
     Tog bort { $tag } från { $count ->
@@ -1465,10 +1467,11 @@ packs-review-now = Nu
 packs-review-store = Från butiken
 packs-review-same = Samma
 packs-review-read-page = Läses från sidan när du sparar
-packs-review-take = { $count ->
-    [one] Fyll i { $count } fält
-   *[other] Fyll i { $count } fält
-}
+packs-review-take =
+    { $count ->
+        [one] Fyll i { $count } fält
+       *[other] Fyll i { $count } fält
+    }
 packs-lookup-searched = Sökte { $date }.
 packs-lookup-again = Sök igen
 packs-lookup-again-after = .
@@ -1485,10 +1488,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Licensnivå
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } resurs har egen licens: låt den också följa paketets
-   *[other] { $count } resurser har egen licens: låt dem också följa paketets
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } resurs har egen licens: låt den också följa paketets
+       *[other] { $count } resurser har egen licens: låt dem också följa paketets
+    }
 packs-store-page = Butikssida
 packs-store-text = Beskrivning från butiken
 packs-store-text-placeholder = Klistra in annonstexten, eller lämna tomt för att hämta den från butikssidan.

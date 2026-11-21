@@ -585,14 +585,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Lisätty { $count } tunniste
-           *[other] Lisätty { $count } tunnistetta
-        }
-       *[other] { $count ->
-            [one] Lisätty { $count } tunniste { $assets } resurssiin
-           *[other] Lisätty { $count } tunnistetta { $assets } resurssiin
-        }
+        [one]
+            { $count ->
+                [one] Lisätty { $count } tunniste
+               *[other] Lisätty { $count } tunnistetta
+            }
+       *[other]
+            { $count ->
+                [one] Lisätty { $count } tunniste { $assets } resurssiin
+               *[other] Lisätty { $count } tunnistetta { $assets } resurssiin
+            }
     }
 app-bulk-untagged =
     { $count ->
@@ -1512,10 +1514,11 @@ packs-review-now = Nyt
 packs-review-store = Kaupasta
 packs-review-same = Sama
 packs-review-read-page = Luetaan sivulta tallennettaessa
-packs-review-take = { $count ->
-    [one] Täytä { $count } kenttä
-   *[other] Täytä { $count } kenttää
-}
+packs-review-take =
+    { $count ->
+        [one] Täytä { $count } kenttä
+       *[other] Täytä { $count } kenttää
+    }
 packs-lookup-searched = Haettu { $date }.
 packs-lookup-again = Hae uudelleen
 packs-lookup-again-after = .
@@ -1532,10 +1535,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Lisenssitaso
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } resurssilla on oma lisenssi: anna sen noudattaa myös paketin lisenssiä
-   *[other] { $count } resurssilla on oma lisenssi: anna niiden noudattaa myös paketin lisenssiä
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } resurssilla on oma lisenssi: anna sen noudattaa myös paketin lisenssiä
+       *[other] { $count } resurssilla on oma lisenssi: anna niiden noudattaa myös paketin lisenssiä
+    }
 packs-store-page = Kauppasivu
 packs-store-text = Kuvaus kaupasta
 packs-store-text-placeholder = Liitä myyntisivun teksti tai jätä tyhjäksi, niin se haetaan kauppasivulta.

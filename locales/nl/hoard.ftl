@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] { $count } tag toegevoegd
-           *[other] { $count } tags toegevoegd
-        }
-       *[other] { $count ->
-            [one] { $count } tag toegevoegd aan { $assets } assets
-           *[other] { $count } tags toegevoegd aan { $assets } assets
-        }
+        [one]
+            { $count ->
+                [one] { $count } tag toegevoegd
+               *[other] { $count } tags toegevoegd
+            }
+       *[other]
+            { $count ->
+                [one] { $count } tag toegevoegd aan { $assets } assets
+               *[other] { $count } tags toegevoegd aan { $assets } assets
+            }
     }
 app-bulk-untagged =
     { $tag } verwijderd van { $count ->
@@ -1462,10 +1464,11 @@ packs-review-now = Nu
 packs-review-store = Uit de store
 packs-review-same = Gelijk
 packs-review-read-page = Wordt bij het opslaan van de pagina gelezen
-packs-review-take = { $count ->
-    [one] { $count } veld invullen
-   *[other] { $count } velden invullen
-}
+packs-review-take =
+    { $count ->
+        [one] { $count } veld invullen
+       *[other] { $count } velden invullen
+    }
 packs-lookup-searched = Gezocht op { $date }.
 packs-lookup-again = Opnieuw zoeken
 packs-lookup-again-after = .
@@ -1482,10 +1485,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Licentieniveau
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } asset heeft een eigen licentie: laat hem ook die van het pakket volgen
-   *[other] { $count } assets hebben een eigen licentie: laat ze ook die van het pakket volgen
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } asset heeft een eigen licentie: laat hem ook die van het pakket volgen
+       *[other] { $count } assets hebben een eigen licentie: laat ze ook die van het pakket volgen
+    }
 packs-store-page = Storepagina
 packs-store-text = Beschrijving uit de store
 packs-store-text-placeholder = Plak de tekst van de pagina, of laat leeg om hem van de storepagina op te halen.

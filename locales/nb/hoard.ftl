@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] La til { $count } tagg
-           *[other] La til { $count } tagger
-        }
-       *[other] { $count ->
-            [one] La til { $count } tagg på { $assets } ressurser
-           *[other] La til { $count } tagger på { $assets } ressurser
-        }
+        [one]
+            { $count ->
+                [one] La til { $count } tagg
+               *[other] La til { $count } tagger
+            }
+       *[other]
+            { $count ->
+                [one] La til { $count } tagg på { $assets } ressurser
+               *[other] La til { $count } tagger på { $assets } ressurser
+            }
     }
 app-bulk-untagged =
     Fjernet { $tag } fra { $count ->
@@ -1464,10 +1466,11 @@ packs-review-now = Nå
 packs-review-store = Fra butikken
 packs-review-same = Samme
 packs-review-read-page = Leses fra siden når du lagrer
-packs-review-take = { $count ->
-    [one] Fyll ut { $count } felt
-   *[other] Fyll ut { $count } felt
-}
+packs-review-take =
+    { $count ->
+        [one] Fyll ut { $count } felt
+       *[other] Fyll ut { $count } felt
+    }
 packs-lookup-searched = Søkte { $date }.
 packs-lookup-again = Søk igjen
 packs-lookup-again-after = .
@@ -1484,10 +1487,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0 …
 packs-license-tier-label = Lisensnivå
 packs-license-tier-placeholder = Personal, Professional …
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } ressurs har sin egen lisens: la den også følge pakkens
-   *[other] { $count } ressurser har sin egen lisens: la dem også følge pakkens
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } ressurs har sin egen lisens: la den også følge pakkens
+       *[other] { $count } ressurser har sin egen lisens: la dem også følge pakkens
+    }
 packs-store-page = Butikkside
 packs-store-text = Beskrivelse fra butikken
 packs-store-text-placeholder = Lim inn teksten fra oppføringen, eller la feltet stå tomt for å hente den fra butikksiden.

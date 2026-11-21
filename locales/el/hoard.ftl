@@ -589,14 +589,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Προστέθηκε { $count } ετικέτα
-           *[other] Προστέθηκαν { $count } ετικέτες
-        }
-       *[other] { $count ->
-            [one] Προστέθηκε { $count } ετικέτα σε { $assets } στοιχεία
-           *[other] Προστέθηκαν { $count } ετικέτες σε { $assets } στοιχεία
-        }
+        [one]
+            { $count ->
+                [one] Προστέθηκε { $count } ετικέτα
+               *[other] Προστέθηκαν { $count } ετικέτες
+            }
+       *[other]
+            { $count ->
+                [one] Προστέθηκε { $count } ετικέτα σε { $assets } στοιχεία
+               *[other] Προστέθηκαν { $count } ετικέτες σε { $assets } στοιχεία
+            }
     }
 app-bulk-untagged =
     { $count ->
@@ -1512,10 +1514,11 @@ packs-review-now = Τώρα
 packs-review-store = Από το κατάστημα
 packs-review-same = Ίδιο
 packs-review-read-page = Θα διαβαστεί από τη σελίδα κατά την αποθήκευση
-packs-review-take = { $count ->
-    [one] Συμπλήρωση { $count } πεδίου
-   *[other] Συμπλήρωση { $count } πεδίων
-}
+packs-review-take =
+    { $count ->
+        [one] Συμπλήρωση { $count } πεδίου
+       *[other] Συμπλήρωση { $count } πεδίων
+    }
 packs-lookup-searched = Αναζητήθηκε { $date }.
 packs-lookup-again = Νέα αναζήτηση
 packs-lookup-again-after = .
@@ -1532,10 +1535,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Επίπεδο άδειας
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } στοιχείο έχει δική του άδεια χρήσης: να ακολουθεί και την άδεια του πακέτου
-   *[other] { $count } στοιχεία έχουν δική τους άδεια χρήσης: να ακολουθούν και την άδεια του πακέτου
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } στοιχείο έχει δική του άδεια χρήσης: να ακολουθεί και την άδεια του πακέτου
+       *[other] { $count } στοιχεία έχουν δική τους άδεια χρήσης: να ακολουθούν και την άδεια του πακέτου
+    }
 packs-store-page = Σελίδα καταστήματος
 packs-store-text = Περιγραφή από το κατάστημα
 packs-store-text-placeholder = Επικολλήστε το κείμενο της καταχώρισης ή αφήστε το κενό για λήψη από τη σελίδα του καταστήματος.

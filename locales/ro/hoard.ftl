@@ -600,16 +600,18 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] S-a adăugat { $count } etichetă
-            [few] S-au adăugat { $count } etichete
-           *[other] S-au adăugat { $count } de etichete
-        }
-       *[other] { $count ->
-            [one] S-a adăugat { $count } etichetă la { $assets } resurse
-            [few] S-au adăugat { $count } etichete la { $assets } resurse
-           *[other] S-au adăugat { $count } de etichete la { $assets } resurse
-        }
+        [one]
+            { $count ->
+                [one] S-a adăugat { $count } etichetă
+                [few] S-au adăugat { $count } etichete
+               *[other] S-au adăugat { $count } de etichete
+            }
+       *[other]
+            { $count ->
+                [one] S-a adăugat { $count } etichetă la { $assets } resurse
+                [few] S-au adăugat { $count } etichete la { $assets } resurse
+               *[other] S-au adăugat { $count } de etichete la { $assets } resurse
+            }
     }
 app-bulk-untagged =
     { $count ->
@@ -1580,11 +1582,12 @@ packs-review-now = Acum
 packs-review-store = Din magazin
 packs-review-same = La fel
 packs-review-read-page = Se citește de pe pagină la salvare
-packs-review-take = { $count ->
-    [one] Completați { $count } câmp
-    [few] Completați { $count } câmpuri
-   *[other] Completați { $count } de câmpuri
-}
+packs-review-take =
+    { $count ->
+        [one] Completați { $count } câmp
+        [few] Completați { $count } câmpuri
+       *[other] Completați { $count } de câmpuri
+    }
 packs-lookup-searched = Căutat { $date }.
 packs-lookup-again = Căutați din nou
 packs-lookup-again-after = .
@@ -1601,11 +1604,12 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Nivelul licenței
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } resursă are licență proprie: aplicați-i și licența pachetului
-    [few] { $count } resurse au licență proprie: aplicați-le și licența pachetului
-   *[other] { $count } de resurse au licență proprie: aplicați-le și licența pachetului
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } resursă are licență proprie: aplicați-i și licența pachetului
+        [few] { $count } resurse au licență proprie: aplicați-le și licența pachetului
+       *[other] { $count } de resurse au licență proprie: aplicați-le și licența pachetului
+    }
 packs-store-page = Pagina de magazin
 packs-store-text = Descrierea din magazin
 packs-store-text-placeholder = Lipiți textul anunțului sau lăsați gol pentru a-l prelua de pe pagina de magazin.

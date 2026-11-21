@@ -585,14 +585,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Aggiunto { $count } tag
-           *[other] Aggiunti { $count } tag
-        }
-       *[other] { $count ->
-            [one] Aggiunto { $count } tag a { $assets } asset
-           *[other] Aggiunti { $count } tag a { $assets } asset
-        }
+        [one]
+            { $count ->
+                [one] Aggiunto { $count } tag
+               *[other] Aggiunti { $count } tag
+            }
+       *[other]
+            { $count ->
+                [one] Aggiunto { $count } tag a { $assets } asset
+               *[other] Aggiunti { $count } tag a { $assets } asset
+            }
     }
 app-bulk-untagged =
     Tag { $tag } tolto da { $count ->
@@ -1476,10 +1478,11 @@ packs-review-now = Attuale
 packs-review-store = Dallo store
 packs-review-same = Uguale
 packs-review-read-page = Lettura dalla pagina al salvataggio
-packs-review-take = { $count ->
-    [one] Compila { $count } campo
-   *[other] Compila { $count } campi
-}
+packs-review-take =
+    { $count ->
+        [one] Compila { $count } campo
+       *[other] Compila { $count } campi
+    }
 packs-lookup-searched = Cercato il { $date }.
 packs-lookup-again = Cerca di nuovo
 packs-lookup-again-after = .
@@ -1496,10 +1499,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Livello di licenza
 packs-license-tier-placeholder = Personale, Professionale…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } asset ha una licenza propria: usa invece quella del pacchetto
-   *[other] { $count } asset hanno una licenza propria: usa invece quella del pacchetto
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } asset ha una licenza propria: usa invece quella del pacchetto
+       *[other] { $count } asset hanno una licenza propria: usa invece quella del pacchetto
+    }
 packs-store-page = Pagina dello store
 packs-store-text = Descrizione dello store
 packs-store-text-placeholder = Incolla il testo dell'inserzione, o lascia vuoto per recuperarlo dalla pagina dello store.

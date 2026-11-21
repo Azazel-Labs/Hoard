@@ -602,18 +602,20 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [1] { $count ->
-            [one] Додано { $count } тег
-            [few] Додано { $count } теги
-            [many] Додано { $count } тегів
-           *[other] Додано { $count } тега
-        }
-       *[other] { $count ->
-            [one] Додано { $count } тег до { $assets } ресурсів
-            [few] Додано { $count } теги до { $assets } ресурсів
-            [many] Додано { $count } тегів до { $assets } ресурсів
-           *[other] Додано { $count } тега до { $assets } ресурсів
-        }
+        [1]
+            { $count ->
+                [one] Додано { $count } тег
+                [few] Додано { $count } теги
+                [many] Додано { $count } тегів
+               *[other] Додано { $count } тега
+            }
+       *[other]
+            { $count ->
+                [one] Додано { $count } тег до { $assets } ресурсів
+                [few] Додано { $count } теги до { $assets } ресурсів
+                [many] Додано { $count } тегів до { $assets } ресурсів
+               *[other] Додано { $count } тега до { $assets } ресурсів
+            }
     }
 app-bulk-untagged =
     Тег { $tag } знято з { $count ->
@@ -1644,12 +1646,13 @@ packs-review-now = Зараз
 packs-review-store = З магазину
 packs-review-same = Однаково
 packs-review-read-page = Під час збереження буде прочитано зі сторінки
-packs-review-take = { $count ->
-    [one] Заповнити { $count } поле
-    [few] Заповнити { $count } поля
-    [many] Заповнити { $count } полів
-   *[other] Заповнити { $count } поля
-}
+packs-review-take =
+    { $count ->
+        [one] Заповнити { $count } поле
+        [few] Заповнити { $count } поля
+        [many] Заповнити { $count } полів
+       *[other] Заповнити { $count } поля
+    }
 packs-lookup-searched = Шукали { $date }.
 packs-lookup-again = Шукати знову
 packs-lookup-again-after = .
@@ -1666,12 +1669,13 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Рівень ліцензії
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
-    [few] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
-    [many] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
-   *[other] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
-}
+packs-own-licenses =
+    { $count ->
+        [one] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+        [few] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+        [many] У { $count } ресурсів своя ліцензія: перемкнути на ліцензію пакета
+       *[other] У { $count } ресурсу своя ліцензія: перемкнути на ліцензію пакета
+    }
 packs-store-page = Сторінка магазину
 packs-store-text = Опис із магазину
 packs-store-text-placeholder = Вставте текст оголошення або залиште порожнім, щоб отримати його зі сторінки магазину.

@@ -577,14 +577,16 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] S'ha afegit { $count } etiqueta
-           *[other] S'han afegit { $count } etiquetes
-        }
-       *[other] { $count ->
-            [one] S'ha afegit { $count } etiqueta a { $assets } recursos
-           *[other] S'han afegit { $count } etiquetes a { $assets } recursos
-        }
+        [one]
+            { $count ->
+                [one] S'ha afegit { $count } etiqueta
+               *[other] S'han afegit { $count } etiquetes
+            }
+       *[other]
+            { $count ->
+                [one] S'ha afegit { $count } etiqueta a { $assets } recursos
+               *[other] S'han afegit { $count } etiquetes a { $assets } recursos
+            }
     }
 app-bulk-untagged =
     { $count ->
@@ -1468,10 +1470,11 @@ packs-review-now = Ara
 packs-review-store = De la botiga
 packs-review-same = Igual
 packs-review-read-page = Es llegirà de la pàgina en desar
-packs-review-take = { $count ->
-    [one] Omple { $count } camp
-   *[other] Omple { $count } camps
-}
+packs-review-take =
+    { $count ->
+        [one] Omple { $count } camp
+       *[other] Omple { $count } camps
+    }
 packs-lookup-searched = S'ha cercat el { $date }.
 packs-lookup-again = Torna a cercar
 packs-lookup-again-after = .
@@ -1488,10 +1491,11 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Nivell de llicència
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } recurs té llicència pròpia: fes que segueixi també la del paquet
-   *[other] { $count } recursos tenen llicència pròpia: fes que segueixin també la del paquet
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } recurs té llicència pròpia: fes que segueixi també la del paquet
+       *[other] { $count } recursos tenen llicència pròpia: fes que segueixin també la del paquet
+    }
 packs-store-page = Pàgina de botiga
 packs-store-text = Descripció de la botiga
 packs-store-text-placeholder = Enganxeu el text de l'anunci, o deixeu-ho buit per obtenir-lo de la pàgina de botiga.

@@ -595,18 +595,20 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Dodano { $count } tag
-            [few] Dodano { $count } tagi
-            [many] Dodano { $count } tagów
-           *[other] Dodano { $count } tagu
-        }
-       *[other] { $count ->
-            [one] Dodano { $count } tag do { $assets } zasobów
-            [few] Dodano { $count } tagi do { $assets } zasobów
-            [many] Dodano { $count } tagów do { $assets } zasobów
-           *[other] Dodano { $count } tagu do { $assets } zasobów
-        }
+        [one]
+            { $count ->
+                [one] Dodano { $count } tag
+                [few] Dodano { $count } tagi
+                [many] Dodano { $count } tagów
+               *[other] Dodano { $count } tagu
+            }
+       *[other]
+            { $count ->
+                [one] Dodano { $count } tag do { $assets } zasobów
+                [few] Dodano { $count } tagi do { $assets } zasobów
+                [many] Dodano { $count } tagów do { $assets } zasobów
+               *[other] Dodano { $count } tagu do { $assets } zasobów
+            }
     }
 app-bulk-untagged =
     Usunięto tag { $tag } z { $count ->
@@ -1597,12 +1599,13 @@ packs-review-now = Teraz
 packs-review-store = Ze sklepu
 packs-review-same = Takie samo
 packs-review-read-page = Zostanie odczytane ze strony przy zapisie
-packs-review-take = { $count ->
-    [one] Wypełnij { $count } pole
-    [few] Wypełnij { $count } pola
-    [many] Wypełnij { $count } pól
-   *[other] Wypełnij { $count } pola
-}
+packs-review-take =
+    { $count ->
+        [one] Wypełnij { $count } pole
+        [few] Wypełnij { $count } pola
+        [many] Wypełnij { $count } pól
+       *[other] Wypełnij { $count } pola
+    }
 packs-lookup-searched = Wyszukano { $date }.
 packs-lookup-again = Szukaj ponownie
 packs-lookup-again-after = .
@@ -1619,12 +1622,13 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Poziom licencji
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } zasób ma własną licencję: niech stosuje też licencję paczki
-    [few] { $count } zasoby mają własną licencję: niech stosują też licencję paczki
-    [many] { $count } zasobów ma własną licencję: niech stosują też licencję paczki
-   *[other] { $count } zasobu ma własną licencję: niech stosują też licencję paczki
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } zasób ma własną licencję: niech stosuje też licencję paczki
+        [few] { $count } zasoby mają własną licencję: niech stosują też licencję paczki
+        [many] { $count } zasobów ma własną licencję: niech stosują też licencję paczki
+       *[other] { $count } zasobu ma własną licencję: niech stosują też licencję paczki
+    }
 packs-store-page = Strona w sklepie
 packs-store-text = Opis ze sklepu
 packs-store-text-placeholder = Można wkleić tekst oferty albo zostawić puste, by pobrać go ze strony sklepu.

@@ -596,18 +596,20 @@ app-tags-paste-had =
 # After pasting: $count tags were added to $assets assets.
 app-tags-pasted =
     { $assets ->
-        [one] { $count ->
-            [one] Přidán { $count } štítek
-            [few] Přidány { $count } štítky
-            [many] Přidáno { $count } štítku
-           *[other] Přidáno { $count } štítků
-        }
-       *[other] { $count ->
-            [one] Přidán { $count } štítek k { $assets } assetům
-            [few] Přidány { $count } štítky k { $assets } assetům
-            [many] Přidáno { $count } štítku k { $assets } assetům
-           *[other] Přidáno { $count } štítků k { $assets } assetům
-        }
+        [one]
+            { $count ->
+                [one] Přidán { $count } štítek
+                [few] Přidány { $count } štítky
+                [many] Přidáno { $count } štítku
+               *[other] Přidáno { $count } štítků
+            }
+       *[other]
+            { $count ->
+                [one] Přidán { $count } štítek k { $assets } assetům
+                [few] Přidány { $count } štítky k { $assets } assetům
+                [many] Přidáno { $count } štítku k { $assets } assetům
+               *[other] Přidáno { $count } štítků k { $assets } assetům
+            }
     }
 app-bulk-untagged =
     Štítek { $tag } odebrán z { $count ->
@@ -1578,12 +1580,13 @@ packs-review-now = Nyní
 packs-review-store = Z obchodu
 packs-review-same = Stejné
 packs-review-read-page = Při uložení se načte ze stránky
-packs-review-take = { $count ->
-    [one] Vyplnit { $count } pole
-    [few] Vyplnit { $count } pole
-    [many] Vyplnit { $count } pole
-   *[other] Vyplnit { $count } polí
-}
+packs-review-take =
+    { $count ->
+        [one] Vyplnit { $count } pole
+        [few] Vyplnit { $count } pole
+        [many] Vyplnit { $count } pole
+       *[other] Vyplnit { $count } polí
+    }
 packs-lookup-searched = Hledáno { $date }.
 packs-lookup-again = Hledat znovu
 packs-lookup-again-after = .
@@ -1600,12 +1603,13 @@ packs-license-placeholder = Fab Standard License, CC BY 4.0…
 packs-license-tier-label = Úroveň licence
 packs-license-tier-placeholder = Personal, Professional…
 # A checkbox under the license: on Save, the pack's assets with a license of their own go by the pack's instead.
-packs-own-licenses = { $count ->
-    [one] { $count } asset má vlastní licenci: ať se řídí i licencí balíčku
-    [few] { $count } assety mají vlastní licenci: ať se řídí i licencí balíčku
-    [many] { $count } assetu má vlastní licenci: ať se řídí i licencí balíčku
-   *[other] { $count } assetů má vlastní licenci: ať se řídí i licencí balíčku
-}
+packs-own-licenses =
+    { $count ->
+        [one] { $count } asset má vlastní licenci: ať se řídí i licencí balíčku
+        [few] { $count } assety mají vlastní licenci: ať se řídí i licencí balíčku
+        [many] { $count } assetu má vlastní licenci: ať se řídí i licencí balíčku
+       *[other] { $count } assetů má vlastní licenci: ať se řídí i licencí balíčku
+    }
 packs-store-page = Stránka v obchodě
 packs-store-text = Popis z obchodu
 packs-store-text-placeholder = Vložte text nabídky, nebo nechte prázdné a načte se ze stránky obchodu.

@@ -512,6 +512,7 @@ app-forget-project = Заборави овај пројекат
 app-save-name-like = слично као { $name }
 app-save-name-favorites = омиљени
 app-search-saved = Сачувано „{ $name }“: налази се у Филтерима, под Ваше
+app-search-updated = Ажурирано „{ $name }“
 app-rank-alike = Најсличније
 app-rank-color = Највише те боје
 app-rank-match = Најбоље подударање
@@ -647,6 +648,9 @@ app-home-version = Hoard { $version } — назад у библиотеку
 app-home = Назад у библиотеку
 app-search-label = Претражи ресурсе
 app-search-placeholder = Претражи називе, путање, ознаке
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = стена or камен: једно од та два · -маховина: изостави · "сува маховина": ове речи заједно
 app-views = Прикази
 app-library = Библиотека
 app-packs = Пакети
@@ -681,6 +685,12 @@ app-needs-review = За преглед
 app-needs-review-title = Само ресурси које још нико није прегледао (иде уз остале филтере)
 app-forget-search-label = Заборави сачувану претрагу { $name }
 app-forget-search = Заборави ову претрагу
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Отвори библиотеку с овом претрагом
+app-default-search-on-title = Библиотека се отвара с овом претрагом. Кликните да то зауставите.
+app-default-search-label = Отвори библиотеку са { $name }
+app-rename-search = Преименуј
+app-rename-search-label = Ново име за { $name }
 app-projects-title = Пројекти који се одавде синхронизују помоћу hoard sync, са оним што је имала њихова последња синхронизација
 app-projects = Пројекти
 app-project-synced = Синхронизовано { $when }
@@ -704,6 +714,11 @@ app-save-name-placeholder = Дајте назив
 app-save = Сачувај
 app-save-search-title = Задржи ову претрагу у Филтерима, под Ваше
 app-save-search = Сачувај претрагу
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Ажурирај „{ $name }“
+app-update-search-title = Задржи тренутни избор у овој сачуваној претрази
+app-save-search-new = Сачувај као нову
 app-select-title = Изаберите више ресурса да бисте их заједно означили, категорисали, додали у колекцију, преузели или архивирали (X или Ctrl-клик)
 app-select = Изабери
 app-tile-size = Величина плочица
@@ -1231,6 +1246,7 @@ projects-favorite-add-failed = Није могуће додати у омиље�
 projects-favorite-remove-failed = Није могуће уклонити из омиљених: { $error }
 projects-save-search-failed = Није могуће сачувати претрагу: { $error }
 projects-forget-search-failed = Није могуће уклонити { $name }: { $error }
+projects-change-search-failed = Није могуће променити { $name }: { $error }
 
 ## projects.ts
 

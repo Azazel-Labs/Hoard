@@ -502,6 +502,7 @@ app-forget-project = Glem dette prosjektet
 app-save-name-like = som { $name }
 app-save-name-favorites = favoritter
 app-search-saved = Lagret «{ $name }»: det ligger i Filtre, under Dine
+app-search-updated = Oppdaterte «{ $name }»
 app-rank-alike = Mest lik
 app-rank-color = Mest av fargen
 app-rank-match = Beste treff
@@ -628,6 +629,9 @@ app-home-version = Hoard { $version } – tilbake til biblioteket
 app-home = Tilbake til biblioteket
 app-search-label = Søk i ressurser
 app-search-placeholder = Søk i navn, baner, tagger
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = stein or fjell: en av dem · -mose: utelat · "tørr mose": disse ordene sammen
 app-views = Visninger
 app-library = Bibliotek
 app-packs = Pakker
@@ -657,6 +661,12 @@ app-needs-review = Trenger gjennomgang
 app-needs-review-title = Bare ressurser ingen har gått gjennom ennå (gjelder sammen med de andre filtrene)
 app-forget-search-label = Glem det lagrede søket { $name }
 app-forget-search = Glem dette søket
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Åpne biblioteket med dette søket
+app-default-search-on-title = Biblioteket åpnes med dette søket. Klikk for å stoppe det.
+app-default-search-label = Åpne biblioteket med { $name }
+app-rename-search = Gi nytt navn
+app-rename-search-label = Nytt navn for { $name }
 app-projects-title = Prosjekter som kjører hoard sync herfra, med det siste synkronisering hadde
 app-projects = Prosjekter
 app-project-synced = Synkronisert { $when }
@@ -679,6 +689,11 @@ app-save-name-placeholder = Gi det et navn
 app-save = Lagre
 app-save-search-title = Behold dette søket i Filtre, under Dine
 app-save-search = Lagre søk
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Oppdater «{ $name }»
+app-update-search-title = Behold det som er valgt nå i dette lagrede søket
+app-save-search-new = Lagre som nytt
 app-select-title = Velg flere ressurser for å tagge, kategorisere, samle, laste ned eller arkivere dem samlet (X, eller Ctrl-klikk)
 app-select = Velg
 app-tile-size = Flisstørrelse
@@ -1193,6 +1208,7 @@ projects-favorite-add-failed = Kunne ikke legge til i favorittene dine: { $error
 projects-favorite-remove-failed = Kunne ikke fjerne fra favorittene dine: { $error }
 projects-save-search-failed = Kunne ikke lagre søket: { $error }
 projects-forget-search-failed = Kunne ikke fjerne { $name }: { $error }
+projects-change-search-failed = Kunne ikke endre { $name }: { $error }
 
 ## projects.ts
 

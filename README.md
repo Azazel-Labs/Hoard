@@ -601,6 +601,12 @@ spins the model about its up axis and Tip a quarter tips its top toward its fron
 model in the pack that way. Their thumbnails are drawn again (ones a browser drew too) and the 3D viewer shows them
 turned. Downloads stay as they were made.
 
+**Searching.** The search box finds what has every word you type, each as the start of a word (`rock` finds
+"rocks"). `rock or stone` finds either, `-moss` leaves out anything with "moss" in it, and `"dry moss"` finds those
+words together as they are. A tag searches as itself: `-set:forest` leaves out that set. Image and sound search look
+for the words without the marks. A search can be saved under a name in the Filters column, renamed there, updated
+with what you've changed since, and made what the library opens to.
+
 **Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to
 match), filters by what a pack holds, its status and its store, and sorts by date, name, size or asset count.
 
@@ -1467,6 +1473,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 |---|---|---|
 | GET, POST | `/api/me/favorites` | your favorite asset ids, or change them: `{add?: [ids], remove?: [ids]}` |
 | GET, POST | `/api/me/searches` | your saved searches, or save one: `{name, query}` (the portal's query string, like `q=rock&kind=texture`) |
+| PUT | `/api/me/searches/{id}` | change one: any of `{name, query, default}`; `default: true` makes it what the library opens to (only one is) |
 | DELETE | `/api/me/searches/{id}` | forget one |
 | GET, PUT | `/api/me/hoard` | how many assets of each kind you've collected into your hoard (`{seen: {kind: count}}`, `null` before you have), or record it |
 

@@ -3,10 +3,10 @@
 // off), Clear all, and saving the search under a name.
 import { computed, nextTick, ref } from 'vue'
 import { auth } from '../auth'
-import { clearFilters, filterQuery, filters, hasFilters, heardNoise, savedNow } from '../filters'
+import { clearFilters, filterQuery, filters, fromSaved, hasFilters, heardNoise, savedBasis, savedNow } from '../filters'
 import { t } from '../i18n'
 import { findKey, keyName } from '../keys'
-import { saveSearch } from '../mine'
+import { changeSearch, mine, saveSearch } from '../mine'
 import { showOk, useTween } from '../ui'
 import TagChip from './TagChip.vue'
 
@@ -46,8 +46,14 @@ async function saveCurrent() {
   if (!name) return
   if (await saveSearch(name, filterQuery())) {
     naming.value = false
+    fromSaved.value = mine.searches.find((s) => s.name === name)?.id ?? null
     showOk(t('app-search-saved', { name }))
   }
+}
+/** Keep what's chosen now as the saved search it started from. */
+async function updateBasis() {
+  const s = savedBasis.value
+  if (s && (await changeSearch(s, { query: filterQuery() }))) showOk(t('app-search-updated', { name: s.name }))
 }
 </script>
 
@@ -76,7 +82,10 @@ async function saveCurrent() {
         <button class="btn" type="submit" :disabled="!saveName.trim()">{{ t('app-save') }}</button>
         <button class="btn ghost" type="button" @click="naming = false">{{ t('app-cancel') }}</button>
       </form>
-      <button v-else type="button" class="linkbtn" :title="t('app-save-search-title')" @click="startNaming">{{ t('app-save-search') }}</button>
+      <template v-else>
+        <button v-if="savedBasis" type="button" class="linkbtn" :title="t('app-update-search-title')" @click="updateBasis">{{ t('app-update-search', { name: savedBasis.name }) }}</button>
+        <button type="button" class="linkbtn" :title="t('app-save-search-title')" @click="startNaming">{{ savedBasis ? t('app-save-search-new') : t('app-save-search') }}</button>
+      </template>
     </template>
   </div>
 </template>

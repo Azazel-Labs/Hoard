@@ -188,7 +188,7 @@ static RANKS: std::sync::Mutex<Vec<Kept>> = std::sync::Mutex::new(Vec::new());
 /// [`rank`], kept for a while for the next pages of the same search by words.
 async fn ranked(state: &AppState, q: &SearchQuery) -> Result<Option<std::sync::Arc<db::LookRank>>> {
     let set = |v: &Option<String>| v.as_deref().is_some_and(|s| !s.trim().is_empty());
-    let text = q.q.as_deref().unwrap_or("").trim();
+    let text = &db::plain_words(q.q.as_deref().unwrap_or(""));
     if text.is_empty() || set(&q.similar) || set(&q.color) || set(&q.imitation) {
         return Ok(rank(state, q).await?.map(std::sync::Arc::new));
     }
@@ -225,7 +225,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
     let color = q.color.as_deref().filter(|c| !c.is_empty()).map(parse_hex);
     if similar.is_none() && color.is_none() {
         // Words alone: with image search on, pictures that show them match too, beside names that have them.
-        let text = q.q.as_deref().unwrap_or("").trim();
+        let text = &db::plain_words(q.q.as_deref().unwrap_or(""));
         if text.is_empty() {
             return Ok(None);
         }

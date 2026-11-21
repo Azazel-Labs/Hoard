@@ -39,7 +39,7 @@ import { useVirtualGrid } from './virtualGrid'
 import { usePanelFit } from './panelFit'
 import { lazy } from './lazy'
 import { formatNumber, t } from './i18n'
-import { clearFilters, filterPlace, filterQuery, filters, filterSources, hasFilters, heardNoise, NO_MUSIC, readFilters, type Named } from './filters'
+import { clearFilters, filterPlace, filterQuery, filters, filterSources, fromSaved, hasFilters, heardNoise, NO_MUSIC, readFilters, type Named } from './filters'
 
 // Opened now and then, so they load when first shown.
 const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
@@ -398,8 +398,9 @@ function browseFavorites() {
 
 // ------------------------------------------------------------------ saved searches
 
-function applySearch(s: { query: string }) {
+function applySearch(s: { id: number; query: string }) {
   readFilters(s.query)
+  fromSaved.value = s.id
   setView('library')
   showFilters.value = false
 }
@@ -1147,6 +1148,7 @@ watch(view, (v) => {
 
 onMounted(() => {
   readFilters(location.search)
+  if (!location.search) openToDefault()
   const deep = location.hash.match(/^#asset=([\w-]+)/)
   if (deep) openAsset(deep[1])
   lastState = urlState()
@@ -1167,6 +1169,20 @@ onBeforeUnmount(() => {
   window.removeEventListener('popstate', onHistory)
   document.removeEventListener('scroll', onAnyScroll, { capture: true })
 })
+/** Opened with no search in the address: the saved search you open to, once they're in, unless you've begun
+ * another meanwhile. */
+function openToDefault() {
+  let done = false
+  watch(() => mine.loaded, (loaded) => {
+    if (!loaded || done) return
+    done = true
+    const d = mine.searches.find((s) => s.default)
+    if (d && !filterQuery()) {
+      readFilters(d.query)
+      fromSaved.value = d.id
+    }
+  }, { immediate: true })
+}
 /** Back/Forward or a typed address: put the page back the way the address says. */
 async function onHistory() {
   restoring = true
@@ -1334,7 +1350,7 @@ const commands = computed<Command[]>(() => {
           class="field"
           type="search"
           :placeholder="searchPlaceholder"
-          :title="filters.kind === 'audio' ? t('app-imitation-title') : undefined"
+          :title="filters.kind === 'audio' ? t('app-imitation-title') : t('app-search-syntax-title')"
           autocomplete="off"
           enterkeyhint="search"
           @focus="view = 'library'"

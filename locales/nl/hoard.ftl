@@ -502,6 +502,7 @@ app-forget-project = Dit project vergeten
 app-save-name-like = zoals { $name }
 app-save-name-favorites = favorieten
 app-search-saved = “{ $name }” opgeslagen: je vindt het in Filters, onder Van jou
+app-search-updated = “{ $name }” bijgewerkt
 app-rank-alike = Meest gelijkend
 app-rank-color = Meeste van de kleur
 app-rank-match = Beste overeenkomst
@@ -628,6 +629,9 @@ app-home-version = Hoard { $version } — terug naar de bibliotheek
 app-home = Terug naar de bibliotheek
 app-search-label = Assets zoeken
 app-search-placeholder = Zoek in namen, paden, tags
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = rots or steen: een van beide · -mos: weglaten · "droog mos": deze woorden samen
 app-views = Weergaven
 app-library = Bibliotheek
 app-packs = Pakketten
@@ -657,6 +661,12 @@ app-needs-review = Nakijken nodig
 app-needs-review-title = Alleen assets die nog niemand heeft nagekeken (werkt samen met de andere filters)
 app-forget-search-label = De opgeslagen zoekopdracht { $name } vergeten
 app-forget-search = Deze zoekopdracht vergeten
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = De bibliotheek openen met deze zoekopdracht
+app-default-search-on-title = De bibliotheek opent met deze zoekopdracht. Klik om dit te stoppen.
+app-default-search-label = De bibliotheek openen met { $name }
+app-rename-search = Naam wijzigen
+app-rename-search-label = Nieuwe naam voor { $name }
 app-projects-title = Projecten die vanaf hier hoard sync gebruiken, met wat hun laatste synchronisatie had
 app-projects = Projecten
 app-project-synced = Gesynchroniseerd { $when }
@@ -679,6 +689,11 @@ app-save-name-placeholder = Geef een naam
 app-save = Opslaan
 app-save-search-title = Bewaar deze zoekopdracht in Filters, onder Van jou
 app-save-search = Zoekopdracht opslaan
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = “{ $name }” bijwerken
+app-update-search-title = Bewaar wat nu is gekozen in deze opgeslagen zoekopdracht
+app-save-search-new = Opslaan als nieuwe
 app-select-title = Kies meerdere assets om ze samen te taggen, te categoriseren, in een collectie te zetten, te downloaden of te archiveren (X, of Ctrl-klik)
 app-select = Selecteren
 app-tile-size = Tegelgrootte
@@ -1193,6 +1208,7 @@ projects-favorite-add-failed = Kon niet aan je favorieten toevoegen: { $error }
 projects-favorite-remove-failed = Kon niet uit je favorieten halen: { $error }
 projects-save-search-failed = Kon de zoekopdracht niet opslaan: { $error }
 projects-forget-search-failed = Kon { $name } niet verwijderen: { $error }
+projects-change-search-failed = Kon { $name } niet wijzigen: { $error }
 
 ## projects.ts
 

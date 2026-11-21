@@ -502,6 +502,7 @@ app-forget-project = 이 프로젝트 잊기
 app-save-name-like = { $name }과(와) 비슷한 것
 app-save-name-favorites = 즐겨찾기
 app-search-saved = “{ $name }”을(를) 저장했습니다. 필터의 내 항목에 있습니다
+app-search-updated = “{ $name }”을(를) 업데이트했습니다
 app-rank-alike = 가장 비슷한 순
 app-rank-color = 색상이 많은 순
 app-rank-match = 관련도 순
@@ -578,6 +579,9 @@ app-home-version = Hoard { $version } — 라이브러리로 돌아가기
 app-home = 라이브러리로 돌아가기
 app-search-label = 에셋 검색
 app-search-placeholder = 이름, 경로, 태그 검색
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = 바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께
 app-views = 보기
 app-library = 라이브러리
 app-packs = 팩
@@ -607,6 +611,12 @@ app-needs-review = 검토 필요
 app-needs-review-title = 아직 아무도 검토하지 않은 에셋만(다른 필터와 함께 적용)
 app-forget-search-label = 저장된 검색 { $name } 잊기
 app-forget-search = 이 검색 잊기
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = 이 검색으로 라이브러리 열기
+app-default-search-on-title = 라이브러리가 이 검색으로 열립니다. 클릭하면 해제합니다.
+app-default-search-label = { $name }(으)로 라이브러리 열기
+app-rename-search = 이름 바꾸기
+app-rename-search-label = { $name }의 새 이름
 app-projects-title = 여기서 hoard sync하는 프로젝트와 마지막 동기화 때의 내용
 app-projects = 프로젝트
 app-project-synced = { $when } 동기화됨
@@ -625,6 +635,11 @@ app-save-name-placeholder = 이름 입력
 app-save = 저장
 app-save-search-title = 이 검색을 필터의 내 항목에 보관합니다
 app-save-search = 검색 저장
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = “{ $name }” 업데이트
+app-update-search-title = 지금 선택한 내용을 이 저장된 검색에 유지
+app-save-search-new = 새로 저장
 app-select-title = 여러 에셋을 골라서 한꺼번에 태그, 분류, 컬렉션 추가, 다운로드, 보관합니다(X 또는 Ctrl+클릭)
 app-select = 선택
 app-tile-size = 타일 크기
@@ -1086,6 +1101,7 @@ projects-favorite-add-failed = 즐겨찾기에 추가하지 못했습니다: { $
 projects-favorite-remove-failed = 즐겨찾기에서 제거하지 못했습니다: { $error }
 projects-save-search-failed = 검색을 저장하지 못했습니다: { $error }
 projects-forget-search-failed = { $name }을(를) 제거하지 못했습니다: { $error }
+projects-change-search-failed = { $name }을(를) 변경하지 못했습니다: { $error }
 
 ## projects.ts
 

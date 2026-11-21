@@ -502,6 +502,7 @@ app-forget-project = このプロジェクトを忘れる
 app-save-name-like = { $name } に似たもの
 app-save-name-favorites = お気に入り
 app-search-saved = 「{ $name }」を保存しました。フィルターの「自分用」にあります
+app-search-updated = 「{ $name }」を更新しました
 app-rank-alike = 似ている順
 app-rank-color = 色の多い順
 app-rank-match = 一致度順
@@ -578,6 +579,9 @@ app-home-version = Hoard { $version } — ライブラリに戻る
 app-home = ライブラリに戻る
 app-search-label = アセットを検索
 app-search-placeholder = 名前、パス、タグを検索
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = 岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて
 app-views = ビュー
 app-library = ライブラリ
 app-packs = パック
@@ -607,6 +611,12 @@ app-needs-review = 要確認
 app-needs-review-title = まだ誰も確認していないアセットのみ（ほかの絞り込みと併用できます）
 app-forget-search-label = 保存した検索 { $name } を忘れる
 app-forget-search = この検索を忘れる
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = この検索でライブラリを開く
+app-default-search-on-title = ライブラリはこの検索で開きます。クリックで解除します。
+app-default-search-label = { $name } でライブラリを開く
+app-rename-search = 名前を変更
+app-rename-search-label = { $name } の新しい名前
 app-projects-title = ここから hoard sync しているプロジェクトと、前回の同期の内容
 app-projects = プロジェクト
 app-project-synced = { $when }に同期
@@ -625,6 +635,11 @@ app-save-name-placeholder = 名前を付ける
 app-save = 保存
 app-save-search-title = この検索をフィルターの「自分用」に残す
 app-save-search = 検索を保存
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = 「{ $name }」を更新
+app-update-search-title = 現在の選択をこの保存した検索に反映する
+app-save-search-new = 新規として保存
 app-select-title = 複数のアセットを選んで、まとめてタグ付け、分類、コレクションへの追加、ダウンロード、アーカイブを行います（X または Ctrl+クリック）
 app-select = 選択
 app-tile-size = タイルのサイズ
@@ -1086,6 +1101,7 @@ projects-favorite-add-failed = お気に入りに追加できませんでした:
 projects-favorite-remove-failed = お気に入りから外せませんでした: { $error }
 projects-save-search-failed = 検索を保存できませんでした: { $error }
 projects-forget-search-failed = { $name } を削除できませんでした: { $error }
+projects-change-search-failed = { $name } を変更できませんでした: { $error }
 
 ## projects.ts
 

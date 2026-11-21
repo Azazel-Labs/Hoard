@@ -215,7 +215,12 @@ pub(super) async fn sounds_call(state: &AppState, name: &str, args: &Value, base
                 Some(db::LookRank { scores, exclude: None, blend: false, keys: db::Keys::Files })
             } else if let Some(text) = q.q.as_deref() {
                 // Words alone: with sound search on, sounds that sound like them, beside names that have them.
-                let scores = crate::clap::search_text(state, text).await.unwrap_or_default();
+                let words = db::plain_words(text);
+                let scores = if words.is_empty() {
+                    Vec::new()
+                } else {
+                    crate::clap::search_text(state, &words).await.unwrap_or_default()
+                };
                 (!scores.is_empty()).then_some(db::LookRank {
                     scores,
                     exclude: None,

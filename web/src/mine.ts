@@ -9,6 +9,8 @@ import { t } from './i18n'
 export const mine = reactive({
   favorites: new Set<string>(),
   searches: [] as SavedSearch[],
+  /** The saved searches are in (for an account). */
+  loaded: false,
 })
 
 /** Starring is for people with an account (and the tokens they make), not guests. */
@@ -26,6 +28,7 @@ export async function loadMine(): Promise<void> {
     const [f, s] = await Promise.all([api.favorites(), api.savedSearches()])
     mine.favorites = new Set(f.assets)
     mine.searches = s.searches
+    mine.loaded = true
   } catch {
     // Not worth an error of its own: the stars just don't show until the next sign-in or reload.
   }
@@ -62,6 +65,17 @@ export async function saveSearch(name: string, query: string): Promise<boolean> 
     return true
   } catch (e) {
     showError(t('projects-save-search-failed', { error: (e as Error).message }))
+    return false
+  }
+}
+
+/** Rename a saved search, change what it searches, or make it (or stop it being) what the library opens to. */
+export async function changeSearch(s: SavedSearch, change: { name?: string; query?: string; default?: boolean }): Promise<boolean> {
+  try {
+    mine.searches = (await api.changeSearch(s.id, change)).searches
+    return true
+  } catch (e) {
+    showError(t('projects-change-search-failed', { name: s.name, error: (e as Error).message }))
     return false
   }
 }

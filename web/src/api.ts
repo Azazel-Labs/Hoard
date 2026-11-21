@@ -355,6 +355,13 @@ export const api = {
   savedSearches: () => request<{ searches: SavedSearch[] }>('/api/me/searches'),
   saveSearch: (name: string, query: string) => post<{ searches: SavedSearch[] }>('/api/me/searches', { name, query }),
   deleteSearch: (id: number) => request<void>(`/api/me/searches/${id}`, { method: 'DELETE' }),
+  /** Rename a saved search, change what it searches, or make it (or stop it being) what the library opens to. */
+  changeSearch: (id: number, change: { name?: string; query?: string; default?: boolean }) =>
+    request<{ searches: SavedSearch[] }>(`/api/me/searches/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(change),
+    }),
   /** How many assets of each kind this account has collected into its hoard, or null before it has collected any. */
   hoard: () => request<{ seen: Record<string, number> | null }>('/api/me/hoard'),
   setHoard: (seen: Record<string, number>) =>

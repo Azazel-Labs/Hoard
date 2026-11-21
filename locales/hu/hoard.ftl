@@ -502,6 +502,7 @@ app-forget-project = Projekt elfelejtése
 app-save-name-like = hasonló: { $name }
 app-save-name-favorites = kedvencek
 app-search-saved = Mentve: „{ $name }”. A Szűrők között, a Saját alatt találja
+app-search-updated = Frissítve: „{ $name }”
 app-rank-alike = Leginkább hasonló
 app-rank-color = Legtöbb ebből a színből
 app-rank-match = Legjobb egyezés
@@ -612,6 +613,9 @@ app-home-version = Hoard { $version } – vissza a könyvtárhoz
 app-home = Vissza a könyvtárhoz
 app-search-label = Assetek keresése
 app-search-placeholder = Keresés név, elérési út, címke szerint
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt
 app-views = Nézetek
 app-library = Könyvtár
 app-packs = Csomagok
@@ -641,6 +645,12 @@ app-needs-review = Átnézésre vár
 app-needs-review-title = Csak azok az assetek, amelyeket még senki nem nézett át (a többi szűrővel együtt működik)
 app-forget-search-label = Mentett keresés elfelejtése: { $name }
 app-forget-search = Keresés elfelejtése
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = A könyvtár ezzel a kereséssel nyíljon meg
+app-default-search-on-title = A könyvtár ezzel a kereséssel nyílik meg. Kattintson a kikapcsoláshoz.
+app-default-search-label = A könyvtár nyíljon meg ezzel: { $name }
+app-rename-search = Átnevezés
+app-rename-search-label = Új név: { $name }
 app-projects-title = Projektek, amelyek a hoard sync paranccsal innen szinkronizálnak, a legutóbbi szinkronizálás adataival
 app-projects = Projektek
 app-project-synced = Szinkronizálva: { $when }
@@ -659,6 +669,11 @@ app-save-name-placeholder = Adjon nevet
 app-save = Mentés
 app-save-search-title = A keresés megőrzése a Szűrők között, a Saját alatt
 app-save-search = Keresés mentése
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Frissítés: „{ $name }”
+app-update-search-title = A jelenlegi kijelölés megtartása ebben a mentett keresésben
+app-save-search-new = Mentés újként
 app-select-title = Több asset kijelölése együttes címkézéshez, kategorizáláshoz, gyűjteménybe tételhez, letöltéshez vagy archiváláshoz (X vagy Ctrl+kattintás)
 app-select = Kijelölés
 app-tile-size = Csempeméret
@@ -1134,6 +1149,7 @@ projects-favorite-add-failed = Nem sikerült hozzáadni a kedvencekhez: { $error
 projects-favorite-remove-failed = Nem sikerült eltávolítani a kedvencek közül: { $error }
 projects-save-search-failed = Nem sikerült menteni a keresést: { $error }
 projects-forget-search-failed = Nem sikerült eltávolítani: { $name }: { $error }
+projects-change-search-failed = Nem sikerült módosítani: { $name }: { $error }
 
 ## Projektek
 

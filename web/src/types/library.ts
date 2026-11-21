@@ -480,6 +480,8 @@ export interface SavedSearch {
   name: string
   query: string
   created_at: string
+  /** What the library opens to. */
+  default: boolean
 }
 
 /** A folder on the server and the folders in it (`GET /api/admin/fs`). */

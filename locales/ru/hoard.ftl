@@ -520,6 +520,7 @@ app-forget-project = Забыть этот проект
 app-save-name-like = похожие на { $name }
 app-save-name-favorites = избранное
 app-search-saved = Поиск «{ $name }» сохранён: он в фильтрах, в разделе «Ваше»
+app-search-updated = Поиск «{ $name }» обновлён
 app-rank-alike = Самые похожие
 app-rank-color = Больше всего этого цвета
 app-rank-match = Лучшее совпадение
@@ -668,6 +669,9 @@ app-home-version = Hoard { $version } — назад в библиотеку
 app-home = Назад в библиотеку
 app-search-label = Поиск ассетов
 app-search-placeholder = Поиск по названиям, путям, тегам
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = скала or камень: одно из двух · -мох: исключить · "сухой мох": эти слова вместе
 app-views = Виды
 app-library = Библиотека
 app-packs = Паки
@@ -703,6 +707,12 @@ app-needs-review = Не просмотрено
 app-needs-review-title = Только ассеты, которые ещё никто не просматривал (сочетается с другими фильтрами)
 app-forget-search-label = Забыть сохранённый поиск { $name }
 app-forget-search = Забыть этот поиск
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Открывать библиотеку с этим поиском
+app-default-search-on-title = Библиотека открывается с этим поиском. Нажмите, чтобы отключить.
+app-default-search-label = Открывать библиотеку с поиском { $name }
+app-rename-search = Переименовать
+app-rename-search-label = Новое название для { $name }
 app-projects-title = Проекты, которые выполняют hoard sync с этого сервера, и что было в их последней синхронизации
 app-projects = Проекты
 app-project-synced = Синхронизирован { $when }
@@ -727,6 +737,11 @@ app-save-name-placeholder = Назовите его
 app-save = Сохранить
 app-save-search-title = Сохранить этот поиск в фильтрах, в разделе «Ваше»
 app-save-search = Сохранить поиск
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Обновить «{ $name }»
+app-update-search-title = Сохранить текущий выбор в этом сохранённом поиске
+app-save-search-new = Сохранить как новый
 app-select-title = Выберите несколько ассетов, чтобы вместе добавить им теги, категорию, собрать в коллекцию, скачать или отправить в архив (X или Ctrl+щелчок)
 app-select = Выбрать
 app-tile-size = Размер плиток
@@ -1281,6 +1296,7 @@ projects-favorite-add-failed = Не удалось добавить в избр�
 projects-favorite-remove-failed = Не удалось убрать из избранного: { $error }
 projects-save-search-failed = Не удалось сохранить поиск: { $error }
 projects-forget-search-failed = Не удалось удалить { $name }: { $error }
+projects-change-search-failed = Не удалось изменить { $name }: { $error }
 
 ## projects.ts
 

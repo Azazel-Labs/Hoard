@@ -11,12 +11,84 @@ use super::{ASSET_COLS, asset_from_row, attach_tags};
 
 /// Turn free text into a safe FTS5 query: every term becomes a quoted prefix match, and all must match.
 fn fts_query(q: &str) -> Option<String> {
-    let terms: Vec<String> = q
-        .split(|c: char| !c.is_alphanumeric())
-        .filter(|t| !t.is_empty())
-        .map(|t| format!("\"{}\"*", t.to_lowercase()))
-        .collect();
-    if terms.is_empty() { None } else { Some(terms.join(" AND ")) }
+    words(q).find
+}
+
+/// What's typed in the search box, for FTS5: what to find, and what to leave out.
+#[derive(Debug, Default, PartialEq)]
+struct Words {
+    /// Every word, each as the start of a word (`rock` finds `rocks`); `a or b` either; `"a b"` those words together
+    /// as they are. A word with dashes or colons in it (`sci-fi`, `set:forest`) is its parts together.
+    find: Option<String>,
+    /// Anything with any of the words after a `-` (`-moss`, `-"dry moss"`).
+    without: Option<String>,
+    /// What to find without the marks: the words for image and sound search to look for.
+    plain: String,
+}
+
+fn words(q: &str) -> Words {
+    /// One word or phrase, as FTS5 has it.
+    fn term(text: &str, exact: bool) -> Option<String> {
+        let parts: Vec<String> =
+            text.split(|c: char| !c.is_alphanumeric()).filter(|t| !t.is_empty()).map(str::to_lowercase).collect();
+        (!parts.is_empty()).then(|| format!("\"{}\"{}", parts.join(" "), if exact { "" } else { "*" }))
+    }
+    let mut find: Vec<Vec<String>> = Vec::new();
+    let mut without = Vec::new();
+    let mut plain = Vec::new();
+    let (mut either, mut chars) = (false, q.chars().peekable());
+    while let Some(&c) = chars.peek() {
+        if c.is_whitespace() || c == '|' {
+            either |= c == '|';
+            chars.next();
+            continue;
+        }
+        let not = c == '-' && chars.clone().nth(1).is_some_and(|n| !n.is_whitespace());
+        if not {
+            chars.next();
+        }
+        let exact = chars.peek() == Some(&'"');
+        let text: String = if exact {
+            chars.next();
+            chars.by_ref().take_while(|&c| c != '"').collect()
+        } else {
+            let mut w = String::new();
+            while let Some(&c) = chars.peek().filter(|c| !c.is_whitespace() && **c != '"' && **c != '|') {
+                w.push(c);
+                chars.next();
+            }
+            w
+        };
+        if !not && !exact && text.eq_ignore_ascii_case("or") {
+            either = true;
+            continue;
+        }
+        let Some(t) = term(&text, exact) else { continue };
+        if not {
+            without.push(t);
+        } else {
+            match find.last_mut() {
+                Some(any) if either => any.push(t),
+                _ => find.push(vec![t]),
+            }
+            plain.push(text.trim().to_owned());
+        }
+        either = false;
+    }
+    let find = find
+        .into_iter()
+        .map(|any| if any.len() == 1 { any.concat() } else { format!("({})", any.join(" OR ")) })
+        .collect::<Vec<_>>();
+    Words {
+        find: (!find.is_empty()).then(|| find.join(" AND ")),
+        without: (!without.is_empty()).then(|| without.join(" OR ")),
+        plain: plain.join(" "),
+    }
+}
+
+/// The words of a search for image and sound search to look for, without its marks or what it leaves out.
+pub(crate) fn plain_words(q: &str) -> String {
+    words(q).plain
 }
 
 struct Filter {
@@ -142,6 +214,12 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
                 f.join = format!("{} {}", f.join, look_join(look));
             }
         }
+    }
+    // Words after a `-`: nothing that has them, whether it matched the words or the look.
+    if let Some(without) = q.q.as_deref().and_then(|t| words(t).without) {
+        f.clauses
+            .push("IFNULL(a.fts_row, 0) NOT IN (SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?)".to_owned());
+        f.params.push(SqlValue::Text(without));
     }
     if let Some(id) = look.and_then(|l| l.exclude.as_deref()) {
         f.clauses.push("a.id != ?".to_owned());
@@ -874,6 +952,71 @@ mod tests {
         // Written on another connection: the next page searches again.
         add(&pool.get().unwrap(), "r0", "rock a", "texture");
         assert_eq!(page(&q, 1), (vec!["r1".to_owned()], 3, 1, vec!["texture 2".to_owned(), "model 1".to_owned()]));
+    }
+
+    #[test]
+    fn the_search_box_reads_or_minus_and_quotes() {
+        let w = |q: &str| {
+            let w = words(q);
+            (w.find.unwrap_or_default(), w.without.unwrap_or_default(), w.plain)
+        };
+        let s = |a: &str, b: &str, c: &str| (a.to_owned(), b.to_owned(), c.to_owned());
+        assert_eq!(w("Rock moss"), s(r#""rock"* AND "moss"*"#, "", "Rock moss"));
+        assert_eq!(w("rock or stone wall"), s(r#"("rock"* OR "stone"*) AND "wall"*"#, "", "rock stone wall"));
+        assert_eq!(w("rock | stone"), s(r#"("rock"* OR "stone"*)"#, "", "rock stone"));
+        assert_eq!(w(r#""dry moss" -wet -"red brick""#), s(r#""dry moss""#, r#""wet"* OR "red brick""#, "dry moss"));
+        assert_eq!(w("sci-fi -set:forest"), s(r#""sci fi"*"#, r#""set forest"*"#, "sci-fi"));
+        assert_eq!(w("-moss"), s("", r#""moss"*"#, ""));
+        // Marks with nothing to go with them are left be.
+        assert_eq!(w(r#"or - "" | rock or"#), s(r#""rock"*"#, "", "rock"));
+        assert_eq!(w(r#"door "and NOT"#), s(r#""door"* AND "and not""#, "", "door and NOT"));
+        assert_eq!(w("orc OR"), s(r#""orc"*"#, "", "orc"));
+    }
+
+    #[test]
+    fn words_after_a_minus_are_left_out() {
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');",
+        )
+        .unwrap();
+        for (id, name, tags) in [
+            ("a", "mossy rock", "green"),
+            ("b", "dry rock", "set forest"),
+            ("c", "stone wall", ""),
+            ("d", "wet moss", ""),
+        ] {
+            conn.execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                 VALUES (?1, 'p1', 'h', ?1 || '.png', ?2, 'png', 'texture', 'x', 'x')",
+                params![id, name],
+            )
+            .unwrap();
+            conn.execute(
+                "INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, '', ?2 FROM assets
+                   WHERE id = ?1",
+                params![id, tags],
+            )
+            .unwrap();
+            conn.execute("UPDATE assets SET fts_row = rowid WHERE id = ?1", [id]).unwrap();
+        }
+        let found = |text: &str| {
+            let mut ids = search(&conn, &SearchQuery { q: Some(text.into()), ..Default::default() }, false)
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|a| a.id)
+                .collect::<Vec<_>>();
+            ids.sort();
+            ids.join(",")
+        };
+        assert_eq!(found("rock"), "a,b");
+        assert_eq!(found("rock -moss"), "b");
+        assert_eq!(found("rock or stone -set:forest"), "a,c");
+        assert_eq!(found("-rock"), "c,d");
+        assert_eq!(found(r#""rock dry""#), "");
+        assert_eq!(found(r#""dry rock""#), "b");
     }
 
     #[test]

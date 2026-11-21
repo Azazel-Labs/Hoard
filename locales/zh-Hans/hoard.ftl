@@ -502,6 +502,7 @@ app-forget-project = 忘记此项目
 app-save-name-like = 类似 { $name }
 app-save-name-favorites = 收藏
 app-search-saved = 已保存“{ $name }”：位于“筛选”中的“我的”下
+app-search-updated = 已更新“{ $name }”
 app-rank-alike = 最相似
 app-rank-color = 该颜色最多
 app-rank-match = 最佳匹配
@@ -581,6 +582,9 @@ app-home-version = Hoard { $version } — 返回资源库
 app-home = 返回资源库
 app-search-label = 搜索资源
 app-search-placeholder = 搜索名称、路径、标签
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = 岩石 or 石头：二选一 · -苔藓：排除 · "干苔藓"：这些词一起出现
 app-views = 视图
 app-library = 资源库
 app-packs = 资源包
@@ -610,6 +614,12 @@ app-needs-review = 待审阅
 app-needs-review-title = 仅显示还没人看过的资源（可与其他筛选条件同时使用）
 app-forget-search-label = 忘记已保存的搜索 { $name }
 app-forget-search = 忘记此搜索
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = 打开资源库时使用此搜索
+app-default-search-on-title = 资源库将以此搜索打开。点击可取消。
+app-default-search-label = 打开资源库时使用 { $name }
+app-rename-search = 重命名
+app-rename-search-label = { $name } 的新名称
 app-projects-title = 从此处执行 hoard sync 的项目，以及它们上次同步的内容
 app-projects = 项目
 app-project-synced = { $when }同步
@@ -628,6 +638,11 @@ app-save-name-placeholder = 命名
 app-save = 保存
 app-save-search-title = 将此搜索保留在“筛选”中的“我的”下
 app-save-search = 保存搜索
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = 更新“{ $name }”
+app-update-search-title = 将当前所选内容保留在此已保存的搜索中
+app-save-search-new = 另存为新搜索
 app-select-title = 选择多个资源，一起打标签、分类、加入合集、下载或归档（X 或 Ctrl+单击）
 app-select = 选择
 app-tile-size = 图块大小
@@ -1092,6 +1107,7 @@ projects-favorite-add-failed = 无法加入收藏：{ $error }
 projects-favorite-remove-failed = 无法移出收藏：{ $error }
 projects-save-search-failed = 无法保存搜索：{ $error }
 projects-forget-search-failed = 无法移除 { $name }：{ $error }
+projects-change-search-failed = 无法更改 { $name }：{ $error }
 
 ## projects.ts
 

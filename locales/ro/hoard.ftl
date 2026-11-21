@@ -517,6 +517,7 @@ app-forget-project = Uitați acest proiect
 app-save-name-like = ca { $name }
 app-save-name-favorites = favorite
 app-search-saved = „{ $name }” a fost salvată: o găsiți în Filtre, la Ale dvs.
+app-search-updated = „{ $name }” a fost actualizată
 app-rank-alike = Cele mai asemănătoare
 app-rank-color = Cel mai mult din culoare
 app-rank-match = Cea mai bună potrivire
@@ -659,6 +660,9 @@ app-home-version = Hoard { $version } — înapoi la bibliotecă
 app-home = Înapoi la bibliotecă
 app-search-label = Căutați resurse
 app-search-placeholder = Căutați nume, căi, etichete
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună
 app-views = Vizualizări
 app-library = Bibliotecă
 app-packs = Pachete
@@ -693,6 +697,12 @@ app-needs-review = De verificat
 app-needs-review-title = Doar resursele pe care nu le-a verificat încă nimeni (merge împreună cu celelalte filtre)
 app-forget-search-label = Uitați căutarea salvată { $name }
 app-forget-search = Uitați această căutare
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Deschideți biblioteca cu această căutare
+app-default-search-on-title = Biblioteca se deschide cu această căutare. Faceți clic pentru a opri.
+app-default-search-label = Deschideți biblioteca cu { $name }
+app-rename-search = Redenumiți
+app-rename-search-label = Nume nou pentru { $name }
 app-projects-title = Proiectele care rulează hoard sync de aici, cu ce avea ultima lor sincronizare
 app-projects = Proiecte
 app-project-synced = Sincronizat { $when }
@@ -716,6 +726,11 @@ app-save-name-placeholder = Denumiți-o
 app-save = Salvați
 app-save-search-title = Păstrați această căutare în Filtre, la Ale dvs.
 app-save-search = Salvați căutarea
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Actualizați „{ $name }”
+app-update-search-title = Păstrați selecția curentă în această căutare salvată
+app-save-search-new = Salvați ca nouă
 app-select-title = Alegeți mai multe resurse pentru a le eticheta, categorisi, colecta, descărca sau arhiva împreună (X sau Ctrl-clic)
 app-select = Selectați
 app-tile-size = Mărimea dalelor
@@ -1257,6 +1272,7 @@ projects-favorite-add-failed = Nu s-a putut adăuga la favorite: { $error }
 projects-favorite-remove-failed = Nu s-a putut scoate din favorite: { $error }
 projects-save-search-failed = Căutarea nu a putut fi salvată: { $error }
 projects-forget-search-failed = { $name } nu a putut fi eliminată: { $error }
+projects-change-search-failed = { $name } nu a putut fi modificată: { $error }
 
 ## projects.ts
 

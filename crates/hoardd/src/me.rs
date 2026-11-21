@@ -5,7 +5,7 @@
 use crate::i18n::tr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::routing::{delete, get};
+use axum::routing::get;
 use axum::{Extension, Json, Router};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::Deserialize;
@@ -22,7 +22,7 @@ pub(crate) fn router() -> Router<AppState> {
     Router::new()
         .route("/api/me/favorites", get(list_favorites).post(change_favorites))
         .route("/api/me/searches", get(list_searches).post(save_search))
-        .route("/api/me/searches/{id}", delete(delete_search))
+        .route("/api/me/searches/{id}", axum::routing::put(change_search).delete(delete_search))
         .route("/api/me/hoard", get(get_hoard).put(set_hoard))
 }
 
@@ -90,12 +90,14 @@ async fn list_searches(State(state): State<AppState>, Extension(who): Extension<
 
 fn searches(c: &Connection, user: i64) -> anyhow::Result<Vec<Value>> {
     let mut stmt = c.prepare(
-        "SELECT id, name, query, created_at FROM saved_searches WHERE user_id = ?1 ORDER BY name COLLATE NOCASE",
+        "SELECT id, name, query, created_at, is_default FROM saved_searches WHERE user_id = ?1
+          ORDER BY name COLLATE NOCASE",
     )?;
     Ok(stmt
         .query_map([user], |r| {
             Ok(json!({ "id": r.get::<_, i64>(0)?, "name": r.get::<_, String>(1)?,
-                       "query": r.get::<_, String>(2)?, "created_at": r.get::<_, String>(3)? }))
+                       "query": r.get::<_, String>(2)?, "created_at": r.get::<_, String>(3)?,
+                       "default": r.get::<_, bool>(4)? }))
         })?
         .collect::<rusqlite::Result<_>>()?)
 }
@@ -132,6 +134,74 @@ async fn save_search(
     })
     .await?;
     Ok((StatusCode::CREATED, Json(json!({ "searches": all }))))
+}
+
+/// What to change about a saved search: its name, what it searches, or whether the library opens to it.
+#[derive(Debug, Deserialize)]
+struct SearchChange {
+    #[serde(default)]
+    name: Option<String>,
+    #[serde(default)]
+    query: Option<String>,
+    #[serde(default)]
+    default: Option<bool>,
+}
+
+/// Rename a saved search, change what it searches, or make it what the library opens to (one at a time: making one
+/// the default stops any other being it). Answers with all of them.
+async fn change_search(
+    State(state): State<AppState>,
+    Extension(who): Extension<Who>,
+    Path(id): Path<i64>,
+    Json(s): Json<SearchChange>,
+) -> ApiResult<Json<Value>> {
+    let user = owner(&who)?;
+    let name = s.name.map(|n| n.trim().to_owned());
+    if name.as_ref().is_some_and(|n| n.is_empty() || n.chars().count() > 80) {
+        return Err(AppError::bad_request(tr!("error-saved-search-name")));
+    }
+    let query = s.query.map(|q| q.trim().trim_start_matches('?').to_owned());
+    if query.as_ref().is_some_and(|q| q.len() > 2000) {
+        return Err(AppError::bad_request(tr!("error-saved-search-too-long")));
+    }
+    let s = SearchChange { name, query, default: s.default };
+    let all = db::call(&state.pool, move |c| change_saved(c, user, id, &s)).await?;
+    let Some(all) = all else {
+        return Err(AppError::not_found(tr!("error-saved-search-not-found", id = id)));
+    };
+    Ok(Json(json!({ "searches": all })))
+}
+
+/// [`change_search`]'s change, if the search is the person's; then all of theirs.
+fn change_saved(c: &Connection, user: i64, id: i64, s: &SearchChange) -> anyhow::Result<Option<Vec<Value>>> {
+    let tx = c.unchecked_transaction()?;
+    let mine = tx
+        .query_row("SELECT 1 FROM saved_searches WHERE id = ?1 AND user_id = ?2", params![id, user], |_| Ok(()))
+        .optional()?
+        .is_some();
+    if !mine {
+        return Ok(None);
+    }
+    if let Some(name) = &s.name {
+        // Another of theirs by that name gives way, as saving under a name does.
+        tx.execute(
+            "DELETE FROM saved_searches WHERE user_id = ?1 AND name = ?2 AND id != ?3",
+            params![user, name, id],
+        )?;
+        tx.execute("UPDATE saved_searches SET name = ?1 WHERE id = ?2", params![name, id])?;
+    }
+    if let Some(query) = &s.query {
+        tx.execute("UPDATE saved_searches SET query = ?1 WHERE id = ?2", params![query, id])?;
+    }
+    match s.default {
+        Some(true) => {
+            tx.execute("UPDATE saved_searches SET is_default = (id = ?1) WHERE user_id = ?2", params![id, user])?
+        }
+        Some(false) => tx.execute("UPDATE saved_searches SET is_default = 0 WHERE id = ?1", [id])?,
+        None => 0,
+    };
+    tx.commit()?;
+    Ok(Some(searches(c, user)?))
 }
 
 async fn delete_search(
@@ -203,6 +273,39 @@ async fn set_hoard(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_saved_search_is_renamed_changed_and_opened_to() {
+        let c = db::test_library();
+        c.execute_batch(
+            "INSERT INTO users (id, username, password_hash, created_at) VALUES (1, 'a', 'x', 'x'), (2, 'b', 'x', 'x');
+             INSERT INTO saved_searches (id, user_id, name, query, created_at) VALUES
+               (1, 1, 'Rocks', 'q=rock', 'x'), (2, 1, 'Moss', 'q=moss', 'x'), (3, 2, 'Theirs', 'q=x', 'x');",
+        )
+        .unwrap();
+        let change = |id, name: Option<&str>, query: Option<&str>, default| {
+            let s = SearchChange { name: name.map(Into::into), query: query.map(Into::into), default };
+            change_saved(&c, 1, id, &s).unwrap().map(|all| {
+                all.iter()
+                    .map(|s| format!("{} {} {} {}", s["id"], s["name"], s["query"], s["default"]))
+                    .collect::<Vec<_>>()
+            })
+        };
+        assert_eq!(
+            change(1, Some("Stones"), Some("q=stone"), Some(true)).unwrap(),
+            [r#"2 "Moss" "q=moss" false"#, r#"1 "Stones" "q=stone" true"#]
+        );
+        // One opens the library at a time.
+        assert_eq!(
+            change(2, None, None, Some(true)).unwrap(),
+            [r#"2 "Moss" "q=moss" true"#, r#"1 "Stones" "q=stone" false"#]
+        );
+        // Renamed to another's name, that one gives way.
+        assert_eq!(change(1, Some("Moss"), None, None).unwrap(), [r#"1 "Moss" "q=stone" false"#]);
+        assert_eq!(change(1, None, None, Some(false)).unwrap(), [r#"1 "Moss" "q=stone" false"#]);
+        // Someone else's isn't theirs to change.
+        assert_eq!(change(3, Some("Mine"), None, None), None);
+    }
 
     #[test]
     fn a_hoard_names_a_few_short_kinds() {

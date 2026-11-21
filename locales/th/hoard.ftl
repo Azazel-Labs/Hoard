@@ -502,6 +502,7 @@ app-forget-project = ลืมโปรเจกต์นี้
 app-save-name-like = คล้าย { $name }
 app-save-name-favorites = รายการโปรด
 app-search-saved = บันทึก “{ $name }” แล้ว: อยู่ในตัวกรอง ใต้หัวข้อ ของคุณ
+app-search-updated = อัปเดต “{ $name }” แล้ว
 app-rank-alike = คล้ายที่สุด
 app-rank-color = มีสีนี้มากที่สุด
 app-rank-match = ตรงที่สุด
@@ -578,6 +579,9 @@ app-home-version = Hoard { $version } — กลับไปที่คลั�
 app-home = กลับไปที่คลัง
 app-search-label = ค้นหาแอสเซ็ต
 app-search-placeholder = ค้นหาชื่อ พาธ แท็ก
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน
 app-views = มุมมอง
 app-library = คลัง
 app-packs = แพ็ก
@@ -607,6 +611,12 @@ app-needs-review = ต้องตรวจ
 app-needs-review-title = เฉพาะแอสเซ็ตที่ยังไม่มีใครตรวจ (ใช้ร่วมกับตัวกรองอื่นได้)
 app-forget-search-label = ลืมการค้นหาที่บันทึกไว้ { $name }
 app-forget-search = ลืมการค้นหานี้
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = เปิดคลังด้วยการค้นหานี้
+app-default-search-on-title = คลังจะเปิดด้วยการค้นหานี้ คลิกเพื่อยกเลิก
+app-default-search-label = เปิดคลังด้วย { $name }
+app-rename-search = เปลี่ยนชื่อ
+app-rename-search-label = ชื่อใหม่ของ { $name }
 app-projects-title = โปรเจกต์ที่ใช้ hoard sync จากที่นี่ พร้อมสิ่งที่การซิงก์ครั้งล่าสุดมี
 app-projects = โปรเจกต์
 app-project-synced = ซิงก์เมื่อ { $when }
@@ -625,6 +635,11 @@ app-save-name-placeholder = ตั้งชื่อ
 app-save = บันทึก
 app-save-search-title = เก็บการค้นหานี้ไว้ในตัวกรอง ใต้หัวข้อ ของคุณ
 app-save-search = บันทึกการค้นหา
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = อัปเดต “{ $name }”
+app-update-search-title = เก็บสิ่งที่เลือกอยู่ตอนนี้ไว้ในการค้นหาที่บันทึกนี้
+app-save-search-new = บันทึกเป็นรายการใหม่
 app-select-title = เลือกหลายแอสเซ็ตเพื่อติดแท็ก จัดหมวดหมู่ เพิ่มลงคอลเลกชัน ดาวน์โหลด หรือเก็บถาวรพร้อมกัน (X หรือ Ctrl-คลิก)
 app-select = เลือก
 app-tile-size = ขนาดไทล์
@@ -1086,6 +1101,7 @@ projects-favorite-add-failed = เพิ่มในรายการโปร�
 projects-favorite-remove-failed = นำออกจากรายการโปรดไม่ได้: { $error }
 projects-save-search-failed = บันทึกการค้นหาไม่ได้: { $error }
 projects-forget-search-failed = นำ { $name } ออกไม่ได้: { $error }
+projects-change-search-failed = เปลี่ยน { $name } ไม่ได้: { $error }
 
 ## projects.ts
 

@@ -502,6 +502,7 @@ app-forget-project = Esquecer este projeto
 app-save-name-like = semelhante a { $name }
 app-save-name-favorites = favoritos
 app-search-saved = «{ $name }» guardada: está em Filtros, em Seus
+app-search-updated = «{ $name }» atualizada
 app-rank-alike = Mais semelhantes
 app-rank-color = Com mais desta cor
 app-rank-match = Melhor correspondência
@@ -628,6 +629,9 @@ app-home-version = Hoard { $version } — voltar à biblioteca
 app-home = Voltar à biblioteca
 app-search-label = Pesquisar recursos
 app-search-placeholder = Pesquisar nomes, caminhos, etiquetas
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = rocha or pedra: uma das duas · -musgo: omitir · "musgo seco": estas palavras juntas
 app-views = Vistas
 app-library = Biblioteca
 app-packs = Pacotes
@@ -657,6 +661,12 @@ app-needs-review = Por rever
 app-needs-review-title = Só recursos que ninguém reviu ainda (combina com os outros filtros)
 app-forget-search-label = Esquecer a pesquisa guardada { $name }
 app-forget-search = Esquecer esta pesquisa
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Abrir a biblioteca com esta pesquisa
+app-default-search-on-title = A biblioteca abre com esta pesquisa. Clique para desativar.
+app-default-search-label = Abrir a biblioteca com { $name }
+app-rename-search = Mudar o nome
+app-rename-search-label = Novo nome para { $name }
 app-projects-title = Projetos que fazem hoard sync a partir daqui, com o que tinha a última sincronização
 app-projects = Projetos
 app-project-synced = Sincronizado { $when }
@@ -679,6 +689,11 @@ app-save-name-placeholder = Dê-lhe um nome
 app-save = Guardar
 app-save-search-title = Manter esta pesquisa em Filtros, em Seus
 app-save-search = Guardar pesquisa
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Atualizar «{ $name }»
+app-update-search-title = Manter o que está escolhido agora nesta pesquisa guardada
+app-save-search-new = Guardar como nova
 app-select-title = Escolher vários recursos para etiquetar, categorizar, colecionar, transferir ou arquivar em conjunto (X, ou Ctrl-clique)
 app-select = Selecionar
 app-tile-size = Tamanho dos mosaicos
@@ -1193,6 +1208,7 @@ projects-favorite-add-failed = Não foi possível adicionar aos seus favoritos: 
 projects-favorite-remove-failed = Não foi possível retirar dos seus favoritos: { $error }
 projects-save-search-failed = Não foi possível guardar a pesquisa: { $error }
 projects-forget-search-failed = Não foi possível remover { $name }: { $error }
+projects-change-search-failed = Não foi possível alterar { $name }: { $error }
 
 ## projects.ts
 

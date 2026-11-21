@@ -1,6 +1,6 @@
 // What the library is narrowed to: the search box, the sidebar's choices, and "more like this". They live in the
 // query string (bookmarkable searches), and a saved search keeps them the same way.
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { t } from './i18n'
 import { findKey } from './keys'
 import { mine } from './mine'
@@ -139,6 +139,10 @@ export function filterQuery(): string {
   if (filters.reviewed) u.set('rev', filters.reviewed === 'yes' ? '1' : '0')
   return u.toString()
 }
+
+/** The saved search the filters were last set from (or saved as): what "Update" keeps the filters as. */
+export const fromSaved = ref<number | null>(null)
+export const savedBasis = computed(() => mine.searches.find((s) => s.id === fromSaved.value) ?? null)
 
 /** The saved search you're looking at, if it's one. */
 export const savedNow = computed(() => {

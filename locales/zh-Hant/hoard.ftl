@@ -502,6 +502,7 @@ app-forget-project = 忘記這個專案
 app-save-name-like = 類似 { $name }
 app-save-name-favorites = 最愛
 app-search-saved = 已儲存「{ $name }」：位於「篩選條件」的「我的」底下
+app-search-updated = 已更新「{ $name }」
 app-rank-alike = 最相似
 app-rank-color = 顏色最多
 app-rank-match = 最符合
@@ -581,6 +582,9 @@ app-home-version = Hoard { $version } — 返回素材庫
 app-home = 返回素材庫
 app-search-label = 搜尋素材
 app-search-placeholder = 搜尋名稱、路徑、標籤
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = 岩石 or 石頭：二選一 · -苔蘚：排除 · "乾苔蘚"：這些詞一起出現
 app-views = 檢視
 app-library = 素材庫
 app-packs = 素材包
@@ -610,6 +614,12 @@ app-needs-review = 待審閱
 app-needs-review-title = 僅顯示還沒人看過的素材（可與其他篩選條件同時使用）
 app-forget-search-label = 忘記已儲存的搜尋 { $name }
 app-forget-search = 忘記這個搜尋
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = 開啟素材庫時使用此搜尋
+app-default-search-on-title = 素材庫會以此搜尋開啟。按一下即可取消。
+app-default-search-label = 開啟素材庫時使用 { $name }
+app-rename-search = 重新命名
+app-rename-search-label = { $name } 的新名稱
 app-projects-title = 從這裡執行 hoard sync 的專案，以及它們上次同步的內容
 app-projects = 專案
 app-project-synced = { $when }同步
@@ -628,6 +638,11 @@ app-save-name-placeholder = 命名
 app-save = 儲存
 app-save-search-title = 將這個搜尋保留在「篩選條件」的「我的」底下
 app-save-search = 儲存搜尋
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = 更新「{ $name }」
+app-update-search-title = 將目前所選內容保留在此已儲存的搜尋中
+app-save-search-new = 另存為新搜尋
 app-select-title = 挑選多個素材，一起加上標籤、分類、收藏、下載或封存（X 或 Ctrl+按一下）
 app-select = 選取
 app-tile-size = 圖塊大小
@@ -1092,6 +1107,7 @@ projects-favorite-add-failed = 無法加入你的最愛：{ $error }
 projects-favorite-remove-failed = 無法從你的最愛移除：{ $error }
 projects-save-search-failed = 無法儲存搜尋：{ $error }
 projects-forget-search-failed = 無法移除 { $name }：{ $error }
+projects-change-search-failed = 無法變更 { $name }：{ $error }
 
 ## 專案
 

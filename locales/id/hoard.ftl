@@ -502,6 +502,7 @@ app-forget-project = Lupakan proyek ini
 app-save-name-like = mirip { $name }
 app-save-name-favorites = favorit
 app-search-saved = “{ $name }” disimpan: ada di Filter, di bawah Milik Anda
+app-search-updated = “{ $name }” diperbarui
 app-rank-alike = Paling mirip
 app-rank-color = Paling banyak warnanya
 app-rank-match = Paling cocok
@@ -590,6 +591,9 @@ app-home-version = Hoard { $version } — kembali ke pustaka
 app-home = Kembali ke pustaka
 app-search-label = Cari aset
 app-search-placeholder = Cari nama, path, tag
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama
 app-views = Tampilan
 app-library = Pustaka
 app-packs = Paket
@@ -619,6 +623,12 @@ app-needs-review = Perlu ditinjau
 app-needs-review-title = Hanya aset yang belum pernah ditinjau siapa pun (berlaku bersama filter lain)
 app-forget-search-label = Lupakan pencarian tersimpan { $name }
 app-forget-search = Lupakan pencarian ini
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Buka pustaka dengan pencarian ini
+app-default-search-on-title = Pustaka dibuka dengan pencarian ini. Klik untuk menghentikan.
+app-default-search-label = Buka pustaka dengan { $name }
+app-rename-search = Ganti nama
+app-rename-search-label = Nama baru untuk { $name }
 app-projects-title = Proyek yang menjalankan hoard sync dari sini, beserta isi sinkronisasi terakhirnya
 app-projects = Proyek
 app-project-synced = Disinkronkan { $when }
@@ -637,6 +647,11 @@ app-save-name-placeholder = Beri nama
 app-save = Simpan
 app-save-search-title = Simpan pencarian ini di Filter, di bawah Milik Anda
 app-save-search = Simpan pencarian
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Perbarui “{ $name }”
+app-update-search-title = Simpan pilihan saat ini ke pencarian tersimpan ini
+app-save-search-new = Simpan sebagai baru
 app-select-title = Pilih beberapa aset untuk diberi tag, dikategorikan, dikoleksi, diunduh, atau diarsipkan bersama (X, atau Ctrl-klik)
 app-select = Pilih
 app-tile-size = Ukuran ubin
@@ -1102,6 +1117,7 @@ projects-favorite-add-failed = Tidak dapat menambahkan ke favorit Anda: { $error
 projects-favorite-remove-failed = Tidak dapat mengeluarkan dari favorit Anda: { $error }
 projects-save-search-failed = Tidak dapat menyimpan pencarian: { $error }
 projects-forget-search-failed = Tidak dapat menghapus { $name }: { $error }
+projects-change-search-failed = Tidak dapat mengubah { $name }: { $error }
 
 ## projects.ts
 

@@ -502,6 +502,7 @@ app-forget-project = Vergeet hierdie projek
 app-save-name-like = soos { $name }
 app-save-name-favorites = gunstelinge
 app-search-saved = “{ $name }” gestoor: dit is in Filters, onder Joune
+app-search-updated = “{ $name }” opgedateer
 app-rank-alike = Mees eenders
 app-rank-color = Meeste van die kleur
 app-rank-match = Beste passing
@@ -628,6 +629,9 @@ app-home-version = Hoard { $version } — terug na die biblioteek
 app-home = Terug na die biblioteek
 app-search-label = Soek bates
 app-search-placeholder = Soek name, paaie, etikette
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam
 app-views = Aansigte
 app-library = Biblioteek
 app-packs = Pakke
@@ -657,6 +661,12 @@ app-needs-review = Moet nagegaan word
 app-needs-review-title = Net bates wat nog niemand nagegaan het nie (werk saam met die ander filters)
 app-forget-search-label = Vergeet die gestoorde soektog { $name }
 app-forget-search = Vergeet hierdie soektog
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Maak die biblioteek met hierdie soektog oop
+app-default-search-on-title = Die biblioteek maak met hierdie soektog oop. Klik om dit te stop.
+app-default-search-label = Maak die biblioteek oop met { $name }
+app-rename-search = Hernoem
+app-rename-search-label = Nuwe naam vir { $name }
 app-projects-title = Projekte wat van hier af hoard sync, met wat hul laaste sinkronisering gehad het
 app-projects = Projekte
 app-project-synced = { $when } gesinkroniseer
@@ -679,6 +689,11 @@ app-save-name-placeholder = Gee dit 'n naam
 app-save = Stoor
 app-save-search-title = Hou hierdie soektog in Filters, onder Joune
 app-save-search = Stoor soektog
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Werk “{ $name }” op
+app-update-search-title = Hou wat nou gekies is in hierdie gestoorde soektog
+app-save-search-new = Stoor as nuwe
 app-select-title = Kies etlike bates om saam te etiketteer, te kategoriseer, te versamel, af te laai of te argiveer (X, of Ctrl-klik)
 app-select = Kies
 app-tile-size = Teëlgrootte
@@ -1193,6 +1208,7 @@ projects-favorite-add-failed = Kon nie by jou gunstelinge voeg nie: { $error }
 projects-favorite-remove-failed = Kon nie uit jou gunstelinge haal nie: { $error }
 projects-save-search-failed = Kon nie die soektog stoor nie: { $error }
 projects-forget-search-failed = Kon nie { $name } verwyder nie: { $error }
+projects-change-search-failed = Kon nie { $name } verander nie: { $error }
 
 ## projects.ts
 

@@ -510,6 +510,7 @@ app-forget-project = Unohda tämä projekti
 app-save-name-like = kuin { $name }
 app-save-name-favorites = suosikit
 app-search-saved = Tallennettu ”{ $name }”: löytyy suodattimista kohdasta Omat
+app-search-updated = Päivitetty ”{ $name }”
 app-rank-alike = Samankaltaisimmat
 app-rank-color = Eniten väriä
 app-rank-match = Paras osuma
@@ -636,6 +637,9 @@ app-home-version = Hoard { $version } – takaisin kirjastoon
 app-home = Takaisin kirjastoon
 app-search-label = Hae resursseja
 app-search-placeholder = Hae nimiä, polkuja, tunnisteita
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = kallio or kivi: jompikumpi · -sammal: jätä pois · "kuiva sammal": nämä sanat yhdessä
 app-views = Näkymät
 app-library = Kirjasto
 app-packs = Paketit
@@ -669,6 +673,12 @@ app-needs-review = Tarkistettavat
 app-needs-review-title = Vain resurssit, joita kukaan ei ole vielä käynyt läpi (toimii muiden suodattimien kanssa)
 app-forget-search-label = Unohda tallennettu haku { $name }
 app-forget-search = Unohda tämä haku
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Avaa kirjasto tällä haulla
+app-default-search-on-title = Kirjasto avautuu tällä haulla. Lopeta napsauttamalla.
+app-default-search-label = Avaa kirjasto haulla { $name }
+app-rename-search = Nimeä uudelleen
+app-rename-search-label = Haun { $name } uusi nimi
 app-projects-title = Projektit, jotka tekevät hoard sync -synkronoinnin täältä, ja mitä niiden viimeisin synkronointi sisälsi
 app-projects = Projektit
 app-project-synced = Synkronoitu { $when }
@@ -691,6 +701,11 @@ app-save-name-placeholder = Anna nimi
 app-save = Tallenna
 app-save-search-title = Säilytä tämä haku suodattimissa kohdassa Omat
 app-save-search = Tallenna haku
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Päivitä ”{ $name }”
+app-update-search-title = Säilytä nykyinen valinta tässä tallennetussa haussa
+app-save-search-new = Tallenna uutena
 app-select-title = Valitse useita resursseja lisätäksesi tunnisteita, luokitellaksesi, kerätäksesi, ladataksesi tai arkistoidaksesi ne yhdessä (X tai Ctrl-napsautus)
 app-select = Valitse
 app-tile-size = Ruutujen koko
@@ -1221,6 +1236,7 @@ projects-favorite-add-failed = Suosikkeihin lisääminen epäonnistui: { $error 
 projects-favorite-remove-failed = Suosikeista poistaminen epäonnistui: { $error }
 projects-save-search-failed = Haun tallennus epäonnistui: { $error }
 projects-forget-search-failed = Haun { $name } poisto epäonnistui: { $error }
+projects-change-search-failed = Haun { $name } muuttaminen epäonnistui: { $error }
 
 ## Projektit
 

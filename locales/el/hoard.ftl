@@ -510,6 +510,7 @@ app-forget-project = Ξεχάστε αυτό το έργο
 app-save-name-like = παρόμοια με { $name }
 app-save-name-favorites = αγαπημένα
 app-search-saved = Αποθηκεύτηκε η «{ $name }»: βρίσκεται στα Φίλτρα, στην ενότητα Δικά σας
+app-search-updated = Ενημερώθηκε η «{ $name }»
 app-rank-alike = Πιο παρόμοια
 app-rank-color = Περισσότερο από το χρώμα
 app-rank-match = Καλύτερη αντιστοιχία
@@ -640,6 +641,9 @@ app-home-version = Hoard { $version } — πίσω στη βιβλιοθήκη
 app-home = Πίσω στη βιβλιοθήκη
 app-search-label = Αναζήτηση στοιχείων
 app-search-placeholder = Αναζήτηση σε ονόματα, διαδρομές, ετικέτες
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί
 app-views = Προβολές
 app-library = Βιβλιοθήκη
 app-packs = Πακέτα
@@ -673,6 +677,12 @@ app-needs-review = Προς έλεγχο
 app-needs-review-title = Μόνο στοιχεία που δεν τα έχει ελέγξει κανείς ακόμη (λειτουργεί μαζί με τα άλλα φίλτρα)
 app-forget-search-label = Ξεχάστε την αποθηκευμένη αναζήτηση { $name }
 app-forget-search = Ξεχάστε αυτή την αναζήτηση
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Άνοιγμα της βιβλιοθήκης με αυτή την αναζήτηση
+app-default-search-on-title = Η βιβλιοθήκη ανοίγει με αυτή την αναζήτηση. Κάντε κλικ για να σταματήσει.
+app-default-search-label = Άνοιγμα της βιβλιοθήκης με την { $name }
+app-rename-search = Μετονομασία
+app-rename-search-label = Νέο όνομα για την { $name }
 app-projects-title = Έργα που κάνουν hoard sync από εδώ, με ό,τι είχε ο τελευταίος συγχρονισμός τους
 app-projects = Έργα
 app-project-synced = Συγχρονίστηκε { $when }
@@ -695,6 +705,11 @@ app-save-name-placeholder = Δώστε όνομα
 app-save = Αποθήκευση
 app-save-search-title = Διατήρηση αυτής της αναζήτησης στα Φίλτρα, στην ενότητα Δικά σας
 app-save-search = Αποθήκευση αναζήτησης
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Ενημέρωση της «{ $name }»
+app-update-search-title = Διατήρηση της τρέχουσας επιλογής σε αυτή την αποθηκευμένη αναζήτηση
+app-save-search-new = Αποθήκευση ως νέας
 app-select-title = Επιλέξτε πολλά στοιχεία για να τους δώσετε ετικέτες, κατηγορία, να τα βάλετε σε συλλογή, να τα κατεβάσετε ή να τα αρχειοθετήσετε μαζί (X ή Ctrl-κλικ)
 app-select = Επιλογή
 app-tile-size = Μέγεθος πλακιδίων
@@ -1221,6 +1236,7 @@ projects-favorite-add-failed = Δεν ήταν δυνατή η προσθήκη 
 projects-favorite-remove-failed = Δεν ήταν δυνατή η αφαίρεση από τα αγαπημένα σας: { $error }
 projects-save-search-failed = Δεν ήταν δυνατή η αποθήκευση της αναζήτησης: { $error }
 projects-forget-search-failed = Δεν ήταν δυνατή η αφαίρεση της «{ $name }»: { $error }
+projects-change-search-failed = Δεν ήταν δυνατή η αλλαγή της «{ $name }»: { $error }
 
 ## projects.ts
 

@@ -2,13 +2,13 @@
 // The library's Filters column (a drawer on phones): your favorites and saved searches, projects, collections, color,
 // kinds, tags and, searching sounds, music. Choosing a place to browse (a saved search, project, collection or your
 // favorites) is App's to do, since it also changes the view; the rest just sets the filters.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { api, type AssetKind, type Collection, type Facet, type Project, type SavedSearch } from '../api'
 import { KIND_LABEL } from '../kinds'
 import { auth, mayEdit } from '../auth'
 import { filters, savedNow } from '../filters'
 import { formatNumber, t } from '../i18n'
-import { forgetSearch, mine } from '../mine'
+import { changeSearch, forgetSearch, mine } from '../mine'
 import { prefs, toggleIn } from '../prefs'
 import { loadProjects, projects } from '../projects'
 import { confirmDialog, daysAgo, showError } from '../ui'
@@ -42,6 +42,21 @@ const COLOR_PRESETS: { hex: string; name: () => string }[] = [
 const member = computed(() => !!auth.status?.signed_in)
 /** May change the library. */
 const editor = computed(() => mayEdit())
+
+// Renaming a saved search, in place: Enter or leaving the field keeps the name, Escape doesn't.
+const renaming = ref<number | null>(null)
+const newName = ref('')
+const vSelect = { mounted: (el: HTMLInputElement) => el.select() }
+function startRename(s: SavedSearch) {
+  newName.value = s.name
+  renaming.value = s.id
+}
+async function rename(s: SavedSearch) {
+  if (renaming.value !== s.id) return
+  renaming.value = null
+  const name = newName.value.trim()
+  if (name && name !== s.name) await changeSearch(s, { name })
+}
 
 async function forgetProject(p: Project) {
   const ok = await confirmDialog({
@@ -134,11 +149,21 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
           </button>
         </li>
         <li v-for="s in mine.searches" :key="s.id" class="saved">
-          <button type="button" :aria-pressed="savedNow?.id === s.id" :title="s.query" @click="emit('search', s)">
+          <form v-if="renaming === s.id" class="rename" @submit.prevent="rename(s)">
+            <input v-model="newName" v-select class="field" maxlength="80" :aria-label="t('app-rename-search-label', { name: s.name })" autocomplete="off" @keydown.esc.stop="renaming = null" @blur="rename(s)" />
+          </form>
+          <button v-else type="button" :aria-pressed="savedNow?.id === s.id" :title="s.query" @click="emit('search', s)" @dblclick="startRename(s)">
             <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
             <span class="cname">{{ s.name }}</span>
           </button>
-          <button type="button" class="forget" :aria-label="t('app-forget-search-label', { name: s.name })" :title="t('app-forget-search')" @click="forgetSearch(s)">
+          <!-- The search the library opens to keeps its mark showing; the rest show theirs on hover. -->
+          <button v-if="renaming !== s.id" type="button" class="forget opens" :class="{ on: s.default }" :aria-pressed="s.default" :aria-label="t('app-default-search-label', { name: s.name })" :title="s.default ? t('app-default-search-on-title') : t('app-default-search-title')" @click="changeSearch(s, { default: !s.default })">
+            <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" :fill="s.default ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 7.5 8 2.5l5.5 5v6h-3.5v-4h-4v4H2.5z" /></svg>
+          </button>
+          <button v-if="renaming !== s.id" type="button" class="forget" :aria-label="t('app-rename-search-label', { name: s.name })" :title="t('app-rename-search')" @click="startRename(s)">
+            <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m10.5 2.5 3 3L6 13H3v-3z" /></svg>
+          </button>
+          <button v-if="renaming !== s.id" type="button" class="forget" :aria-label="t('app-forget-search-label', { name: s.name })" :title="t('app-forget-search')" @click="forgetSearch(s)">
             <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
           </button>
         </li>
@@ -293,6 +318,9 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
 .collections li.saved:hover .forget, .collections .forget:focus-visible { opacity: 1; }
 .collections .forget:hover { color: var(--text); }
 @media (hover: none) { .collections .forget { opacity: 1; } }
+.collections .kinds .opens[aria-pressed='true'] { opacity: 1; color: var(--accent); background: none; box-shadow: none; }
+.rename { flex: 1; min-width: 0; }
+.rename .field { width: 100%; padding: 0.2rem 0.45rem; font-size: var(--step--1); }
 .facet-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .facet {
   display: inline-flex; align-items: baseline; padding: 0.1em 0.45em; border: 1px solid var(--line); border-radius: var(--r-chip);

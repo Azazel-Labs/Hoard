@@ -502,6 +502,7 @@ app-forget-project = Bu projeyi unut
 app-save-name-like = { $name } benzeri
 app-save-name-favorites = favoriler
 app-search-saved = “{ $name }” kaydedildi: Filtreler’de, Kişisel altında
+app-search-updated = “{ $name }” güncellendi
 app-rank-alike = En benzer
 app-rank-color = En çok bu renk
 app-rank-match = En iyi eşleşme
@@ -600,6 +601,9 @@ app-home-version = Hoard { $version } — kütüphaneye dön
 app-home = Kütüphaneye dön
 app-search-label = Varlıklarda ara
 app-search-placeholder = Ad, yol ya da etiket ara
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte
 app-views = Görünümler
 app-library = Kütüphane
 app-packs = Paketler
@@ -629,6 +633,12 @@ app-needs-review = İnceleme bekliyor
 app-needs-review-title = Yalnızca henüz kimsenin incelemediği varlıklar (diğer filtrelerle birlikte çalışır)
 app-forget-search-label = { $name } kayıtlı aramasını unut
 app-forget-search = Bu aramayı unut
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Kütüphaneyi bu aramayla aç
+app-default-search-on-title = Kütüphane bu aramayla açılır. Durdurmak için tıkla.
+app-default-search-label = Kütüphaneyi { $name } ile aç
+app-rename-search = Yeniden adlandır
+app-rename-search-label = { $name } için yeni ad
 app-projects-title = Buradan hoard sync yapan projeler ve son eşitlemelerinde olanlar
 app-projects = Projeler
 app-project-synced = Son eşitleme: { $when }
@@ -647,6 +657,11 @@ app-save-name-placeholder = Ad verin
 app-save = Kaydet
 app-save-search-title = Bu aramayı Filtreler’de, Kişisel altında tut
 app-save-search = Aramayı kaydet
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = “{ $name }” aramasını güncelle
+app-update-search-title = Şu an seçili olanları bu kayıtlı aramada tut
+app-save-search-new = Yeni olarak kaydet
 app-select-title = Birlikte etiketlemek, kategorilemek, koleksiyona eklemek, indirmek ya da arşivlemek için birkaç varlık seçin (X ya da Ctrl ile tıklama)
 app-select = Seç
 app-tile-size = Kutucuk boyutu
@@ -1122,6 +1137,7 @@ projects-favorite-add-failed = Favorilerinize eklenemedi: { $error }
 projects-favorite-remove-failed = Favorilerinizden çıkarılamadı: { $error }
 projects-save-search-failed = Arama kaydedilemedi: { $error }
 projects-forget-search-failed = { $name } kaldırılamadı: { $error }
+projects-change-search-failed = { $name } değiştirilemedi: { $error }
 
 ## projects.ts
 

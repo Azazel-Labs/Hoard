@@ -502,6 +502,7 @@ app-forget-project = Quên dự án này
 app-save-name-like = giống { $name }
 app-save-name-favorites = yêu thích
 app-search-saved = Đã lưu “{ $name }”: nằm trong Bộ lọc, mục Của bạn
+app-search-updated = Đã cập nhật “{ $name }”
 app-rank-alike = Giống nhất
 app-rank-color = Nhiều màu đó nhất
 app-rank-match = Khớp nhất
@@ -581,6 +582,9 @@ app-home-version = Hoard { $version } — quay lại thư viện
 app-home = Quay lại thư viện
 app-search-label = Tìm tài nguyên
 app-search-placeholder = Tìm theo tên, đường dẫn, thẻ
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau
 app-views = Chế độ xem
 app-library = Thư viện
 app-packs = Gói
@@ -610,6 +614,12 @@ app-needs-review = Cần duyệt
 app-needs-review-title = Chỉ các tài nguyên chưa ai xem qua (dùng cùng các bộ lọc khác)
 app-forget-search-label = Quên tìm kiếm đã lưu { $name }
 app-forget-search = Quên tìm kiếm này
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Mở thư viện với tìm kiếm này
+app-default-search-on-title = Thư viện mở với tìm kiếm này. Nhấp để tắt.
+app-default-search-label = Mở thư viện với { $name }
+app-rename-search = Đổi tên
+app-rename-search-label = Tên mới cho { $name }
 app-projects-title = Các dự án chạy hoard sync từ đây, cùng nội dung của lần đồng bộ gần nhất
 app-projects = Dự án
 app-project-synced = Đã đồng bộ { $when }
@@ -628,6 +638,11 @@ app-save-name-placeholder = Đặt tên
 app-save = Lưu
 app-save-search-title = Giữ tìm kiếm này trong Bộ lọc, mục Của bạn
 app-save-search = Lưu tìm kiếm
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Cập nhật “{ $name }”
+app-update-search-title = Giữ lựa chọn hiện tại trong tìm kiếm đã lưu này
+app-save-search-new = Lưu thành mới
 app-select-title = Chọn nhiều tài nguyên để gắn thẻ, phân loại, đưa vào bộ sưu tập, tải xuống hoặc lưu trữ cùng lúc (X, hoặc Ctrl-nhấp)
 app-select = Chọn
 app-tile-size = Kích thước ô
@@ -1092,6 +1107,7 @@ projects-favorite-add-failed = Không thể thêm vào mục yêu thích: { $err
 projects-favorite-remove-failed = Không thể bỏ khỏi mục yêu thích: { $error }
 projects-save-search-failed = Không thể lưu tìm kiếm: { $error }
 projects-forget-search-failed = Không thể gỡ { $name }: { $error }
+projects-change-search-failed = Không thể thay đổi { $name }: { $error }
 
 ## Dự án
 

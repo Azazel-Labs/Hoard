@@ -517,6 +517,7 @@ app-forget-project = Zapomenout tento projekt
 app-save-name-like = podobné { $name }
 app-save-name-favorites = oblíbené
 app-search-saved = Uloženo „{ $name }“: najdete ho ve Filtrech v části Vaše
+app-search-updated = Aktualizováno „{ $name }“
 app-rank-alike = Nejpodobnější
 app-rank-color = Nejvíc dané barvy
 app-rank-match = Nejlepší shoda
@@ -657,6 +658,9 @@ app-home-version = Hoard { $version } — zpět do knihovny
 app-home = Zpět do knihovny
 app-search-label = Hledat assety
 app-search-placeholder = Hledat názvy, cesty, štítky
+# The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
+# the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
+app-search-syntax-title = skála or kámen: jedno z obou · -mech: vynechat · "suchý mech": tato slova pohromadě
 app-views = Zobrazení
 app-library = Knihovna
 app-packs = Balíčky
@@ -691,6 +695,12 @@ app-needs-review = Ke kontrole
 app-needs-review-title = Jen assety, které zatím nikdo nezkontroloval (funguje spolu s ostatními filtry)
 app-forget-search-label = Zapomenout uložené hledání { $name }
 app-forget-search = Zapomenout toto hledání
+# Beside each saved search in Filters: a house mark that makes it what the library opens to (only one is), and renaming it.
+app-default-search-title = Otevřít knihovnu s tímto hledáním
+app-default-search-on-title = Knihovna se otevírá s tímto hledáním. Kliknutím to zrušíte.
+app-default-search-label = Otevřít knihovnu s hledáním { $name }
+app-rename-search = Přejmenovat
+app-rename-search-label = Nový název pro { $name }
 app-projects-title = Projekty, které odsud synchronizuje hoard sync, s tím, co měla jejich poslední synchronizace
 app-projects = Projekty
 app-project-synced = Synchronizováno { $when }
@@ -714,6 +724,11 @@ app-save-name-placeholder = Pojmenujte ho
 app-save = Uložit
 app-save-search-title = Uchovat toto hledání ve Filtrech v části Vaše
 app-save-search = Uložit hledání
+# Beside Save search, after a saved search was chosen and then changed: keep the changes in that saved search instead.
+# Save search then reads "Save as new".
+app-update-search = Aktualizovat „{ $name }“
+app-update-search-title = Uložit aktuální výběr do tohoto uloženého hledání
+app-save-search-new = Uložit jako nové
 app-select-title = Vyberte několik assetů, které chcete společně oštítkovat, zařadit do kategorie, přidat do kolekce, stáhnout nebo archivovat (X nebo Ctrl+klik)
 app-select = Vybrat
 app-tile-size = Velikost dlaždic
@@ -1255,6 +1270,7 @@ projects-favorite-add-failed = Nepodařilo se přidat do oblíbených: { $error 
 projects-favorite-remove-failed = Nepodařilo se odebrat z oblíbených: { $error }
 projects-save-search-failed = Hledání se nepodařilo uložit: { $error }
 projects-forget-search-failed = { $name } se nepodařilo odebrat: { $error }
+projects-change-search-failed = { $name } se nepodařilo změnit: { $error }
 
 ## projects.ts
 

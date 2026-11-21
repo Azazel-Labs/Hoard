@@ -23,13 +23,20 @@ const gpuNote = computed(() => {
   return null
 })
 
-// Labels and hints are getters, so they're in the language of the moment.
-const THUMBS: { value: ThumbQuality; readonly label: string; readonly hint: string }[] = [
-  { value: 'small', get label() { return t('settings-thumbs-small') }, get hint() { return t('settings-thumbs-small-hint') } },
-  { value: 'balanced', get label() { return t('settings-thumbs-balanced') }, get hint() { return t('settings-thumbs-balanced-hint') } },
-  { value: 'sharp', get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
+// Labels and hints are getters, so they're in the language of the moment. `jpeg` and `avif` are the qualities
+// thumbnails are stored and sent at (`ThumbQuality` in crates/hoardd/src/settings.rs); Lossless is PNG, sent as it is.
+const THUMBS: { value: ThumbQuality; jpeg?: number; avif?: number; readonly label: string; readonly hint: string }[] = [
+  { value: 'small', jpeg: 70, avif: 55, get label() { return t('settings-thumbs-small') }, get hint() { return t('settings-thumbs-small-hint') } },
+  { value: 'balanced', jpeg: 82, avif: 68, get label() { return t('settings-thumbs-balanced') }, get hint() { return t('settings-thumbs-balanced-hint') } },
+  { value: 'sharp', jpeg: 92, avif: 80, get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
   { value: 'lossless', get label() { return t('settings-thumbs-lossless') }, get hint() { return t('settings-thumbs-lossless-hint') } },
 ]
+/** What browsers get with a choice: AVIF when that's on, the stored JPEG when not. Nothing for Lossless, whose hint says. */
+function sentAs(q: (typeof THUMBS)[number]): string {
+  const avif = s.value?.options.thumb_avif.value
+  const quality = avif ? q.avif : q.jpeg
+  return quality === undefined ? '' : t('settings-thumbs-sent', { format: avif ? 'AVIF' : 'JPEG', quality })
+}
 // How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
 const usage = ref<Stats | null>(null)
 async function loadUsage() {
@@ -90,7 +97,7 @@ watch(
           :disabled="busy"
           @change="save({ thumb_quality: q.value }, t('settings-thumbs-saved', { quality: q.label }))"
         />
-        <span><strong>{{ q.label }}</strong><small>{{ q.hint }}</small></span>
+        <span><strong>{{ q.label }}</strong><small>{{ sentAs(q) }} {{ q.hint }}</small></span>
       </label>
     </div>
     <div class="switches motion">

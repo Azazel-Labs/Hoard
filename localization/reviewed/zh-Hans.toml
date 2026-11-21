@@ -10396,44 +10396,48 @@ source = "Send thumbnails as AVIF"
 translation = "以 AVIF 发送缩略图"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "能显示 AVIF 的浏览器会收到更小的缩略图，常常不到一半大小。每张缩略图在第一次显示时由已存的缩略图生成，并与转换结果一起保存；在此之前发送已存的那张。首次浏览大型资源库时，生成它们最多会占用两个核心。无损缩略图和像素画按原样发送。"
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "能显示 AVIF 的浏览器会收到与上面所选清晰度相同的缩略图，常常不到一半大小。每张缩略图在第一次显示时由已存的缩略图生成，并与转换结果一起保存；在此之前发送已存的那张。首次浏览大型资源库时，生成它们最多会占用两个核心。无损缩略图和像素画按原样发送。"
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "均衡"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG，质量 82。在缩略图尺寸下很难与原图区分。"
+source = "Hard to tell from the original at thumbnail size."
+translation = "在缩略图尺寸下很难与原图区分。"
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "无损"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG，与生成时完全一致。大好几倍。"
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG，与生成时完全一致。大好几倍。从不以 AVIF 发送。"
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "缩略图：{ $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }，质量 { $quality }。"
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "更清晰"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG，质量 92。大小约为“均衡”的两倍。"
+source = "About twice the size of Balanced."
+translation = "大小约为“均衡”的两倍。"
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "更小"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG，质量 70。在网格中没问题；近看稍有模糊。"
+source = "Fine in the grid; a little soft up close."
+translation = "在网格中没问题；近看稍有模糊。"
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

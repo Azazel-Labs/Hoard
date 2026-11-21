@@ -246,9 +246,16 @@ test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once t
 
   await page.goto('/#settings/performance')
   const avif = page.getByRole('checkbox', { name: 'Send thumbnails as AVIF' })
+  // Each choice says what browsers get: the stored JPEG, then the AVIF made at the same sharpness.
+  const choice = (name: string) =>
+    page.getByRole('radiogroup', { name: 'Thumbnails' }).locator('label').filter({ has: page.getByText(name, { exact: true }) })
   await expect(avif).not.toBeChecked()
+  await expect(choice('Balanced')).toContainText('JPEG, quality 82. Hard to tell')
   await avif.check()
   await expect.poll(async () => (await (await api.get('/api/admin/settings')).json()).options.thumb_avif.value).toBe(true)
+  await expect(choice('Balanced')).toContainText('AVIF, quality 68. Hard to tell')
+  await expect(choice('Sharper')).toContainText('AVIF, quality 80.')
+  await expect(choice('Lossless')).toHaveText(/^Lossless\s*PNG, exactly as made\. Several times larger, and never sent as AVIF\.$/)
   try {
     // The stored picture goes out while the AVIF is made, not to be kept by the browser.
     const first = await thumb('image/avif,image/webp,*/*')

@@ -3445,16 +3445,18 @@ settings-thumbs-what = How new thumbnails and model views are stored. Ones with 
 settings-previews-size = Previews take { $size } now.
 # The note after choosing: $quality is the choice.
 settings-thumbs-saved = Thumbnails: { $quality }
+# What browsers get with a choice, before its hint: $format is JPEG or AVIF, $quality a number like 82.
+settings-thumbs-sent = { $format }, quality { $quality }.
 settings-thumbs-small = Smaller
-settings-thumbs-small-hint = JPEG, quality 70. Fine in the grid; a little soft up close.
+settings-thumbs-small-hint = Fine in the grid; a little soft up close.
 settings-thumbs-balanced = Balanced
-settings-thumbs-balanced-hint = JPEG, quality 82. Hard to tell from the original at thumbnail size.
+settings-thumbs-balanced-hint = Hard to tell from the original at thumbnail size.
 settings-thumbs-sharp = Sharper
-settings-thumbs-sharp-hint = JPEG, quality 92. About twice the size of Balanced.
+settings-thumbs-sharp-hint = About twice the size of Balanced.
 settings-thumbs-lossless = Lossless
-settings-thumbs-lossless-hint = PNG, exactly as made. Several times larger.
+settings-thumbs-lossless-hint = PNG, exactly as made. Several times larger, and never sent as AVIF.
 settings-thumbs-avif = Send thumbnails as AVIF
-settings-thumbs-avif-what = Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are.
+settings-thumbs-avif-what = Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are.
 settings-motion-thumbs = Moving thumbnails for animations
 settings-motion-thumbs-what = Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them.
 settings-limits = Work and limits

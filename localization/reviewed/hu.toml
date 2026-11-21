@@ -10470,44 +10470,48 @@ source = "Send thumbnails as AVIF"
 translation = "Bélyegképek küldése AVIF formátumban"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Az AVIF-et megjelenítő böngészők kisebb bélyegképeket kapnak, gyakran a méret felénél is kisebbet. Mindegyik a tárolt bélyegképből készül az első megjelenítéskor, és az átalakítások mellett marad meg; addig a tárolt kerül elküldésre. Az elkészítésük legfeljebb két magot foglal le, amíg egy nagy könyvtárat először böngésznek. A veszteségmentes bélyegképek és a pixel art változatlanul mennek ki."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Az AVIF-et megjelenítő böngészők a fenti választással azonos élességű bélyegképeket kapnak, gyakran a méret felénél is kisebbet. Mindegyik a tárolt bélyegképből készül az első megjelenítéskor, és az átalakítások mellett marad meg; addig a tárolt kerül elküldésre. Az elkészítésük legfeljebb két magot foglal le, amíg egy nagy könyvtárat először böngésznek. A veszteségmentes bélyegképek és a pixel art változatlanul mennek ki."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Kiegyensúlyozott"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, 82-es minőség. Bélyegképméretben alig különböztethető meg az eredetitől."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Bélyegképméretben alig különböztethető meg az eredetitől."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Veszteségmentes"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, pontosan úgy, ahogy elkészült. Többszörösen nagyobb."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, pontosan úgy, ahogy elkészült. Többszörösen nagyobb. Soha nem mennek ki AVIF-ként."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Bélyegképek: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, minőség: { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Élesebb"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, 92-es minőség. Nagyjából kétszer akkora, mint a Kiegyensúlyozott."
+source = "About twice the size of Balanced."
+translation = "Nagyjából kétszer akkora, mint a Kiegyensúlyozott."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Kisebb"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, 70-es minőség. A rácsban megfelel; közelről kissé lágy."
+source = "Fine in the grid; a little soft up close."
+translation = "A rácsban megfelel; közelről kissé lágy."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

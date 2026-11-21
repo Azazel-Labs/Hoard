@@ -10631,44 +10631,48 @@ source = "Send thumbnails as AVIF"
 translation = "Vorschaubilder als AVIF senden"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Browser, die AVIF anzeigen, bekommen kleinere Vorschaubilder, oft weniger als halb so groß. Jedes wird beim ersten Anzeigen aus dem gespeicherten Vorschaubild erstellt und bei den Umwandlungen aufbewahrt; bis dahin wird das gespeicherte gesendet. Das Erstellen hält bis zu zwei Kerne beschäftigt, während eine große Bibliothek zum ersten Mal durchgesehen wird. Verlustfreie Vorschaubilder und Pixel-Art werden unverändert gesendet."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Browser, die AVIF anzeigen, bekommen Vorschaubilder so scharf wie bei der Wahl oben, oft weniger als halb so groß. Jedes wird beim ersten Anzeigen aus dem gespeicherten Vorschaubild erstellt und bei den Umwandlungen aufbewahrt; bis dahin wird das gespeicherte gesendet. Das Erstellen hält bis zu zwei Kerne beschäftigt, während eine große Bibliothek zum ersten Mal durchgesehen wird. Verlustfreie Vorschaubilder und Pixel-Art werden unverändert gesendet."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Ausgewogen"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, Qualität 82. In Vorschaubildgröße kaum vom Original zu unterscheiden."
+source = "Hard to tell from the original at thumbnail size."
+translation = "In Vorschaubildgröße kaum vom Original zu unterscheiden."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Verlustfrei"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, genau wie erstellt. Um ein Vielfaches größer."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, genau wie erstellt. Um ein Vielfaches größer. Werden nie als AVIF gesendet."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Vorschaubilder: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, Qualität { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Schärfer"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, Qualität 92. Etwa doppelt so groß wie „Ausgewogen“."
+source = "About twice the size of Balanced."
+translation = "Etwa doppelt so groß wie „Ausgewogen“."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Kleiner"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, Qualität 70. Im Raster in Ordnung; aus der Nähe etwas weich."
+source = "Fine in the grid; a little soft up close."
+translation = "Im Raster in Ordnung; aus der Nähe etwas weich."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

@@ -10382,44 +10382,48 @@ source = "Send thumbnails as AVIF"
 translation = "Gửi ảnh thu nhỏ dưới dạng AVIF"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Trình duyệt hiển thị được AVIF sẽ nhận ảnh thu nhỏ nhỏ hơn, thường chưa tới một nửa kích thước. Mỗi ảnh được tạo từ ảnh thu nhỏ đã lưu vào lần đầu hiển thị và được giữ cùng các bản chuyển đổi; trước đó ảnh đã lưu sẽ được gửi. Việc tạo chúng chiếm tới hai lõi trong khi một thư viện lớn được duyệt lần đầu. Ảnh thu nhỏ không mất dữ liệu và pixel art được gửi nguyên trạng."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Trình duyệt hiển thị được AVIF sẽ nhận ảnh thu nhỏ sắc nét như lựa chọn ở trên, thường chưa tới một nửa kích thước. Mỗi ảnh được tạo từ ảnh thu nhỏ đã lưu vào lần đầu hiển thị và được giữ cùng các bản chuyển đổi; trước đó ảnh đã lưu sẽ được gửi. Việc tạo chúng chiếm tới hai lõi trong khi một thư viện lớn được duyệt lần đầu. Ảnh thu nhỏ không mất dữ liệu và pixel art được gửi nguyên trạng."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Cân bằng"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, chất lượng 82. Khó phân biệt với bản gốc ở kích thước ảnh thu nhỏ."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Khó phân biệt với bản gốc ở kích thước ảnh thu nhỏ."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Không mất dữ liệu"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, đúng như khi tạo. Lớn hơn vài lần."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, đúng như khi tạo. Lớn hơn vài lần. Không bao giờ được gửi dưới dạng AVIF."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Ảnh thu nhỏ: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, chất lượng { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Sắc nét hơn"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, chất lượng 92. Lớn khoảng gấp đôi Cân bằng."
+source = "About twice the size of Balanced."
+translation = "Lớn khoảng gấp đôi Cân bằng."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Nhỏ hơn"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, chất lượng 70. Ổn trong lưới; hơi mờ khi xem gần."
+source = "Fine in the grid; a little soft up close."
+translation = "Ổn trong lưới; hơi mờ khi xem gần."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

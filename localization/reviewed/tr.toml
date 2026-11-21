@@ -10442,44 +10442,48 @@ source = "Send thumbnails as AVIF"
 translation = "Küçük resimleri AVIF olarak gönder"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF gösterebilen tarayıcılar daha küçük küçük resimler alır, çoğu zaman boyutun yarısından da az. Her biri ilk gösterildiğinde saklanan küçük resimden yapılır ve dönüştürmelerle birlikte tutulur; o zamana kadar saklanan gönderilir. Bunları yapmak, büyük bir kitaplığa ilk kez göz atılırken en fazla iki çekirdeği meşgul eder. Kayıpsız küçük resimler ve piksel sanatı olduğu gibi gönderilir."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF gösterebilen tarayıcılar, yukarıdaki seçim kadar net küçük resimler alır, çoğu zaman boyutun yarısından da az. Her biri ilk gösterildiğinde saklanan küçük resimden yapılır ve dönüştürmelerle birlikte tutulur; o zamana kadar saklanan gönderilir. Bunları yapmak, büyük bir kitaplığa ilk kez göz atılırken en fazla iki çekirdeği meşgul eder. Kayıpsız küçük resimler ve piksel sanatı olduğu gibi gönderilir."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Dengeli"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, kalite 82. Küçük resim boyutunda özgününden ayırt etmek zor."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Küçük resim boyutunda özgününden ayırt etmek zor."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Kayıpsız"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, tam oluşturulduğu gibi. Birkaç kat daha büyük."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, tam oluşturulduğu gibi. Birkaç kat daha büyük. Hiçbir zaman AVIF olarak gönderilmez."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Küçük resimler: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, kalite { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Daha keskin"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, kalite 92. Dengeli’nin yaklaşık iki katı boyutta."
+source = "About twice the size of Balanced."
+translation = "Dengeli’nin yaklaşık iki katı boyutta."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Daha küçük"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, kalite 70. Izgarada iyi; yakından biraz yumuşak."
+source = "Fine in the grid; a little soft up close."
+translation = "Izgarada iyi; yakından biraz yumuşak."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

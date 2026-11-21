@@ -10352,44 +10352,48 @@ source = "Send thumbnails as AVIF"
 translation = "썸네일을 AVIF로 보내기"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF를 표시하는 브라우저는 더 작은 썸네일을 받습니다. 절반 이하인 경우가 많습니다. 각 썸네일은 처음 표시될 때 저장된 썸네일로 만들어지고 변환 파일과 함께 보관되며, 그전까지는 저장된 썸네일이 전송됩니다. 큰 라이브러리를 처음 둘러보는 동안 만드는 데 최대 두 개의 코어를 사용합니다. 무손실 썸네일과 픽셀 아트는 그대로 전송됩니다."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF를 표시하는 브라우저는 위에서 고른 선명도 그대로 더 작은 썸네일을 받습니다. 절반 이하인 경우가 많습니다. 각 썸네일은 처음 표시될 때 저장된 썸네일로 만들어지고 변환 파일과 함께 보관되며, 그전까지는 저장된 썸네일이 전송됩니다. 큰 라이브러리를 처음 둘러보는 동안 만드는 데 최대 두 개의 코어를 사용합니다. 무손실 썸네일과 픽셀 아트는 그대로 전송됩니다."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "균형"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, 품질 82. 썸네일 크기에서는 원본과 구분하기 어렵습니다."
+source = "Hard to tell from the original at thumbnail size."
+translation = "썸네일 크기에서는 원본과 구분하기 어렵습니다."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "무손실"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, 만든 그대로입니다. 몇 배 더 큽니다."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, 만든 그대로입니다. 몇 배 더 큽니다. AVIF로 보내지 않습니다."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "썸네일: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, 품질 { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "선명하게"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, 품질 92. 균형의 약 두 배 크기입니다."
+source = "About twice the size of Balanced."
+translation = "균형의 약 두 배 크기입니다."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "작게"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, 품질 70. 그리드에서는 괜찮고, 가까이 보면 약간 흐립니다."
+source = "Fine in the grid; a little soft up close."
+translation = "그리드에서는 괜찮고, 가까이 보면 약간 흐립니다."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

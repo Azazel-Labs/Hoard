@@ -10396,44 +10396,48 @@ source = "Send thumbnails as AVIF"
 translation = "サムネイルを AVIF で送る"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF を表示できるブラウザには、より小さい（多くは半分以下の）サムネイルが送られます。各サムネイルは初めて表示されたときに保存済みのサムネイルから作られ、変換と一緒に保管されます。それまでは保存済みのものが送られます。大きなライブラリを初めて閲覧する間、作成のために最大 2 コアが使われます。ロスレスのサムネイルとピクセルアートはそのまま送られます。"
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF を表示できるブラウザには、上で選んだ鮮明さのまま、より小さい（多くは半分以下の）サムネイルが送られます。各サムネイルは初めて表示されたときに保存済みのサムネイルから作られ、変換と一緒に保管されます。それまでは保存済みのものが送られます。大きなライブラリを初めて閲覧する間、作成のために最大 2 コアが使われます。ロスレスのサムネイルとピクセルアートはそのまま送られます。"
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "バランス"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG、品質 82。サムネイルのサイズでは元の画像と見分けにくい品質です。"
+source = "Hard to tell from the original at thumbnail size."
+translation = "サムネイルのサイズでは元の画像と見分けにくい品質です。"
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "ロスレス"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG、作成したそのまま。数倍大きくなります。"
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG、作成したそのまま。数倍大きくなります。AVIF では送られません。"
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "サムネイル: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }、品質 { $quality }。"
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "鮮明"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG、品質 92。「バランス」の約 2 倍のサイズです。"
+source = "About twice the size of Balanced."
+translation = "「バランス」の約 2 倍のサイズです。"
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "小さめ"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG、品質 70。グリッドでは十分ですが、近くで見ると少しぼやけます。"
+source = "Fine in the grid; a little soft up close."
+translation = "グリッドでは十分ですが、近くで見ると少しぼやけます。"
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

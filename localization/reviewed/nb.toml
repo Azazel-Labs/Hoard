@@ -10633,44 +10633,48 @@ source = "Send thumbnails as AVIF"
 translation = "Send miniatyrbilder som AVIF"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Nettlesere som viser AVIF, får mindre miniatyrbilder, ofte under halvparten av størrelsen. Hvert lages fra det lagrede miniatyrbildet første gang det vises, og tas vare på sammen med konverteringene; inntil da sendes det lagrede. Å lage dem holder opptil to kjerner opptatt mens et stort bibliotek blas gjennom for første gang. Tapsfrie miniatyrbilder og pikselkunst sendes som de er."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Nettlesere som viser AVIF, får miniatyrbilder like skarpe som valget ovenfor, ofte under halvparten av størrelsen. Hvert lages fra det lagrede miniatyrbildet første gang det vises, og tas vare på sammen med konverteringene; inntil da sendes det lagrede. Å lage dem holder opptil to kjerner opptatt mens et stort bibliotek blas gjennom for første gang. Tapsfrie miniatyrbilder og pikselkunst sendes som de er."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Balansert"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, kvalitet 82. Vanskelig å skille fra originalen i miniatyrstørrelse."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Vanskelig å skille fra originalen i miniatyrstørrelse."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Tapsfri"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, nøyaktig slik det ble laget. Flere ganger større."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, nøyaktig slik det ble laget. Flere ganger større. Sendes aldri som AVIF."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatyrbilder: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, kvalitet { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Skarpere"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, kvalitet 92. Omtrent dobbelt så stor som Balansert."
+source = "About twice the size of Balanced."
+translation = "Omtrent dobbelt så stor som Balansert."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Mindre"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, kvalitet 70. Greit i rutenettet; litt mykt på nært hold."
+source = "Fine in the grid; a little soft up close."
+translation = "Greit i rutenettet; litt mykt på nært hold."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

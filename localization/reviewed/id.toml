@@ -10414,44 +10414,48 @@ source = "Send thumbnails as AVIF"
 translation = "Kirim gambar mini sebagai AVIF"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Browser yang bisa menampilkan AVIF mendapat gambar mini yang lebih kecil, sering kali kurang dari separuh ukurannya. Masing-masing dibuat dari gambar mini tersimpan saat pertama kali ditampilkan dan disimpan bersama hasil konversi; sampai saat itu yang tersimpan yang dikirim. Membuatnya menyibukkan hingga dua inti selagi pustaka besar dijelajahi pertama kali. Gambar mini lossless dan pixel art dikirim apa adanya."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Browser yang bisa menampilkan AVIF mendapat gambar mini setajam pilihan di atas, sering kali kurang dari separuh ukurannya. Masing-masing dibuat dari gambar mini tersimpan saat pertama kali ditampilkan dan disimpan bersama hasil konversi; sampai saat itu yang tersimpan yang dikirim. Membuatnya menyibukkan hingga dua inti selagi pustaka besar dijelajahi pertama kali. Gambar mini lossless dan pixel art dikirim apa adanya."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Seimbang"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, kualitas 82. Sulit dibedakan dari aslinya pada ukuran gambar mini."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Sulit dibedakan dari aslinya pada ukuran gambar mini."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Lossless"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, persis seperti dibuat. Beberapa kali lebih besar."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, persis seperti dibuat. Beberapa kali lebih besar. Tidak pernah dikirim sebagai AVIF."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Gambar mini: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, kualitas { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Lebih tajam"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, kualitas 92. Sekitar dua kali ukuran Seimbang."
+source = "About twice the size of Balanced."
+translation = "Sekitar dua kali ukuran Seimbang."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Lebih kecil"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, kualitas 70. Cukup di kisi; sedikit buram dari dekat."
+source = "Fine in the grid; a little soft up close."
+translation = "Cukup di kisi; sedikit buram dari dekat."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

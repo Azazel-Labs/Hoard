@@ -10680,44 +10680,48 @@ source = "Send thumbnails as AVIF"
 translation = "Lähetä pikkukuvat AVIF-muodossa"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF-kuvia näyttävät selaimet saavat pienempiä pikkukuvia, usein alle puolet koosta. Kukin tehdään tallennetusta pikkukuvasta, kun se näytetään ensimmäisen kerran, ja säilytetään muunnosten kanssa; siihen asti lähetetään tallennettu. Niiden tekeminen pitää enintään kaksi ydintä kiireisenä, kun suurta kirjastoa selataan ensimmäistä kertaa. Häviöttömät pikkukuvat ja pikselitaide lähetetään sellaisinaan."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF-kuvia näyttävät selaimet saavat yllä valitun tarkkuisia pikkukuvia, usein alle puolet koosta. Kukin tehdään tallennetusta pikkukuvasta, kun se näytetään ensimmäisen kerran, ja säilytetään muunnosten kanssa; siihen asti lähetetään tallennettu. Niiden tekeminen pitää enintään kaksi ydintä kiireisenä, kun suurta kirjastoa selataan ensimmäistä kertaa. Häviöttömät pikkukuvat ja pikselitaide lähetetään sellaisinaan."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Tasapainoinen"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, laatu 82. Vaikea erottaa alkuperäisestä pikkukuvan koossa."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Vaikea erottaa alkuperäisestä pikkukuvan koossa."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Häviötön"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, täsmälleen tehtynä. Monta kertaa suurempi."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, täsmälleen tehtynä. Monta kertaa suurempi. Ei koskaan lähetetä AVIF-muodossa."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Pikkukuvat: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, laatu { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Terävämmät"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, laatu 92. Noin kaksi kertaa Tasapainoisen kokoinen."
+source = "About twice the size of Balanced."
+translation = "Noin kaksi kertaa Tasapainoisen kokoinen."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Pienemmät"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, laatu 70. Riittää ruudukossa; hieman pehmeä läheltä."
+source = "Fine in the grid; a little soft up close."
+translation = "Riittää ruudukossa; hieman pehmeä läheltä."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

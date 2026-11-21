@@ -10690,44 +10690,48 @@ source = "Send thumbnails as AVIF"
 translation = "Αποστολή μικρογραφιών ως AVIF"
 
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Τα προγράμματα περιήγησης που εμφανίζουν AVIF παίρνουν μικρότερες μικρογραφίες, συχνά κάτω από το μισό μέγεθος. Η καθεμία φτιάχνεται από την αποθηκευμένη μικρογραφία την πρώτη φορά που εμφανίζεται και κρατιέται μαζί με τις μετατροπές· μέχρι τότε στέλνεται η αποθηκευμένη. Η δημιουργία τους απασχολεί έως δύο πυρήνες όσο μια μεγάλη βιβλιοθήκη περιηγείται για πρώτη φορά. Οι μικρογραφίες χωρίς απώλειες και το pixel art στέλνονται όπως είναι."
+source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Τα προγράμματα περιήγησης που εμφανίζουν AVIF παίρνουν μικρογραφίες τόσο ευκρινείς όσο η παραπάνω επιλογή, συχνά κάτω από το μισό μέγεθος. Η καθεμία φτιάχνεται από την αποθηκευμένη μικρογραφία την πρώτη φορά που εμφανίζεται και κρατιέται μαζί με τις μετατροπές· μέχρι τότε στέλνεται η αποθηκευμένη. Η δημιουργία τους απασχολεί έως δύο πυρήνες όσο μια μεγάλη βιβλιοθήκη περιηγείται για πρώτη φορά. Οι μικρογραφίες χωρίς απώλειες και το pixel art στέλνονται όπως είναι."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Ισορροπημένες"
 
 [messages.settings-thumbs-balanced-hint]
-source = "JPEG, quality 82. Hard to tell from the original at thumbnail size."
-translation = "JPEG, ποιότητα 82. Δύσκολα ξεχωρίζουν από το πρωτότυπο σε μέγεθος μικρογραφίας."
+source = "Hard to tell from the original at thumbnail size."
+translation = "Δύσκολα ξεχωρίζουν από το πρωτότυπο σε μέγεθος μικρογραφίας."
 
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Χωρίς απώλειες"
 
 [messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger."
-translation = "PNG, ακριβώς όπως δημιουργήθηκαν. Αρκετές φορές μεγαλύτερες."
+source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
+translation = "PNG, ακριβώς όπως δημιουργήθηκαν. Αρκετές φορές μεγαλύτερες. Δεν στέλνονται ποτέ ως AVIF."
 
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Μικρογραφίες: { $quality }"
+
+[messages.settings-thumbs-sent]
+source = "{ $format }, quality { $quality }."
+translation = "{ $format }, ποιότητα { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"
 translation = "Πιο ευκρινείς"
 
 [messages.settings-thumbs-sharp-hint]
-source = "JPEG, quality 92. About twice the size of Balanced."
-translation = "JPEG, ποιότητα 92. Περίπου διπλάσιο μέγεθος από τις Ισορροπημένες."
+source = "About twice the size of Balanced."
+translation = "Περίπου διπλάσιο μέγεθος από τις Ισορροπημένες."
 
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Μικρότερες"
 
 [messages.settings-thumbs-small-hint]
-source = "JPEG, quality 70. Fine in the grid; a little soft up close."
-translation = "JPEG, ποιότητα 70. Καλές στο πλέγμα· λίγο θολές από κοντά."
+source = "Fine in the grid; a little soft up close."
+translation = "Καλές στο πλέγμα· λίγο θολές από κοντά."
 
 [messages.settings-thumbs-what]
 source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."

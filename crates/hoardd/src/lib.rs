@@ -108,6 +108,7 @@ mod textures;
 mod tools;
 mod unitymat;
 mod unreal_editor;
+mod unreal_recolour;
 mod updates;
 mod uploads;
 mod webglb;
@@ -281,6 +282,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     motion::kick(&state);
     let st = Arc::clone(&state);
     tokio::spawn(async move { takes::backfill(&st).await });
+    tokio::spawn(unreal_recolour::run(Arc::clone(&state)));
     let st = Arc::clone(&state);
     tokio::spawn(async move { looks::schedule(&st).await });
     {

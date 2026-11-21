@@ -914,4 +914,30 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // 88: a pack uploaded again goes into the pack it already is (new files added, changed ones replaced) instead of
     // becoming a copy; the upload remembers which pack it's for until it's complete.
     "ALTER TABLE upload_meta ADD COLUMN merge_into TEXT;",
+    // 89: Unreal stores a package's thumbnail, and a texture's PNG source, with red and blue swapped (its BGRA pixels
+    // compressed as RGBA), and they were shown as stored, so a red asset looked blue. Packs with Unreal packages are
+    // read again, which draws their thumbnails again.
+    "UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id AND lower(a.ext) IN ('uasset', 'umap'))
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 90: what a converted asset came from is never forgotten. `blob_hash` is the original only while it's kept;
+    // `orig_hash` is its hash for good, kept after the original is discarded. `converter` is which code, at which
+    // revision, made the file and how ("hoard-unreal r2: PNG source, red and blue put right"), each later conversion
+    // added after "; then ". NULL for files made before this was recorded, of which only `notes` tells.
+    "ALTER TABLE asset_origin ADD COLUMN orig_hash TEXT;
+     ALTER TABLE asset_origin ADD COLUMN converter TEXT;
+     UPDATE asset_origin SET orig_hash = blob_hash;",
+    // 91: textures Hoard's reader converted before hoard-unreal r2 have red and blue swapped where Unreal stored the
+    // source as an 8-bit PNG. Each is listed with the file it has now; `unreal_recolour` puts them right at start,
+    // from the original where it's kept or else from the PNG itself, and only while the asset still has that file.
+    "CREATE TABLE unreal_recolour (asset_id TEXT PRIMARY KEY, blob_hash TEXT NOT NULL) WITHOUT ROWID;
+     INSERT INTO unreal_recolour (asset_id, blob_hash)
+       SELECT a.id, a.blob_hash FROM asset_origin o JOIN assets a ON a.id = o.asset_id
+       WHERE o.method = 'native' AND o.class = 'Texture2D' AND lower(a.ext) = 'png';",
 ];

@@ -22,6 +22,24 @@ first:
 - **Browsing a big pack: 0.63 s** for a pack of 120,000, with its counts beside the grid. Counts by kind are
   already kept per pack (`pack_kinds`), so the facets with no other filter can come from there.
 
+## What a converted file came from
+
+A file Hoard converted (an Unreal texture to PNG, a WAV to FLAC) has to say what it came from for good, even once
+the original is discarded. Until migration 90 it didn't reliably: the original's hash was dropped with the original,
+and what made the file was free-text notes that didn't always say. So when the Unreal converter turned out to have
+swapped red and blue, which PNGs it had swapped had to be worked out from clues. Since then, `asset_origin` keeps the
+original's hash for good (`orig_hash`) and which converter at which revision made the file and how (`converter`,
+e.g. `hoard-unreal r2: PNG source, red and blue put right`). Still missing:
+
+- **Originals discarded before migration 90 are only a path and notes.** Their hash is gone unless the pack is added
+  again.
+- **The record isn't shown.** The asset page shows the original's path, class, engine and notes, but not its hash or
+  what converted it.
+- **Deleting a converted asset deletes the record** (`asset_origin` goes with its asset). A small tombstone would
+  keep that the pack once had `T_Jar.uasset`, with its hash, and what came of it.
+- **Thumbnails and other derivatives don't record what drew them.** A fix to a thumbnail reader (the same red/blue
+  swap) has to re-read every pack of that format, because which thumbnails the old reader drew isn't known.
+
 ## Store details for the Unity Asset Store and Humble Bundle
 
 Store details searches Fab, itch.io, Kenney and OpenGameArt, and a pack whose files name its listing gets it filled

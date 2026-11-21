@@ -94,6 +94,14 @@ pub(crate) struct Origin {
     pub(crate) dependencies: Vec<String>,
     pub(crate) method: &'static str,
     pub(crate) notes: Vec<String>,
+    /// Which code, at which revision, made the file and how ("hoard-unreal r2: PNG source, red and blue put right").
+    /// Empty says only Hoard's version and the method.
+    pub(crate) converter: String,
+}
+
+/// What [`Origin::converter`] says for a file made by `hoard-unreal` the way `how` says.
+pub(crate) fn native_converter(how: &str) -> String {
+    format!("hoard-unreal r{}: {how}", convert::REVISION)
 }
 
 /// Swap an asset's file for a converted one, recording where it came from. Returns false when the converted file
@@ -113,28 +121,56 @@ pub(crate) fn replace_asset(
         })
         .optional()?
         .context("asset is gone")?;
-    // Converting twice keeps the first origin (the package, not an intermediate file).
-    let prior: Option<(String, String, Option<String>)> = tx
-        .query_row("SELECT path, ext, blob_hash FROM asset_origin WHERE asset_id = ?1", [asset_id], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+    // Converting twice keeps the first origin (the package, not an intermediate file), and its hash for good.
+    let prior: Option<(String, String, Option<String>, Option<String>)> = tx
+        .query_row("SELECT path, ext, blob_hash, orig_hash FROM asset_origin WHERE asset_id = ?1", [asset_id], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
         })
         .optional()?;
-    let (orig_path, orig_ext, orig_hash) = prior.unwrap_or_else(|| (path.clone(), ext.clone(), Some(old_hash)));
+    let (orig_path, orig_ext, orig_kept, orig_hash) = match prior {
+        Some((p, e, kept, hash)) => {
+            let hash = hash.or_else(|| kept.clone());
+            (p, e, kept, hash)
+        }
+        None => (path.clone(), ext.clone(), Some(old_hash.clone()), Some(old_hash)),
+    };
     tx.execute(
         "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
         params![new.hash, new.size as i64, now],
     )?;
     let deps = json!(origin.dependencies).to_string();
     let notes = origin.notes.join("; ");
-    let kept = orig_hash.filter(|_| keep_original);
+    let kept = orig_kept.filter(|_| keep_original);
+    let converter = if origin.converter.is_empty() {
+        format!("hoard {} {}", env!("CARGO_PKG_VERSION"), origin.method)
+    } else {
+        origin.converter.clone()
+    };
+    // A second conversion adds to the record of the first rather than replacing it.
     let record = |target_id: &str| -> rusqlite::Result<usize> {
         tx.execute(
-            "INSERT INTO asset_origin (asset_id, path, ext, blob_hash, class, engine, dependencies, method, notes,
-                                       converted_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+            "INSERT INTO asset_origin (asset_id, path, ext, blob_hash, orig_hash, class, engine, dependencies, method,
+                                       notes, converter, converted_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
              ON CONFLICT (asset_id) DO UPDATE SET blob_hash = CASE WHEN ?4 IS NULL THEN NULL ELSE blob_hash END,
-                 method = excluded.method, notes = excluded.notes, converted_at = excluded.converted_at",
-            params![target_id, orig_path, orig_ext, kept, origin.class, origin.engine, deps, origin.method, notes, now],
+                 orig_hash = COALESCE(asset_origin.orig_hash, excluded.orig_hash),
+                 method = excluded.method, notes = excluded.notes,
+                 converter = COALESCE(asset_origin.converter, 'unrecorded') || '; then ' || excluded.converter,
+                 converted_at = excluded.converted_at",
+            params![
+                target_id,
+                orig_path,
+                orig_ext,
+                kept,
+                orig_hash,
+                origin.class,
+                origin.engine,
+                deps,
+                origin.method,
+                notes,
+                converter,
+                now
+            ],
         )
     };
     let new_path = match target(tx, &pack_id, &path, new_ext, &new.hash)? {
@@ -198,6 +234,7 @@ fn convert_file(local: &Path) -> (Outcome, Origin) {
         dependencies: pkg.dependencies.clone(),
         method: "native",
         notes: Vec::new(),
+        converter: String::new(),
     };
     (convert::convert(&data, &pkg), origin)
 }
@@ -266,6 +303,7 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, mut req: Reque
             Outcome::Converted { file, notes } => {
                 let blob = state.blobs.put_bytes(file.bytes, AssetKind::from_ext(file.ext)).await?;
                 origin.notes = notes;
+                origin.converter = native_converter(file.how);
                 let ext = file.ext;
                 let replaced = db::call(&state.pool, move |c| {
                     let tx = c.transaction()?;
@@ -476,4 +514,53 @@ pub(crate) fn pack_origins(conn: &Connection, pack_id: &str) -> Result<HashMap<S
         })?
         .collect::<rusqlite::Result<_>>()?;
     Ok(rows)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    type Row = (Option<String>, Option<String>, String, String);
+
+    fn origin_row(c: &Connection) -> Row {
+        c.query_row("SELECT blob_hash, orig_hash, converter, path FROM asset_origin WHERE asset_id = 't'", [], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
+        })
+        .unwrap()
+    }
+
+    /// What a converted file came from, and what made it, outlive the original and a second conversion.
+    #[test]
+    fn where_a_file_came_from_outlives_the_original() {
+        let mut conn = db::test_library();
+        conn.execute_batch(
+            "INSERT INTO packs (id, name, status, created_at) VALUES ('p', 'Props', 'ready', 'x');
+             INSERT INTO blobs (hash, size, created_at) VALUES ('pkg', 1, 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('t', 'p', 'pkg', 'T_Jar.uasset', 'T_Jar', 'uasset', 'texture', '{}', 'x', 'x');",
+        )
+        .unwrap();
+        let made = native_converter("PNG source, red and blue put right");
+        let origin =
+            Origin { class: Some("Texture2D".into()), method: "native", converter: made.clone(), ..Origin::default() };
+        let tx = conn.transaction().unwrap();
+        assert!(replace_asset(&tx, "t", &StoredBlob { hash: "png".into(), size: 2 }, "png", &origin, false).unwrap());
+        tx.commit().unwrap();
+        let (kept, orig, by, path) = origin_row(&conn);
+        assert_eq!(kept, None, "the package is discarded");
+        assert_eq!(orig.as_deref(), Some("pkg"), "but what it was is remembered");
+        assert_eq!(by, format!("hoard-unreal r{}: PNG source, red and blue put right", convert::REVISION));
+        assert_eq!(path, "T_Jar.uasset");
+
+        // Converted again: the package is still what it came from, and both steps are told.
+        let tx = conn.transaction().unwrap();
+        let again = Origin { method: "rule", ..Origin::default() };
+        replace_asset(&tx, "t", &StoredBlob { hash: "jpg".into(), size: 3 }, "jpg", &again, true).unwrap();
+        tx.commit().unwrap();
+        let (kept, orig, by, path) = origin_row(&conn);
+        assert_eq!(kept, None);
+        assert_eq!(orig.as_deref(), Some("pkg"));
+        assert_eq!(by, format!("{made}; then hoard {} rule", env!("CARGO_PKG_VERSION")));
+        assert_eq!(path, "T_Jar.uasset");
+    }
 }

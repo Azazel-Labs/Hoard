@@ -29,12 +29,19 @@ const fn guid(a: u32, b: u32, c: u32, d: u32) -> [u8; 16] {
     [a[0], a[1], a[2], a[3], b[0], b[1], b[2], b[3], c[0], c[1], c[2], c[3], d[0], d[1], d[2], d[3]]
 }
 
+/// This converter's revision. Raise it whenever what a conversion writes changes, so the files an older revision
+/// made can be told apart and made again: Hoard keeps it with every converted asset (`asset_origin.converter`).
+/// 1: until red and blue were put right in 8-bit PNG texture sources. 2: from then.
+pub const REVISION: u32 = 2;
+
 /// A converted file.
 #[derive(Debug, Clone)]
 pub struct OutFile {
     /// File extension, e.g. `png`, `wav`, `json`.
     pub ext: &'static str,
     pub bytes: Vec<u8>,
+    /// Which way it was made, in a few words ("PNG source, red and blue put right"), kept with the asset.
+    pub how: &'static str,
 }
 
 #[derive(Debug, Clone)]
@@ -101,7 +108,10 @@ fn sound(data: &[u8], pkg: &Package) -> Converted {
     for entry in trailer(data, pkg) {
         match bulk::decode_entry(data, &entry) {
             Ok(bytes) if bytes.starts_with(b"RIFF") && bytes.get(8..12) == Some(b"WAVE") => {
-                return Ok((OutFile { ext: "wav", bytes }, vec!["from the package trailer".into()]));
+                return Ok((
+                    OutFile { ext: "wav", bytes, how: "WAV source from the package trailer" },
+                    vec!["from the package trailer".into()],
+                ));
             }
             Err(e) if matches!(e.downcast_ref::<UndecodableError>(), Some(UndecodableError(Undecodable::Oodle))) => {
                 oodle = true;
@@ -110,7 +120,8 @@ fn sound(data: &[u8], pkg: &Package) -> Converted {
         }
     }
     if let Some(src) = carve_source(data, "SoundWave", usize::try_from(pkg.header_size)?) {
-        return Ok((OutFile { ext: src.ext, bytes: src.bytes }, vec!["from inline bulk data".into()]));
+        let file = OutFile { ext: src.ext, bytes: src.bytes, how: "WAV source carved from inline bulk data" };
+        return Ok((file, vec!["from inline bulk data".into()]));
     }
     if oodle {
         bail!(UndecodableError(Undecodable::Oodle));
@@ -169,7 +180,10 @@ fn texture(data: &[u8], pkg: &Package) -> Converted {
     else {
         // No readable source settings: an image stored whole in the bulk data is still the source.
         return match carve_source(data, "Texture2D", usize::try_from(pkg.header_size)?) {
-            Some(c) => Ok((OutFile { ext: c.ext, bytes: c.bytes }, vec!["from inline bulk data".into()])),
+            Some(c) => {
+                let file = OutFile { ext: c.ext, bytes: c.bytes, how: "PNG source carved from inline bulk data" };
+                Ok((file, vec!["from inline bulk data".into()]))
+            }
             None => Err(props.err().unwrap_or_else(|| anyhow::anyhow!("texture has no Source settings"))),
         };
     };
@@ -191,17 +205,17 @@ fn texture(data: &[u8], pkg: &Package) -> Converted {
         || compression == "1";
     let jpeg = compression == "TSCF_JPEG" || compression == "2";
 
-    let payload = match source_payload(data, pkg, p) {
-        Ok(b) => b,
+    let (payload, carved) = match source_payload(data, pkg, p) {
+        Ok(b) => (b, false),
         Err(e) if e.downcast_ref::<UndecodableError>().is_some() => return Err(e),
         // Layout surprise: fall back to the trailer's only/largest payload, then to carving a PNG.
         Err(first) => {
             let entries = trailer(data, pkg);
             let best = entries.iter().filter(|e| e.access == bulk::Access::Local).max_by_key(|e| e.raw_size);
             match best {
-                Some(entry) => bulk::decode_entry(data, entry)?,
+                Some(entry) => (bulk::decode_entry(data, entry)?, false),
                 None => match carve_source(data, "Texture2D", usize::try_from(pkg.header_size)?) {
-                    Some(c) => c.bytes,
+                    Some(c) => (c.bytes, true),
                     None => return Err(first.context("couldn't find the texture source")),
                 },
             }
@@ -213,10 +227,22 @@ fn texture(data: &[u8], pkg: &Package) -> Converted {
     )];
     if png || payload.starts_with(b"\x89PNG") {
         ensure!(payload.starts_with(b"\x89PNG"), "source says PNG but isn't one");
-        return Ok((OutFile { ext: "png", bytes: payload }, notes));
+        // Stored with red and blue swapped, but for the long-gone RGBA8 format; a carved PNG is put right already,
+        // and doing it twice would undo it.
+        let (bytes, how) = if format == "TSF_RGBA8_DEPRECATED" {
+            (payload, "PNG source as stored (RGBA8)")
+        } else if carved {
+            (payload, "PNG source carved from bulk data")
+        } else {
+            match crate::package::recolour_png(&payload)? {
+                Some(fixed) => (fixed, "PNG source, red and blue put right"),
+                None => (payload, "PNG source as stored (16-bit or grey)"),
+            }
+        };
+        return Ok((OutFile { ext: "png", bytes, how }, notes));
     }
     if jpeg || payload.starts_with(&[0xFF, 0xD8, 0xFF]) {
-        return Ok((OutFile { ext: "jpg", bytes: payload }, notes));
+        return Ok((OutFile { ext: "jpg", bytes: payload, how: "JPEG source as stored" }, notes));
     }
     ensure!(w > 0 && h > 0 && w <= 65_536 && h <= 65_536, "texture source has no size");
     let (w, h) = (u32::try_from(w)?, u32::try_from(h)?);
@@ -233,7 +259,7 @@ fn raw_pixels(px: &[u8], w: u32, h: u32, format: &str) -> Result<OutFile> {
         let mut bytes = Vec::new();
         let fmt = if ext == "exr" { image::ImageFormat::OpenExr } else { image::ImageFormat::Png };
         img.write_to(&mut std::io::Cursor::new(&mut bytes), fmt)?;
-        Ok(OutFile { ext, bytes })
+        Ok(OutFile { ext, bytes, how: "raw source pixels" })
     };
     Ok(match format {
         "TSF_G8" => encode(image::GrayImage::from_raw(w, h, need(1)?.to_vec()).context("size")?.into(), "png")?,
@@ -400,7 +426,7 @@ fn material(data: &[u8], pkg: &Package) -> Converted {
     }
     let bytes = serde_json::to_vec_pretty(&out)?;
     Ok((
-        OutFile { ext: "json", bytes },
+        OutFile { ext: "json", bytes, how: "material parameters" },
         vec![format!("{} texture parameters", out["textures"].as_object().map_or(0, Map::len))],
     ))
 }
@@ -455,7 +481,8 @@ fn data_table(data: &[u8], pkg: &Package) -> Converted {
         "rows": Value::Object(rows),
     });
     let n = out["rows"].as_object().map_or(0, Map::len);
-    Ok((OutFile { ext: "json", bytes: serde_json::to_vec_pretty(&out)? }, vec![format!("{n} rows")]))
+    let file = OutFile { ext: "json", bytes: serde_json::to_vec_pretty(&out)?, how: "data table rows" };
+    Ok((file, vec![format!("{n} rows")]))
 }
 
 #[cfg(test)]
@@ -553,8 +580,14 @@ mod tests {
         assert_eq!(img.as_raw(), &[0, 1000, 40_000, 65_535]);
     }
 
+    fn pixels(png: &[u8]) -> image::DynamicImage {
+        image::load_from_memory_with_format(png, image::ImageFormat::Png).unwrap()
+    }
+
+    /// Unreal compresses a BGRA8 source as though it were RGBA: a red texel is stored blue in the PNG. Checked
+    /// against the engine's own `RGBTable16x1` (red ramps along each tile), whose PNG source reads blue there.
     #[test]
-    fn png_source_passes_through() {
+    fn bgra8_png_source_comes_out_in_its_true_colours() {
         let mut png = Vec::new();
         image::RgbaImage::from_pixel(3, 3, image::Rgba([1, 2, 3, 4]))
             .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
@@ -562,8 +595,21 @@ mod tests {
         let mut p = texture_package(1012, 3, 3, "TSF_BGRA8", Some("TSCF_PNG"), &editor_bulk(png.len()));
         p.trailer = Some(trailer(&[(PAYLOAD_ID, compressed_buffer_raw(&png), png.len() as u64)]));
         let (file, notes) = converted(convert_bytes(&p.build()));
-        assert_eq!((file.ext, file.bytes), ("png", png));
+        assert_eq!(file.ext, "png");
+        assert_eq!(pixels(&file.bytes).to_rgba8().get_pixel(1, 1).0, [3, 2, 1, 4]);
         assert_eq!(notes, ["3x3 TSF_BGRA8 TSCF_PNG"]);
+    }
+
+    #[test]
+    fn rgba16_png_source_passes_through() {
+        let mut png = Vec::new();
+        image::DynamicImage::ImageRgba16(image::ImageBuffer::from_pixel(3, 3, image::Rgba([100u16, 200, 300, 400])))
+            .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
+            .unwrap();
+        let mut p = texture_package(1012, 3, 3, "TSF_RGBA16", Some("TSCF_PNG"), &editor_bulk(png.len()));
+        p.trailer = Some(trailer(&[(PAYLOAD_ID, compressed_buffer_raw(&png), png.len() as u64)]));
+        let (file, _) = converted(convert_bytes(&p.build()));
+        assert_eq!((file.ext, file.bytes), ("png", png));
     }
 
     #[test]
@@ -591,17 +637,18 @@ mod tests {
                 seed.to_le_bytes()[0]
             })
             .collect();
+        let stored = image::RgbaImage::from_raw(64, 64, noise).unwrap();
         let mut png = Vec::new();
-        image::RgbaImage::from_raw(64, 64, noise)
-            .unwrap()
-            .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
-            .unwrap();
+        stored.write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png).unwrap();
         let mut buf = compressed_buffer_lz4(&png, 10);
         buf[8] = 3; // Oodle
         let mut p = texture_package(1012, 64, 64, "TSF_BGRA8", Some("TSCF_PNG"), &editor_bulk(png.len()));
         p.trailer = Some(trailer(&[(PAYLOAD_ID, buf, png.len() as u64)]));
         let (file, _) = converted(convert_bytes(&p.build()));
-        assert_eq!((file.ext, file.bytes), ("png", png));
+        assert_eq!(file.ext, "png");
+        let mut want = stored;
+        want.pixels_mut().for_each(|p| p.0.swap(0, 2));
+        assert_eq!(pixels(&file.bytes).to_rgba8(), want, "put right once, not twice");
     }
 
     #[test]

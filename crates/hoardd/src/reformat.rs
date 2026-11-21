@@ -32,6 +32,11 @@ const MAX_KEEP_DAYS: u32 = 365;
 /// How many of the files a change would convert are listed by name.
 const SAMPLE: usize = 200;
 
+/// The libraries that make what rules convert to, as `asset_origin.converter` names them. Keep in step with
+/// Cargo.lock (a test checks).
+const POLYSMELT: &str = "polysmelt 0.13.2";
+const FLACENC: &str = "flacenc 0.5.1";
+
 /// The formats rules convert to.
 pub(crate) const TARGETS: &[&str] = &["glb", "flac"];
 
@@ -386,12 +391,12 @@ fn convert_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<usize> {
         let rule = &rules.rules[t.rule];
         let dir = work.path().join(n.to_string());
         let made = if rule.to == "flac" {
-            wav_to_flac(state, rt, &conn, &t.file)
+            wav_to_flac(state, rt, &conn, &t.file).map(|f| f.map(|b| (b, format!("encoded by {FLACENC}"))))
         } else {
             convert_one(state, rt, &conn, &t.file, rule, facing, &images, &dir).map(Some)
         };
         std::fs::remove_dir_all(&dir).ok();
-        let bytes = match made {
+        let (bytes, how) = match made {
             Ok(Some(b)) => b,
             Ok(None) => continue,
             Err(e) => {
@@ -405,6 +410,7 @@ fn convert_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<usize> {
         let origin = Origin {
             method: "rule",
             notes: vec![format!("{} → {}", t.file.ext.to_uppercase(), rule.to.to_uppercase())],
+            converter: format!("hoard {} rule: {how}", env!("CARGO_PKG_VERSION")),
             ..Origin::default()
         };
         let mut conn = state.pool.get()?;
@@ -451,17 +457,17 @@ fn convert_one(
     facing: Facing,
     images: &[([u8; 32], String)],
     dir: &Path,
-) -> Result<Vec<u8>> {
-    let glb = if let Some(hash) = &file.blender_glb
+) -> Result<(Vec<u8>, String)> {
+    let (glb, how) = if let Some(hash) = &file.blender_glb
         && !crate::meshes::reads(&file.ext)
     {
-        rt.block_on(state.blobs.read_all(hash))?.to_vec()
+        (rt.block_on(state.blobs.read_all(hash))?.to_vec(), "the GLB Blender made of it".to_owned())
     } else {
         let local = crate::materials::fetch_model(state, rt, conn, &file.id, dir)?;
         match file.ext.as_str() {
             // Its image files stay where they are, beside it.
-            "gltf" => crate::formats::build_glb(&local, false)?,
-            ext => crate::meshes::glb(&local, ext, dir)?.0,
+            "gltf" => (crate::formats::build_glb(&local, false)?, "glTF packed as GLB".to_owned()),
+            ext => (crate::meshes::glb(&local, ext, dir)?.0, format!("read and written by {POLYSMELT}")),
         }
     };
     let mut files = BTreeMap::new();
@@ -470,7 +476,7 @@ fn convert_one(
     }
     let facing = if rule.upright { facing } else { Facing::default() };
     let (glb, _) = crate::glbfiles::link(&glb, facing, &files).context("pointing the model at its textures")?;
-    Ok(glb)
+    Ok((glb, how))
 }
 
 /// A WAV file as a FLAC that gives it back. One a FLAC can't (`None`) stays as it is, and the rules leave it alone
@@ -633,6 +639,17 @@ mod tests {
 
     fn rule(from: &[&str]) -> Rule {
         Rule { on: true, from: from.iter().map(|s| (*s).to_owned()).collect(), to: "glb".into(), upright: true }
+    }
+
+    /// A converted file's origin names the library version that made it, so that has to be the one built in.
+    #[test]
+    fn converter_names_match_the_libraries_built_in() {
+        let lock = include_str!("../../../Cargo.lock");
+        for named in [POLYSMELT, FLACENC] {
+            let (name, version) = named.split_once(' ').unwrap();
+            let entry = format!("name = \"{name}\"\nversion = \"{version}\"\n");
+            assert!(lock.replace("\r\n", "\n").contains(&entry), "{named} isn't what Cargo.lock has: update it");
+        }
     }
 
     #[test]

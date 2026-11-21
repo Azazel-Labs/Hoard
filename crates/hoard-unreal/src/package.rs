@@ -94,7 +94,7 @@ pub struct Package {
     pub asset_name: Option<String>,
     /// Other packages this one imports from, e.g. `/Game/Pack/Textures/T_Rock` (engine packages left out).
     pub dependencies: Vec<String>,
-    /// Editor thumbnail (PNG or JPEG bytes).
+    /// Editor thumbnail (PNG or JPEG bytes) as stored, red and blue swapped: see [`Package::thumbnail_image`].
     pub thumbnail: Option<Vec<u8>>,
     /// Asset registry tags of the main asset.
     pub tags: Vec<(String, String)>,
@@ -138,6 +138,14 @@ impl Package {
     }
     pub(crate) fn custom_version(&self, guid: [u8; 16]) -> Option<i32> {
         self.custom_versions.iter().find(|(g, _)| *g == guid).map(|(_, v)| *v)
+    }
+    /// The editor thumbnail, decoded, in its true colours. Unreal compresses the thumbnail's BGRA pixels as though
+    /// they were RGBA, so the PNG or JPEG in the file has red and blue swapped (a red jar is stored blue); the editor
+    /// swaps them back as it reads. Every version does it, 4.x through 5.x, PNG and JPEG alike.
+    pub fn thumbnail_image(&self) -> Option<image::DynamicImage> {
+        let mut img = image::load_from_memory(self.thumbnail.as_deref()?).ok()?;
+        swap_red_blue(&mut img);
+        Some(img)
     }
     /// The main asset export (flagged as the asset, or the first top-level object).
     pub fn main_export(&self) -> Option<&Export> {
@@ -624,10 +632,62 @@ pub fn carve_source(data: &[u8], class: &str, header_size: usize) -> Option<Embe
                     best = Some(png);
                 }
             }
-            best.filter(|b| b.len() > 1024).map(|b| Embedded { ext: "png", bytes: b.to_vec() })
+            let png = best.filter(|b| b.len() > 1024)?;
+            Some(Embedded { ext: "png", bytes: recolour_png(png).ok().flatten().unwrap_or_else(|| png.to_vec()) })
         }
         _ => None,
     }
+}
+
+/// Swap red and blue in place, in 8-bit colour images (the only kind Unreal stores BGRA).
+fn swap_red_blue(img: &mut image::DynamicImage) {
+    match img {
+        image::DynamicImage::ImageRgba8(px) => px.pixels_mut().for_each(|p| p.0.swap(0, 2)),
+        image::DynamicImage::ImageRgb8(px) => px.pixels_mut().for_each(|p| p.0.swap(0, 2)),
+        _ => {}
+    }
+}
+
+/// A texture source Unreal stored as PNG, in its true colours. A `TSF_BGRA8` source (any 8-bit colour one) is
+/// compressed from BGRA pixels as though they were RGBA, as thumbnails are, so red and blue come out swapped and are
+/// put back here. A 16-bit (`TSF_RGBA16`) or grey source is in order: `None`, to keep as it is.
+pub fn recolour_png(png: &[u8]) -> Result<Option<Vec<u8>>> {
+    let mut img = image::load_from_memory_with_format(png, image::ImageFormat::Png)?;
+    if !matches!(img, image::DynamicImage::ImageRgba8(_) | image::DynamicImage::ImageRgb8(_)) {
+        return Ok(None);
+    }
+    swap_red_blue(&mut img);
+    Ok(Some(encode_png(&img)?))
+}
+
+/// Whether this PNG is one the converter wrote itself (from raw source pixels), rather than one Unreal compressed:
+/// writing its pixels again gives back the same bytes. Unreal's encoder (libpng) gives different ones, and splits
+/// the pixels over IDAT chunks of 8 KB where this one writes a single chunk, so a large one is told by that alone.
+pub fn written_here(png: &[u8]) -> bool {
+    if png_chunks(png).filter(|t| t == b"IDAT").nth(1).is_some() {
+        return false;
+    }
+    image::load_from_memory_with_format(png, image::ImageFormat::Png)
+        .ok()
+        .and_then(|img| encode_png(&img).ok())
+        .is_some_and(|again| again == png)
+}
+
+/// The types of a PNG's chunks, in order, as far as they can be read.
+fn png_chunks(png: &[u8]) -> impl Iterator<Item = [u8; 4]> + '_ {
+    let mut at = 8;
+    std::iter::from_fn(move || {
+        let head = png.get(at..at + 8)?;
+        let len = u32::from_be_bytes(head[..4].try_into().ok()?) as usize;
+        at = at.checked_add(12)?.checked_add(len)?;
+        head[4..8].try_into().ok()
+    })
+}
+
+fn encode_png(img: &image::DynamicImage) -> Result<Vec<u8>> {
+    let mut out = Vec::new();
+    img.write_to(&mut std::io::Cursor::new(&mut out), image::ImageFormat::Png)?;
+    Ok(out)
 }
 
 /// A complete RIFF/WAVE file inside `data`, sized by its RIFF header.
@@ -734,6 +794,52 @@ pub(crate) mod tests {
         assert_eq!(content_relative("/MyPlugin/Meshes/SM_A"), Some("Meshes/SM_A"));
         assert_eq!(kind_of("Texture2D"), AssetKind::Texture);
         assert_eq!(kind_of("StaticMesh"), AssetKind::Model);
+    }
+
+    /// A PNG the converter wrote is told from one Unreal compressed, which another encoder made.
+    #[test]
+    fn pngs_written_here_are_told_from_unreals() {
+        use image::ImageEncoder;
+        let img = image::RgbaImage::from_fn(64, 32, |x, y| image::Rgba([x as u8 * 4, y as u8 * 8, 200, 255]));
+        let ours = encode_png(&img.clone().into()).unwrap();
+        assert!(written_here(&ours));
+        let mut theirs = Vec::new();
+        image::codecs::png::PngEncoder::new_with_quality(
+            &mut theirs,
+            image::codecs::png::CompressionType::Best,
+            image::codecs::png::FilterType::Paeth,
+        )
+        .write_image(img.as_raw(), 64, 32, image::ExtendedColorType::Rgba8)
+        .unwrap();
+        assert_ne!(theirs, ours);
+        assert!(!written_here(&theirs));
+        // libpng's 8 KB IDAT chunks: our bytes, split in two.
+        let at = 8 + 25;
+        let len = u32::from_be_bytes(ours[at..at + 4].try_into().unwrap()) as usize;
+        let (data, rest) = (&ours[at + 8..at + 8 + len], &ours[at + 12 + len..]);
+        let mut split = ours[..at].to_vec();
+        for half in [&data[..len / 2], &data[len / 2..]] {
+            split.extend((half.len() as u32).to_be_bytes());
+            split.extend(b"IDAT");
+            split.extend(half);
+            split.extend([0; 4]);
+        }
+        split.extend(rest);
+        assert!(!written_here(&split));
+        assert!(!written_here(b"not a png"));
+    }
+
+    /// The editor stores its thumbnails' BGRA pixels as though RGBA: a red jar is a blue one in the file.
+    #[test]
+    fn thumbnails_come_out_in_their_true_colours() {
+        for format in [image::ImageFormat::Png, image::ImageFormat::Jpeg] {
+            let stored = image::RgbImage::from_pixel(8, 8, image::Rgb([0, 0, 255]));
+            let mut bytes = Vec::new();
+            stored.write_to(&mut std::io::Cursor::new(&mut bytes), format).unwrap();
+            let pkg = Package { thumbnail: Some(bytes), ..Package::default() };
+            let [r, g, b, _] = pkg.thumbnail_image().unwrap().to_rgba8().get_pixel(4, 4).0;
+            assert!(r > 240 && g < 16 && b < 16, "{format:?}: {r} {g} {b}");
+        }
     }
 
     /// Point `HOARD_UASSET_DIR` at a folder of real packages (`UAssetAPI`'s test assets work) to check the parser

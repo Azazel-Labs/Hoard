@@ -191,9 +191,7 @@ pub(super) fn analyze_unreal(path: &Path, ext: &str, a: &mut Analysis) -> anyhow
     }
     a.kind = Some(unreal::kind_of(&class));
 
-    if let Some(thumb) = &pkg.thumbnail
-        && let Ok(img) = image::load_from_memory(thumb)
-    {
+    if let Some(img) = pkg.thumbnail_image() {
         let img = img.thumbnail(THUMB_SIZE, THUMB_SIZE).to_rgba8();
         a.thumb = thumb_bytes(img, false).ok();
     }

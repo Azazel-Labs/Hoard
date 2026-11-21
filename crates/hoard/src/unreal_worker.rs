@@ -271,6 +271,8 @@ async fn convert_pack(client: &Client, args: &WorkerArgs, pack_id: &str, items: 
     let report: Report = serde_json::from_slice(&tokio::fs::read(&report_path).await?)?;
     println!("  editor finished in {:.0}s", started.elapsed().as_secs_f32());
 
+    // Kept with each file's origin: the editor's path names its engine version (…/UE_5.4/…).
+    let converter = format!("hoard unreal-worker {}: exported by {}", env!("CARGO_PKG_VERSION"), args.editor.display());
     let mut uploaded = 0usize;
     for e in &report.exported {
         let (Some(id), Some(file)) = (by_package.get(&e.package), &e.file) else { continue };
@@ -285,6 +287,7 @@ async fn convert_pack(client: &Client, args: &WorkerArgs, pack_id: &str, items: 
                 ("method", "editor"),
                 ("keep_original", if args.keep_originals { "1" } else { "0" }),
                 ("notes", "exported by Unreal Editor"),
+                ("converter", converter.as_str()),
             ])
             .body(bytes);
         match client.auth(req).send().await {

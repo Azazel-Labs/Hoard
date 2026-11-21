@@ -207,6 +207,9 @@ pub(super) struct ReplaceParams {
     keep_original: Option<u8>,
     #[serde(default)]
     notes: Option<String>,
+    /// What made the file: the tool, its version and how (kept with the asset's origin).
+    #[serde(default)]
+    converter: Option<String>,
 }
 
 /// Swap an asset's file for a converted one (`hoard unreal-worker` uploads editor exports here).
@@ -242,6 +245,7 @@ pub(super) async fn replace_asset(
         dependencies: Vec::new(),
         method: if p.method.as_deref() == Some("native") { "native" } else { "editor" },
         notes: p.notes.into_iter().collect(),
+        converter: p.converter.map_or_default(|c| c.chars().take(500).collect()),
     };
     let keep = p.keep_original.unwrap_or(1) != 0;
     let id2 = id.clone();

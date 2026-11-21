@@ -717,3 +717,82 @@ fn what_was_made_from_an_animated_fbx_is_made_again() {
         ["hero "]
     );
 }
+
+#[test]
+fn packs_with_unreal_packages_are_read_again_for_their_thumbnails() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let fix = MIGRATIONS.iter().position(|m| m.contains("lower(a.ext) IN ('uasset', 'umap')")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..fix]).unwrap();
+    // A pack of packages, one with only a level, one of plain images, one already being read and one archived.
+    conn.execute_batch(
+        "PRAGMA foreign_keys = OFF;
+         INSERT INTO packs (id, name, status, created_at) VALUES
+           ('jars', 'Jars', 'ready', 'x'), ('level', 'Level', 'ready', 'x'), ('pics', 'Pictures', 'ready', 'x'),
+           ('busy', 'Busy', 'ready', 'x'), ('old', 'Old', 'ready', 'x');
+         UPDATE packs SET archived_at = 'x' WHERE id = 'old';
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+           ('a', 'jars', 'h1', 'Props/SM_Jar.uasset', 'SM_Jar', 'uasset', 'model', '{}', 'x', 'x'),
+           ('b', 'level', 'h2', 'Maps/Demo.umap', 'Demo', 'umap', 'scene', '{}', 'x', 'x'),
+           ('c', 'pics', 'h3', 'jar.png', 'jar', 'png', 'texture', '{}', 'x', 'x'),
+           ('d', 'busy', 'h4', 'T_Frame.uasset', 'T_Frame', 'uasset', 'texture', '{}', 'x', 'x'),
+           ('e', 'old', 'h5', 'T_Old.UASSET', 'T_Old', 'UASSET', 'texture', '{}', 'x', 'x');
+         DELETE FROM jobs;
+         INSERT INTO jobs (kind, pack_id, status, run_after, created_at, updated_at)
+           VALUES ('materials', 'busy', 'running', 'x', 'x', 'x');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..=fix]).unwrap();
+    let strings = |sql: &str| -> Vec<String> {
+        conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+    };
+    assert_eq!(
+        strings("SELECT kind || ' ' || pack_id FROM jobs ORDER BY pack_id, kind"),
+        ["materials busy", "retag jars", "retag level"]
+    );
+    assert_eq!(
+        strings("SELECT id || ' ' || status FROM packs WHERE id <> 'p1' ORDER BY id"),
+        ["busy ready", "jars ingesting", "level ingesting", "old ready", "pics ready"]
+    );
+}
+
+#[test]
+fn converted_assets_keep_their_originals_hash_and_old_unreal_textures_are_listed_to_recolour() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let fix = MIGRATIONS.iter().position(|m| m.contains("ADD COLUMN orig_hash")).unwrap();
+    assert!(MIGRATIONS[fix + 1].contains("CREATE TABLE unreal_recolour"));
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..fix]).unwrap();
+    // A texture whose package was kept, one whose package was discarded, a sound, an editor export and a rule's.
+    conn.execute_batch(
+        "PRAGMA foreign_keys = OFF;
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+           ('kept', 'p1', 'k', 'T_A.png', 'T_A', 'png', 'texture', '{}', 'x', 'x'),
+           ('gone', 'p1', 'g', 'T_B.png', 'T_B', 'png', 'texture', '{}', 'x', 'x'),
+           ('snd', 'p1', 's', 'S_C.wav', 'S_C', 'wav', 'audio', '{}', 'x', 'x'),
+           ('mesh', 'p1', 'm', 'SM_D.fbx', 'SM_D', 'fbx', 'model', '{}', 'x', 'x'),
+           ('tex', 'p1', 't', 'T_E.png', 'T_E', 'png', 'texture', '{}', 'x', 'x');
+         INSERT INTO asset_origin (asset_id, path, ext, blob_hash, class, method, converted_at) VALUES
+           ('kept', 'T_A.uasset', 'uasset', 'pkg-a', 'Texture2D', 'native', 'x'),
+           ('gone', 'T_B.uasset', 'uasset', NULL, 'Texture2D', 'native', 'x'),
+           ('snd', 'S_C.uasset', 'uasset', NULL, 'SoundWave', 'native', 'x'),
+           ('mesh', 'SM_D.uasset', 'uasset', 'pkg-d', 'StaticMesh', 'editor', 'x'),
+           ('tex', 'T_E.tga', 'tga', 'tga-e', NULL, 'rule', 'x');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..=fix + 1]).unwrap();
+    let strings = |sql: &str| -> Vec<String> {
+        conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+    };
+    assert_eq!(
+        strings(
+            "SELECT asset_id || ' ' || COALESCE(orig_hash, '-') || ' ' || COALESCE(converter, '-')
+                   FROM asset_origin ORDER BY asset_id"
+        ),
+        ["gone - -", "kept pkg-a -", "mesh pkg-d -", "snd - -", "tex tga-e -"]
+    );
+    assert_eq!(
+        strings("SELECT asset_id || ' ' || blob_hash FROM unreal_recolour ORDER BY asset_id"),
+        ["gone g", "kept k"]
+    );
+}

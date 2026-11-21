@@ -545,8 +545,6 @@ app-ns-script = Sistem tulisan
 app-bulk-failed = Tidak dapat mengubah { $count } aset itu: { $error }
 app-bulk-untagged = { $tag } dilepas dari { $count } aset
 app-bulk-tagged = { $count } aset diberi tag { $tag }
-app-bulk-category-set = Kategori { $count } aset ditetapkan menjadi { $category }
-app-bulk-category-cleared = Kategori { $count } aset dikosongkan
 app-bulk-review = Tandai ditinjau
 app-bulk-review-title = Tandai aset terpilih sebagai sudah ditinjau: aturan dan AI tidak akan mengubah tag-nya lagi
 app-bulk-unreview = Tandai belum ditinjau
@@ -659,6 +657,14 @@ app-resize-label = Ubah ukuran panel detail
 app-resize-title = Seret untuk mengubah ukuran · klik dua kali untuk lebar yang pas
 app-selected-label = Aset terpilih
 app-selected = { $count } dipilih
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Edit…
+app-edit-selected-title = Ubah tag dan kolom semuanya (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] { $count } hasil dipilih
+    }
 app-pick-assets = Pilih aset
 app-download-zip = Unduh zip
 app-credits-title = CREDITS.md untuk paket asal aset ini: siapa pembuatnya, lisensinya, dan baris kredit yang diminta
@@ -679,16 +685,51 @@ app-bulk-tag-add-title = Tambahkan tag ini ke setiap aset terpilih
 app-bulk-tag-add = Tambah
 app-bulk-tag-remove-title = Lepas tag ini dari setiap aset terpilih
 app-bulk-tag-remove = Lepas
-app-bulk-category-label = Kategori untuk aset terpilih (kosong untuk mengosongkannya)
-app-bulk-category-placeholder = Kategori
-app-bulk-category-set-title = Tetapkan kategori setiap aset terpilih
-app-bulk-category-clear-title = Kosongkan kategori setiap aset terpilih
-app-bulk-category-set-button = Tetapkan
-app-bulk-category-clear-button = Kosongkan
 app-remove-from-collection = Keluarkan dari { $name }
 app-unfavorite = Hapus dari favorit
 app-favorite = Favoritkan
 app-select-all = Pilih semua { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] Pilih semua { $count } hasil
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] Edit { $count } aset
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] Edit semua { $count } hasil
+    }
+bulk-edit-close = Tutup
+bulk-edit-tags = Tag
+bulk-edit-tag-add = Tambah tag ke semuanya
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } dari { $count }
+bulk-edit-untick = Hapus semua centang
+bulk-edit-untick-title = Lepas semua tag, lalu centang yang ingin dipertahankan
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Tag yang paling sering dipakai di antaranya
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Beragam, dibiarkan apa adanya
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Dibiarkan apa adanya
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Dikosongkan di semuanya
+bulk-edit-reset = Kembalikan seperti semula
+bulk-edit-all-note = Ini mengubah semua hasil, termasuk yang belum dimuat, dan tidak bisa dibatalkan dalam satu langkah.
+bulk-edit-save =
+    { $count ->
+       *[other] Simpan { $count } perubahan
+    }
+bulk-edit-nothing = Tidak ada yang berubah
+bulk-edit-saved =
+    { $count ->
+       *[other] { $count } aset diperbarui
+    }
 app-archive-selected-title = Keluar dari pencarian sampai dipulihkan atau dihapus permanen, dari Arsip
 app-drop-items = Jatuhkan { $count } item untuk menambahkannya
 app-drop = Jatuhkan untuk menambahkan ke Hoard
@@ -728,6 +769,9 @@ palette-select-several = Pilih beberapa…
 palette-select-several-keywords = massal banyak tag arsip bulk multiple archive
 palette-archive-selected = Arsipkan { $count } yang dipilih
 palette-archive-selected-keywords = hapus buang sampah delete remove trash
+palette-edit-selected = Edit { $count } yang dipilih
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = ubah massal tag kategori lisensi rating
 palette-clear-selection = Kosongkan pilihan
 palette-clear-filters = Hapus filter
 palette-clear-filters-keywords = setel ulang reset
@@ -776,6 +820,7 @@ shortcuts-select = Pilih atau batalkan pilihan
 shortcuts-favorite = Tambahkan ke atau keluarkan dari favorit Anda
 shortcuts-reviewed = Tandai sudah ditinjau, atau tidak
 shortcuts-tag = Tambah tag
+shortcuts-edit = Edit yang dipilih
 shortcuts-key-click = klik
 shortcuts-select-range = Pilih rentang
 shortcuts-select-all = Pilih semua yang ditampilkan

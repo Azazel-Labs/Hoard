@@ -549,8 +549,6 @@ app-bulk-failed =
     }
 app-bulk-untagged = { $tag } etiketi { $count } varlıktan kaldırıldı
 app-bulk-tagged = { $count } varlığa { $tag } etiketi eklendi
-app-bulk-category-set = { $count } varlığın kategorisi { $category } olarak ayarlandı
-app-bulk-category-cleared = { $count } varlığın kategorisi temizlendi
 app-bulk-review = İncelendi say
 app-bulk-review-title = Seçili varlıkları gözden geçirilmiş olarak işaretleyin: bundan sonra kurallar ve yapay zekâ etiketlerine dokunmaz
 app-bulk-unreview = İncelenmedi say
@@ -651,6 +649,15 @@ app-resize-label = Ayrıntılar panelini yeniden boyutlandır
 app-resize-title = Yeniden boyutlandırmak için sürükleyin · sığan genişlik için çift tıklayın
 app-selected-label = Seçili varlıklar
 app-selected = { $count } seçili
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Düzenle…
+app-edit-selected-title = Hepsinin etiketlerini ve alanlarını değiştir (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } sonuç seçildi
+       *[other] { $count } sonucun tümü seçildi
+    }
 app-pick-assets = Varlık seçin
 app-download-zip = Zip olarak indir
 app-credits-title = Bunların geldiği paketler için CREDITS.md: onları kimin yaptığı, lisansları ve istedikleri emek satırları
@@ -671,16 +678,56 @@ app-bulk-tag-add-title = Bu etiketi seçili her varlığa ekle
 app-bulk-tag-add = Ekle
 app-bulk-tag-remove-title = Bu etiketi seçili her varlıktan kaldır
 app-bulk-tag-remove = Kaldır
-app-bulk-category-label = Seçili varlıkların kategorisi (boş bırakmak temizler)
-app-bulk-category-placeholder = Kategori
-app-bulk-category-set-title = Seçili her varlığın kategorisini ayarla
-app-bulk-category-clear-title = Seçili her varlığın kategorisini temizle
-app-bulk-category-set-button = Ayarla
-app-bulk-category-clear-button = Temizle
 app-remove-from-collection = { $name } koleksiyonundan çıkar
 app-unfavorite = Favorilerden çıkar
 app-favorite = Favorilere ekle
 app-select-all = Tümünü seç ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] { $count } sonucu seç
+       *[other] { $count } sonucun tümünü seç
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] { $count } varlığı düzenle
+       *[other] { $count } varlığı düzenle
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] { $count } sonucu düzenle
+       *[other] { $count } sonucun tümünü düzenle
+    }
+bulk-edit-close = Kapat
+bulk-edit-tags = Etiketler
+bulk-edit-tag-add = Hepsine etiket ekle
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $count } içinde { $have }
+bulk-edit-untick = Tüm işaretleri kaldır
+bulk-edit-untick-title = Tüm etiketleri kaldır, sonra tutulacakları işaretle
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Bunlar arasında en çok kullanılan etiketler
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Karışık, olduğu gibi bırakılır
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Olduğu gibi bırakılır
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Hepsinde temizlendi
+bulk-edit-reset = Eski haline getir
+bulk-edit-all-note = Bu, henüz yüklenmemiş olanlar dahil tüm sonuçları değiştirir ve tek adımda geri alınamaz.
+bulk-edit-save =
+    { $count ->
+        [one] { $count } değişikliği kaydet
+       *[other] { $count } değişikliği kaydet
+    }
+bulk-edit-nothing = Hiçbir şey değişmedi
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } varlık güncellendi
+       *[other] { $count } varlık güncellendi
+    }
 app-archive-selected-title = Arşiv’den geri yüklenene ya da kalıcı olarak silinene kadar aramada görünmezler
 app-drop-items = Eklemek için { $count } öğeyi bırakın
 app-drop = Hoard’a eklemek için bırakın
@@ -720,6 +767,9 @@ palette-select-several = Birkaç tane seç…
 palette-select-several-keywords = toplu çoklu etiket arşiv bulk multiple tag archive
 palette-archive-selected = Seçili { $count } öğeyi arşivle
 palette-archive-selected-keywords = sil kaldır çöp delete remove trash
+palette-edit-selected = Seçili { $count } öğeyi düzenle
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = toplu değişiklik etiketler kategori lisans puan
 palette-clear-selection = Seçimi temizle
 palette-clear-filters = Filtreleri temizle
 palette-clear-filters-keywords = sıfırla reset
@@ -768,6 +818,7 @@ shortcuts-select = Seç ya da seçimi kaldır
 shortcuts-favorite = Favorilere ekle ya da favorilerden çıkar
 shortcuts-reviewed = İncelendi olarak işaretle ya da işareti kaldır
 shortcuts-tag = Etiket ekle
+shortcuts-edit = Seçilenleri düzenle
 shortcuts-key-click = tıklama
 shortcuts-select-range = Bir aralık seç
 shortcuts-select-all = Gösterilen her şeyi seç

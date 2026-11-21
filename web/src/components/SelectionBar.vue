@@ -23,6 +23,12 @@ const props = defineProps<{
   collections: Collection[]
   /** Whether everything picked is a favorite already. */
   allStarred: boolean
+  /** How many the search finds, loaded or not. */
+  total: number
+  /** Everything the search finds is picked, not just `checked`: only what works on a search is offered. */
+  allMatching: boolean
+  /** Whether everything the search finds can be picked (not when it's by look or sound). */
+  canMatchAll: boolean
 }>()
 const preferSources = defineModel<boolean>('preferSources', { required: true })
 const emit = defineEmits<{
@@ -33,12 +39,15 @@ const emit = defineEmits<{
   uncollect: [id: string]
   favorite: [on: boolean]
   all: []
+  /** Pick everything the search finds. */
+  matchAll: []
+  /** Open the editor for what's picked. */
+  edit: []
   archive: []
   done: []
 }>()
 
 const bulkTag = ref('')
-const bulkCategory = ref('')
 const bulkBusy = ref(false)
 
 /** One edit to many assets in one go. False if it failed. */
@@ -71,25 +80,6 @@ async function bulkTagEdit(remove: boolean) {
     run: () => void bulkEdit(touched, undo),
   })
 }
-async function bulkSetCategory() {
-  const category = bulkCategory.value.trim()
-  const ids = [...props.checked]
-  if (!ids.length) return
-  // Remember each one's old category so Undo can put them back.
-  const before = new Map<string, string[]>()
-  for (const id of ids) {
-    const c = props.items.find((a) => a.id === id)?.category ?? ''
-    before.set(c, [...(before.get(c) ?? []), id])
-  }
-  if (!(await bulkEdit(ids, { category }))) return
-  bulkCategory.value = ''
-  showOk(category ? t('app-bulk-category-set', { category, count: ids.length }) : t('app-bulk-category-cleared', { count: ids.length }), {
-    label: t('app-undo'),
-    run: () => {
-      for (const [c, group] of before) void bulkEdit(group, { category: c })
-    },
-  })
-}
 /** Every checked asset already gone over: the button then takes the mark off instead. */
 const allReviewed = computed(() => props.checked.length > 0 && props.checked.every((id) => !!props.items.find((a) => a.id === id)?.reviewed_at))
 async function bulkReviewed() {
@@ -112,7 +102,9 @@ async function bulkAccept() {
 
 <template>
   <div class="selbar" role="region" :aria-label="t('app-selected-label')">
-    <strong>{{ checked.length ? t('app-selected', { count: checked.length }) : t('app-pick-assets') }}</strong>
+    <strong>{{ allMatching ? t('app-selected-all', { count: total }) : checked.length ? t('app-selected', { count: checked.length }) : t('app-pick-assets') }}</strong>
+    <button v-if="editor && checked.length" type="button" class="btn" :title="t('app-edit-selected-title')" @click="emit('edit')">{{ t('app-edit-selected') }}</button>
+    <template v-if="!allMatching">
     <a v-if="checked.length && !bagShown" class="btn primary" :href="zipUrl" download>{{ t('app-download-zip') }}</a>
     <button v-if="checked.length && !bagShown" type="button" class="btn" :title="t('app-credits-title')" @click="emit('credits')">{{ t('app-credits') }}</button>
     <label v-if="withSource && !bagShown" class="srccheck" :title="t('app-prefer-sources-title')">
@@ -124,13 +116,6 @@ async function bulkAccept() {
         <input id="bulk-tag" v-model="bulkTag" class="field" :placeholder="t('app-bulk-tag-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
         <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy" :title="t('app-bulk-tag-add-title')">{{ t('app-bulk-tag-add') }}</button>
         <button class="btn" type="button" :disabled="!bulkTag.trim() || bulkBusy" :title="t('app-bulk-tag-remove-title')" @click="bulkTagEdit(true)">{{ t('app-bulk-tag-remove') }}</button>
-      </form>
-      <form class="bulktag" @submit.prevent="bulkSetCategory">
-        <label class="visually-hidden" for="bulk-cat">{{ t('app-bulk-category-label') }}</label>
-        <input id="bulk-cat" v-model="bulkCategory" class="field cat" :placeholder="t('app-bulk-category-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
-        <button class="btn" type="submit" :disabled="bulkBusy || !checked.length" :title="bulkCategory.trim() ? t('app-bulk-category-set-title') : t('app-bulk-category-clear-title')">
-          {{ bulkCategory.trim() ? t('app-bulk-category-set-button') : t('app-bulk-category-clear-button') }}
-        </button>
       </form>
       <button type="button" class="btn" :disabled="bulkBusy || !checked.length" :title="allReviewed ? t('app-bulk-unreview-title') : t('app-bulk-review-title')" @click="bulkReviewed">
         {{ allReviewed ? t('app-bulk-unreview') : t('app-bulk-review') }}
@@ -150,8 +135,10 @@ async function bulkAccept() {
     <button v-if="member && checked.length" type="button" class="btn" @click="emit('favorite', !allStarred)">
       {{ allStarred ? t('app-unfavorite') : t('app-favorite') }}
     </button>
-    <button type="button" class="linkbtn" @click="emit('all')">{{ t('app-select-all', { count: items.length }) }}</button>
+    <button v-if="canMatchAll && total > items.length" type="button" class="linkbtn" @click="emit('matchAll')">{{ t('app-select-matching', { count: total }) }}</button>
+    <button v-else-if="checked.length < items.length" type="button" class="linkbtn" @click="emit('all')">{{ t('app-select-all', { count: items.length }) }}</button>
     <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" :title="t('app-archive-selected-title')" @click="emit('archive')">{{ t('app-archive') }}</button>
+    </template>
     <button type="button" class="btn ghost" @click="emit('done')">{{ t('app-done') }}</button>
   </div>
 </template>

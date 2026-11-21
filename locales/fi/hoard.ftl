@@ -569,16 +569,6 @@ app-bulk-tagged =
         [one] Tunniste { $tag } lisättiin { $count } resurssiin
        *[other] Tunniste { $tag } lisättiin { $count } resurssiin
     }
-app-bulk-category-set =
-    { $count ->
-        [one] Luokaksi asetettiin { $category } { $count } resurssille
-       *[other] Luokaksi asetettiin { $category } { $count } resurssille
-    }
-app-bulk-category-cleared =
-    { $count ->
-        [one] Luokka tyhjennettiin { $count } resurssilta
-       *[other] Luokka tyhjennettiin { $count } resurssilta
-    }
 app-bulk-review = Merkitse tarkistetuiksi
 app-bulk-review-title = Merkitse valitut resurssit läpikäydyiksi: säännöt ja tekoäly eivät enää koske niiden tunnisteisiin
 app-bulk-unreview = Poista tarkistusmerkintä
@@ -707,6 +697,15 @@ app-resize-label = Muuta tietopaneelin kokoa
 app-resize-title = Vedä muuttaaksesi kokoa · kaksoisnapsauta sopivaa leveyttä varten
 app-selected-label = Valitut resurssit
 app-selected = { $count } valittuna
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Muokkaa…
+app-edit-selected-title = Muuta kaikkien tunnisteita ja kenttiä (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } osuma valittu
+       *[other] Kaikki { $count } osumaa valittu
+    }
 app-pick-assets = Valitse resursseja
 app-download-zip = Lataa zip
 app-credits-title = CREDITS.md niille paketeille, joista nämä ovat: kuka ne teki, niiden lisenssit ja niiden pyytämät tekijämaininnat
@@ -727,16 +726,56 @@ app-bulk-tag-add-title = Lisää tämä tunniste jokaiseen valittuun resurssiin
 app-bulk-tag-add = Lisää
 app-bulk-tag-remove-title = Poista tämä tunniste jokaisesta valitusta resurssista
 app-bulk-tag-remove = Poista
-app-bulk-category-label = Valittujen resurssien luokka (tyhjä tyhjentää sen)
-app-bulk-category-placeholder = Luokka
-app-bulk-category-set-title = Aseta jokaisen valitun resurssin luokka
-app-bulk-category-clear-title = Tyhjennä jokaisen valitun resurssin luokka
-app-bulk-category-set-button = Aseta
-app-bulk-category-clear-button = Tyhjennä
 app-remove-from-collection = Poista kokoelmasta { $name }
 app-unfavorite = Poista suosikeista
 app-favorite = Suosikiksi
 app-select-all = Valitse kaikki { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Valitse { $count } osuma
+       *[other] Valitse kaikki { $count } osumaa
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Muokkaa { $count } resurssia
+       *[other] Muokkaa { $count } resurssia
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Muokkaa { $count } osumaa
+       *[other] Muokkaa kaikkia { $count } osumaa
+    }
+bulk-edit-close = Sulje
+bulk-edit-tags = Tunnisteet
+bulk-edit-tag-add = Lisää tunniste kaikkiin
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } / { $count }
+bulk-edit-untick = Poista kaikki valinnat
+bulk-edit-untick-title = Poista kaikki tunnisteet ja valitse sitten ne, jotka jätetään
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Niistä eniten käytetyt tunnisteet
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Vaihtelee, jää ennalleen
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Jää ennalleen
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Tyhjennetty kaikista
+bulk-edit-reset = Palauta ennalleen
+bulk-edit-all-note = Tämä muuttaa kaikkia osumia, myös niitä, joita ei ole vielä ladattu, eikä sitä voi perua yhdellä kertaa.
+bulk-edit-save =
+    { $count ->
+        [one] Tallenna { $count } muutos
+       *[other] Tallenna { $count } muutosta
+    }
+bulk-edit-nothing = Mikään ei muuttunut
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } resurssi päivitetty
+       *[other] { $count } resurssia päivitetty
+    }
 app-archive-selected-title = Poissa hauista, kunnes ne palautetaan tai poistetaan lopullisesti arkistosta
 app-drop-items = Pudota { $count } kohdetta lisätäksesi ne
 app-drop = Pudota lisätäksesi Hoardiin
@@ -784,6 +823,9 @@ palette-archive-selected =
        *[other] Arkistoi { $count } valittua
     }
 palette-archive-selected-keywords = poista roskakori delete remove trash
+palette-edit-selected = Muokkaa valittuja ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = massamuutos tunnisteet luokka lisenssi arvosana
 palette-clear-selection = Tyhjennä valinta
 palette-clear-filters = Tyhjennä suodattimet
 palette-clear-filters-keywords = nollaa reset
@@ -832,6 +874,7 @@ shortcuts-select = Valitse tai poista valinta
 shortcuts-favorite = Lisää suosikkeihin tai poista niistä
 shortcuts-reviewed = Merkitse tarkistetuksi tai poista merkintä
 shortcuts-tag = Lisää tunniste
+shortcuts-edit = Muokkaa valittuja
 shortcuts-key-click = napsautus
 shortcuts-select-range = Valitse alue
 shortcuts-select-all = Valitse kaikki näytetyt

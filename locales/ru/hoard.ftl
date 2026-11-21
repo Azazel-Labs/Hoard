@@ -587,20 +587,6 @@ app-bulk-tagged =
         [many] Тег { $tag } добавлен { $count } ассетам
        *[other] Тег { $tag } добавлен { $count } ассета
     }
-app-bulk-category-set =
-    { $count ->
-        [one] Категория { $category } задана { $count } ассету
-        [few] Категория { $category } задана { $count } ассетам
-        [many] Категория { $category } задана { $count } ассетам
-       *[other] Категория { $category } задана { $count } ассета
-    }
-app-bulk-category-cleared =
-    { $count ->
-        [one] Категория очищена у { $count } ассета
-        [few] Категория очищена у { $count } ассетов
-        [many] Категория очищена у { $count } ассетов
-       *[other] Категория очищена у { $count } ассета
-    }
 app-bulk-review = Отметить просмотренными
 app-bulk-review-title = Отметить выбранные ассеты как просмотренные: после этого правила и ИИ не трогают их теги
 app-bulk-unreview = Снять отметку
@@ -743,6 +729,17 @@ app-resize-label = Изменить ширину панели сведений
 app-resize-title = Перетащите, чтобы изменить ширину · двойной щелчок — подходящая ширина
 app-selected-label = Выбранные ассеты
 app-selected = Выбрано: { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Изменить…
+app-edit-selected-title = Изменить теги и поля у всех (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Выбран { $count } результат
+        [few] Выбрано { $count } результата
+        [many] Выбрано { $count } результатов
+       *[other] Выбрано { $count } результата
+    }
 app-pick-assets = Выберите ассеты
 app-download-zip = Скачать zip
 app-credits-title = CREDITS.md для паков, из которых они взяты: кто их сделал, их лицензии и строки благодарности, которые они просят указать
@@ -763,16 +760,66 @@ app-bulk-tag-add-title = Добавить этот тег каждому выб�
 app-bulk-tag-add = Добавить
 app-bulk-tag-remove-title = Снять этот тег с каждого выбранного ассета
 app-bulk-tag-remove = Снять
-app-bulk-category-label = Категория для выбранных ассетов (пустое поле очищает её)
-app-bulk-category-placeholder = Категория
-app-bulk-category-set-title = Задать категорию каждому выбранному ассету
-app-bulk-category-clear-title = Очистить категорию у каждого выбранного ассета
-app-bulk-category-set-button = Задать
-app-bulk-category-clear-button = Очистить
 app-remove-from-collection = Убрать из «{ $name }»
 app-unfavorite = Убрать из избранного
 app-favorite = В избранное
 app-select-all = Выбрать все ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Выбрать { $count } результат
+        [few] Выбрать все { $count } результата
+        [many] Выбрать все { $count } результатов
+       *[other] Выбрать все { $count } результата
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Изменить { $count } ассет
+        [few] Изменить { $count } ассета
+        [many] Изменить { $count } ассетов
+       *[other] Изменить { $count } ассета
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Изменить { $count } результат
+        [few] Изменить все { $count } результата
+        [many] Изменить все { $count } результатов
+       *[other] Изменить все { $count } результата
+    }
+bulk-edit-close = Закрыть
+bulk-edit-tags = Теги
+bulk-edit-tag-add = Добавить тег всем
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } из { $count }
+bulk-edit-untick = Снять все отметки
+bulk-edit-untick-title = Убрать все теги, затем отметить те, что нужно оставить
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Самые используемые теги среди них
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Разные значения, не меняются
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Не меняется
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Очищено у всех
+bulk-edit-reset = Вернуть как было
+bulk-edit-all-note = Это изменит все результаты, в том числе ещё не загруженные, и отменить это одним шагом нельзя.
+bulk-edit-save =
+    { $count ->
+        [one] Сохранить { $count } изменение
+        [few] Сохранить { $count } изменения
+        [many] Сохранить { $count } изменений
+       *[other] Сохранить { $count } изменения
+    }
+bulk-edit-nothing = Ничего не изменилось
+bulk-edit-saved =
+    { $count ->
+        [one] Обновлён { $count } ассет
+        [few] Обновлено { $count } ассета
+        [many] Обновлено { $count } ассетов
+       *[other] Обновлено { $count } ассета
+    }
 app-archive-selected-title = Не показываются в поиске, пока их не восстановят или не удалят навсегда из архива
 app-drop-items =
     { $count ->
@@ -818,6 +865,9 @@ palette-select-several = Выбрать несколько…
 palette-select-several-keywords = массово несколько тег архив bulk multiple tag archive
 palette-archive-selected = Отправить в архив выбранные ({ $count })
 palette-archive-selected-keywords = удалить убрать корзина delete remove trash
+palette-edit-selected = Изменить выбранные ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = массовое изменение теги категория лицензия рейтинг
 palette-clear-selection = Снять выделение
 palette-clear-filters = Сбросить фильтры
 palette-clear-filters-keywords = сброс очистить reset
@@ -866,6 +916,7 @@ shortcuts-select = Выбрать или снять выбор
 shortcuts-favorite = Добавить в избранное или убрать из него
 shortcuts-reviewed = Отметить как просмотренное или снять отметку
 shortcuts-tag = Добавить тег
+shortcuts-edit = Изменить выбранное
 shortcuts-key-click = щелчок
 shortcuts-select-range = Выбрать диапазон
 shortcuts-select-all = Выбрать всё показанное

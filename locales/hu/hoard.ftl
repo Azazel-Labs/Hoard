@@ -549,8 +549,6 @@ app-bulk-failed =
     }: { $error }
 app-bulk-untagged = Címke eltávolítva { $count } assetről: { $tag }
 app-bulk-tagged = { $count } asset felcímkézve ezzel: { $tag }
-app-bulk-category-set = { $count } asset kategóriája beállítva: { $category }
-app-bulk-category-cleared = { $count } asset kategóriája törölve
 app-bulk-review = Megjelölés átnézettként
 app-bulk-review-title = A kijelölt assetek megjelölése átnézettként: a szabályok és az MI ezután nem nyúlnak a címkéikhez
 app-bulk-unreview = Jelölés levétele
@@ -663,6 +661,15 @@ app-resize-label = A részletek panel átméretezése
 app-resize-title = Húzza az átméretezéshez · dupla kattintás az illeszkedő szélességhez
 app-selected-label = Kijelölt assetek
 app-selected = { $count } kijelölve
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Szerkesztés…
+app-edit-selected-title = Az összes címkéjének és mezőjének módosítása (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } találat kijelölve
+       *[other] Mind a(z) { $count } találat kijelölve
+    }
 app-pick-assets = Válasszon asseteket
 app-download-zip = Letöltés zipként
 app-credits-title = CREDITS.md azokhoz a csomagokhoz, amelyekből ezek származnak: kik készítették őket, milyen licenccel, és milyen forrásmegjelölést kérnek
@@ -683,16 +690,56 @@ app-bulk-tag-add-title = A címke hozzáadása minden kijelölt assethez
 app-bulk-tag-add = Hozzáadás
 app-bulk-tag-remove-title = A címke eltávolítása minden kijelölt assetről
 app-bulk-tag-remove = Eltávolítás
-app-bulk-category-label = A kijelölt assetek kategóriája (üresen hagyva törli)
-app-bulk-category-placeholder = Kategória
-app-bulk-category-set-title = Minden kijelölt asset kategóriájának beállítása
-app-bulk-category-clear-title = Minden kijelölt asset kategóriájának törlése
-app-bulk-category-set-button = Beállítás
-app-bulk-category-clear-button = Törlés
 app-remove-from-collection = Eltávolítás innen: { $name }
 app-unfavorite = Eltávolítás a kedvencekből
 app-favorite = Kedvencekhez
 app-select-all = Mind kijelölése ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] A(z) { $count } találat kijelölése
+       *[other] Mind a(z) { $count } találat kijelölése
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] { $count } asset szerkesztése
+       *[other] { $count } asset szerkesztése
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] { $count } találat szerkesztése
+       *[other] Mind a(z) { $count } találat szerkesztése
+    }
+bulk-edit-close = Bezárás
+bulk-edit-tags = Címkék
+bulk-edit-tag-add = Címke hozzáadása mindegyikhez
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } / { $count }
+bulk-edit-untick = Minden jelölés törlése
+bulk-edit-untick-title = Az összes címke eltávolítása, majd a megtartandók bejelölése
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = A legtöbbet használt címkék közöttük
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Vegyes, változatlan marad
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Változatlan marad
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Mindegyiknél törölve
+bulk-edit-reset = Visszaállítás
+bulk-edit-all-note = Ez minden találatot módosít, a még be nem töltötteket is, és egy lépésben nem vonható vissza.
+bulk-edit-save =
+    { $count ->
+        [one] { $count } módosítás mentése
+       *[other] { $count } módosítás mentése
+    }
+bulk-edit-nothing = Nincs változás
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } asset frissítve
+       *[other] { $count } asset frissítve
+    }
 app-archive-selected-title = Kikerülnek a keresésből, amíg vissza nem állítja vagy végleg nem törli őket az Archívumból
 app-drop-items = Engedje el, és { $count } elem hozzáadódik
 app-drop = Engedje el, és bekerül a Hoardba
@@ -732,6 +779,9 @@ palette-select-several = Több kijelölése…
 palette-select-several-keywords = tömeges több címke archiválás bulk multiple tag archive
 palette-archive-selected = A kijelöltek archiválása ({ $count })
 palette-archive-selected-keywords = törlés eltávolítás kuka delete remove trash
+palette-edit-selected = A kijelölt { $count } szerkesztése
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = tömeges módosítás címkék kategória licenc értékelés
 palette-clear-selection = Kijelölés megszüntetése
 palette-clear-filters = Szűrők törlése
 palette-clear-filters-keywords = visszaállítás alaphelyzet reset
@@ -780,6 +830,7 @@ shortcuts-select = Kijelölés vagy kijelölés megszüntetése
 shortcuts-favorite = Hozzáadás a kedvencekhez vagy eltávolítás onnan
 shortcuts-reviewed = Megjelölés átnézettként, vagy a jelölés levétele
 shortcuts-tag = Címke hozzáadása
+shortcuts-edit = A kijelöltek szerkesztése
 shortcuts-key-click = kattintás
 shortcuts-select-range = Tartomány kijelölése
 shortcuts-select-all = Minden látható kijelölése

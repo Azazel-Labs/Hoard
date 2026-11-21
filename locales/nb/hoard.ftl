@@ -561,16 +561,6 @@ app-bulk-tagged =
         [one] { $count } ressurs
        *[other] { $count } ressurser
     } med { $tag }
-app-bulk-category-set =
-    Satte kategorien for { $count ->
-        [one] { $count } ressurs
-       *[other] { $count } ressurser
-    } til { $category }
-app-bulk-category-cleared =
-    Fjernet kategorien for { $count ->
-        [one] { $count } ressurs
-       *[other] { $count } ressurser
-    }
 app-bulk-review = Merk som gjennomgått
 app-bulk-review-title = Merk de valgte ressursene som gjennomgått: reglene og AI lar taggene deres være etter dette
 app-bulk-unreview = Merk som ikke gjennomgått
@@ -695,6 +685,15 @@ app-resize-label = Endre størrelse på detaljpanelet
 app-resize-title = Dra for å endre størrelse · dobbeltklikk for bredden som passer
 app-selected-label = Valgte ressurser
 app-selected = { $count } valgt
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Rediger…
+app-edit-selected-title = Endre taggene og feltene til alle (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } treff valgt
+       *[other] Alle { $count } treff valgt
+    }
 app-pick-assets = Velg ressurser
 app-download-zip = Last ned zip
 app-credits-title = CREDITS.md for pakkene disse kommer fra: hvem som laget dem, lisensene og krediteringslinjene de ber om
@@ -715,16 +714,56 @@ app-bulk-tag-add-title = Legg til denne taggen på alle valgte ressurser
 app-bulk-tag-add = Legg til
 app-bulk-tag-remove-title = Fjern denne taggen fra alle valgte ressurser
 app-bulk-tag-remove = Fjern
-app-bulk-category-label = Kategori for de valgte ressursene (tom fjerner den)
-app-bulk-category-placeholder = Kategori
-app-bulk-category-set-title = Angi kategorien for alle valgte ressurser
-app-bulk-category-clear-title = Fjern kategorien for alle valgte ressurser
-app-bulk-category-set-button = Angi
-app-bulk-category-clear-button = Fjern
 app-remove-from-collection = Fjern fra { $name }
 app-unfavorite = Fjern favoritt
 app-favorite = Favoritt
 app-select-all = Velg alle { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Velg { $count } treff
+       *[other] Velg alle { $count } treff
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Rediger { $count } ressurs
+       *[other] Rediger { $count } ressurser
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Rediger { $count } treff
+       *[other] Rediger alle { $count } treff
+    }
+bulk-edit-close = Lukk
+bulk-edit-tags = Tagger
+bulk-edit-tag-add = Legg til en tagg på alle
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } av { $count }
+bulk-edit-untick = Fjern alle avmerkinger
+bulk-edit-untick-title = Fjern alle tagger, og merk så de som skal beholdes
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = De mest brukte taggene blant dem
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Blandet, beholdes som de er
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Beholdes som den er
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Tømt på alle
+bulk-edit-reset = Sett tilbake som det var
+bulk-edit-all-note = Dette endrer alle treff, også de som ikke er lastet ennå, og kan ikke angres i ett steg.
+bulk-edit-save =
+    { $count ->
+        [one] Lagre { $count } endring
+       *[other] Lagre { $count } endringer
+    }
+bulk-edit-nothing = Ingenting endret
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } ressurs oppdatert
+       *[other] { $count } ressurser oppdatert
+    }
 app-archive-selected-title = Utenfor søk til de gjenopprettes eller slettes for godt, fra Arkiv
 app-drop-items = Slipp { $count } elementer for å legge dem til
 app-drop = Slipp for å legge til i Hoard
@@ -764,6 +803,9 @@ palette-select-several = Velg flere …
 palette-select-several-keywords = mange flere tagg arkiver bulk multiple tag archive
 palette-archive-selected = Arkiver de { $count } valgte
 palette-archive-selected-keywords = slett fjern papirkurv delete remove trash
+palette-edit-selected = Rediger de { $count } valgte
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = masseendring tagger kategori lisens vurdering
 palette-clear-selection = Fjern utvalget
 palette-clear-filters = Fjern filtre
 palette-clear-filters-keywords = nullstill tilbakestill reset
@@ -812,6 +854,7 @@ shortcuts-select = Velg eller fjern valg
 shortcuts-favorite = Legg til i eller fjern fra favorittene dine
 shortcuts-reviewed = Merk som gjennomgått eller ikke
 shortcuts-tag = Legg til en tagg
+shortcuts-edit = Rediger det valgte
 shortcuts-key-click = klikk
 shortcuts-select-range = Velg et område
 shortcuts-select-all = Velg alt som vises

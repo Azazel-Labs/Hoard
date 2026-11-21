@@ -545,8 +545,6 @@ app-ns-script = 文字体系
 app-bulk-failed = { $count } 件のアセットを変更できませんでした: { $error }
 app-bulk-untagged = { $count } 件のアセットから { $tag } を外しました
 app-bulk-tagged = { $count } 件のアセットに { $tag } を付けました
-app-bulk-category-set = { $count } 件のアセットのカテゴリーを { $category } にしました
-app-bulk-category-cleared = { $count } 件のアセットのカテゴリーを消去しました
 app-bulk-review = 確認済みにする
 app-bulk-review-title = 選択したアセットを確認済みにします。以後、ルールと AI はタグに手を加えません
 app-bulk-unreview = 未確認に戻す
@@ -647,6 +645,14 @@ app-resize-label = 詳細パネルのサイズを変更
 app-resize-title = ドラッグでサイズ変更 · ダブルクリックで内容に合う幅に
 app-selected-label = 選択したアセット
 app-selected = { $count } 件を選択中
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = 編集…
+app-edit-selected-title = すべてのタグとフィールドを変更 (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] { $count } 件の検索結果を選択中
+    }
 app-pick-assets = アセットを選ぶ
 app-download-zip = zip をダウンロード
 app-credits-title = これらの入手元パックの CREDITS.md: 作者、ライセンス、求められているクレジット表記
@@ -667,16 +673,51 @@ app-bulk-tag-add-title = 選択したすべてのアセットにこのタグを�
 app-bulk-tag-add = 追加
 app-bulk-tag-remove-title = 選択したすべてのアセットからこのタグを外す
 app-bulk-tag-remove = 外す
-app-bulk-category-label = 選択したアセットのカテゴリー（空にすると消去）
-app-bulk-category-placeholder = カテゴリー
-app-bulk-category-set-title = 選択したすべてのアセットのカテゴリーを設定
-app-bulk-category-clear-title = 選択したすべてのアセットのカテゴリーを消去
-app-bulk-category-set-button = 設定
-app-bulk-category-clear-button = 消去
 app-remove-from-collection = { $name } から外す
 app-unfavorite = お気に入りから外す
 app-favorite = お気に入り
 app-select-all = { $count } 件をすべて選択
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] { $count } 件の検索結果をすべて選択
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] { $count } 件のアセットを編集
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] { $count } 件の検索結果をすべて編集
+    }
+bulk-edit-close = 閉じる
+bulk-edit-tags = タグ
+bulk-edit-tag-add = すべてにタグを追加
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $count } 件中 { $have } 件
+bulk-edit-untick = すべてのチェックを外す
+bulk-edit-untick-title = すべてのタグを外してから、残すものにチェックを入れます
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = その中でよく使われているタグ
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = 値が異なります。変更しません
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = 変更しません
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = すべてで消去
+bulk-edit-reset = 元に戻す
+bulk-edit-all-note = 未読み込みの結果を含むすべての検索結果が変更され、1 回の操作では元に戻せません。
+bulk-edit-save =
+    { $count ->
+       *[other] { $count } 件の変更を保存
+    }
+bulk-edit-nothing = 変更はありません
+bulk-edit-saved =
+    { $count ->
+       *[other] { $count } 件のアセットを更新しました
+    }
 app-archive-selected-title = アーカイブから復元するか完全に削除するまで、検索に表示されなくなります
 app-drop-items = ドロップして { $count } 個の項目を追加
 app-drop = ドロップして Hoard に追加
@@ -716,6 +757,9 @@ palette-select-several = 複数選択…
 palette-select-several-keywords = 一括 複数 タグ アーカイブ bulk multiple tag archive
 palette-archive-selected = 選択した { $count } 件をアーカイブ
 palette-archive-selected-keywords = 削除 除去 ゴミ箱 delete remove trash
+palette-edit-selected = 選択した { $count } 件を編集
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = 一括変更 タグ カテゴリ ライセンス 評価
 palette-clear-selection = 選択を解除
 palette-clear-filters = フィルターをクリア
 palette-clear-filters-keywords = リセット reset
@@ -764,6 +808,7 @@ shortcuts-select = 選択または選択解除
 shortcuts-favorite = お気に入りに追加、またはお気に入りから外す
 shortcuts-reviewed = 確認済みにする、または解除する
 shortcuts-tag = タグを追加
+shortcuts-edit = 選択中のものを編集
 shortcuts-key-click = クリック
 shortcuts-select-range = 範囲を選択
 shortcuts-select-all = 表示中のものをすべて選択

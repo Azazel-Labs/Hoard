@@ -561,16 +561,6 @@ app-bulk-tagged =
         [one] Se etiquetó { $count } recurso
        *[other] Se etiquetaron { $count } recursos
     } con { $tag }
-app-bulk-category-set =
-    Se cambió la categoría de { $count ->
-        [one] { $count } recurso
-       *[other] { $count } recursos
-    } a { $category }
-app-bulk-category-cleared =
-    Se borró la categoría de { $count ->
-        [one] { $count } recurso
-       *[other] { $count } recursos
-    }
 app-bulk-review = Marcar revisados
 app-bulk-review-title = Marcar los recursos seleccionados como revisados: las reglas y la IA ya no tocarán sus etiquetas
 app-bulk-unreview = Marcar sin revisar
@@ -695,6 +685,15 @@ app-resize-label = Cambiar el tamaño del panel de detalles
 app-resize-title = Arrastra para cambiar el tamaño · doble clic para el ancho justo
 app-selected-label = Recursos seleccionados
 app-selected = { $count } seleccionados
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Editar…
+app-edit-selected-title = Cambiar las etiquetas y los campos de todos (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } resultado seleccionado
+       *[other] Los { $count } resultados seleccionados
+    }
 app-pick-assets = Elige recursos
 app-download-zip = Descargar zip
 app-credits-title = CREDITS.md de los paquetes de los que vienen: quién los hizo, sus licencias y las líneas de crédito que piden
@@ -715,16 +714,56 @@ app-bulk-tag-add-title = Agregar esta etiqueta a todos los recursos seleccionado
 app-bulk-tag-add = Agregar
 app-bulk-tag-remove-title = Quitar esta etiqueta de todos los recursos seleccionados
 app-bulk-tag-remove = Quitar
-app-bulk-category-label = Categoría de los recursos seleccionados (vacía la borra)
-app-bulk-category-placeholder = Categoría
-app-bulk-category-set-title = Asignar la categoría a todos los recursos seleccionados
-app-bulk-category-clear-title = Borrar la categoría de todos los recursos seleccionados
-app-bulk-category-set-button = Asignar
-app-bulk-category-clear-button = Borrar
 app-remove-from-collection = Quitar de { $name }
 app-unfavorite = Quitar de favoritos
 app-favorite = Agregar a favoritos
 app-select-all = Seleccionar los { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Seleccionar el resultado ({ $count })
+       *[other] Seleccionar los { $count } resultados
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Editar { $count } recurso
+       *[other] Editar { $count } recursos
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Editar { $count } resultado
+       *[other] Editar los { $count } resultados
+    }
+bulk-edit-close = Cerrar
+bulk-edit-tags = Etiquetas
+bulk-edit-tag-add = Agregar una etiqueta a todos
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } de { $count }
+bulk-edit-untick = Desmarcar todo
+bulk-edit-untick-title = Quitar todas las etiquetas y luego marcar las que se quieran conservar
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Las etiquetas más usadas entre ellos
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Mixto, se deja como está
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Se deja como está
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Borrado en todos
+bulk-edit-reset = Volver a como estaba
+bulk-edit-all-note = Esto cambia todos los resultados, incluso los que aún no se cargaron, y no se puede deshacer en un solo paso.
+bulk-edit-save =
+    { $count ->
+        [one] Guardar { $count } cambio
+       *[other] Guardar { $count } cambios
+    }
+bulk-edit-nothing = No cambió nada
+bulk-edit-saved =
+    { $count ->
+        [one] Se actualizó { $count } recurso
+       *[other] Se actualizaron { $count } recursos
+    }
 app-archive-selected-title = Fuera de la búsqueda hasta que se restauren o se eliminen definitivamente, desde Archivados
 app-drop-items = Suelta { $count } elementos para agregarlos
 app-drop = Suelta para agregarlos a Hoard
@@ -764,6 +803,9 @@ palette-select-several = Seleccionar varios…
 palette-select-several-keywords = masivo varios múltiples etiquetar archivar bulk multiple tag archive
 palette-archive-selected = Archivar los { $count } seleccionados
 palette-archive-selected-keywords = eliminar quitar borrar papelera delete remove trash
+palette-edit-selected = Editar los { $count } seleccionados
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = cambio masivo etiquetas categoría licencia calificación
 palette-clear-selection = Borrar la selección
 palette-clear-filters = Borrar filtros
 palette-clear-filters-keywords = restablecer reiniciar reset
@@ -812,6 +854,7 @@ shortcuts-select = Seleccionar o deseleccionar
 shortcuts-favorite = Agregar a tus favoritos o quitar de ellos
 shortcuts-reviewed = Marcar como revisado o no
 shortcuts-tag = Agregar una etiqueta
+shortcuts-edit = Editar lo seleccionado
 shortcuts-key-click = clic
 shortcuts-select-range = Seleccionar un rango
 shortcuts-select-all = Seleccionar todo lo que se muestra

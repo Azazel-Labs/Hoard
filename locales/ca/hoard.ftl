@@ -561,16 +561,6 @@ app-bulk-tagged =
         [one] S'ha etiquetat { $count } recurs amb { $tag }
        *[other] S'han etiquetat { $count } recursos amb { $tag }
     }
-app-bulk-category-set =
-    { $count ->
-        [one] S'ha definit la categoria de { $count } recurs com a { $category }
-       *[other] S'ha definit la categoria de { $count } recursos com a { $category }
-    }
-app-bulk-category-cleared =
-    { $count ->
-        [one] S'ha esborrat la categoria de { $count } recurs
-       *[other] S'ha esborrat la categoria de { $count } recursos
-    }
 app-bulk-review = Marca com a revisats
 app-bulk-review-title = Marca els recursos seleccionats com a revisats: les regles i la IA deixaran en pau les seves etiquetes
 app-bulk-unreview = Marca com a no revisats
@@ -695,6 +685,15 @@ app-resize-label = Redimensiona el tauler de detalls
 app-resize-title = Arrossegueu per redimensionar · doble clic per a l'amplada que s'ajusta
 app-selected-label = Recursos seleccionats
 app-selected = { $count } seleccionats
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Edita…
+app-edit-selected-title = Canvia les etiquetes i els camps de tots (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } resultat seleccionat
+       *[other] Tots { $count } resultats seleccionats
+    }
 app-pick-assets = Trieu recursos
 app-download-zip = Baixa un zip
 app-credits-title = CREDITS.md dels paquets d'on provenen: qui els ha fet, les seves llicències i les línies de crèdit que demanen
@@ -715,16 +714,56 @@ app-bulk-tag-add-title = Afegeix aquesta etiqueta a tots els recursos selecciona
 app-bulk-tag-add = Afegeix
 app-bulk-tag-remove-title = Treu aquesta etiqueta de tots els recursos seleccionats
 app-bulk-tag-remove = Treu
-app-bulk-category-label = Categoria per als recursos seleccionats (buida l'esborra)
-app-bulk-category-placeholder = Categoria
-app-bulk-category-set-title = Defineix la categoria de tots els recursos seleccionats
-app-bulk-category-clear-title = Esborra la categoria de tots els recursos seleccionats
-app-bulk-category-set-button = Defineix
-app-bulk-category-clear-button = Esborra
 app-remove-from-collection = Treu de { $name }
 app-unfavorite = Treu de preferits
 app-favorite = Afegeix a preferits
 app-select-all = Selecciona'ls tots ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Selecciona el resultat ({ $count })
+       *[other] Selecciona els { $count } resultats
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Edita { $count } recurs
+       *[other] Edita { $count } recursos
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Edita { $count } resultat
+       *[other] Edita els { $count } resultats
+    }
+bulk-edit-close = Tanca
+bulk-edit-tags = Etiquetes
+bulk-edit-tag-add = Afegeix una etiqueta a tots
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } de { $count }
+bulk-edit-untick = Desmarca-ho tot
+bulk-edit-untick-title = Treu totes les etiquetes i marca després les que vulguis conservar
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Les etiquetes més usades entre ells
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Barrejat, es deixa tal com està
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Es deixa tal com està
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Esborrat a tots
+bulk-edit-reset = Torna a deixar-ho com estava
+bulk-edit-all-note = Això canvia tots els resultats, també els que encara no s'han carregat, i no es pot desfer d'un sol cop.
+bulk-edit-save =
+    { $count ->
+        [one] Desa { $count } canvi
+       *[other] Desa { $count } canvis
+    }
+bulk-edit-nothing = No ha canviat res
+bulk-edit-saved =
+    { $count ->
+        [one] S'ha actualitzat { $count } recurs
+       *[other] S'han actualitzat { $count } recursos
+    }
 app-archive-selected-title = Fora de la cerca fins que es restaurin o se suprimeixin definitivament, des de l'Arxiu
 app-drop-items = Deixeu anar { $count } elements per afegir-los
 app-drop = Deixeu anar per afegir-ho a Hoard
@@ -764,6 +803,9 @@ palette-select-several = Selecciona'n diversos…
 palette-select-several-keywords = massiu múltiple etiqueta arxiva bulk multiple tag archive
 palette-archive-selected = Arxiva els { $count } seleccionats
 palette-archive-selected-keywords = suprimeix elimina treu paperera delete remove trash
+palette-edit-selected = Edita els { $count } seleccionats
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = canvi massiu etiquetes categoria llicència valoració
 palette-clear-selection = Esborra la selecció
 palette-clear-filters = Esborra els filtres
 palette-clear-filters-keywords = restableix reinicia reset
@@ -812,6 +854,7 @@ shortcuts-select = Selecciona o desselecciona
 shortcuts-favorite = Afegeix als preferits o treu-ne
 shortcuts-reviewed = Marca com a revisat o no
 shortcuts-tag = Afegeix una etiqueta
+shortcuts-edit = Edita la selecció
 shortcuts-key-click = clic
 shortcuts-select-range = Selecciona un interval
 shortcuts-select-all = Selecciona tot el que es mostra

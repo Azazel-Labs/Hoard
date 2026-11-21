@@ -561,16 +561,6 @@ app-bulk-tagged =
         [one] { $count } resurs
        *[other] { $count } resurser
     } med { $tag }
-app-bulk-category-set =
-    Satte kategorin för { $count ->
-        [one] { $count } resurs
-       *[other] { $count } resurser
-    } till { $category }
-app-bulk-category-cleared =
-    Rensade kategorin för { $count ->
-        [one] { $count } resurs
-       *[other] { $count } resurser
-    }
 app-bulk-review = Markera granskade
 app-bulk-review-title = Markera de valda resurserna som genomgångna: regler och AI lämnar deras taggar ifred efter det
 app-bulk-unreview = Markera ogranskade
@@ -695,6 +685,15 @@ app-resize-label = Ändra storlek på detaljpanelen
 app-resize-title = Dra för att ändra storlek · dubbelklicka för den bredd som passar
 app-selected-label = Valda resurser
 app-selected = { $count } valda
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Redigera…
+app-edit-selected-title = Ändra taggar och fält för alla (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } träff vald
+       *[other] Alla { $count } träffar valda
+    }
 app-pick-assets = Välj resurser
 app-download-zip = Ladda ner zip
 app-credits-title = CREDITS.md för paketen de kommer från: vem som gjorde dem, deras licenser och de krediteringsrader de ber om
@@ -715,16 +714,56 @@ app-bulk-tag-add-title = Lägg till taggen på alla valda resurser
 app-bulk-tag-add = Lägg till
 app-bulk-tag-remove-title = Ta bort taggen från alla valda resurser
 app-bulk-tag-remove = Ta bort
-app-bulk-category-label = Kategori för de valda resurserna (tom rensar den)
-app-bulk-category-placeholder = Kategori
-app-bulk-category-set-title = Ange kategorin för alla valda resurser
-app-bulk-category-clear-title = Rensa kategorin för alla valda resurser
-app-bulk-category-set-button = Ange
-app-bulk-category-clear-button = Rensa
 app-remove-from-collection = Ta bort från { $name }
 app-unfavorite = Ta bort favorit
 app-favorite = Favorit
 app-select-all = Välj alla { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Välj { $count } träff
+       *[other] Välj alla { $count } träffar
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Redigera { $count } resurs
+       *[other] Redigera { $count } resurser
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Redigera { $count } träff
+       *[other] Redigera alla { $count } träffar
+    }
+bulk-edit-close = Stäng
+bulk-edit-tags = Taggar
+bulk-edit-tag-add = Lägg till en tagg på alla
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } av { $count }
+bulk-edit-untick = Avmarkera alla
+bulk-edit-untick-title = Ta bort alla taggar och markera sedan dem som ska behållas
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = De mest använda taggarna bland dem
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Blandat, lämnas som det är
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Lämnas som det är
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Rensat på alla
+bulk-edit-reset = Återställ
+bulk-edit-all-note = Det här ändrar alla träffar, även de som inte har lästs in än, och kan inte ångras i ett steg.
+bulk-edit-save =
+    { $count ->
+        [one] Spara { $count } ändring
+       *[other] Spara { $count } ändringar
+    }
+bulk-edit-nothing = Inget ändrades
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } resurs uppdaterad
+       *[other] { $count } resurser uppdaterade
+    }
 app-archive-selected-title = Borta från sökningen tills de återställs eller raderas för gott, från Arkiv
 app-drop-items = Släpp { $count } objekt för att lägga till dem
 app-drop = Släpp för att lägga till i Hoard
@@ -764,6 +803,9 @@ palette-select-several = Välj flera…
 palette-select-several-keywords = flera massändring tagga arkivera bulk multiple tag archive
 palette-archive-selected = Arkivera de { $count } valda
 palette-archive-selected-keywords = radera ta bort papperskorg delete remove trash
+palette-edit-selected = Redigera de { $count } valda
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = massändring taggar kategori licens betyg
 palette-clear-selection = Rensa markeringen
 palette-clear-filters = Rensa filter
 palette-clear-filters-keywords = återställ nollställ reset
@@ -812,6 +854,7 @@ shortcuts-select = Markera eller avmarkera
 shortcuts-favorite = Lägg till i eller ta bort från dina favoriter
 shortcuts-reviewed = Markera som granskad eller inte
 shortcuts-tag = Lägg till en tagg
+shortcuts-edit = Redigera det valda
 shortcuts-key-click = klick
 shortcuts-select-range = Markera ett intervall
 shortcuts-select-all = Markera allt som visas

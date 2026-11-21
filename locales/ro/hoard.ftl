@@ -585,18 +585,6 @@ app-bulk-tagged =
         [few] S-au etichetat { $count } resurse cu { $tag }
        *[other] S-au etichetat { $count } de resurse cu { $tag }
     }
-app-bulk-category-set =
-    { $count ->
-        [one] Categoria pentru { $count } resursă a fost setată la { $category }
-        [few] Categoria pentru { $count } resurse a fost setată la { $category }
-       *[other] Categoria pentru { $count } de resurse a fost setată la { $category }
-    }
-app-bulk-category-cleared =
-    { $count ->
-        [one] Categoria pentru { $count } resursă a fost golită
-        [few] Categoria pentru { $count } resurse a fost golită
-       *[other] Categoria pentru { $count } de resurse a fost golită
-    }
 app-bulk-review = Marcați verificate
 app-bulk-review-title = Marcați resursele selectate ca verificate: regulile și AI nu le mai ating etichetele după aceea
 app-bulk-unreview = Marcați neverificate
@@ -732,6 +720,16 @@ app-resize-label = Redimensionați panoul de detalii
 app-resize-title = Trageți pentru a redimensiona · dublu clic pentru lățimea potrivită
 app-selected-label = Resurse selectate
 app-selected = { $count } selectate
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Editează…
+app-edit-selected-title = Schimbă etichetele și câmpurile tuturor (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } rezultat selectat
+        [few] { $count } rezultate selectate
+       *[other] Toate cele { $count } de rezultate selectate
+    }
 app-pick-assets = Alegeți resurse
 app-download-zip = Descărcați zip
 app-credits-title = CREDITS.md pentru pachetele din care provin: cine le-a creat, licențele lor și mențiunile pe care le cer
@@ -752,16 +750,61 @@ app-bulk-tag-add-title = Adăugați această etichetă la fiecare resursă selec
 app-bulk-tag-add = Adăugați
 app-bulk-tag-remove-title = Scoateți această etichetă de pe fiecare resursă selectată
 app-bulk-tag-remove = Eliminați
-app-bulk-category-label = Categoria pentru resursele selectate (gol o șterge)
-app-bulk-category-placeholder = Categorie
-app-bulk-category-set-title = Setați categoria fiecărei resurse selectate
-app-bulk-category-clear-title = Ștergeți categoria fiecărei resurse selectate
-app-bulk-category-set-button = Setați
-app-bulk-category-clear-button = Ștergeți
 app-remove-from-collection = Eliminați din { $name }
 app-unfavorite = Scoateți din favorite
 app-favorite = Adăugați la favorite
 app-select-all = Selectați toate ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Selectează rezultatul ({ $count })
+        [few] Selectează cele { $count } rezultate
+       *[other] Selectează toate cele { $count } de rezultate
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Editează { $count } resursă
+        [few] Editează { $count } resurse
+       *[other] Editează { $count } de resurse
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Editează { $count } rezultat
+        [few] Editează cele { $count } rezultate
+       *[other] Editează toate cele { $count } de rezultate
+    }
+bulk-edit-close = Închide
+bulk-edit-tags = Etichete
+bulk-edit-tag-add = Adaugă o etichetă la toate
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } din { $count }
+bulk-edit-untick = Debifează tot
+bulk-edit-untick-title = Scoate toate etichetele, apoi bifează-le pe cele de păstrat
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Cele mai folosite etichete dintre ele
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Mixt, lăsat neschimbat
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Lăsat neschimbat
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Golit la toate
+bulk-edit-reset = Revino la cum era
+bulk-edit-all-note = Aceasta modifică toate rezultatele, inclusiv pe cele încă neîncărcate, și nu poate fi anulată dintr-un singur pas.
+bulk-edit-save =
+    { $count ->
+        [one] Salvează { $count } modificare
+        [few] Salvează { $count } modificări
+       *[other] Salvează { $count } de modificări
+    }
+bulk-edit-nothing = Nimic modificat
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } resursă actualizată
+        [few] { $count } resurse actualizate
+       *[other] { $count } de resurse actualizate
+    }
 app-archive-selected-title = Scoase din căutare până când sunt restaurate sau șterse definitiv din Arhivă
 app-drop-items =
     { $count ->
@@ -806,6 +849,9 @@ palette-select-several = Selectați mai multe…
 palette-select-several-keywords = grup multiple etichetă arhivă bulk multiple tag archive
 palette-archive-selected = Arhivați cele { $count } selectate
 palette-archive-selected-keywords = ștergere eliminare coș delete remove trash
+palette-edit-selected = Editează cele { $count } selectate
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = modificare în masă etichete categorie licență evaluare
 palette-clear-selection = Goliți selecția
 palette-clear-filters = Ștergeți filtrele
 palette-clear-filters-keywords = resetare reset
@@ -854,6 +900,7 @@ shortcuts-select = Selectare sau deselectare
 shortcuts-favorite = Adăugare la favorite sau scoatere din favorite
 shortcuts-reviewed = Marcare ca verificat sau nu
 shortcuts-tag = Adăugarea unei etichete
+shortcuts-edit = Editează selecția
 shortcuts-key-click = clic
 shortcuts-select-range = Selectarea unui interval
 shortcuts-select-all = Selectarea a tot ce este afișat

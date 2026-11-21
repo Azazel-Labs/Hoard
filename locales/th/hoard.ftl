@@ -545,8 +545,6 @@ app-ns-script = ระบบการเขียน
 app-bulk-failed = เปลี่ยนแอสเซ็ต { $count } รายการนั้นไม่ได้: { $error }
 app-bulk-untagged = นำแท็ก { $tag } ออกจาก { $count } แอสเซ็ตแล้ว
 app-bulk-tagged = ติดแท็ก { $tag } ให้ { $count } แอสเซ็ตแล้ว
-app-bulk-category-set = ตั้งหมวดหมู่ของ { $count } แอสเซ็ตเป็น { $category } แล้ว
-app-bulk-category-cleared = ล้างหมวดหมู่ของ { $count } แอสเซ็ตแล้ว
 app-bulk-review = ทำเครื่องหมายว่าตรวจแล้ว
 app-bulk-review-title = ทำเครื่องหมายแอสเซ็ตที่เลือกว่าดูแล้ว: หลังจากนี้กฎและ AI จะไม่แตะแท็กของแอสเซ็ตเหล่านั้น
 app-bulk-unreview = ยกเลิกว่าตรวจแล้ว
@@ -647,6 +645,14 @@ app-resize-label = ปรับขนาดแผงรายละเอีย�
 app-resize-title = ลากเพื่อปรับขนาด · ดับเบิลคลิกเพื่อใช้ความกว้างที่พอดี
 app-selected-label = แอสเซ็ตที่เลือก
 app-selected = เลือก { $count } รายการ
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = แก้ไข…
+app-edit-selected-title = เปลี่ยนแท็กและช่องข้อมูลของทั้งหมด (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] เลือกผลลัพธ์ { $count } รายการ
+    }
 app-pick-assets = เลือกแอสเซ็ต
 app-download-zip = ดาวน์โหลด zip
 app-credits-title = CREDITS.md ของแพ็กที่แอสเซ็ตเหล่านี้มาจาก: ใครเป็นผู้สร้าง สัญญาอนุญาต และข้อความเครดิตที่ผู้สร้างขอ
@@ -667,16 +673,51 @@ app-bulk-tag-add-title = เพิ่มแท็กนี้ให้ทุก�
 app-bulk-tag-add = เพิ่ม
 app-bulk-tag-remove-title = นำแท็กนี้ออกจากทุกแอสเซ็ตที่เลือก
 app-bulk-tag-remove = นำออก
-app-bulk-category-label = หมวดหมู่ของแอสเซ็ตที่เลือก (เว้นว่างเพื่อล้าง)
-app-bulk-category-placeholder = หมวดหมู่
-app-bulk-category-set-title = ตั้งหมวดหมู่ของทุกแอสเซ็ตที่เลือก
-app-bulk-category-clear-title = ล้างหมวดหมู่ของทุกแอสเซ็ตที่เลือก
-app-bulk-category-set-button = ตั้ง
-app-bulk-category-clear-button = ล้าง
 app-remove-from-collection = นำออกจาก { $name }
 app-unfavorite = นำออกจากรายการโปรด
 app-favorite = เพิ่มในรายการโปรด
 app-select-all = เลือกทั้งหมด { $count } รายการ
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] เลือกผลลัพธ์ทั้ง { $count } รายการ
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] แก้ไขแอสเซ็ต { $count } รายการ
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] แก้ไขผลลัพธ์ทั้ง { $count } รายการ
+    }
+bulk-edit-close = ปิด
+bulk-edit-tags = แท็ก
+bulk-edit-tag-add = เพิ่มแท็กให้ทั้งหมด
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } จาก { $count }
+bulk-edit-untick = ยกเลิกเลือกทั้งหมด
+bulk-edit-untick-title = เอาแท็กออกทั้งหมด แล้วเลือกเฉพาะแท็กที่จะเก็บไว้
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = แท็กที่ใช้บ่อยที่สุดในกลุ่มนี้
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = ค่าต่างกัน คงไว้ตามเดิม
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = คงไว้ตามเดิม
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = ล้างในทั้งหมดแล้ว
+bulk-edit-reset = คืนค่าเดิม
+bulk-edit-all-note = การเปลี่ยนนี้มีผลกับผลลัพธ์ทั้งหมด รวมถึงที่ยังไม่โหลด และย้อนกลับไม่ได้ในขั้นตอนเดียว
+bulk-edit-save =
+    { $count ->
+       *[other] บันทึก { $count } การเปลี่ยนแปลง
+    }
+bulk-edit-nothing = ไม่มีอะไรเปลี่ยนแปลง
+bulk-edit-saved =
+    { $count ->
+       *[other] อัปเดตแอสเซ็ต { $count } รายการแล้ว
+    }
 app-archive-selected-title = ไม่แสดงในการค้นหาจนกว่าจะกู้คืนหรือลบถาวรจากที่เก็บถาวร
 app-drop-items = วาง { $count } รายการเพื่อเพิ่ม
 app-drop = วางเพื่อเพิ่มลงใน Hoard
@@ -716,6 +757,9 @@ palette-select-several = เลือกหลายรายการ…
 palette-select-several-keywords = หลายรายการ แท็ก เก็บถาวร bulk multiple tag archive
 palette-archive-selected = เก็บถาวร { $count } รายการที่เลือก
 palette-archive-selected-keywords = ลบ นำออก ถังขยะ delete remove trash
+palette-edit-selected = แก้ไข { $count } รายการที่เลือก
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = เปลี่ยนจำนวนมาก แท็ก หมวดหมู่ ใบอนุญาต คะแนน
 palette-clear-selection = ล้างการเลือก
 palette-clear-filters = ล้างตัวกรอง
 palette-clear-filters-keywords = รีเซ็ต reset
@@ -764,6 +808,7 @@ shortcuts-select = เลือกหรือยกเลิกการเล�
 shortcuts-favorite = เพิ่มหรือนำออกจากรายการโปรด
 shortcuts-reviewed = ทำเครื่องหมายว่าตรวจแล้ว หรือยกเลิก
 shortcuts-tag = เพิ่มแท็ก
+shortcuts-edit = แก้ไขรายการที่เลือก
 shortcuts-key-click = คลิก
 shortcuts-select-range = เลือกเป็นช่วง
 shortcuts-select-all = เลือกทุกรายการที่แสดง

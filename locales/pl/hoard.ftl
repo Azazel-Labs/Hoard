@@ -581,20 +581,6 @@ app-bulk-tagged =
         [many] { $count } zasobów
        *[other] { $count } zasobu
     }
-app-bulk-category-set =
-    Ustawiono kategorię { $category } dla { $count ->
-        [one] { $count } zasobu
-        [few] { $count } zasobów
-        [many] { $count } zasobów
-       *[other] { $count } zasobu
-    }
-app-bulk-category-cleared =
-    Wyczyszczono kategorię { $count ->
-        [one] { $count } zasobu
-        [few] { $count } zasobów
-        [many] { $count } zasobów
-       *[other] { $count } zasobu
-    }
 app-bulk-review = Oznacz jako sprawdzone
 app-bulk-review-title = Oznacz zaznaczone zasoby jako przejrzane: reguły i AI nie ruszają potem ich tagów
 app-bulk-unreview = Oznacz jako niesprawdzone
@@ -737,6 +723,17 @@ app-resize-label = Zmień szerokość panelu szczegółów
 app-resize-title = Przeciągnij, by zmienić szerokość · kliknij dwukrotnie, by dopasować
 app-selected-label = Zaznaczone zasoby
 app-selected = Zaznaczono: { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Edytuj…
+app-edit-selected-title = Zmień tagi i pola wszystkich (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Zaznaczono { $count } wynik
+        [few] Zaznaczono { $count } wyniki
+        [many] Zaznaczono { $count } wyników
+       *[other] Zaznaczono wszystkie { $count } wyniku
+    }
 app-pick-assets = Wybierz zasoby
 app-download-zip = Pobierz zip
 app-credits-title = CREDITS.md dla paczek, z których pochodzą: kto je stworzył, ich licencje i wymagane przez nie podziękowania
@@ -757,16 +754,66 @@ app-bulk-tag-add-title = Dodaj ten tag do każdego zaznaczonego zasobu
 app-bulk-tag-add = Dodaj
 app-bulk-tag-remove-title = Usuń ten tag z każdego zaznaczonego zasobu
 app-bulk-tag-remove = Usuń
-app-bulk-category-label = Kategoria zaznaczonych zasobów (puste pole ją czyści)
-app-bulk-category-placeholder = Kategoria
-app-bulk-category-set-title = Ustaw kategorię każdego zaznaczonego zasobu
-app-bulk-category-clear-title = Wyczyść kategorię każdego zaznaczonego zasobu
-app-bulk-category-set-button = Ustaw
-app-bulk-category-clear-button = Wyczyść
 app-remove-from-collection = Usuń z { $name }
 app-unfavorite = Usuń z ulubionych
 app-favorite = Dodaj do ulubionych
 app-select-all = Zaznacz wszystkie ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Zaznacz { $count } wynik
+        [few] Zaznacz wszystkie { $count } wyniki
+        [many] Zaznacz wszystkie { $count } wyników
+       *[other] Zaznacz wszystkie { $count } wyniku
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Edytuj { $count } zasób
+        [few] Edytuj { $count } zasoby
+        [many] Edytuj { $count } zasobów
+       *[other] Edytuj { $count } zasobu
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Edytuj { $count } wynik
+        [few] Edytuj wszystkie { $count } wyniki
+        [many] Edytuj wszystkie { $count } wyników
+       *[other] Edytuj wszystkie { $count } wyniku
+    }
+bulk-edit-close = Zamknij
+bulk-edit-tags = Tagi
+bulk-edit-tag-add = Dodaj tag do wszystkich
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } z { $count }
+bulk-edit-untick = Odznacz wszystko
+bulk-edit-untick-title = Usuń wszystkie tagi, a potem zaznacz te do zachowania
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Najczęściej używane tagi wśród nich
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Różne, bez zmian
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Bez zmian
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Wyczyszczono u wszystkich
+bulk-edit-reset = Przywróć
+bulk-edit-all-note = To zmieni wszystkie wyniki, także te jeszcze niezaładowane, i nie da się tego cofnąć jednym krokiem.
+bulk-edit-save =
+    { $count ->
+        [one] Zapisz { $count } zmianę
+        [few] Zapisz { $count } zmiany
+        [many] Zapisz { $count } zmian
+       *[other] Zapisz { $count } zmiany
+    }
+bulk-edit-nothing = Nic się nie zmieniło
+bulk-edit-saved =
+    { $count ->
+        [one] Zaktualizowano { $count } zasób
+        [few] Zaktualizowano { $count } zasoby
+        [many] Zaktualizowano { $count } zasobów
+       *[other] Zaktualizowano { $count } zasobu
+    }
 app-archive-selected-title = Znikną z wyszukiwania, dopóki nie zostaną przywrócone lub usunięte na stałe z Archiwum
 app-drop-items =
     { $count ->
@@ -812,6 +859,9 @@ palette-select-several = Zaznacz kilka…
 palette-select-several-keywords = zbiorczo wiele tag archiwizuj bulk multiple archive
 palette-archive-selected = Zarchiwizuj zaznaczone ({ $count })
 palette-archive-selected-keywords = usuń kosz delete remove trash
+palette-edit-selected = Edytuj zaznaczone ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = zmiana zbiorcza tagi kategoria licencja ocena
 palette-clear-selection = Wyczyść zaznaczenie
 palette-clear-filters = Wyczyść filtry
 palette-clear-filters-keywords = resetuj reset
@@ -860,6 +910,7 @@ shortcuts-select = Zaznacz lub odznacz
 shortcuts-favorite = Dodaj do ulubionych lub usuń z ulubionych
 shortcuts-reviewed = Oznacz jako sprawdzone lub nie
 shortcuts-tag = Dodaj tag
+shortcuts-edit = Edytuj zaznaczone
 shortcuts-key-click = kliknięcie
 shortcuts-select-range = Zaznacz zakres
 shortcuts-select-all = Zaznacz wszystko, co widoczne

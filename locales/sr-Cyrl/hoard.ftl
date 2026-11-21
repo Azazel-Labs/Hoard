@@ -570,13 +570,6 @@ app-bulk-tagged =
         [few] { $count } ресурса
        *[other] { $count } ресурса
     }
-app-bulk-category-set =
-    Категорија { $category } постављена је за { $count ->
-        [one] { $count } ресурс
-        [few] { $count } ресурса
-       *[other] { $count } ресурса
-    }
-app-bulk-category-cleared = Категорија је уклоњена са { $count } ресурса
 app-bulk-review = Означи прегледаним
 app-bulk-review-title = Означи изабране ресурсе као прегледане: правила и ВИ после тога не дирају њихове ознаке
 app-bulk-unreview = Означи непрегледаним
@@ -712,6 +705,16 @@ app-resize-label = Промени величину панела с детаљи�
 app-resize-title = Превуците да промените величину · двоклик за ширину која одговара
 app-selected-label = Изабрани ресурси
 app-selected = Изабрано: { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Измени…
+app-edit-selected-title = Промени ознаке и поља свих (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Изабран је { $count } резултат
+        [few] Изабрана су { $count } резултата
+       *[other] Изабрано је свих { $count } резултата
+    }
 app-pick-assets = Изаберите ресурсе
 app-download-zip = Преузми zip
 app-credits-title = CREDITS.md за пакете из којих ово потиче: ко их је направио, њихове лиценце и наводи заслуга које траже
@@ -732,16 +735,61 @@ app-bulk-tag-add-title = Додај ову ознаку сваком изабр�
 app-bulk-tag-add = Додај
 app-bulk-tag-remove-title = Уклони ову ознаку са сваког изабраног ресурса
 app-bulk-tag-remove = Уклони
-app-bulk-category-label = Категорија за изабране ресурсе (празно је брише)
-app-bulk-category-placeholder = Категорија
-app-bulk-category-set-title = Постави категорију сваког изабраног ресурса
-app-bulk-category-clear-title = Обриши категорију сваког изабраног ресурса
-app-bulk-category-set-button = Постави
-app-bulk-category-clear-button = Обриши
 app-remove-from-collection = Уклони из { $name }
 app-unfavorite = Уклони из омиљених
 app-favorite = Додај у омиљене
 app-select-all = Изабери све ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Изабери { $count } резултат
+        [few] Изабери свих { $count } резултата
+       *[other] Изабери свих { $count } резултата
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Измени { $count } ресурс
+        [few] Измени { $count } ресурса
+       *[other] Измени { $count } ресурса
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Измени { $count } резултат
+        [few] Измени свих { $count } резултата
+       *[other] Измени свих { $count } резултата
+    }
+bulk-edit-close = Затвори
+bulk-edit-tags = Ознаке
+bulk-edit-tag-add = Додај ознаку свима
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } од { $count }
+bulk-edit-untick = Поништи све ознаке
+bulk-edit-untick-title = Уклони све ознаке, па означи оне које треба задржати
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Најчешће коришћене ознаке међу њима
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Мешано, остаје како јесте
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Остаје како јесте
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Обрисано код свих
+bulk-edit-reset = Врати како је било
+bulk-edit-all-note = Ово мења све резултате, укључујући и оне који још нису учитани, и не може се опозвати у једном кораку.
+bulk-edit-save =
+    { $count ->
+        [one] Сачувај { $count } измену
+        [few] Сачувај { $count } измене
+       *[other] Сачувај { $count } измена
+    }
+bulk-edit-nothing = Ништа није промењено
+bulk-edit-saved =
+    { $count ->
+        [one] Ажуриран је { $count } ресурс
+        [few] Ажурирана су { $count } ресурса
+       *[other] Ажурирано је { $count } ресурса
+    }
 app-archive-selected-title = Ван претраге док се не врате или трајно обришу, из Архиве
 app-drop-items = Отпустите да бисте додали ставке ({ $count })
 app-drop = Отпустите да додате у Hoard
@@ -781,6 +829,9 @@ palette-select-several = Изабери више…
 palette-select-several-keywords = групно више ознака архивирај bulk multiple tag archive
 palette-archive-selected = Архивирај изабране ({ $count })
 palette-archive-selected-keywords = обриши уклони отпад delete remove trash
+palette-edit-selected = Измени изабране ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = масовна измена ознаке категорија лиценца оцена
 palette-clear-selection = Поништи избор
 palette-clear-filters = Обриши филтере
 palette-clear-filters-keywords = ресетуј reset
@@ -829,6 +880,7 @@ shortcuts-select = Изабери или поништи избор
 shortcuts-favorite = Додај у омиљене или уклони из њих
 shortcuts-reviewed = Означи као прегледано или не
 shortcuts-tag = Додај ознаку
+shortcuts-edit = Измени изабрано
 shortcuts-key-click = клик
 shortcuts-select-range = Изабери опсег
 shortcuts-select-all = Изабери све приказано

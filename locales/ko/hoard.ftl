@@ -545,8 +545,6 @@ app-ns-script = 문자 체계
 app-bulk-failed = 에셋 { $count }개를 변경하지 못했습니다: { $error }
 app-bulk-untagged = 에셋 { $count }개에서 { $tag } 태그를 뗐습니다
 app-bulk-tagged = 에셋 { $count }개에 { $tag } 태그를 붙였습니다
-app-bulk-category-set = 에셋 { $count }개의 분류를 { $category }(으)로 설정했습니다
-app-bulk-category-cleared = 에셋 { $count }개의 분류를 지웠습니다
 app-bulk-review = 검토함으로 표시
 app-bulk-review-title = 선택한 에셋을 검토한 것으로 표시: 이후 규칙과 AI는 태그를 건드리지 않습니다
 app-bulk-unreview = 검토 해제
@@ -647,6 +645,14 @@ app-resize-label = 세부 정보 패널 크기 조정
 app-resize-title = 드래그하여 크기 조정 · 더블클릭하면 맞는 너비로
 app-selected-label = 선택한 에셋
 app-selected = { $count }개 선택됨
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = 편집…
+app-edit-selected-title = 모든 항목의 태그와 필드 변경 (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] 검색 결과 { $count }개 선택됨
+    }
 app-pick-assets = 에셋 선택
 app-download-zip = zip 다운로드
 app-credits-title = 이 에셋들이 속한 팩의 CREDITS.md: 만든 사람, 라이선스, 요청하는 크레디트 문구
@@ -667,16 +673,51 @@ app-bulk-tag-add-title = 선택한 모든 에셋에 이 태그 붙이기
 app-bulk-tag-add = 추가
 app-bulk-tag-remove-title = 선택한 모든 에셋에서 이 태그 떼기
 app-bulk-tag-remove = 제거
-app-bulk-category-label = 선택한 에셋의 분류(비우면 지워짐)
-app-bulk-category-placeholder = 분류
-app-bulk-category-set-title = 선택한 모든 에셋의 분류 설정
-app-bulk-category-clear-title = 선택한 모든 에셋의 분류 지우기
-app-bulk-category-set-button = 설정
-app-bulk-category-clear-button = 지우기
 app-remove-from-collection = { $name }에서 제거
 app-unfavorite = 즐겨찾기 해제
 app-favorite = 즐겨찾기
 app-select-all = { $count }개 모두 선택
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] 검색 결과 { $count }개 모두 선택
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] 에셋 { $count }개 편집
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] 검색 결과 { $count }개 모두 편집
+    }
+bulk-edit-close = 닫기
+bulk-edit-tags = 태그
+bulk-edit-tag-add = 모든 항목에 태그 추가
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $count }개 중 { $have }개
+bulk-edit-untick = 모두 선택 해제
+bulk-edit-untick-title = 모든 태그를 제거한 다음 유지할 태그를 선택하세요
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = 그중 가장 많이 쓰인 태그
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = 값이 다름, 그대로 둠
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = 그대로 둠
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = 모든 항목에서 비움
+bulk-edit-reset = 원래대로
+bulk-edit-all-note = 아직 불러오지 않은 결과를 포함해 모든 검색 결과가 변경되며, 한 번에 되돌릴 수 없습니다.
+bulk-edit-save =
+    { $count ->
+       *[other] 변경 { $count }개 저장
+    }
+bulk-edit-nothing = 변경된 내용 없음
+bulk-edit-saved =
+    { $count ->
+       *[other] 에셋 { $count }개를 업데이트했습니다
+    }
 app-archive-selected-title = 보관함에서 복원하거나 영구 삭제할 때까지 검색에서 빠집니다
 app-drop-items = 놓아서 항목 { $count }개 추가
 app-drop = 놓아서 Hoard에 추가
@@ -716,6 +757,9 @@ palette-select-several = 여러 개 선택…
 palette-select-several-keywords = 일괄 여러 태그 보관 bulk multiple tag archive
 palette-archive-selected = 선택한 { $count }개 보관
 palette-archive-selected-keywords = 삭제 제거 휴지통 delete remove trash
+palette-edit-selected = 선택한 { $count }개 편집
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = 일괄 변경 태그 카테고리 라이선스 평점
 palette-clear-selection = 선택 해제
 palette-clear-filters = 필터 지우기
 palette-clear-filters-keywords = 초기화 재설정 reset
@@ -764,6 +808,7 @@ shortcuts-select = 선택 또는 선택 해제
 shortcuts-favorite = 즐겨찾기에 추가 또는 제거
 shortcuts-reviewed = 검토함으로 표시 또는 해제
 shortcuts-tag = 태그 추가
+shortcuts-edit = 선택 항목 편집
 shortcuts-key-click = 클릭
 shortcuts-select-range = 범위 선택
 shortcuts-select-all = 표시된 모든 항목 선택

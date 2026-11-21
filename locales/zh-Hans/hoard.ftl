@@ -548,8 +548,6 @@ app-bulk-failed =
     }：{ $error }
 app-bulk-untagged = 已从 { $count } 个资源上移除 { $tag }
 app-bulk-tagged = 已为 { $count } 个资源添加标签 { $tag }
-app-bulk-category-set = 已将 { $count } 个资源的类别设为 { $category }
-app-bulk-category-cleared = 已清除 { $count } 个资源的类别
 app-bulk-review = 标记已审阅
 app-bulk-review-title = 将所选资源标记为已看过：此后规则和 AI 不再改动它们的标签
 app-bulk-unreview = 标记未审阅
@@ -650,6 +648,14 @@ app-resize-label = 调整详情面板大小
 app-resize-title = 拖动调整大小 · 双击适配宽度
 app-selected-label = 已选资源
 app-selected = 已选 { $count } 个
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = 编辑…
+app-edit-selected-title = 更改全部的标签和字段 (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] 已选 { $count } 个结果
+    }
 app-pick-assets = 选择资源
 app-download-zip = 下载 zip
 app-credits-title = 这些资源所属资源包的 CREDITS.md：作者、许可证以及他们要求的署名文字
@@ -670,16 +676,51 @@ app-bulk-tag-add-title = 为每个所选资源添加此标签
 app-bulk-tag-add = 添加
 app-bulk-tag-remove-title = 从每个所选资源上移除此标签
 app-bulk-tag-remove = 移除
-app-bulk-category-label = 所选资源的类别（留空则清除）
-app-bulk-category-placeholder = 类别
-app-bulk-category-set-title = 设置每个所选资源的类别
-app-bulk-category-clear-title = 清除每个所选资源的类别
-app-bulk-category-set-button = 设置
-app-bulk-category-clear-button = 清除
 app-remove-from-collection = 从 { $name } 中移除
 app-unfavorite = 取消收藏
 app-favorite = 收藏
 app-select-all = 全选 { $count } 个
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] 选择全部 { $count } 个结果
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] 编辑 { $count } 个资源
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] 编辑全部 { $count } 个结果
+    }
+bulk-edit-close = 关闭
+bulk-edit-tags = 标签
+bulk-edit-tag-add = 为全部添加标签
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } / { $count }
+bulk-edit-untick = 全部取消勾选
+bulk-edit-untick-title = 移除所有标签，再勾选要保留的标签
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = 其中最常用的标签
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = 各不相同，保持原样
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = 保持原样
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = 已在全部中清除
+bulk-edit-reset = 恢复原样
+bulk-edit-all-note = 这会更改所有结果，包括尚未加载的，且无法一步撤销。
+bulk-edit-save =
+    { $count ->
+       *[other] 保存 { $count } 项更改
+    }
+bulk-edit-nothing = 没有更改
+bulk-edit-saved =
+    { $count ->
+       *[other] 已更新 { $count } 个资源
+    }
 app-archive-selected-title = 在从“归档”中恢复或永久删除之前，不会出现在搜索中
 app-drop-items = 放下 { $count } 个项目以添加
 app-drop = 放下以添加到 Hoard
@@ -719,6 +760,9 @@ palette-select-several = 选择多个…
 palette-select-several-keywords = 批量 多选 标签 归档 bulk multiple tag archive
 palette-archive-selected = 归档所选的 { $count } 个
 palette-archive-selected-keywords = 删除 移除 回收站 delete remove trash
+palette-edit-selected = 编辑已选的 { $count } 个
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = 批量更改 标签 分类 许可证 评分
 palette-clear-selection = 清除选择
 palette-clear-filters = 清除筛选
 palette-clear-filters-keywords = 重置 reset
@@ -767,6 +811,7 @@ shortcuts-select = 选择或取消选择
 shortcuts-favorite = 加入或移出收藏
 shortcuts-reviewed = 标记为已审阅或取消
 shortcuts-tag = 添加标签
+shortcuts-edit = 编辑所选项
 shortcuts-key-click = 单击
 shortcuts-select-range = 选择范围
 shortcuts-select-all = 选择显示的全部内容

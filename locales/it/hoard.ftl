@@ -569,16 +569,6 @@ app-bulk-tagged =
         [one] { $count } asset
        *[other] { $count } asset
     }
-app-bulk-category-set =
-    Categoria di { $count ->
-        [one] { $count } asset impostata
-       *[other] { $count } asset impostata
-    } su { $category }
-app-bulk-category-cleared =
-    Categoria di { $count ->
-        [one] { $count } asset cancellata
-       *[other] { $count } asset cancellata
-    }
 app-bulk-review = Segna come rivisti
 app-bulk-review-title = Segna gli asset selezionati come già controllati: da ora regole e IA non ne toccano i tag
 app-bulk-unreview = Segna come non rivisti
@@ -703,6 +693,15 @@ app-resize-label = Ridimensiona il pannello dei dettagli
 app-resize-title = Trascina per ridimensionare · doppio clic per la larghezza adatta
 app-selected-label = Asset selezionati
 app-selected = { $count } selezionati
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Modifica…
+app-edit-selected-title = Cambia i tag e i campi di tutti (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] { $count } risultato selezionato
+       *[other] Tutti i { $count } risultati selezionati
+    }
 app-pick-assets = Scegli asset
 app-download-zip = Scarica zip
 app-credits-title = CREDITS.md per i pacchetti da cui provengono: chi li ha creati, le loro licenze e le righe di credito che richiedono
@@ -723,16 +722,56 @@ app-bulk-tag-add-title = Aggiungi questo tag a ogni asset selezionato
 app-bulk-tag-add = Aggiungi
 app-bulk-tag-remove-title = Togli questo tag da ogni asset selezionato
 app-bulk-tag-remove = Rimuovi
-app-bulk-category-label = Categoria per gli asset selezionati (vuota la cancella)
-app-bulk-category-placeholder = Categoria
-app-bulk-category-set-title = Imposta la categoria di ogni asset selezionato
-app-bulk-category-clear-title = Cancella la categoria di ogni asset selezionato
-app-bulk-category-set-button = Imposta
-app-bulk-category-clear-button = Cancella
 app-remove-from-collection = Rimuovi da { $name }
 app-unfavorite = Togli dai preferiti
 app-favorite = Aggiungi ai preferiti
 app-select-all = Seleziona tutti e { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Seleziona il risultato ({ $count })
+       *[other] Seleziona tutti i { $count } risultati
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Modifica { $count } asset
+       *[other] Modifica { $count } asset
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Modifica { $count } risultato
+       *[other] Modifica tutti i { $count } risultati
+    }
+bulk-edit-close = Chiudi
+bulk-edit-tags = Tag
+bulk-edit-tag-add = Aggiungi un tag a tutti
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } su { $count }
+bulk-edit-untick = Deseleziona tutto
+bulk-edit-untick-title = Rimuovi tutti i tag, poi spunta quelli da tenere
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = I tag più usati tra questi
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Valori diversi, lasciati invariati
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Lasciato invariato
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Cancellato su tutti
+bulk-edit-reset = Ripristina
+bulk-edit-all-note = Questo modifica tutti i risultati, anche quelli non ancora caricati, e non può essere annullato in un solo passaggio.
+bulk-edit-save =
+    { $count ->
+        [one] Salva { $count } modifica
+       *[other] Salva { $count } modifiche
+    }
+bulk-edit-nothing = Nessuna modifica
+bulk-edit-saved =
+    { $count ->
+        [one] { $count } asset aggiornato
+       *[other] { $count } asset aggiornati
+    }
 app-archive-selected-title = Esclusi dalla ricerca finché non vengono ripristinati o eliminati definitivamente, dall'Archivio
 app-drop-items = Rilascia { $count } elementi per aggiungerli
 app-drop = Rilascia per aggiungere a Hoard
@@ -772,6 +811,9 @@ palette-select-several = Seleziona più elementi…
 palette-select-several-keywords = multipla multipli gruppo tag archivia bulk multiple archive
 palette-archive-selected = Archivia i { $count } selezionati
 palette-archive-selected-keywords = elimina rimuovi cestino delete remove trash
+palette-edit-selected = Modifica i { $count } selezionati
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = modifica multipla tag categoria licenza valutazione
 palette-clear-selection = Annulla la selezione
 palette-clear-filters = Cancella i filtri
 palette-clear-filters-keywords = azzera reimposta reset
@@ -820,6 +862,7 @@ shortcuts-select = Seleziona o deseleziona
 shortcuts-favorite = Aggiungi ai preferiti o togli dai preferiti
 shortcuts-reviewed = Segna come rivisto o non rivisto
 shortcuts-tag = Aggiungi un tag
+shortcuts-edit = Modifica la selezione
 shortcuts-key-click = clic
 shortcuts-select-range = Seleziona un intervallo
 shortcuts-select-all = Seleziona tutto ciò che è mostrato

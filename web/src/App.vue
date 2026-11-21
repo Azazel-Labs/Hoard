@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import {
-  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats,
+  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type SearchParams, type Stats,
 } from './api'
 import { filesFromDrop, groupsFromPicked, type Group } from './drop'
 import { KIND_LABEL, KIND_NAME } from './kinds'
@@ -19,6 +19,7 @@ import AssetDetail from './components/AssetDetail.vue'
 import SelectionBag from './components/SelectionBag.vue'
 import AssetTile from './components/AssetTile.vue'
 import SelectionBar from './components/SelectionBar.vue'
+import BulkEditDialog, { type UndoGroup } from './components/BulkEditDialog.vue'
 import DropOverlay from './components/DropOverlay.vue'
 import PacksView from './components/PacksView.vue'
 import ActiveFilters from './components/ActiveFilters.vue'
@@ -118,8 +119,9 @@ let pagesIn = new Set<number>()
 let pagesOnTheWay = new Map<number, Promise<void>>()
 const fetchingPages = ref(0)
 
-function searchPage(page: number, sidebar = false) {
-  return api.search({
+/** What the filters search for, without which page of it. */
+function queryParams(): SearchParams {
+  return {
       q: filters.q.trim() || undefined,
       kind: filters.kind || undefined,
       tags: filters.tags,
@@ -137,10 +139,16 @@ function searchPage(page: number, sidebar = false) {
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
       reviewed: filters.reviewed ? filters.reviewed === 'yes' : undefined,
+      hide_supporting: !prefs.showSupporting,
+  }
+}
+
+function searchPage(page: number, sidebar = false) {
+  return api.search({
+      ...queryParams(),
       // The sidebar's tags only need the count, not the tiles again.
       limit: sidebar ? 1 : PAGE,
       offset: page * PAGE,
-      hide_supporting: !prefs.showSupporting,
       facets: sidebar,
     }, searchAbort.signal)
 }
@@ -155,6 +163,8 @@ async function runSearch(opts: { keep?: boolean } = {}) {
   pagesOnTheWay = new Map()
   fetchingPages.value = 0
   loading.value = true
+  // Everything a different search finds isn't what was picked.
+  if (!opts.keep) allOf.value = null
   try {
     const res = await searchPage(0)
     if (seq !== searchSeq) return
@@ -511,6 +521,15 @@ async function removeFromCollection(ids: string[], id: string, quiet = false) {
 
 const checked = ref<string[]>([])
 const checkedSet = computed(() => new Set(checked.value))
+/** The picks at the moment everything the search finds was picked: picking anything else since undoes that. */
+const allOf = shallowRef<string[] | null>(null)
+const allMatching = computed(() => allOf.value !== null && allOf.value === checked.value)
+/** Picking everything a search finds, to edit it on the server: not one by look or sound, which ranks rather than picks. */
+const canMatchAll = computed(() => editor.value && !filters.similar && !filters.color && !filters.imitation)
+function pickAllMatching() {
+  checked.value = items.value.map((a) => a.id)
+  allOf.value = checked.value
+}
 let anchor: string | null = null
 
 function toggleCheck(a: Asset, e?: MouseEvent | KeyboardEvent) {
@@ -557,10 +576,57 @@ function patchLoaded(ids: string[], edit: Omit<BulkEdit, 'ids'>) {
     }
     const category = edit.category === undefined ? a.category : edit.category.trim() || null
     const reviewed_at = edit.reviewed === undefined ? a.reviewed_at : edit.reviewed ? (a.reviewed_at ?? new Date().toISOString()) : null
-    return { ...a, tags, category, reviewed_at }
+    const rating = edit.rating === undefined ? a.rating : edit.rating || null
+    const license = edit.license === undefined ? a.license : edit.license.trim() || null
+    const source_url = edit.source_url === undefined ? a.source_url : edit.source_url.trim() || null
+    return { ...a, tags, category, reviewed_at, rating, license, source_url }
   }
   slots.value = slots.value.map((a) => a && patch(a))
   if (selected.value && set.has(selected.value.id)) selected.value = patch(selected.value)
+}
+const bulkOpen = ref(false)
+/** What the editor works on: what's picked, or the asset with the keyboard on it when nothing is. */
+const bulkTargets = shallowRef<Asset[]>([])
+function openBulkEdit(focused?: Asset | null) {
+  if (!mayEdit()) return
+  if (checked.value.length) bulkTargets.value = checked.value.map((id) => checkedSeen.value.get(id)).filter((a): a is Asset => !!a)
+  else if (focused) bulkTargets.value = [focused]
+  else return
+  bulkOpen.value = true
+}
+/** Save the editor's changes: to the picked assets, with Undo, or to everything the search finds. */
+async function applyBulk(edit: Omit<BulkEdit, 'ids' | 'query'>, undo: UndoGroup[]): Promise<boolean> {
+  const all = allMatching.value
+  const ids = bulkTargets.value.map((a) => a.id)
+  let updated = ids.length
+  try {
+    updated = (await api.bulkAssets(all ? { query: queryParams(), ...edit } : { ids, ...edit })).updated
+  } catch (e) {
+    showError(t('app-bulk-failed', { count: all ? total.value : ids.length, error: (e as Error).message }))
+    return false
+  }
+  if (all) {
+    // Much of it isn't loaded: search again, which also drops what no longer matches.
+    runSearch({ keep: true })
+    if (selected.value) openAsset(selected.value.id)
+    showOk(t('bulk-edit-saved', { count: updated }))
+    return true
+  }
+  patchLoaded(ids, edit)
+  if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
+  showOk(t('bulk-edit-saved', { count: updated }), undo.length ? {
+    label: t('app-undo'),
+    run: async () => {
+      try {
+        for (const g of undo) await api.bulkAssets({ ids: g.ids, ...g.edit })
+      } catch (e) {
+        showError(t('app-bulk-failed', { count: ids.length, error: (e as Error).message }))
+      }
+      runSearch({ keep: true })
+      if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
+    },
+  } : undefined)
+  return true
 }
 /** CREDITS.md for the selected assets' packs (and the packs of what they need, as the zip has them). */
 async function creditsForChecked() {
@@ -897,6 +963,10 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'r' && focused && mayEdit()) {
     void toggleReviewed(focused)
   }
+  if (e.key === 'e' && (checked.value.length || focused) && mayEdit()) {
+    e.preventDefault()
+    openBulkEdit(focused)
+  }
   if (e.key === 't' && focused && mayEdit()) {
     e.preventDefault()
     void focusTagBox(focused)
@@ -1080,6 +1150,13 @@ const commands = computed<Command[]>(() => {
     out.push({ id: 'act:all', group: actions, label: t('palette-select-all', { count: items.value.length }), hint: `${mod}A`, keywords: t('palette-select-all-keywords'), run: () => (checked.value = items.value.map((a) => a.id)) })
   }
   if (view.value === 'library' && !selecting.value) out.push({ id: 'act:select', group: actions, label: t('palette-select-several'), hint: 'X', keywords: t('palette-select-several-keywords'), run: () => (selectMode.value = true) })
+  if (checked.value.length && editor.value) {
+    const count = allMatching.value ? total.value : checked.value.length
+    out.push({ id: 'act:edit', group: actions, label: t('palette-edit-selected', { count }), hint: 'E', keywords: t('palette-edit-selected-keywords'), run: () => openBulkEdit() })
+  }
+  if (view.value === 'library' && canMatchAll.value && total.value > items.value.length && !allMatching.value) {
+    out.push({ id: 'act:matching', group: actions, label: t('app-select-matching', { count: total.value }), keywords: t('palette-select-all-keywords'), run: pickAllMatching })
+  }
   if (checked.value.length && editor.value) out.push({ id: 'act:archive', group: actions, label: t('palette-archive-selected', { count: checked.value.length }), keywords: t('palette-archive-selected-keywords'), run: archiveChecked })
   if (checked.value.length) out.push({ id: 'act:none', group: actions, label: t('palette-clear-selection'), hint: 'Esc', run: () => (checked.value = []) })
   if (hasFilters.value) out.push({ id: 'act:clear', group: actions, label: t('palette-clear-filters'), keywords: t('palette-clear-filters-keywords'), run: clearFilters })
@@ -1365,7 +1442,7 @@ const commands = computed<Command[]>(() => {
               :style="i < rising ? { '--i': i } : { animation: 'none' }"
               :asset="a"
             :selected="selected?.id === a.id"
-            :checked="checkedSet.has(a.id)"
+            :checked="allMatching || checkedSet.has(a.id)"
             :selecting="selecting"
               @open="onTileOpen(a, $event)"
               @check="toggleCheck(a, $event)"
@@ -1460,7 +1537,12 @@ const commands = computed<Command[]>(() => {
         :member="member"
         :collections="collections"
         :all-starred="allStarred"
+        :total="total"
+        :all-matching="allMatching"
+        :can-match-all="canMatchAll"
         @patched="patchLoaded"
+        @edit="openBulkEdit()"
+        @match-all="pickAllMatching"
         @credits="creditsForChecked"
         @collect="(target) => addToCollection(checked, target)"
         @uncollect="(id) => removeFromCollection(checked, id)"
@@ -1509,6 +1591,14 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
+    <BulkEditDialog
+      v-if="bulkOpen"
+      :assets="allMatching ? [] : bulkTargets"
+      :query="allMatching ? queryParams() : null"
+      :count="allMatching ? total : bulkTargets.length"
+      :apply="applyBulk"
+      @close="bulkOpen = false"
+    />
     <SetupWizard v-if="setupOpen && admin" @done="setupDone" />
     <UiLayer />
   </div>

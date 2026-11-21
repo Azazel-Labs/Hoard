@@ -548,8 +548,6 @@ app-ns-script = Hệ chữ viết
 app-bulk-failed = Không thể thay đổi { $count } tài nguyên đó: { $error }
 app-bulk-untagged = Đã bỏ thẻ { $tag } khỏi { $count } tài nguyên
 app-bulk-tagged = Đã gắn thẻ { $tag } cho { $count } tài nguyên
-app-bulk-category-set = Đã đặt danh mục của { $count } tài nguyên thành { $category }
-app-bulk-category-cleared = Đã xóa danh mục của { $count } tài nguyên
 app-bulk-review = Đánh dấu đã duyệt
 app-bulk-review-title = Đánh dấu các tài nguyên đã chọn là đã xem qua: sau đó quy tắc và AI sẽ không đụng đến thẻ của chúng
 app-bulk-unreview = Đánh dấu chưa duyệt
@@ -650,6 +648,14 @@ app-resize-label = Đổi kích thước bảng chi tiết
 app-resize-title = Kéo để đổi kích thước · nhấp đúp để có độ rộng vừa khít
 app-selected-label = Tài nguyên đã chọn
 app-selected = Đã chọn { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Sửa…
+app-edit-selected-title = Đổi thẻ và các trường của tất cả (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+       *[other] Đã chọn { $count } kết quả
+    }
 app-pick-assets = Chọn tài nguyên
 app-download-zip = Tải xuống zip
 app-credits-title = CREDITS.md cho các gói chứa những tài nguyên này: ai đã tạo, giấy phép của chúng và dòng ghi công mà họ yêu cầu
@@ -670,16 +676,51 @@ app-bulk-tag-add-title = Thêm thẻ này cho mọi tài nguyên đã chọn
 app-bulk-tag-add = Thêm
 app-bulk-tag-remove-title = Bỏ thẻ này khỏi mọi tài nguyên đã chọn
 app-bulk-tag-remove = Bỏ
-app-bulk-category-label = Danh mục cho các tài nguyên đã chọn (để trống sẽ xóa danh mục)
-app-bulk-category-placeholder = Danh mục
-app-bulk-category-set-title = Đặt danh mục cho mọi tài nguyên đã chọn
-app-bulk-category-clear-title = Xóa danh mục của mọi tài nguyên đã chọn
-app-bulk-category-set-button = Đặt
-app-bulk-category-clear-button = Xóa
 app-remove-from-collection = Gỡ khỏi { $name }
 app-unfavorite = Bỏ yêu thích
 app-favorite = Yêu thích
 app-select-all = Chọn tất cả { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+       *[other] Chọn tất cả { $count } kết quả
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+       *[other] Sửa { $count } tài nguyên
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+       *[other] Sửa tất cả { $count } kết quả
+    }
+bulk-edit-close = Đóng
+bulk-edit-tags = Thẻ
+bulk-edit-tag-add = Thêm thẻ cho tất cả
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } trên { $count }
+bulk-edit-untick = Bỏ chọn tất cả
+bulk-edit-untick-title = Gỡ mọi thẻ, rồi chọn lại những thẻ cần giữ
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Các thẻ dùng nhiều nhất trong số đó
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Khác nhau, giữ nguyên
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Giữ nguyên
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Đã xóa ở tất cả
+bulk-edit-reset = Hoàn lại như cũ
+bulk-edit-all-note = Thao tác này thay đổi mọi kết quả, kể cả những kết quả chưa tải, và không thể hoàn tác trong một bước.
+bulk-edit-save =
+    { $count ->
+       *[other] Lưu { $count } thay đổi
+    }
+bulk-edit-nothing = Không có gì thay đổi
+bulk-edit-saved =
+    { $count ->
+       *[other] Đã cập nhật { $count } tài nguyên
+    }
 app-archive-selected-title = Không xuất hiện trong tìm kiếm cho đến khi được khôi phục hoặc xóa vĩnh viễn, từ Kho lưu trữ
 app-drop-items = Thả { $count } mục để thêm
 app-drop = Thả để thêm vào kho Hoard
@@ -719,6 +760,9 @@ palette-select-several = Chọn nhiều…
 palette-select-several-keywords = hàng loạt nhiều gắn thẻ lưu trữ bulk multiple tag archive
 palette-archive-selected = Lưu trữ { $count } mục đã chọn
 palette-archive-selected-keywords = xóa gỡ thùng rác delete remove trash
+palette-edit-selected = Sửa { $count } mục đã chọn
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = thay đổi hàng loạt thẻ danh mục giấy phép xếp hạng
 palette-clear-selection = Bỏ chọn
 palette-clear-filters = Xóa bộ lọc
 palette-clear-filters-keywords = đặt lại reset
@@ -767,6 +811,7 @@ shortcuts-select = Chọn hoặc bỏ chọn
 shortcuts-favorite = Thêm vào hoặc bỏ khỏi mục yêu thích
 shortcuts-reviewed = Đánh dấu đã duyệt, hoặc bỏ đánh dấu
 shortcuts-tag = Thêm thẻ
+shortcuts-edit = Sửa mục đã chọn
 shortcuts-key-click = nhấp
 shortcuts-select-range = Chọn một dải
 shortcuts-select-all = Chọn mọi thứ đang hiện

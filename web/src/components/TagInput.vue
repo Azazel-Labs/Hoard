@@ -125,6 +125,8 @@ function onKey(e: KeyboardEvent) {
     }
   } else if (e.key === 'Escape') {
     if (open.value || text.value) {
+      // Only the list or the text goes, not a dialog the box is in.
+      e.preventDefault()
       e.stopPropagation()
       if (open.value) open.value = false
       else text.value = ''

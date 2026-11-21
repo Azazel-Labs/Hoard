@@ -573,16 +573,6 @@ app-bulk-tagged =
         [one] Προστέθηκε η ετικέτα { $tag } σε { $count } στοιχείο
        *[other] Προστέθηκε η ετικέτα { $tag } σε { $count } στοιχεία
     }
-app-bulk-category-set =
-    { $count ->
-        [one] Ορίστηκε η κατηγορία { $category } σε { $count } στοιχείο
-       *[other] Ορίστηκε η κατηγορία { $category } σε { $count } στοιχεία
-    }
-app-bulk-category-cleared =
-    { $count ->
-        [one] Καταργήθηκε η κατηγορία από { $count } στοιχείο
-       *[other] Καταργήθηκε η κατηγορία από { $count } στοιχεία
-    }
 app-bulk-review = Σήμανση ως ελεγμένα
 app-bulk-review-title = Σήμανση των επιλεγμένων στοιχείων ως ελεγμένων: οι κανόνες και η AI δεν θα αγγίζουν πλέον τις ετικέτες τους
 app-bulk-unreview = Σήμανση ως μη ελεγμένα
@@ -711,6 +701,15 @@ app-resize-label = Αλλαγή μεγέθους του πίνακα λεπτο�
 app-resize-title = Σύρετε για αλλαγή μεγέθους · διπλό κλικ για το πλάτος που ταιριάζει
 app-selected-label = Επιλεγμένα στοιχεία
 app-selected = { $count } επιλεγμένα
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Επεξεργασία…
+app-edit-selected-title = Αλλαγή των ετικετών και των πεδίων όλων (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Επιλέχθηκε { $count } αποτέλεσμα
+       *[other] Επιλέχθηκαν και τα { $count } αποτελέσματα
+    }
 app-pick-assets = Επιλέξτε στοιχεία
 app-download-zip = Λήψη zip
 app-credits-title = CREDITS.md για τα πακέτα από τα οποία προέρχονται: ποιος τα δημιούργησε, οι άδειες χρήσης τους και οι αναφορές που ζητούν
@@ -731,16 +730,56 @@ app-bulk-tag-add-title = Προσθήκη αυτής της ετικέτας σ�
 app-bulk-tag-add = Προσθήκη
 app-bulk-tag-remove-title = Αφαίρεση αυτής της ετικέτας από κάθε επιλεγμένο στοιχείο
 app-bulk-tag-remove = Αφαίρεση
-app-bulk-category-label = Κατηγορία για τα επιλεγμένα στοιχεία (κενό για κατάργηση)
-app-bulk-category-placeholder = Κατηγορία
-app-bulk-category-set-title = Ορισμός της κατηγορίας κάθε επιλεγμένου στοιχείου
-app-bulk-category-clear-title = Κατάργηση της κατηγορίας κάθε επιλεγμένου στοιχείου
-app-bulk-category-set-button = Ορισμός
-app-bulk-category-clear-button = Κατάργηση
 app-remove-from-collection = Αφαίρεση από τη συλλογή { $name }
 app-unfavorite = Αφαίρεση από αγαπημένα
 app-favorite = Αγαπημένο
 app-select-all = Επιλογή και των { $count }
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Επιλογή του { $count } αποτελέσματος
+       *[other] Επιλογή και των { $count } αποτελεσμάτων
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Επεξεργασία { $count } στοιχείου
+       *[other] Επεξεργασία { $count } στοιχείων
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Επεξεργασία { $count } αποτελέσματος
+       *[other] Επεξεργασία και των { $count } αποτελεσμάτων
+    }
+bulk-edit-close = Κλείσιμο
+bulk-edit-tags = Ετικέτες
+bulk-edit-tag-add = Προσθήκη ετικέτας σε όλα
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } από { $count }
+bulk-edit-untick = Αποεπιλογή όλων
+bulk-edit-untick-title = Αφαίρεση όλων των ετικετών και μετά επιλογή αυτών που θα μείνουν
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Οι πιο χρησιμοποιημένες ετικέτες ανάμεσά τους
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Διαφορετικές τιμές, μένουν ως έχουν
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Μένει ως έχει
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Εκκαθαρίστηκε σε όλα
+bulk-edit-reset = Επαναφορά
+bulk-edit-all-note = Αυτό αλλάζει όλα τα αποτελέσματα, και όσα δεν έχουν φορτωθεί ακόμη, και δεν αναιρείται με ένα βήμα.
+bulk-edit-save =
+    { $count ->
+        [one] Αποθήκευση { $count } αλλαγής
+       *[other] Αποθήκευση { $count } αλλαγών
+    }
+bulk-edit-nothing = Δεν άλλαξε τίποτα
+bulk-edit-saved =
+    { $count ->
+        [one] Ενημερώθηκε { $count } στοιχείο
+       *[other] Ενημερώθηκαν { $count } στοιχεία
+    }
 app-archive-selected-title = Εκτός αναζήτησης μέχρι να επαναφερθούν ή να διαγραφούν οριστικά από την Αρχειοθήκη
 app-drop-items = Αφήστε { $count } αντικείμενα για να τα προσθέσετε
 app-drop = Αφήστε για προσθήκη στο Hoard
@@ -784,6 +823,9 @@ palette-archive-selected =
        *[other] Αρχειοθέτηση των { $count } επιλεγμένων
     }
 palette-archive-selected-keywords = διαγραφή αφαίρεση κάδος delete remove trash
+palette-edit-selected = Επεξεργασία των { $count } επιλεγμένων
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = μαζική αλλαγή ετικέτες κατηγορία άδεια αξιολόγηση
 palette-clear-selection = Απαλοιφή επιλογής
 palette-clear-filters = Απαλοιφή φίλτρων
 palette-clear-filters-keywords = επαναφορά μηδενισμός reset
@@ -832,6 +874,7 @@ shortcuts-select = Επιλογή ή αποεπιλογή
 shortcuts-favorite = Προσθήκη ή αφαίρεση από τα αγαπημένα σας
 shortcuts-reviewed = Σήμανση ως ελεγμένο ή όχι
 shortcuts-tag = Προσθήκη ετικέτας
+shortcuts-edit = Επεξεργασία των επιλεγμένων
 shortcuts-key-click = κλικ
 shortcuts-select-range = Επιλογή εύρους
 shortcuts-select-all = Επιλογή όλων όσων εμφανίζονται

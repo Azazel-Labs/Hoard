@@ -580,18 +580,6 @@ app-bulk-tagged =
         [few] { $count } assetům
        *[other] { $count } assetům
     }
-app-bulk-category-set =
-    Kategorie { $count ->
-        [one] { $count } assetu
-        [few] { $count } assetů
-       *[other] { $count } assetů
-    } nastavena na { $category }
-app-bulk-category-cleared =
-    Kategorie vymazána u { $count ->
-        [one] { $count } assetu
-        [few] { $count } assetů
-       *[other] { $count } assetů
-    }
 app-bulk-review = Označit jako zkontrolované
 app-bulk-review-title = Označit vybrané assety jako zkontrolované: pravidla a AI pak jejich štítky nechají být
 app-bulk-unreview = Označit jako nezkontrolované
@@ -727,6 +715,16 @@ app-resize-label = Změnit velikost panelu podrobností
 app-resize-title = Táhnutím změníte velikost · dvojklik nastaví šířku podle obsahu
 app-selected-label = Vybrané assety
 app-selected = Vybráno: { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Upravit…
+app-edit-selected-title = Změnit štítky a pole u všech (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Vybrán { $count } výsledek
+        [few] Vybrány { $count } výsledky
+       *[other] Vybráno všech { $count } výsledků
+    }
 app-pick-assets = Vyberte assety
 app-download-zip = Stáhnout zip
 app-credits-title = CREDITS.md pro balíčky, ze kterých pocházejí: kdo je vytvořil, jejich licence a řádky s poděkováním, o které žádají
@@ -747,16 +745,61 @@ app-bulk-tag-add-title = Přidat tento štítek všem vybraným assetům
 app-bulk-tag-add = Přidat
 app-bulk-tag-remove-title = Odebrat tento štítek všem vybraným assetům
 app-bulk-tag-remove = Odebrat
-app-bulk-category-label = Kategorie pro vybrané assety (prázdná ji vymaže)
-app-bulk-category-placeholder = Kategorie
-app-bulk-category-set-title = Nastavit kategorii všem vybraným assetům
-app-bulk-category-clear-title = Vymazat kategorii všem vybraným assetům
-app-bulk-category-set-button = Nastavit
-app-bulk-category-clear-button = Vymazat
 app-remove-from-collection = Odebrat z { $name }
 app-unfavorite = Odebrat z oblíbených
 app-favorite = Přidat do oblíbených
 app-select-all = Vybrat vše ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Vybrat { $count } výsledek
+        [few] Vybrat všechny { $count } výsledky
+       *[other] Vybrat všech { $count } výsledků
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Upravit { $count } asset
+        [few] Upravit { $count } assety
+       *[other] Upravit { $count } assetů
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Upravit { $count } výsledek
+        [few] Upravit všechny { $count } výsledky
+       *[other] Upravit všech { $count } výsledků
+    }
+bulk-edit-close = Zavřít
+bulk-edit-tags = Štítky
+bulk-edit-tag-add = Přidat štítek všem
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } z { $count }
+bulk-edit-untick = Zrušit označení všech
+bulk-edit-untick-title = Odebrat všechny štítky a poté označit ty, které se mají ponechat
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Nejpoužívanější štítky mezi nimi
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Různé, beze změny
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Beze změny
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = U všech vymazáno
+bulk-edit-reset = Vrátit zpět
+bulk-edit-all-note = Změní všechny výsledky, i ty, které ještě nejsou načtené, a nelze to vrátit jedním krokem.
+bulk-edit-save =
+    { $count ->
+        [one] Uložit { $count } změnu
+        [few] Uložit { $count } změny
+       *[other] Uložit { $count } změn
+    }
+bulk-edit-nothing = Nic se nezměnilo
+bulk-edit-saved =
+    { $count ->
+        [one] Aktualizován { $count } asset
+        [few] Aktualizovány { $count } assety
+       *[other] Aktualizováno { $count } assetů
+    }
 app-archive-selected-title = Mimo hledání, dokud je v Archivu neobnovíte nebo trvale nesmažete
 app-drop-items =
     { $count ->
@@ -801,6 +844,9 @@ palette-select-several = Vybrat několik…
 palette-select-several-keywords = hromadně více štítek archivovat bulk multiple tag archive
 palette-archive-selected = Archivovat vybrané ({ $count })
 palette-archive-selected-keywords = smazat odstranit koš delete remove trash
+palette-edit-selected = Upravit vybrané ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = hromadná změna štítky kategorie licence hodnocení
 palette-clear-selection = Zrušit výběr
 palette-clear-filters = Vymazat filtry
 palette-clear-filters-keywords = resetovat obnovit reset
@@ -849,6 +895,7 @@ shortcuts-select = Vybrat nebo zrušit výběr
 shortcuts-favorite = Přidat do oblíbených nebo z nich odebrat
 shortcuts-reviewed = Označit jako zkontrolované, nebo ne
 shortcuts-tag = Přidat štítek
+shortcuts-edit = Upravit vybrané
 shortcuts-key-click = klik
 shortcuts-select-range = Vybrat rozsah
 shortcuts-select-all = Vybrat vše zobrazené

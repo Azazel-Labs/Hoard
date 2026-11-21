@@ -588,20 +588,6 @@ app-bulk-tagged =
         [many] { $count } ресурсів
        *[other] { $count } ресурсу
     }
-app-bulk-category-set =
-    Категорію { $count ->
-        [one] { $count } ресурсу
-        [few] { $count } ресурсів
-        [many] { $count } ресурсів
-       *[other] { $count } ресурсу
-    } змінено на { $category }
-app-bulk-category-cleared =
-    Категорію { $count ->
-        [one] { $count } ресурсу
-        [few] { $count } ресурсів
-        [many] { $count } ресурсів
-       *[other] { $count } ресурсу
-    } очищено
 app-bulk-review = Позначити переглянутим
 app-bulk-review-title = Позначити вибрані ресурси як переглянуті: після цього правила та ШІ не чіпають їхніх тегів
 app-bulk-unreview = Позначити непереглянутим
@@ -744,6 +730,17 @@ app-resize-label = Змінити розмір панелі відомостей
 app-resize-title = Перетягніть, щоб змінити розмір · двічі клацніть, щоб підібрати ширину
 app-selected-label = Вибрані ресурси
 app-selected = Вибрано: { $count }
+# The button on the bar of picked assets that opens the editor for all of them at once.
+app-edit-selected = Редагувати…
+app-edit-selected-title = Змінити теги та поля всіх (E)
+# Every match of the search is picked, including those not loaded yet.
+app-selected-all =
+    { $count ->
+        [one] Вибрано { $count } результат
+        [few] Вибрано { $count } результати
+        [many] Вибрано { $count } результатів
+       *[other] Вибрано { $count } результату
+    }
 app-pick-assets = Виберіть ресурси
 app-download-zip = Завантажити zip
 app-credits-title = CREDITS.md для пакетів, з яких вони походять: хто їх створив, їхні ліцензії та рядки подяки, про які просять автори
@@ -764,16 +761,66 @@ app-bulk-tag-add-title = Додати цей тег до кожного вибр
 app-bulk-tag-add = Додати
 app-bulk-tag-remove-title = Зняти цей тег з кожного вибраного ресурсу
 app-bulk-tag-remove = Зняти
-app-bulk-category-label = Категорія для вибраних ресурсів (порожнє поле очищає її)
-app-bulk-category-placeholder = Категорія
-app-bulk-category-set-title = Задати категорію кожному вибраному ресурсу
-app-bulk-category-clear-title = Очистити категорію кожного вибраного ресурсу
-app-bulk-category-set-button = Задати
-app-bulk-category-clear-button = Очистити
 app-remove-from-collection = Вилучити з { $name }
 app-unfavorite = Прибрати з обраного
 app-favorite = В обране
 app-select-all = Вибрати всі ({ $count })
+# Picks every match of the search, including those not loaded yet, to edit them all.
+app-select-matching =
+    { $count ->
+        [one] Вибрати { $count } результат
+        [few] Вибрати всі { $count } результати
+        [many] Вибрати всі { $count } результатів
+       *[other] Вибрати всі { $count } результату
+    }
+# The dialog that edits many picked assets at once (E). Its heading.
+bulk-edit-title =
+    { $count ->
+        [one] Редагувати { $count } ресурс
+        [few] Редагувати { $count } ресурси
+        [many] Редагувати { $count } ресурсів
+       *[other] Редагувати { $count } ресурсу
+    }
+# Its heading when editing every match of a search.
+bulk-edit-title-all =
+    { $count ->
+        [one] Редагувати { $count } результат
+        [few] Редагувати всі { $count } результати
+        [many] Редагувати всі { $count } результатів
+       *[other] Редагувати всі { $count } результату
+    }
+bulk-edit-close = Закрити
+bulk-edit-tags = Теги
+bulk-edit-tag-add = Додати тег усім
+# Beside a tag: how many of the assets being edited have it, e.g. "3 of 12".
+bulk-edit-tag-count = { $have } з { $count }
+bulk-edit-untick = Зняти всі позначки
+bulk-edit-untick-title = Прибрати всі теги, а потім позначити ті, що треба залишити
+# Editing every match of a search: the tags listed are only the most used among them.
+bulk-edit-tags-most-used = Найуживаніші теги серед них
+# In a field whose value differs between the assets: each keeps its own unless something is typed.
+bulk-edit-mixed = Різні значення, не змінюються
+# In a field when editing every match of a search: each keeps its own unless something is typed.
+bulk-edit-keep = Не змінюється
+# In a field that was emptied: saving clears it on all of them.
+bulk-edit-cleared = Очищено в усіх
+bulk-edit-reset = Повернути як було
+bulk-edit-all-note = Це змінить усі результати, зокрема ще не завантажені, і скасувати це одним кроком не можна.
+bulk-edit-save =
+    { $count ->
+        [one] Зберегти { $count } зміну
+        [few] Зберегти { $count } зміни
+        [many] Зберегти { $count } змін
+       *[other] Зберегти { $count } зміни
+    }
+bulk-edit-nothing = Нічого не змінено
+bulk-edit-saved =
+    { $count ->
+        [one] Оновлено { $count } ресурс
+        [few] Оновлено { $count } ресурси
+        [many] Оновлено { $count } ресурсів
+       *[other] Оновлено { $count } ресурсу
+    }
 app-archive-selected-title = Зникнуть із пошуку, доки їх не відновлять з архіву або не видалять остаточно
 app-drop-items =
     { $count ->
@@ -831,6 +878,9 @@ palette-archive-selected =
        *[other] Перенести в архів { $count } вибраного
     }
 palette-archive-selected-keywords = видалити прибрати кошик delete remove trash
+palette-edit-selected = Редагувати вибрані ({ $count })
+# Words that find the action above when typed into the command palette.
+palette-edit-selected-keywords = масова зміна теги категорія ліцензія оцінка
 palette-clear-selection = Скасувати вибір
 palette-clear-filters = Очистити фільтри
 palette-clear-filters-keywords = скинути reset
@@ -879,6 +929,7 @@ shortcuts-select = Вибрати або скасувати вибір
 shortcuts-favorite = Додати в обране або прибрати з обраного
 shortcuts-reviewed = Позначити як переглянутий або зняти позначку
 shortcuts-tag = Додати тег
+shortcuts-edit = Редагувати вибране
 shortcuts-key-click = клацання
 shortcuts-select-range = Вибрати діапазон
 shortcuts-select-all = Вибрати все показане

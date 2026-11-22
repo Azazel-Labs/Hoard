@@ -103,6 +103,9 @@ jobs:
     needs: [plan, tag]
     uses: ./.github/workflows/release.yml
     permissions: { contents: write, packages: write }
+    # A called workflow sees none of the repository's secrets unless they're passed on: the desktop builds need the
+    # updater's signing key.
+    secrets: inherit
     with:
       tag: v${{ needs.plan.outputs.version }}
       edge: true

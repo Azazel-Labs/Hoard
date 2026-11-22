@@ -67,6 +67,8 @@ function intoFolder(name: string) {
 
 <style scoped>
 .folderbar { display: flex; align-items: center; gap: 0.6rem; margin: -0.25rem 0 0.9rem; min-width: 0; }
+/* Compact's bar over the grid is shorter, so nothing tucks up under it. */
+:root[data-density='compact'] .folderbar { margin: 0 0 0.6rem; }
 .folders-toggle { display: inline-flex; align-items: center; gap: 0.35rem; font-size: var(--step--1); padding: 0.25em 0.6em; }
 .folders-toggle[aria-pressed='true'] { background: var(--panel); border-color: var(--line); }
 .crumbs { display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; list-style: none; min-width: 0; font-size: var(--step--1); }

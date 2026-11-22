@@ -1925,6 +1925,7 @@ const commands = computed<Command[]>(() => {
 :root[data-density='compact'] .top { padding-block: 0.35rem; }
 :root[data-density='compact'] .bar { padding-block: 0.45rem; }
 :root[data-density='compact'] .side { padding-top: 0.6rem; }
+:root[data-density='compact'] .supporting { margin: 0 0 0.6rem; }
 
 /* Placeholder tiles while the first page loads. */
 .skeleton {

@@ -11830,6 +11830,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "บันทึกเป็น"
 
+[messages.tags-sort]
+source = "Order"
+translation = "ลำดับ"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "ใช้มากที่สุด"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "ก–ฮ"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "กว้างกว่าและแคบกว่า"

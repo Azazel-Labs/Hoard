@@ -11890,6 +11890,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Kaydedilen ad:"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Sıra"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "En çok kullanılan"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Daha geniş ve daha dar"

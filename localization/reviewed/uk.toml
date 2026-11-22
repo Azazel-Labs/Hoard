@@ -12441,6 +12441,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Збережено як"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Порядок"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Найуживаніші"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "А–Я"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Ширші й вужчі"

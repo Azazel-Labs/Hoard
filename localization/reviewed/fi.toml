@@ -12170,6 +12170,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Tallennettu nimellä"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Järjestys"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Käytetyimmät"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Ö"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Laajemmat ja suppeammat"

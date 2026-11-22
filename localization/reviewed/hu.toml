@@ -11918,6 +11918,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Mentve ezen a néven:"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Sorrend"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Leggyakoribb"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Tágabb és szűkebb"

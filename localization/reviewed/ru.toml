@@ -12414,6 +12414,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Сохранён как"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Порядок"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Самые частые"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "А–Я"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Общие и узкие"

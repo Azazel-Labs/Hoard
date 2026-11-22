@@ -2684,6 +2684,9 @@ tags-forget-failed = Couldn't change that: { $error }
 tags-find = Find tags
 # “set:” is a tag prefix, kept as it is.
 tags-find-placeholder = Find tags, e.g. rock or set:
+tags-sort = Order
+tags-sort-count = Most used
+tags-sort-name = A–Z
 # How many tags the list shows.
 tags-count =
     { $count ->

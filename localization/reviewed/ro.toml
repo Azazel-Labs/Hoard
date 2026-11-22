@@ -12323,6 +12323,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Salvată ca"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Ordine"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Cele mai folosite"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Mai largi și mai înguste"

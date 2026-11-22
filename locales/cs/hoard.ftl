@@ -2589,6 +2589,9 @@ tags-merge-failed = Nepodařilo se sloučit: { $error }
 tags-forget-failed = Nepodařilo se to změnit: { $error }
 tags-find = Najít štítky
 tags-find-placeholder = Najít štítky, např. rock nebo set:
+tags-sort = Řazení
+tags-sort-count = Nejpoužívanější
+tags-sort-name = A–Z
 tags-count =
     { $count ->
         [one] { $count } štítek

@@ -11833,6 +11833,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "儲存為"
 
+[messages.tags-sort]
+source = "Order"
+translation = "排序"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "最常用"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "依名稱"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "上層與下層"

@@ -12176,6 +12176,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Αποθηκεύτηκε ως"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Σειρά"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Πιο συχνές"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "Α–Ω"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Ευρύτερες και στενότερες"

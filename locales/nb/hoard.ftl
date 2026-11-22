@@ -2402,6 +2402,9 @@ tags-merge-failed = Kunne ikke slå sammen: { $error }
 tags-forget-failed = Kunne ikke endre det: { $error }
 tags-find = Finn tagger
 tags-find-placeholder = Finn tagger, f.eks. rock eller set:
+tags-sort = Rekkefølge
+tags-sort-count = Mest brukt
+tags-sort-name = A–Å
 tags-count =
     { $count ->
         [one] { $count } tagg

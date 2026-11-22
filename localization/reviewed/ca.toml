@@ -12101,6 +12101,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "S'ha desat com a"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Ordre"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Més usades"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Més àmplies i més específiques"

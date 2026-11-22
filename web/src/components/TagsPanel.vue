@@ -4,6 +4,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type Facet } from '../api'
 import { formatNumber, t } from '../i18n'
+import { prefs } from '../prefs'
 import { confirmDialog, showError, showOk } from '../ui'
 import TagChip from './TagChip.vue'
 
@@ -37,6 +38,10 @@ watch(q, () => {
   debounce = setTimeout(load, 200)
 })
 
+/** The list in the order picked: as the server sends it (most used first), or A to Z. */
+const sorted = computed(() =>
+  tags.value && prefs.tagSort === 'name' ? [...tags.value].sort((a, b) => a.value.localeCompare(b.value)) : (tags.value ?? []),
+)
 const count = computed(() => new Map((tags.value ?? []).map((t) => [t.value, t.count])))
 
 // Tags put under broader ones (on their tag pages), drawn as a tree: each broader tag with what's under it.
@@ -160,6 +165,11 @@ watch(moreEl, (el) => {
         <label class="visually-hidden" for="tags-q">{{ t('tags-find') }}</label>
         <input id="tags-q" v-model="q" class="field" type="search" :placeholder="t('tags-find-placeholder')" />
         <span v-if="tags" class="muted">{{ tags.length >= 2000 ? t('tags-count-more', { count: tags.length }) : t('tags-count', { count: tags.length }) }}</span>
+        <div class="order" role="radiogroup" :aria-label="t('tags-sort')">
+          <label v-for="o in (['count', 'name'] as const)" :key="o">
+            <input v-model="prefs.tagSort" type="radio" name="tags-sort" :value="o" />{{ o === 'count' ? t('tags-sort-count') : t('tags-sort-name') }}
+          </label>
+        </div>
       </div>
       <p class="what">{{ t('tags-what') }}</p>
 
@@ -182,7 +192,7 @@ watch(moreEl, (el) => {
       <p v-if="!tags" class="what">{{ t('tags-loading') }}</p>
       <p v-else-if="!tags.length" class="what none">{{ q ? t('tags-none-containing', { text: q.trim() }) : t('tags-none') }}</p>
       <ul v-else class="list">
-        <li v-for="tag in tags.slice(0, limit)" :key="tag.value" :class="{ on: picked.includes(tag.value) }">
+        <li v-for="tag in sorted.slice(0, limit)" :key="tag.value" :class="{ on: picked.includes(tag.value) }">
           <label class="pick">
             <input type="checkbox" :checked="picked.includes(tag.value)" @change="toggle(tag.value)" />
             <span class="mono">{{ tag.value }}</span>
@@ -217,6 +227,16 @@ section { display: grid; gap: 0.6rem; }
 .find { display: flex; gap: 0.75rem; align-items: center; }
 .find .field { flex: 1; min-width: 0; max-width: 26rem; }
 .muted { color: var(--muted); white-space: nowrap; }
+/* Most used or A to Z: two segments, the radios inside them. */
+.order { display: inline-flex; gap: 2px; margin-left: auto; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--well); }
+.order label {
+  position: relative; padding: 0.25em 0.75em; border-radius: 6px; color: var(--muted); cursor: pointer; white-space: nowrap;
+  transition: background-color var(--dur-1), color var(--dur-1);
+}
+.order label:hover { color: var(--text); }
+.order label:has(:checked) { background: var(--raised); color: var(--text); font-weight: 600; box-shadow: var(--elev-1), 0 0 0 1px var(--line); }
+.order label:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.order input { position: absolute; opacity: 0; pointer-events: none; }
 .merge {
   position: sticky; top: 0; z-index: 2; display: grid; gap: 0.6rem; padding: 0.8rem 0.9rem;
   border: 1px solid var(--card-on-line); border-radius: 8px; background: var(--raised); box-shadow: var(--elev-2);

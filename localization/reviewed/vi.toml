@@ -11827,6 +11827,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Đã lưu thành"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Thứ tự"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Dùng nhiều nhất"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Rộng hơn và hẹp hơn"

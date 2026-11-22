@@ -2611,6 +2611,9 @@ tags-merge-failed = Nie udało się scalić: { $error }
 tags-forget-failed = Nie udało się tego zmienić: { $error }
 tags-find = Znajdź tagi
 tags-find-placeholder = Znajdź tagi, np. rock lub set:
+tags-sort = Kolejność
+tags-sort-count = Najczęstsze
+tags-sort-name = A–Z
 tags-count =
     { $count ->
         [one] { $count } tag

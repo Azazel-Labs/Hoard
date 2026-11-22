@@ -11859,6 +11859,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Disimpan sebagai"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Urutan"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Paling sering"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "A–Z"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Lebih luas dan lebih sempit"

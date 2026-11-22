@@ -12248,6 +12248,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "Сачувано као"
 
+[messages.tags-sort]
+source = "Order"
+translation = "Редослед"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "Најкоришћеније"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "А–Ш"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Шире и уже"

@@ -2461,6 +2461,9 @@ tags-merge-failed = Yhdistäminen epäonnistui: { $error }
 tags-forget-failed = Muutos epäonnistui: { $error }
 tags-find = Etsi tunnisteita
 tags-find-placeholder = Etsi tunnisteita, esim. rock tai set:
+tags-sort = Järjestys
+tags-sort-count = Käytetyimmät
+tags-sort-name = A–Ö
 tags-count =
     { $count ->
         [one] { $count } tunniste

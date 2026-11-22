@@ -2403,6 +2403,9 @@ tags-merge-failed = Kunde inte slå ihop: { $error }
 tags-forget-failed = Kunde inte ändra det: { $error }
 tags-find = Hitta taggar
 tags-find-placeholder = Hitta taggar, t.ex. rock eller set:
+tags-sort = Ordning
+tags-sort-count = Mest använda
+tags-sort-name = A–Ö
 tags-count =
     { $count ->
         [one] { $count } tagg

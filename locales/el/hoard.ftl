@@ -2466,6 +2466,9 @@ tags-merge-failed = Δεν ήταν δυνατή η συγχώνευση: { $err
 tags-forget-failed = Δεν ήταν δυνατή η αλλαγή: { $error }
 tags-find = Εύρεση ετικετών
 tags-find-placeholder = Βρείτε ετικέτες, π.χ. rock ή set:
+tags-sort = Σειρά
+tags-sort-count = Πιο συχνές
+tags-sort-name = Α–Ω
 tags-count =
     { $count ->
         [one] { $count } ετικέτα

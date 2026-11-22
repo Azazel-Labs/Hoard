@@ -2400,6 +2400,9 @@ tags-merge-failed = Kon niet samenvoegen: { $error }
 tags-forget-failed = Kon dat niet wijzigen: { $error }
 tags-find = Tags zoeken
 tags-find-placeholder = Zoek tags, bijv. rock of set:
+tags-sort = Volgorde
+tags-sort-count = Meest gebruikt
+tags-sort-name = A–Z
 tags-count =
     { $count ->
         [one] { $count } tag

@@ -29,10 +29,12 @@ export interface Prefs {
   uploadsCollapsed: boolean
   /** The dragon hoard (Settings → General) seen through an arcade screen. */
   hoardArcade: boolean
+  /** Settings → Tags lists the most used first, or A to Z. */
+  tagSort: 'count' | 'name'
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true, tagSort: 'count' }
 
 function load(): Prefs {
   try {

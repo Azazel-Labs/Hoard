@@ -2650,6 +2650,9 @@ tags-merge-failed = Не удалось объединить: { $error }
 tags-forget-failed = Не удалось это изменить: { $error }
 tags-find = Найти теги
 tags-find-placeholder = Найдите теги, например rock или set:
+tags-sort = Порядок
+tags-sort-count = Самые частые
+tags-sort-name = А–Я
 tags-count =
     { $count ->
         [one] { $count } тег

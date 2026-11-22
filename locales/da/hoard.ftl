@@ -2402,6 +2402,9 @@ tags-merge-failed = Kunne ikke flette: { $error }
 tags-forget-failed = Kunne ikke ændre det: { $error }
 tags-find = Find tags
 tags-find-placeholder = Find tags, f.eks. rock eller set:
+tags-sort = Rækkefølge
+tags-sort-count = Mest brugt
+tags-sort-name = A–Å
 tags-count =
     { $count ->
         [one] { $count } tag

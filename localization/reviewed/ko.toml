@@ -11794,6 +11794,18 @@ translation = '{ "" }'
 source = "Saved as"
 translation = "저장된 이름:"
 
+[messages.tags-sort]
+source = "Order"
+translation = "정렬"
+
+[messages.tags-sort-count]
+source = "Most used"
+translation = "많이 쓰인 순"
+
+[messages.tags-sort-name]
+source = "A–Z"
+translation = "이름순"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "상위 및 하위"

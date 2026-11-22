@@ -2592,6 +2592,9 @@ tags-merge-failed = Nu s-a putut uni: { $error }
 tags-forget-failed = Nu s-a putut face modificarea: { $error }
 tags-find = Găsiți etichete
 tags-find-placeholder = Găsiți etichete, de ex. rock sau set:
+tags-sort = Ordine
+tags-sort-count = Cele mai folosite
+tags-sort-name = A–Z
 tags-count =
     { $count ->
         [one] { $count } etichetă

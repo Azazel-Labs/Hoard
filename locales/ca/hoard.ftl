@@ -2406,6 +2406,9 @@ tags-merge-failed = No s'ha pogut fusionar: { $error }
 tags-forget-failed = No s'ha pogut canviar: { $error }
 tags-find = Cerca etiquetes
 tags-find-placeholder = Cerqueu etiquetes, p. ex. rock o set:
+tags-sort = Ordre
+tags-sort-count = Més usades
+tags-sort-name = A–Z
 tags-count =
     { $count ->
         [one] { $count } etiqueta

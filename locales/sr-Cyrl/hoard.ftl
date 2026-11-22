@@ -2502,6 +2502,9 @@ tags-merge-failed = Спајање није успело: { $error }
 tags-forget-failed = Није могуће то променити: { $error }
 tags-find = Пронађи ознаке
 tags-find-placeholder = Пронађите ознаке, нпр. rock или set:
+tags-sort = Редослед
+tags-sort-count = Најкоришћеније
+tags-sort-name = А–Ш
 tags-count =
     { $count ->
         [one] { $count } ознака

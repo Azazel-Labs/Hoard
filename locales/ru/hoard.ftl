@@ -2531,12 +2531,23 @@ theme-ember = Угли
 theme-moss = Мох
 theme-aubergine = Баклажан
 theme-oxblood = Бордо
+theme-sky = Небо
+theme-mint = Мята
+theme-apricot = Абрикос
+theme-lemon = Лимон
+theme-midnight = Полночь
+theme-lagoon = Лагуна
+theme-neon = Неон
 theme-light-slate-blurb = Холодный сине-серый
 theme-light-paper-blurb = Простой нейтральный серый
 theme-light-linen-blurb = Тёплый кремовый, янтарь
 theme-light-sage-blurb = Мягкий зелёный
 theme-light-lilac-blurb = Бледно-фиолетовый
 theme-light-blush-blurb = Пыльная роза
+theme-light-sky-blurb = Чистый небесно-голубой
+theme-light-mint-blurb = Прохладная аквамариновая мята
+theme-light-apricot-blurb = Нежный персик, оранжевый
+theme-light-lemon-blurb = Бледно-жёлтый, охра
 theme-dark-graphite-blurb = Нейтральный серый без оттенка
 theme-dark-slate-blurb = Сине-серый
 theme-dark-obsidian-blurb = Почти чёрный, для OLED
@@ -2544,6 +2555,9 @@ theme-dark-ember-blurb = Тёплый угольный, янтарь
 theme-dark-moss-blurb = Лесной зелёно-чёрный
 theme-dark-aubergine-blurb = Сливово-чёрный, сирень
 theme-dark-oxblood-blurb = Винно-чёрный, коралл
+theme-dark-midnight-blurb = Глубокий тёмно-синий, небесный
+theme-dark-lagoon-blurb = Глубокий сине-зелёный, аквамарин
+theme-dark-neon-blurb = Почти чёрный, ярко-розовый
 
 ## texnames.ts
 

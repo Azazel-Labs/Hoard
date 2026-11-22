@@ -12391,6 +12391,10 @@ translation = "Bungkus"
 source = "Wrap long lines (W)"
 translation = "Bungkus baris panjang (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Aprikot"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Terung"
@@ -12411,9 +12415,21 @@ translation = "Arang hangat, amber"
 source = "Neutral gray, no tint"
 translation = "Abu-abu netral, tanpa rona"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Hijau toska pekat, aqua"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Biru dongker pekat, biru langit"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Hitam kehijauan hutan"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Nyaris hitam, merah muda terang"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12435,9 +12451,25 @@ translation = "Bara"
 source = "Graphite"
 translation = "Grafit"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Laguna"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Lemon"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Persik lembut, oranye"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Merah mawar kusam"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Kuning pucat, oker"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12447,6 +12479,10 @@ translation = "Ungu muda pucat"
 source = "Warm cream, amber"
 translation = "Krem hangat, amber"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Mint aqua yang sejuk"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Abu-abu netral polos"
@@ -12454,6 +12490,10 @@ translation = "Abu-abu netral polos"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Hijau lembut"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Biru langit cerah"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12467,9 +12507,21 @@ translation = "Lila"
 source = "Linen"
 translation = "Linen"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Tengah Malam"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Mint"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Lumut"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12486,6 +12538,10 @@ translation = "Kertas"
 [messages.theme-sage]
 source = "Sage"
 translation = "Sage"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Langit"
 
 [messages.theme-slate]
 source = "Slate"

@@ -2480,12 +2480,23 @@ theme-ember = Žár
 theme-moss = Mech
 theme-aubergine = Lilek
 theme-oxblood = Bordó
+theme-sky = Obloha
+theme-mint = Máta
+theme-apricot = Meruňka
+theme-lemon = Citron
+theme-midnight = Půlnoc
+theme-lagoon = Laguna
+theme-neon = Neon
 theme-light-slate-blurb = Chladná modrošedá
 theme-light-paper-blurb = Prostá neutrální šedá
 theme-light-linen-blurb = Teplá krémová, jantarová
 theme-light-sage-blurb = Jemná zelená
 theme-light-lilac-blurb = Bledě fialová
 theme-light-blush-blurb = Prachově růžová
+theme-light-sky-blurb = Jasná nebeská modř
+theme-light-mint-blurb = Chladná akvamarínová máta
+theme-light-apricot-blurb = Jemná broskev, oranžová
+theme-light-lemon-blurb = Bledě žlutá, okr
 theme-dark-graphite-blurb = Neutrální šedá bez nádechu
 theme-dark-slate-blurb = Modrošedá
 theme-dark-obsidian-blurb = Téměř černá, pro OLED
@@ -2493,6 +2504,9 @@ theme-dark-ember-blurb = Teplá antracitová, jantarová
 theme-dark-moss-blurb = Lesně zelená až černá
 theme-dark-aubergine-blurb = Švestkově černá, šeříková
 theme-dark-oxblood-blurb = Vínově černá, korálová
+theme-dark-midnight-blurb = Tmavě námořnická, nebeská modř
+theme-dark-lagoon-blurb = Tmavá modrozelená, akvamarín
+theme-dark-neon-blurb = Téměř černá, sytě růžová
 
 ## texnames.ts
 

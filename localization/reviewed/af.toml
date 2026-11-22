@@ -12630,6 +12630,10 @@ translation = "Omvou"
 source = "Wrap long lines (W)"
 translation = "Vou lang reëls om (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Appelkoos"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Eiervrug"
@@ -12650,9 +12654,21 @@ translation = "Warm houtskool, amber"
 source = "Neutral gray, no tint"
 translation = "Neutrale grys, geen tint nie"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Diep blougroen, akwa"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Diep vlootblou, hemelsblou"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Woudgroen-swart"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Byna swart, helder pienk"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12674,9 +12690,25 @@ translation = "Gloed"
 source = "Graphite"
 translation = "Grafiet"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Strandmeer"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Suurlemoen"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Sagte perske, oranje"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Dowwe roos"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Ligte geel, oker"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12686,6 +12718,10 @@ translation = "Ligte violet"
 source = "Warm cream, amber"
 translation = "Warm room, amber"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Koel akwa-kruisement"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Eenvoudige neutrale grys"
@@ -12693,6 +12729,10 @@ translation = "Eenvoudige neutrale grys"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Sagte groen"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Helder hemelsblou"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12706,9 +12746,21 @@ translation = "Sering"
 source = "Linen"
 translation = "Linne"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Middernag"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Kruisement"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Mos"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12725,6 +12777,10 @@ translation = "Papier"
 [messages.theme-sage]
 source = "Sage"
 translation = "Salie"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Lug"
 
 [messages.theme-slate]
 source = "Slate"

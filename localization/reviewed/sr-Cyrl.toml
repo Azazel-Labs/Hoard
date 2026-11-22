@@ -12785,6 +12785,10 @@ translation = "Преломи"
 source = "Wrap long lines (W)"
 translation = "Преломи дугачке редове (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Кајсија"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Патлиџан"
@@ -12805,9 +12809,21 @@ translation = "Топли угаљ, ћилибар"
 source = "Neutral gray, no tint"
 translation = "Неутрална сива, без нијансе"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Дубока плавозелена, аквамарин"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Дубока тамноплава, небоплава"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Шумска зеленоцрна"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Скоро црна, јарко ружичаста"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12829,9 +12845,25 @@ translation = "Жар"
 source = "Graphite"
 translation = "Графит"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Лагуна"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Лимун"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Мека бресква, наранџаста"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Пепељаста ружичаста"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Бледожута, окер"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12841,6 +12873,10 @@ translation = "Бледа љубичаста"
 source = "Warm cream, amber"
 translation = "Топла крем, ћилибар"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Свежа аквамарин нана"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Обична неутрална сива"
@@ -12848,6 +12884,10 @@ translation = "Обична неутрална сива"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Мека зелена"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Ведро небоплава"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12861,9 +12901,21 @@ translation = "Јоргован"
 source = "Linen"
 translation = "Лан"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Поноћ"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Нана"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Маховина"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Неон"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12880,6 +12932,10 @@ translation = "Папир"
 [messages.theme-sage]
 source = "Sage"
 translation = "Жалфија"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Небо"
 
 [messages.theme-slate]
 source = "Slate"

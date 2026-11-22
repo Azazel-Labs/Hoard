@@ -2303,12 +2303,23 @@ theme-ember = Sintel
 theme-moss = Mos
 theme-aubergine = Aubergine
 theme-oxblood = Ossenbloed
+theme-sky = Hemel
+theme-mint = Munt
+theme-apricot = Abrikoos
+theme-lemon = Citroen
+theme-midnight = Middernacht
+theme-lagoon = Lagune
+theme-neon = Neon
 theme-light-slate-blurb = Koel blauwgrijs
 theme-light-paper-blurb = Eenvoudig neutraal grijs
 theme-light-linen-blurb = Warm crème, amber
 theme-light-sage-blurb = Zacht groen
 theme-light-lilac-blurb = Bleek violet
 theme-light-blush-blurb = Oudroze
+theme-light-sky-blurb = Helder hemelsblauw
+theme-light-mint-blurb = Koel aquamunt
+theme-light-apricot-blurb = Zachte perzik, oranje
+theme-light-lemon-blurb = Lichtgeel, oker
 theme-dark-graphite-blurb = Neutraal grijs, zonder tint
 theme-dark-slate-blurb = Blauwgrijs
 theme-dark-obsidian-blurb = Bijna zwart, voor OLED
@@ -2316,6 +2327,9 @@ theme-dark-ember-blurb = Warm antraciet, amber
 theme-dark-moss-blurb = Bosgroen-zwart
 theme-dark-aubergine-blurb = Pruimzwart, lila
 theme-dark-oxblood-blurb = Wijnzwart, koraal
+theme-dark-midnight-blurb = Diep marineblauw, hemelsblauw
+theme-dark-lagoon-blurb = Diep petrol, aqua
+theme-dark-neon-blurb = Bijna zwart, felroze
 
 ## texnames.ts
 

@@ -4,7 +4,7 @@
 import { onBeforeUnmount } from 'vue'
 import { LANGUAGES, languageName, preferredCatalog, t } from '../i18n'
 import { prefs, shows, toggleIn } from '../prefs'
-import { DARK_THEMES, LIGHT_THEMES, previewScheme, setTheme, themeFor, usedScheme } from '../theme'
+import { DARK_THEMES, LIGHT_THEMES, previewScheme, reveal, setTheme, themeFor, usedScheme } from '../theme'
 
 const browserLanguages = navigator.languages
 
@@ -16,13 +16,20 @@ const LOOKS = [
  * Pick a theme and wear it at once, even when it's for the scheme not in use (see `previewScheme`). Runs on click,
  * not change: clicking the theme that's already picked (back to light while previewing dark) has to work too.
  */
-function setLook(scheme: 'light' | 'dark', id: string) {
-  if (scheme === 'light') prefs.lightTheme = id
-  else prefs.darkTheme = id
-  previewScheme.value = scheme === usedScheme() ? null : scheme
+function setLook(scheme: 'light' | 'dark', id: string, e: MouseEvent) {
+  const preview = scheme === usedScheme() ? null : scheme
+  if (themeFor(scheme).id === id && previewScheme.value === preview) return
+  // The new look spreads out from the tile's little preview, which bounces.
+  const tile = (e.currentTarget as HTMLElement).closest('.sw')?.querySelector('.mini')
+  reveal(() => {
+    if (scheme === 'light') prefs.lightTheme = id
+    else prefs.darkTheme = id
+    previewScheme.value = preview
+  }, tile)
 }
 const endPreview = () => (previewScheme.value = null)
 onBeforeUnmount(endPreview)
+const backToUsed = (e: MouseEvent) => reveal(endPreview, e.currentTarget as HTMLElement)
 
 const SCHEMES = [
   { value: 'system' as const, get label() { return t('appearance-scheme-system') } },
@@ -87,7 +94,7 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
             v-bind="{ [`data-${g.scheme}`]: theme.id }"
             :title="theme.blurb"
           >
-            <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === theme.id" @click="setLook(g.scheme, theme.id)" />
+            <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === theme.id" @click="setLook(g.scheme, theme.id, $event)" />
             <span class="mini" aria-hidden="true">
               <span class="bar" /><span class="ln" /><span class="ln short" /><span class="dot" />
             </span>
@@ -98,7 +105,7 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
       </div>
       <p v-if="previewScheme" class="hint preview" role="status">
         {{ t('settings-preview', { preview: previewScheme, used: usedScheme(), system: prefs.theme === 'system' ? 'yes' : 'no' }) }}
-        <button type="button" class="btn ghost" @click="endPreview">{{ t('settings-preview-back', { used: usedScheme() }) }}</button>
+        <button type="button" class="btn ghost" @click="backToUsed">{{ t('settings-preview-back', { used: usedScheme() }) }}</button>
       </p>
       <p v-else-if="shows('header-theme')" class="hint">{{ t('settings-look-hint') }}</p>
     </section>

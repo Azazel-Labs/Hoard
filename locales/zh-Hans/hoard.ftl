@@ -2086,12 +2086,23 @@ theme-ember = 余烬
 theme-moss = 苔藓
 theme-aubergine = 茄紫
 theme-oxblood = 牛血红
+theme-sky = 晴空
+theme-mint = 薄荷
+theme-apricot = 杏色
+theme-lemon = 柠檬
+theme-midnight = 午夜
+theme-lagoon = 泻湖
+theme-neon = 霓虹
 theme-light-slate-blurb = 冷调蓝灰
 theme-light-paper-blurb = 素净中性灰
 theme-light-linen-blurb = 暖调奶油色，琥珀点缀
 theme-light-sage-blurb = 柔和绿色
 theme-light-lilac-blurb = 淡紫色
 theme-light-blush-blurb = 灰粉玫瑰色
+theme-light-sky-blurb = 清澈天蓝
+theme-light-mint-blurb = 清凉水绿薄荷
+theme-light-apricot-blurb = 柔和桃色，橙色点缀
+theme-light-lemon-blurb = 淡黄，赭色点缀
 theme-dark-graphite-blurb = 中性灰，无色调
 theme-dark-slate-blurb = 蓝灰
 theme-dark-obsidian-blurb = 近乎纯黑，适合 OLED
@@ -2099,6 +2110,9 @@ theme-dark-ember-blurb = 暖调炭灰，琥珀点缀
 theme-dark-moss-blurb = 森林绿黑
 theme-dark-aubergine-blurb = 梅紫黑，丁香点缀
 theme-dark-oxblood-blurb = 酒红黑，珊瑚点缀
+theme-dark-midnight-blurb = 深海军蓝，天蓝点缀
+theme-dark-lagoon-blurb = 深青绿，水绿点缀
+theme-dark-neon-blurb = 近乎纯黑，亮粉点缀
 
 ## texnames.ts
 

@@ -35,6 +35,26 @@
   --l-text: #2b1e20; --l-muted: #6e5a5d; --l-faint: #9a8689; --l-accent: #b8455a;
   --l-check-a: #eee2e4; --l-check-b: #f8f1f2;
 }
+[data-light='sky'] {
+  --l-bg: #eaf2fb; --l-panel: #f5f9fd; --l-raised: #ffffff; --l-line: #cddcec;
+  --l-text: #14212f; --l-muted: #4d6075; --l-faint: #788ba0; --l-accent: #1b6fc8;
+  --l-check-a: #dde8f5; --l-check-b: #eef4fb;
+}
+[data-light='mint'] {
+  --l-bg: #e7f3f1; --l-panel: #f3faf8; --l-raised: #ffffff; --l-line: #c9e0dc;
+  --l-text: #132624; --l-muted: #4a6561; --l-faint: #76908c; --l-accent: #0b7a72;
+  --l-check-a: #d9ece8; --l-check-b: #ebf6f3;
+}
+[data-light='apricot'] {
+  --l-bg: #f8eee7; --l-panel: #fcf7f3; --l-raised: #fffdfb; --l-line: #ebd7c8;
+  --l-text: #2c1f17; --l-muted: #705b4e; --l-faint: #9c8679; --l-accent: #b0460f;
+  --l-check-a: #f1e2d6; --l-check-b: #f9f0ea;
+}
+[data-light='lemon'] {
+  --l-bg: #f6f3df; --l-panel: #fbf9ed; --l-raised: #fffef7; --l-line: #e2dbb5;
+  --l-text: #26230f; --l-muted: #65603c; --l-faint: #908965; --l-accent: #7f6500;
+  --l-check-a: #ece7ca; --l-check-b: #f7f4e4;
+}
 
 :root, [data-dark='graphite'] {
   --d-bg: #161618; --d-panel: #1c1c1f; --d-raised: #26262a; --d-line: #323236;
@@ -70,6 +90,21 @@
   --d-bg: #181113; --d-panel: #1f1618; --d-raised: #2a1e21; --d-line: #3b2a2e;
   --d-text: #f1e6e7; --d-muted: #b59ea2; --d-faint: #7e676b; --d-accent: #ff8f80;
   --d-check-a: #271c1f; --d-check-b: #2e2225;
+}
+[data-dark='midnight'] {
+  --d-bg: #0d1322; --d-panel: #12192b; --d-raised: #1a2337; --d-line: #263149;
+  --d-text: #e2e8f5; --d-muted: #92a0bc; --d-faint: #5e6b87; --d-accent: #6fb4ff;
+  --d-check-a: #192134; --d-check-b: #1f283c;
+}
+[data-dark='lagoon'] {
+  --d-bg: #0c1617; --d-panel: #111d1f; --d-raised: #182729; --d-line: #243638;
+  --d-text: #ddefed; --d-muted: #8eafab; --d-faint: #5a7673; --d-accent: #4fd0c4;
+  --d-check-a: #172527; --d-check-b: #1d2d2f;
+}
+[data-dark='neon'] {
+  --d-bg: #110d15; --d-panel: #17121c; --d-raised: #201927; --d-line: #2e2537;
+  --d-text: #f2e9f5; --d-muted: #aa9bb2; --d-faint: #74667d; --d-accent: #ff5cb3;
+  --d-check-a: #1e1724; --d-check-b: #251d2c;
 }
 
 :root {
@@ -277,9 +312,13 @@ html[data-vt='detail']::view-transition-new(detail):only-child { animation: vt-s
 html[data-vt='detail']::view-transition-old(detail):only-child { animation: vt-slide-out var(--dur-2) var(--ease-in-out) forwards; }
 @keyframes vt-slide-in { from { opacity: 0; translate: 48px 0; } }
 @keyframes vt-slide-out { to { opacity: 0; translate: 48px 0; } }
-/* Theme changes: the new theme is revealed in a circle from the button (App.vue animates the clip-path). */
+/* Theme changes: the new theme is revealed in a circle from the button or tile pressed, which bounces in its new look
+   on a layer of its own (theme.ts reveal animates both). */
 html[data-vt='theme']::view-transition-old(root),
 html[data-vt='theme']::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html[data-vt='theme']::view-transition-group(theme-pick) { animation: none; }
+html[data-vt='theme']::view-transition-old(theme-pick) { display: none; }
+html[data-vt='theme']::view-transition-new(theme-pick) { animation: none; }
 
 /* Reduced motion: nothing moves, slides, scales or loops, but color and opacity still change softly so state changes
    don't snap. Animations finish at once on their final frame (a drawn tick still ends up drawn). */

@@ -2504,12 +2504,23 @@ theme-ember = Żar
 theme-moss = Mech
 theme-aubergine = Bakłażan
 theme-oxblood = Bordo
+theme-sky = Niebo
+theme-mint = Mięta
+theme-apricot = Morela
+theme-lemon = Cytryna
+theme-midnight = Północ
+theme-lagoon = Laguna
+theme-neon = Neon
 theme-light-slate-blurb = Chłodny niebieskoszary
 theme-light-paper-blurb = Zwykły neutralny szary
 theme-light-linen-blurb = Ciepły kremowy, bursztyn
 theme-light-sage-blurb = Delikatna zieleń
 theme-light-lilac-blurb = Blady fiolet
 theme-light-blush-blurb = Przygaszony róż
+theme-light-sky-blurb = Czysty błękit nieba
+theme-light-mint-blurb = Chłodna akwamarynowa mięta
+theme-light-apricot-blurb = Delikatna brzoskwinia, pomarańcz
+theme-light-lemon-blurb = Bladożółty, ochra
 theme-dark-graphite-blurb = Neutralny szary, bez odcienia
 theme-dark-slate-blurb = Niebieskoszary
 theme-dark-obsidian-blurb = Prawie czarny, do OLED
@@ -2517,6 +2528,9 @@ theme-dark-ember-blurb = Ciepły grafit, bursztyn
 theme-dark-moss-blurb = Leśna zieleń z czernią
 theme-dark-aubergine-blurb = Śliwkowa czerń, liliowy
 theme-dark-oxblood-blurb = Winna czerń, koral
+theme-dark-midnight-blurb = Głęboki granat, błękit
+theme-dark-lagoon-blurb = Głęboki morski, akwamaryna
+theme-dark-neon-blurb = Prawie czarny, jaskrawy róż
 
 ## texnames.ts
 

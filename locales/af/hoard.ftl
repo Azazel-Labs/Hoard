@@ -2303,12 +2303,23 @@ theme-ember = Gloed
 theme-moss = Mos
 theme-aubergine = Eiervrug
 theme-oxblood = Osbloed
+theme-sky = Lug
+theme-mint = Kruisement
+theme-apricot = Appelkoos
+theme-lemon = Suurlemoen
+theme-midnight = Middernag
+theme-lagoon = Strandmeer
+theme-neon = Neon
 theme-light-slate-blurb = Koel blougrys
 theme-light-paper-blurb = Eenvoudige neutrale grys
 theme-light-linen-blurb = Warm room, amber
 theme-light-sage-blurb = Sagte groen
 theme-light-lilac-blurb = Ligte violet
 theme-light-blush-blurb = Dowwe roos
+theme-light-sky-blurb = Helder hemelsblou
+theme-light-mint-blurb = Koel akwa-kruisement
+theme-light-apricot-blurb = Sagte perske, oranje
+theme-light-lemon-blurb = Ligte geel, oker
 theme-dark-graphite-blurb = Neutrale grys, geen tint nie
 theme-dark-slate-blurb = Blougrys
 theme-dark-obsidian-blurb = Amper swart, vir OLED
@@ -2316,6 +2327,9 @@ theme-dark-ember-blurb = Warm houtskool, amber
 theme-dark-moss-blurb = Woudgroen-swart
 theme-dark-aubergine-blurb = Pruimswart, sering
 theme-dark-oxblood-blurb = Wynswart, koraal
+theme-dark-midnight-blurb = Diep vlootblou, hemelsblou
+theme-dark-lagoon-blurb = Diep blougroen, akwa
+theme-dark-neon-blurb = Byna swart, helder pienk
 
 ## texnames.ts
 

@@ -2163,12 +2163,23 @@ theme-ember = Parázs
 theme-moss = Moha
 theme-aubergine = Padlizsán
 theme-oxblood = Bordó
+theme-sky = Égbolt
+theme-mint = Menta
+theme-apricot = Sárgabarack
+theme-lemon = Citrom
+theme-midnight = Éjfél
+theme-lagoon = Lagúna
+theme-neon = Neon
 theme-light-slate-blurb = Hűvös kékesszürke
 theme-light-paper-blurb = Egyszerű semleges szürke
 theme-light-linen-blurb = Meleg krém, borostyán
 theme-light-sage-blurb = Lágy zöld
 theme-light-lilac-blurb = Halvány ibolya
 theme-light-blush-blurb = Fakó rózsa
+theme-light-sky-blurb = Tiszta égkék
+theme-light-mint-blurb = Hűvös vízkék menta
+theme-light-apricot-blurb = Lágy barack, narancs
+theme-light-lemon-blurb = Halványsárga, okker
 theme-dark-graphite-blurb = Semleges szürke, árnyalat nélkül
 theme-dark-slate-blurb = Kékesszürke
 theme-dark-obsidian-blurb = Majdnem fekete, OLED-hez
@@ -2176,6 +2187,9 @@ theme-dark-ember-blurb = Meleg szénszürke, borostyán
 theme-dark-moss-blurb = Erdőzöld-fekete
 theme-dark-aubergine-blurb = Szilvafekete, orgona
 theme-dark-oxblood-blurb = Borfekete, korall
+theme-dark-midnight-blurb = Mély sötétkék, égkék
+theme-dark-lagoon-blurb = Mély kékeszöld, vízkék
+theme-dark-neon-blurb = Majdnem fekete, élénk rózsaszín
 
 ## Textúranevek
 

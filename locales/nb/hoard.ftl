@@ -2305,12 +2305,23 @@ theme-ember = Glør
 theme-moss = Mose
 theme-aubergine = Aubergine
 theme-oxblood = Oksblod
+theme-sky = Himmel
+theme-mint = Mynte
+theme-apricot = Aprikos
+theme-lemon = Sitron
+theme-midnight = Midnatt
+theme-lagoon = Lagune
+theme-neon = Neon
 theme-light-slate-blurb = Kjølig blågrå
 theme-light-paper-blurb = Enkel nøytral grå
 theme-light-linen-blurb = Varm krem, rav
 theme-light-sage-blurb = Myk grønn
 theme-light-lilac-blurb = Blek fiolett
 theme-light-blush-blurb = Støvete rosa
+theme-light-sky-blurb = Klar himmelblå
+theme-light-mint-blurb = Kjølig akvamynte
+theme-light-apricot-blurb = Myk fersken, oransje
+theme-light-lemon-blurb = Blekgul, oker
 theme-dark-graphite-blurb = Nøytral grå, uten fargetone
 theme-dark-slate-blurb = Blågrå
 theme-dark-obsidian-blurb = Nesten svart, for OLED
@@ -2318,6 +2329,9 @@ theme-dark-ember-blurb = Varm kullgrå, rav
 theme-dark-moss-blurb = Skoggrønn-svart
 theme-dark-aubergine-blurb = Plommesvart, syrin
 theme-dark-oxblood-blurb = Vinsvart, korall
+theme-dark-midnight-blurb = Dyp marineblå, himmelblå
+theme-dark-lagoon-blurb = Dyp blågrønn, akva
+theme-dark-neon-blurb = Nesten svart, knallrosa
 
 ## texnames.ts
 

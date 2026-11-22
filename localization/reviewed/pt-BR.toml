@@ -12642,6 +12642,10 @@ translation = "Quebrar linhas"
 source = "Wrap long lines (W)"
 translation = "Quebrar linhas longas (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Damasco"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Berinjela"
@@ -12662,9 +12666,21 @@ translation = "Carvão quente, âmbar"
 source = "Neutral gray, no tint"
 translation = "Cinza neutro, sem matiz"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Verde-azulado profundo, água-marinha"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Azul-marinho profundo, celeste"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Preto esverdeado de floresta"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Quase preto, rosa vibrante"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12686,9 +12702,25 @@ translation = "Brasa"
 source = "Graphite"
 translation = "Grafite"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Lagoa"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Limão"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Pêssego suave, laranja"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Rosa antigo"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Amarelo-claro, ocre"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12698,6 +12730,10 @@ translation = "Violeta claro"
 source = "Warm cream, amber"
 translation = "Creme quente, âmbar"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Menta água-marinha fresca"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Cinza neutro simples"
@@ -12705,6 +12741,10 @@ translation = "Cinza neutro simples"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Verde suave"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Azul-celeste límpido"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12718,9 +12758,21 @@ translation = "Lilás"
 source = "Linen"
 translation = "Linho"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Meia-noite"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Menta"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Musgo"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12737,6 +12789,10 @@ translation = "Papel"
 [messages.theme-sage]
 source = "Sage"
 translation = "Sálvia"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Céu"
 
 [messages.theme-slate]
 source = "Slate"

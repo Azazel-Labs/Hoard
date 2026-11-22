@@ -2333,12 +2333,23 @@ theme-ember = Braise
 theme-moss = Mousse
 theme-aubergine = Aubergine
 theme-oxblood = Sang-de-bœuf
+theme-sky = Ciel
+theme-mint = Menthe
+theme-apricot = Abricot
+theme-lemon = Citron
+theme-midnight = Minuit
+theme-lagoon = Lagon
+theme-neon = Néon
 theme-light-slate-blurb = Gris-bleu froid
 theme-light-paper-blurb = Gris neutre et simple
 theme-light-linen-blurb = Crème chaud, ambre
 theme-light-sage-blurb = Vert doux
 theme-light-lilac-blurb = Violet pâle
 theme-light-blush-blurb = Vieux rose
+theme-light-sky-blurb = Bleu ciel limpide
+theme-light-mint-blurb = Menthe aigue-marine fraîche
+theme-light-apricot-blurb = Pêche douce, orange
+theme-light-lemon-blurb = Jaune pâle, ocre
 theme-dark-graphite-blurb = Gris neutre, sans teinte
 theme-dark-slate-blurb = Gris-bleu
 theme-dark-obsidian-blurb = Presque noir, pour les écrans OLED
@@ -2346,6 +2357,9 @@ theme-dark-ember-blurb = Anthracite chaud, ambre
 theme-dark-moss-blurb = Noir vert forêt
 theme-dark-aubergine-blurb = Noir prune, lilas
 theme-dark-oxblood-blurb = Noir lie-de-vin, corail
+theme-dark-midnight-blurb = Bleu marine profond, bleu ciel
+theme-dark-lagoon-blurb = Sarcelle profond, aigue-marine
+theme-dark-neon-blurb = Presque noir, rose vif
 
 ## texnames.ts
 

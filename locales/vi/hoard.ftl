@@ -2086,12 +2086,23 @@ theme-ember = Than hồng
 theme-moss = Rêu
 theme-aubergine = Cà tím
 theme-oxblood = Đỏ huyết
+theme-sky = Bầu trời
+theme-mint = Bạc hà
+theme-apricot = Mơ
+theme-lemon = Chanh vàng
+theme-midnight = Nửa đêm
+theme-lagoon = Đầm phá
+theme-neon = Neon
 theme-light-slate-blurb = Xám xanh dịu mát
 theme-light-paper-blurb = Xám trung tính đơn giản
 theme-light-linen-blurb = Kem ấm, hổ phách
 theme-light-sage-blurb = Xanh lá dịu
 theme-light-lilac-blurb = Tím nhạt
 theme-light-blush-blurb = Hồng phấn trầm
+theme-light-sky-blurb = Xanh da trời trong trẻo
+theme-light-mint-blurb = Bạc hà xanh ngọc mát dịu
+theme-light-apricot-blurb = Đào nhạt, cam
+theme-light-lemon-blurb = Vàng nhạt, son đất
 theme-dark-graphite-blurb = Xám trung tính, không ánh màu
 theme-dark-slate-blurb = Xám xanh
 theme-dark-obsidian-blurb = Gần như đen, cho màn hình OLED
@@ -2099,6 +2110,9 @@ theme-dark-ember-blurb = Than ấm, hổ phách
 theme-dark-moss-blurb = Đen ánh xanh rừng
 theme-dark-aubergine-blurb = Đen ánh mận, tím nhạt
 theme-dark-oxblood-blurb = Đen ánh rượu vang, san hô
+theme-dark-midnight-blurb = Xanh hải quân đậm, xanh trời
+theme-dark-lagoon-blurb = Xanh mòng két đậm, xanh ngọc
+theme-dark-neon-blurb = Gần như đen, hồng rực
 
 ## Tên texture
 

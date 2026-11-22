@@ -12712,6 +12712,10 @@ translation = "Αναδίπλωση"
 source = "Wrap long lines (W)"
 translation = "Αναδίπλωση μεγάλων γραμμών (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Βερίκοκο"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Μελιτζανί"
@@ -12732,9 +12736,21 @@ translation = "Ζεστό ανθρακί, κεχριμπάρι"
 source = "Neutral gray, no tint"
 translation = "Ουδέτερο γκρι, χωρίς απόχρωση"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Βαθύ πετρόλ, γαλαζοπράσινο"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Βαθύ ναυτικό μπλε, γαλάζιο"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Πράσινο του δάσους προς το μαύρο"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Σχεδόν μαύρο, έντονο ροζ"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12756,9 +12772,25 @@ translation = "Θράκα"
 source = "Graphite"
 translation = "Γραφίτης"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Λιμνοθάλασσα"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Λεμόνι"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Απαλό ροδακινί, πορτοκαλί"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Ξεθωριασμένο ροζ"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Ανοιχτό κίτρινο, ώχρα"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12768,6 +12800,10 @@ translation = "Ανοιχτό βιολετί"
 source = "Warm cream, amber"
 translation = "Ζεστό κρεμ, κεχριμπάρι"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Δροσερή γαλαζοπράσινη μέντα"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Απλό ουδέτερο γκρι"
@@ -12775,6 +12811,10 @@ translation = "Απλό ουδέτερο γκρι"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Απαλό πράσινο"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Καθαρό γαλάζιο"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12788,9 +12828,21 @@ translation = "Λιλά"
 source = "Linen"
 translation = "Λινό"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Μεσάνυχτα"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Μέντα"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Βρύο"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Νέον"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12807,6 +12859,10 @@ translation = "Χαρτί"
 [messages.theme-sage]
 source = "Sage"
 translation = "Φασκόμηλο"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Ουρανός"
 
 [messages.theme-slate]
 source = "Slate"

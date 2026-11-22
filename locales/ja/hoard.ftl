@@ -2086,12 +2086,23 @@ theme-ember = Ember
 theme-moss = Moss
 theme-aubergine = Aubergine
 theme-oxblood = Oxblood
+theme-sky = Sky
+theme-mint = Mint
+theme-apricot = Apricot
+theme-lemon = Lemon
+theme-midnight = Midnight
+theme-lagoon = Lagoon
+theme-neon = Neon
 theme-light-slate-blurb = 涼しげな青みがかったグレー
 theme-light-paper-blurb = 素朴なニュートラルグレー
 theme-light-linen-blurb = 温かみのあるクリームとアンバー
 theme-light-sage-blurb = 柔らかな緑
 theme-light-lilac-blurb = 淡いすみれ色
 theme-light-blush-blurb = くすんだローズ
+theme-light-sky-blurb = 澄んだ空色
+theme-light-mint-blurb = 涼しげなアクアミント
+theme-light-apricot-blurb = やわらかなピーチとオレンジ
+theme-light-lemon-blurb = 淡い黄色とオーカー
 theme-dark-graphite-blurb = 色味のないニュートラルグレー
 theme-dark-slate-blurb = 青みがかったグレー
 theme-dark-obsidian-blurb = 黒に近い色、OLED 向け
@@ -2099,6 +2110,9 @@ theme-dark-ember-blurb = 温かみのあるチャコールとアンバー
 theme-dark-moss-blurb = 森のような緑がかった黒
 theme-dark-aubergine-blurb = プラムがかった黒とライラック
 theme-dark-oxblood-blurb = ワインがかった黒とコーラル
+theme-dark-midnight-blurb = 深いネイビーと空色
+theme-dark-lagoon-blurb = 深いティールとアクア
+theme-dark-neon-blurb = 黒に近い色とビビッドピンク
 
 ## texnames.ts
 

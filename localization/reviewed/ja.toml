@@ -12373,6 +12373,10 @@ translation = "折り返し"
 source = "Wrap long lines (W)"
 translation = "長い行を折り返す（W）"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Apricot"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Aubergine"
@@ -12393,9 +12397,21 @@ translation = "温かみのあるチャコールとアンバー"
 source = "Neutral gray, no tint"
 translation = "色味のないニュートラルグレー"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "深いティールとアクア"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "深いネイビーと空色"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "森のような緑がかった黒"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "黒に近い色とビビッドピンク"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12417,9 +12433,25 @@ translation = "Ember"
 source = "Graphite"
 translation = "Graphite"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Lagoon"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Lemon"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "やわらかなピーチとオレンジ"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "くすんだローズ"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "淡い黄色とオーカー"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12429,6 +12461,10 @@ translation = "淡いすみれ色"
 source = "Warm cream, amber"
 translation = "温かみのあるクリームとアンバー"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "涼しげなアクアミント"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "素朴なニュートラルグレー"
@@ -12436,6 +12472,10 @@ translation = "素朴なニュートラルグレー"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "柔らかな緑"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "澄んだ空色"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12449,9 +12489,21 @@ translation = "Lilac"
 source = "Linen"
 translation = "Linen"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Midnight"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Mint"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Moss"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12468,6 +12520,10 @@ translation = "Paper"
 [messages.theme-sage]
 source = "Sage"
 translation = "Sage"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Sky"
 
 [messages.theme-slate]
 source = "Slate"

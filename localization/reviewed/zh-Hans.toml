@@ -12373,6 +12373,10 @@ translation = "换行"
 source = "Wrap long lines (W)"
 translation = "自动换行（W）"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "杏色"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "茄紫"
@@ -12393,9 +12397,21 @@ translation = "暖调炭灰，琥珀点缀"
 source = "Neutral gray, no tint"
 translation = "中性灰，无色调"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "深青绿，水绿点缀"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "深海军蓝，天蓝点缀"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "森林绿黑"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "近乎纯黑，亮粉点缀"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12417,9 +12433,25 @@ translation = "余烬"
 source = "Graphite"
 translation = "石墨"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "泻湖"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "柠檬"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "柔和桃色，橙色点缀"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "灰粉玫瑰色"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "淡黄，赭色点缀"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12429,6 +12461,10 @@ translation = "淡紫色"
 source = "Warm cream, amber"
 translation = "暖调奶油色，琥珀点缀"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "清凉水绿薄荷"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "素净中性灰"
@@ -12436,6 +12472,10 @@ translation = "素净中性灰"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "柔和绿色"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "清澈天蓝"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12449,9 +12489,21 @@ translation = "丁香"
 source = "Linen"
 translation = "亚麻"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "午夜"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "薄荷"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "苔藓"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "霓虹"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12468,6 +12520,10 @@ translation = "纸张"
 [messages.theme-sage]
 source = "Sage"
 translation = "鼠尾草"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "晴空"
 
 [messages.theme-slate]
 source = "Slate"

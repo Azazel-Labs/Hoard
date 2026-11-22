@@ -2118,12 +2118,23 @@ theme-ember = Bara
 theme-moss = Lumut
 theme-aubergine = Terung
 theme-oxblood = Merah Hati
+theme-sky = Langit
+theme-mint = Mint
+theme-apricot = Aprikot
+theme-lemon = Lemon
+theme-midnight = Tengah Malam
+theme-lagoon = Laguna
+theme-neon = Neon
 theme-light-slate-blurb = Biru keabuan yang sejuk
 theme-light-paper-blurb = Abu-abu netral polos
 theme-light-linen-blurb = Krem hangat, amber
 theme-light-sage-blurb = Hijau lembut
 theme-light-lilac-blurb = Ungu muda pucat
 theme-light-blush-blurb = Merah mawar kusam
+theme-light-sky-blurb = Biru langit cerah
+theme-light-mint-blurb = Mint aqua yang sejuk
+theme-light-apricot-blurb = Persik lembut, oranye
+theme-light-lemon-blurb = Kuning pucat, oker
 theme-dark-graphite-blurb = Abu-abu netral, tanpa rona
 theme-dark-slate-blurb = Biru keabuan
 theme-dark-obsidian-blurb = Hampir hitam, untuk OLED
@@ -2131,6 +2142,9 @@ theme-dark-ember-blurb = Arang hangat, amber
 theme-dark-moss-blurb = Hitam kehijauan hutan
 theme-dark-aubergine-blurb = Hitam keunguan, lila
 theme-dark-oxblood-blurb = Hitam anggur, koral
+theme-dark-midnight-blurb = Biru dongker pekat, biru langit
+theme-dark-lagoon-blurb = Hijau toska pekat, aqua
+theme-dark-neon-blurb = Nyaris hitam, merah muda terang
 
 ## texnames.ts
 

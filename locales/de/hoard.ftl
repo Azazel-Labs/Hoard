@@ -2303,12 +2303,23 @@ theme-ember = Glut
 theme-moss = Moos
 theme-aubergine = Aubergine
 theme-oxblood = Ochsenblut
+theme-sky = Himmel
+theme-mint = Minze
+theme-apricot = Aprikose
+theme-lemon = Zitrone
+theme-midnight = Mitternacht
+theme-lagoon = Lagune
+theme-neon = Neon
 theme-light-slate-blurb = Kühles Blaugrau
 theme-light-paper-blurb = Schlichtes neutrales Grau
 theme-light-linen-blurb = Warmes Creme, Bernstein
 theme-light-sage-blurb = Sanftes Grün
 theme-light-lilac-blurb = Blasses Violett
 theme-light-blush-blurb = Altrosa
+theme-light-sky-blurb = Klares Himmelblau
+theme-light-mint-blurb = Kühles Aqua-Mint
+theme-light-apricot-blurb = Sanfter Pfirsich, Orange
+theme-light-lemon-blurb = Blassgelb, Ocker
 theme-dark-graphite-blurb = Neutrales Grau, ohne Tönung
 theme-dark-slate-blurb = Blaugrau
 theme-dark-obsidian-blurb = Fast schwarz, für OLED
@@ -2316,6 +2327,9 @@ theme-dark-ember-blurb = Warmes Anthrazit, Bernstein
 theme-dark-moss-blurb = Waldgrün-Schwarz
 theme-dark-aubergine-blurb = Pflaumenschwarz, Flieder
 theme-dark-oxblood-blurb = Weinschwarz, Koralle
+theme-dark-midnight-blurb = Tiefes Marineblau, Himmelblau
+theme-dark-lagoon-blurb = Tiefes Petrol, Aqua
+theme-dark-neon-blurb = Fast schwarz, Pink
 
 ## texnames.ts
 

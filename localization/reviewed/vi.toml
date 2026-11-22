@@ -12359,6 +12359,10 @@ translation = "Ngắt dòng"
 source = "Wrap long lines (W)"
 translation = "Ngắt dòng dài (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Mơ"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Cà tím"
@@ -12379,9 +12383,21 @@ translation = "Than ấm, hổ phách"
 source = "Neutral gray, no tint"
 translation = "Xám trung tính, không ánh màu"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Xanh mòng két đậm, xanh ngọc"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Xanh hải quân đậm, xanh trời"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Đen ánh xanh rừng"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Gần như đen, hồng rực"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12403,9 +12419,25 @@ translation = "Than hồng"
 source = "Graphite"
 translation = "Than chì"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Đầm phá"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Chanh vàng"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Đào nhạt, cam"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Hồng phấn trầm"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Vàng nhạt, son đất"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12415,6 +12447,10 @@ translation = "Tím nhạt"
 source = "Warm cream, amber"
 translation = "Kem ấm, hổ phách"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Bạc hà xanh ngọc mát dịu"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Xám trung tính đơn giản"
@@ -12422,6 +12458,10 @@ translation = "Xám trung tính đơn giản"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Xanh lá dịu"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Xanh da trời trong trẻo"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12435,9 +12475,21 @@ translation = "Tử đinh hương"
 source = "Linen"
 translation = "Vải lanh"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Nửa đêm"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Bạc hà"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Rêu"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12454,6 +12506,10 @@ translation = "Giấy"
 [messages.theme-sage]
 source = "Sage"
 translation = "Xô thơm"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Bầu trời"
 
 [messages.theme-slate]
 source = "Slate"

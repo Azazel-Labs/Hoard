@@ -2309,12 +2309,23 @@ theme-ember = Brasa
 theme-moss = Molsa
 theme-aubergine = Albergínia
 theme-oxblood = Granat
+theme-sky = Cel
+theme-mint = Menta
+theme-apricot = Albercoc
+theme-lemon = Llimona
+theme-midnight = Mitjanit
+theme-lagoon = Llacuna
+theme-neon = Neó
 theme-light-slate-blurb = Gris blavós fred
 theme-light-paper-blurb = Gris neutre senzill
 theme-light-linen-blurb = Crema càlid, ambre
 theme-light-sage-blurb = Verd suau
 theme-light-lilac-blurb = Violeta pàl·lid
 theme-light-blush-blurb = Rosa empolsat
+theme-light-sky-blurb = Blau cel clar
+theme-light-mint-blurb = Menta aiguamarina fresca
+theme-light-apricot-blurb = Préssec suau, taronja
+theme-light-lemon-blurb = Groc pàl·lid, ocre
 theme-dark-graphite-blurb = Gris neutre, sense tint
 theme-dark-slate-blurb = Gris blavós
 theme-dark-obsidian-blurb = Gairebé negre, per a OLED
@@ -2322,6 +2333,9 @@ theme-dark-ember-blurb = Carbó càlid, ambre
 theme-dark-moss-blurb = Negre verd bosc
 theme-dark-aubergine-blurb = Negre pruna, lila
 theme-dark-oxblood-blurb = Negre vi, corall
+theme-dark-midnight-blurb = Blau marí fosc, blau cel
+theme-dark-lagoon-blurb = Verd blavós fosc, aiguamarina
+theme-dark-neon-blurb = Gairebé negre, rosa intens
 
 ## texnames.ts
 

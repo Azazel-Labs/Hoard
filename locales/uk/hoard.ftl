@@ -2574,12 +2574,23 @@ theme-ember = Жар
 theme-moss = Мох
 theme-aubergine = Баклажан
 theme-oxblood = Бордо
+theme-sky = Небо
+theme-mint = М’ята
+theme-apricot = Абрикос
+theme-lemon = Лимон
+theme-midnight = Північ
+theme-lagoon = Лагуна
+theme-neon = Неон
 theme-light-slate-blurb = Прохолодний синьо-сірий
 theme-light-paper-blurb = Простий нейтральний сірий
 theme-light-linen-blurb = Теплий кремовий, бурштин
 theme-light-sage-blurb = М’який зелений
 theme-light-lilac-blurb = Блідо-фіолетовий
 theme-light-blush-blurb = Припорошена троянда
+theme-light-sky-blurb = Чистий небесно-блакитний
+theme-light-mint-blurb = Прохолодна аквамаринова м’ята
+theme-light-apricot-blurb = Ніжний персик, помаранчевий
+theme-light-lemon-blurb = Блідо-жовтий, вохра
 theme-dark-graphite-blurb = Нейтральний сірий, без відтінку
 theme-dark-slate-blurb = Синьо-сірий
 theme-dark-obsidian-blurb = Майже чорний, для OLED
@@ -2587,6 +2598,9 @@ theme-dark-ember-blurb = Теплий вугільний, бурштин
 theme-dark-moss-blurb = Лісовий зелено-чорний
 theme-dark-aubergine-blurb = Сливово-чорний, бузок
 theme-dark-oxblood-blurb = Винно-чорний, корал
+theme-dark-midnight-blurb = Глибокий темно-синій, блакитний
+theme-dark-lagoon-blurb = Глибокий синьо-зелений, аквамарин
+theme-dark-neon-blurb = Майже чорний, яскраво-рожевий
 
 ## texnames.ts
 

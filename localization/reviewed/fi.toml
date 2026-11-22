@@ -12706,6 +12706,10 @@ translation = "Rivitys"
 source = "Wrap long lines (W)"
 translation = "Rivitä pitkät rivit (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Aprikoosi"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Munakoiso"
@@ -12726,9 +12730,21 @@ translation = "Lämmin hiilenharmaa, meripihka"
 source = "Neutral gray, no tint"
 translation = "Neutraali harmaa, ei sävyä"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Syvä sinivihreä, akva"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Syvä laivastonsininen, taivaansininen"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Metsänvihreä-musta"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Lähes musta, kirkas pinkki"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12750,9 +12766,25 @@ translation = "Hiillos"
 source = "Graphite"
 translation = "Grafiitti"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Laguuni"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Sitruuna"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Pehmeä persikka, oranssi"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Himmeä ruusu"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Vaaleankeltainen, okra"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12762,6 +12794,10 @@ translation = "Vaalea violetti"
 source = "Warm cream, amber"
 translation = "Lämmin kerma, meripihka"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Viileä akvaminttu"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Pelkistetty neutraali harmaa"
@@ -12769,6 +12805,10 @@ translation = "Pelkistetty neutraali harmaa"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Pehmeä vihreä"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Kirkas taivaansininen"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12782,9 +12822,21 @@ translation = "Sireeni"
 source = "Linen"
 translation = "Pellava"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Keskiyö"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Minttu"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Sammal"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12801,6 +12853,10 @@ translation = "Paperi"
 [messages.theme-sage]
 source = "Sage"
 translation = "Salvia"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Taivas"
 
 [messages.theme-slate]
 source = "Slate"

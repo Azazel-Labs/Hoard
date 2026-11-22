@@ -12878,6 +12878,10 @@ translation = "Zalamovat"
 source = "Wrap long lines (W)"
 translation = "Zalamovat dlouhé řádky (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Meruňka"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Lilek"
@@ -12898,9 +12902,21 @@ translation = "Teplá antracitová, jantarová"
 source = "Neutral gray, no tint"
 translation = "Neutrální šedá bez nádechu"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Tmavá modrozelená, akvamarín"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Tmavě námořnická, nebeská modř"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Lesně zelená až černá"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Téměř černá, sytě růžová"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12922,9 +12938,25 @@ translation = "Žár"
 source = "Graphite"
 translation = "Grafit"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Laguna"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Citron"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Jemná broskev, oranžová"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Prachově růžová"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Bledě žlutá, okr"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12934,6 +12966,10 @@ translation = "Bledě fialová"
 source = "Warm cream, amber"
 translation = "Teplá krémová, jantarová"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Chladná akvamarínová máta"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Prostá neutrální šedá"
@@ -12941,6 +12977,10 @@ translation = "Prostá neutrální šedá"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Jemná zelená"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Jasná nebeská modř"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12954,9 +12994,21 @@ translation = "Šeřík"
 source = "Linen"
 translation = "Len"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Půlnoc"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Máta"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Mech"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12973,6 +13025,10 @@ translation = "Papír"
 [messages.theme-sage]
 source = "Sage"
 translation = "Šalvěj"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Obloha"
 
 [messages.theme-slate]
 source = "Slate"

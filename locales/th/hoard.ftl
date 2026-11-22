@@ -2089,12 +2089,23 @@ theme-ember = ถ่านคุ
 theme-moss = มอส
 theme-aubergine = มะเขือม่วง
 theme-oxblood = แดงเลือดนก
+theme-sky = ท้องฟ้า
+theme-mint = มินต์
+theme-apricot = แอปริคอต
+theme-lemon = เลมอน
+theme-midnight = เที่ยงคืน
+theme-lagoon = ลากูน
+theme-neon = นีออน
 theme-light-slate-blurb = เทาอมฟ้าโทนเย็น
 theme-light-paper-blurb = เทากลางเรียบ ๆ
 theme-light-linen-blurb = ครีมอุ่น อำพัน
 theme-light-sage-blurb = เขียวอ่อนนุ่ม
 theme-light-lilac-blurb = ม่วงอ่อนจาง
 theme-light-blush-blurb = ชมพูกุหลาบหม่น
+theme-light-sky-blurb = ฟ้าใส
+theme-light-mint-blurb = มินต์สีฟ้าน้ำทะเลเย็นตา
+theme-light-apricot-blurb = พีชอ่อน ส้ม
+theme-light-lemon-blurb = เหลืองอ่อน สีดินเหลือง
 theme-dark-graphite-blurb = เทากลาง ไม่มีโทนสี
 theme-dark-slate-blurb = เทาอมฟ้า
 theme-dark-obsidian-blurb = เกือบดำ สำหรับจอ OLED
@@ -2102,6 +2113,9 @@ theme-dark-ember-blurb = ถ่านโทนอุ่น อำพัน
 theme-dark-moss-blurb = เขียวป่าเข้มเกือบดำ
 theme-dark-aubergine-blurb = ม่วงพลัมเกือบดำ ไลแลค
 theme-dark-oxblood-blurb = แดงไวน์เกือบดำ ปะการัง
+theme-dark-midnight-blurb = กรมท่าเข้ม ฟ้า
+theme-dark-lagoon-blurb = เขียวหัวเป็ดเข้ม ฟ้าน้ำทะเล
+theme-dark-neon-blurb = เกือบดำ ชมพูสด
 
 ## texnames.ts
 

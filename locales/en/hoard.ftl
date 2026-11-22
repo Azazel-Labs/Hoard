@@ -2569,6 +2569,13 @@ theme-ember = Ember
 theme-moss = Moss
 theme-aubergine = Aubergine
 theme-oxblood = Oxblood
+theme-sky = Sky
+theme-mint = Mint
+theme-apricot = Apricot
+theme-lemon = Lemon
+theme-midnight = Midnight
+theme-lagoon = Lagoon
+theme-neon = Neon
 # A few words on how each theme feels, under its name in Settings → Appearance.
 theme-light-slate-blurb = Cool blue-gray
 theme-light-paper-blurb = Plain neutral gray
@@ -2576,6 +2583,10 @@ theme-light-linen-blurb = Warm cream, amber
 theme-light-sage-blurb = Soft green
 theme-light-lilac-blurb = Pale violet
 theme-light-blush-blurb = Dusty rose
+theme-light-sky-blurb = Clear sky blue
+theme-light-mint-blurb = Cool aqua mint
+theme-light-apricot-blurb = Soft peach, orange
+theme-light-lemon-blurb = Pale yellow, ochre
 theme-dark-graphite-blurb = Neutral gray, no tint
 theme-dark-slate-blurb = Blue-gray
 theme-dark-obsidian-blurb = Near black, for OLED
@@ -2583,6 +2594,9 @@ theme-dark-ember-blurb = Warm charcoal, amber
 theme-dark-moss-blurb = Forest green-black
 theme-dark-aubergine-blurb = Plum-black, lilac
 theme-dark-oxblood-blurb = Wine-black, coral
+theme-dark-midnight-blurb = Deep navy, sky blue
+theme-dark-lagoon-blurb = Deep teal, aqua
+theme-dark-neon-blurb = Near black, hot pink
 
 ## texnames.ts
 

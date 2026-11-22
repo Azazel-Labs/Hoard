@@ -2478,12 +2478,23 @@ theme-ember = Jar
 theme-moss = Mușchi
 theme-aubergine = Vânătă
 theme-oxblood = Bordo
+theme-sky = Cer
+theme-mint = Mentă
+theme-apricot = Caisă
+theme-lemon = Lămâie
+theme-midnight = Miezul nopții
+theme-lagoon = Lagună
+theme-neon = Neon
 theme-light-slate-blurb = Gri-albastru rece
 theme-light-paper-blurb = Gri neutru simplu
 theme-light-linen-blurb = Crem cald, chihlimbar
 theme-light-sage-blurb = Verde moale
 theme-light-lilac-blurb = Violet pal
 theme-light-blush-blurb = Roz prăfuit
+theme-light-sky-blurb = Albastru-cer limpede
+theme-light-mint-blurb = Mentă acvamarin răcoroasă
+theme-light-apricot-blurb = Piersică delicată, portocaliu
+theme-light-lemon-blurb = Galben pal, ocru
 theme-dark-graphite-blurb = Gri neutru, fără nuanță
 theme-dark-slate-blurb = Gri-albastru
 theme-dark-obsidian-blurb = Aproape negru, pentru OLED
@@ -2491,6 +2502,9 @@ theme-dark-ember-blurb = Cărbune cald, chihlimbar
 theme-dark-moss-blurb = Verde de pădure spre negru
 theme-dark-aubergine-blurb = Prună spre negru, liliac
 theme-dark-oxblood-blurb = Vin spre negru, coral
+theme-dark-midnight-blurb = Bleumarin intens, albastru-cer
+theme-dark-lagoon-blurb = Turcoaz închis, acvamarin
+theme-dark-neon-blurb = Aproape negru, roz aprins
 
 ## texnames.ts
 

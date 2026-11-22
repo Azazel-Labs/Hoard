@@ -12422,6 +12422,10 @@ translation = "Kaydır"
 source = "Wrap long lines (W)"
 translation = "Uzun satırları kaydır (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Kayısı"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Patlıcan"
@@ -12442,9 +12446,21 @@ translation = "Sıcak kömür, kehribar"
 source = "Neutral gray, no tint"
 translation = "Nötr gri, renk tonu yok"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Derin petrol yeşili, su yeşili"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Derin lacivert, gök mavisi"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Orman yeşili-siyah"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Neredeyse siyah, canlı pembe"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12466,9 +12482,25 @@ translation = "Kor"
 source = "Graphite"
 translation = "Grafit"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Lagün"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Limon"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Yumuşak şeftali, turuncu"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Tozlu gül"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Soluk sarı, aşı boyası"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12478,6 +12510,10 @@ translation = "Soluk menekşe"
 source = "Warm cream, amber"
 translation = "Sıcak krem, kehribar"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Serin su yeşili nane"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Sade nötr gri"
@@ -12485,6 +12521,10 @@ translation = "Sade nötr gri"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Yumuşak yeşil"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Berrak gök mavisi"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12498,9 +12538,21 @@ translation = "Leylak"
 source = "Linen"
 translation = "Keten"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Gece Yarısı"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Nane"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Yosun"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12517,6 +12569,10 @@ translation = "Kâğıt"
 [messages.theme-sage]
 source = "Sage"
 translation = "Adaçayı"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Gökyüzü"
 
 [messages.theme-slate]
 source = "Slate"

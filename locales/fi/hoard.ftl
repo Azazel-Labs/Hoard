@@ -2360,12 +2360,23 @@ theme-ember = Hiillos
 theme-moss = Sammal
 theme-aubergine = Munakoiso
 theme-oxblood = Häränveri
+theme-sky = Taivas
+theme-mint = Minttu
+theme-apricot = Aprikoosi
+theme-lemon = Sitruuna
+theme-midnight = Keskiyö
+theme-lagoon = Laguuni
+theme-neon = Neon
 theme-light-slate-blurb = Viileä siniharmaa
 theme-light-paper-blurb = Pelkistetty neutraali harmaa
 theme-light-linen-blurb = Lämmin kerma, meripihka
 theme-light-sage-blurb = Pehmeä vihreä
 theme-light-lilac-blurb = Vaalea violetti
 theme-light-blush-blurb = Himmeä ruusu
+theme-light-sky-blurb = Kirkas taivaansininen
+theme-light-mint-blurb = Viileä akvaminttu
+theme-light-apricot-blurb = Pehmeä persikka, oranssi
+theme-light-lemon-blurb = Vaaleankeltainen, okra
 theme-dark-graphite-blurb = Neutraali harmaa, ei sävyä
 theme-dark-slate-blurb = Siniharmaa
 theme-dark-obsidian-blurb = Lähes musta, OLED-näytöille
@@ -2373,6 +2384,9 @@ theme-dark-ember-blurb = Lämmin hiilenharmaa, meripihka
 theme-dark-moss-blurb = Metsänvihreä-musta
 theme-dark-aubergine-blurb = Luumunmusta, sireeni
 theme-dark-oxblood-blurb = Viininmusta, koralli
+theme-dark-midnight-blurb = Syvä laivastonsininen, taivaansininen
+theme-dark-lagoon-blurb = Syvä sinivihreä, akva
+theme-dark-neon-blurb = Lähes musta, kirkas pinkki
 
 ## Tekstuurien nimet
 

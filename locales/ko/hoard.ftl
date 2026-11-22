@@ -2062,12 +2062,23 @@ theme-ember = 엠버
 theme-moss = 모스
 theme-aubergine = 오버진
 theme-oxblood = 옥스블러드
+theme-sky = 스카이
+theme-mint = 민트
+theme-apricot = 애프리콧
+theme-lemon = 레몬
+theme-midnight = 미드나이트
+theme-lagoon = 라군
+theme-neon = 네온
 theme-light-slate-blurb = 차가운 청회색
 theme-light-paper-blurb = 무난한 중성 회색
 theme-light-linen-blurb = 따뜻한 크림색, 호박색
 theme-light-sage-blurb = 부드러운 초록
 theme-light-lilac-blurb = 연한 보라
 theme-light-blush-blurb = 차분한 장미색
+theme-light-sky-blurb = 맑은 하늘색
+theme-light-mint-blurb = 시원한 아쿠아 민트
+theme-light-apricot-blurb = 부드러운 복숭아색, 주황
+theme-light-lemon-blurb = 연한 노랑, 황토색
 theme-dark-graphite-blurb = 색조 없는 중성 회색
 theme-dark-slate-blurb = 청회색
 theme-dark-obsidian-blurb = OLED용 검정에 가까운 색
@@ -2075,6 +2086,9 @@ theme-dark-ember-blurb = 따뜻한 숯색, 호박색
 theme-dark-moss-blurb = 숲 같은 초록빛 검정
 theme-dark-aubergine-blurb = 자두빛 검정, 라일락
 theme-dark-oxblood-blurb = 와인빛 검정, 코럴
+theme-dark-midnight-blurb = 짙은 네이비, 하늘색
+theme-dark-lagoon-blurb = 짙은 청록, 아쿠아
+theme-dark-neon-blurb = 검정에 가까운 색, 핫핑크
 
 ## texnames.ts
 

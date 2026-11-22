@@ -2365,12 +2365,23 @@ theme-ember = Θράκα
 theme-moss = Βρύο
 theme-aubergine = Μελιτζανί
 theme-oxblood = Βυσσινί
+theme-sky = Ουρανός
+theme-mint = Μέντα
+theme-apricot = Βερίκοκο
+theme-lemon = Λεμόνι
+theme-midnight = Μεσάνυχτα
+theme-lagoon = Λιμνοθάλασσα
+theme-neon = Νέον
 theme-light-slate-blurb = Ψυχρό γαλαζογκρίζο
 theme-light-paper-blurb = Απλό ουδέτερο γκρι
 theme-light-linen-blurb = Ζεστό κρεμ, κεχριμπάρι
 theme-light-sage-blurb = Απαλό πράσινο
 theme-light-lilac-blurb = Ανοιχτό βιολετί
 theme-light-blush-blurb = Ξεθωριασμένο ροζ
+theme-light-sky-blurb = Καθαρό γαλάζιο
+theme-light-mint-blurb = Δροσερή γαλαζοπράσινη μέντα
+theme-light-apricot-blurb = Απαλό ροδακινί, πορτοκαλί
+theme-light-lemon-blurb = Ανοιχτό κίτρινο, ώχρα
 theme-dark-graphite-blurb = Ουδέτερο γκρι, χωρίς απόχρωση
 theme-dark-slate-blurb = Γαλαζογκρίζο
 theme-dark-obsidian-blurb = Σχεδόν μαύρο, για OLED
@@ -2378,6 +2389,9 @@ theme-dark-ember-blurb = Ζεστό ανθρακί, κεχριμπάρι
 theme-dark-moss-blurb = Πράσινο του δάσους προς το μαύρο
 theme-dark-aubergine-blurb = Δαμασκηνί προς το μαύρο, λιλά
 theme-dark-oxblood-blurb = Κρασάτο προς το μαύρο, κοραλλί
+theme-dark-midnight-blurb = Βαθύ ναυτικό μπλε, γαλάζιο
+theme-dark-lagoon-blurb = Βαθύ πετρόλ, γαλαζοπράσινο
+theme-dark-neon-blurb = Σχεδόν μαύρο, έντονο ροζ
 
 ## texnames.ts
 

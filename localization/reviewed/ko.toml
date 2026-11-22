@@ -12326,6 +12326,10 @@ translation = "줄 바꿈"
 source = "Wrap long lines (W)"
 translation = "긴 줄 바꿈(W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "애프리콧"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "오버진"
@@ -12346,9 +12350,21 @@ translation = "따뜻한 숯색, 호박색"
 source = "Neutral gray, no tint"
 translation = "색조 없는 중성 회색"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "짙은 청록, 아쿠아"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "짙은 네이비, 하늘색"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "숲 같은 초록빛 검정"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "검정에 가까운 색, 핫핑크"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12370,9 +12386,25 @@ translation = "엠버"
 source = "Graphite"
 translation = "그래파이트"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "라군"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "레몬"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "부드러운 복숭아색, 주황"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "차분한 장미색"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "연한 노랑, 황토색"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12382,6 +12414,10 @@ translation = "연한 보라"
 source = "Warm cream, amber"
 translation = "따뜻한 크림색, 호박색"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "시원한 아쿠아 민트"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "무난한 중성 회색"
@@ -12389,6 +12425,10 @@ translation = "무난한 중성 회색"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "부드러운 초록"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "맑은 하늘색"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12402,9 +12442,21 @@ translation = "라일락"
 source = "Linen"
 translation = "리넨"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "미드나이트"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "민트"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "모스"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "네온"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12421,6 +12473,10 @@ translation = "페이퍼"
 [messages.theme-sage]
 source = "Sage"
 translation = "세이지"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "스카이"
 
 [messages.theme-slate]
 source = "Slate"

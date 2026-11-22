@@ -12362,6 +12362,10 @@ translation = "ตัดบรรทัด"
 source = "Wrap long lines (W)"
 translation = "ตัดบรรทัดยาว (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "แอปริคอต"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "มะเขือม่วง"
@@ -12382,9 +12386,21 @@ translation = "ถ่านโทนอุ่น อำพัน"
 source = "Neutral gray, no tint"
 translation = "เทากลาง ไม่มีโทนสี"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "เขียวหัวเป็ดเข้ม ฟ้าน้ำทะเล"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "กรมท่าเข้ม ฟ้า"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "เขียวป่าเข้มเกือบดำ"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "เกือบดำ ชมพูสด"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12406,9 +12422,25 @@ translation = "ถ่านคุ"
 source = "Graphite"
 translation = "แกรไฟต์"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "ลากูน"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "เลมอน"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "พีชอ่อน ส้ม"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "ชมพูกุหลาบหม่น"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "เหลืองอ่อน สีดินเหลือง"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12418,6 +12450,10 @@ translation = "ม่วงอ่อนจาง"
 source = "Warm cream, amber"
 translation = "ครีมอุ่น อำพัน"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "มินต์สีฟ้าน้ำทะเลเย็นตา"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "เทากลางเรียบ ๆ"
@@ -12425,6 +12461,10 @@ translation = "เทากลางเรียบ ๆ"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "เขียวอ่อนนุ่ม"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "ฟ้าใส"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12438,9 +12478,21 @@ translation = "ไลแลค"
 source = "Linen"
 translation = "ลินิน"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "เที่ยงคืน"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "มินต์"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "มอส"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "นีออน"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12457,6 +12509,10 @@ translation = "กระดาษ"
 [messages.theme-sage]
 source = "Sage"
 translation = "เสจ"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "ท้องฟ้า"
 
 [messages.theme-slate]
 source = "Slate"

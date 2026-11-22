@@ -2092,12 +2092,23 @@ theme-ember = 餘燼
 theme-moss = 苔蘚
 theme-aubergine = 茄紫
 theme-oxblood = 牛血紅
+theme-sky = 晴空
+theme-mint = 薄荷
+theme-apricot = 杏色
+theme-lemon = 檸檬
+theme-midnight = 午夜
+theme-lagoon = 潟湖
+theme-neon = 霓虹
 theme-light-slate-blurb = 冷調藍灰
 theme-light-paper-blurb = 樸素中性灰
 theme-light-linen-blurb = 溫暖奶油色、琥珀色
 theme-light-sage-blurb = 柔和綠色
 theme-light-lilac-blurb = 淡紫色
 theme-light-blush-blurb = 灰玫瑰色
+theme-light-sky-blurb = 清澈天藍
+theme-light-mint-blurb = 清涼水綠薄荷
+theme-light-apricot-blurb = 柔和桃色，橙色點綴
+theme-light-lemon-blurb = 淡黃，赭色點綴
 theme-dark-graphite-blurb = 中性灰，無色調
 theme-dark-slate-blurb = 藍灰
 theme-dark-obsidian-blurb = 近乎全黑，適合 OLED
@@ -2105,6 +2116,9 @@ theme-dark-ember-blurb = 溫暖炭灰、琥珀色
 theme-dark-moss-blurb = 森林綠黑
 theme-dark-aubergine-blurb = 梅紫黑、淡紫色
 theme-dark-oxblood-blurb = 酒紅黑、珊瑚色
+theme-dark-midnight-blurb = 深海軍藍，天藍點綴
+theme-dark-lagoon-blurb = 深青綠，水綠點綴
+theme-dark-neon-blurb = 近乎純黑，亮粉點綴
 
 ## 貼圖命名
 

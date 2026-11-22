@@ -2403,12 +2403,23 @@ theme-ember = Жар
 theme-moss = Маховина
 theme-aubergine = Патлиџан
 theme-oxblood = Бордо
+theme-sky = Небо
+theme-mint = Нана
+theme-apricot = Кајсија
+theme-lemon = Лимун
+theme-midnight = Поноћ
+theme-lagoon = Лагуна
+theme-neon = Неон
 theme-light-slate-blurb = Хладна плавосива
 theme-light-paper-blurb = Обична неутрална сива
 theme-light-linen-blurb = Топла крем, ћилибар
 theme-light-sage-blurb = Мека зелена
 theme-light-lilac-blurb = Бледа љубичаста
 theme-light-blush-blurb = Пепељаста ружичаста
+theme-light-sky-blurb = Ведро небоплава
+theme-light-mint-blurb = Свежа аквамарин нана
+theme-light-apricot-blurb = Мека бресква, наранџаста
+theme-light-lemon-blurb = Бледожута, окер
 theme-dark-graphite-blurb = Неутрална сива, без нијансе
 theme-dark-slate-blurb = Плавосива
 theme-dark-obsidian-blurb = Скоро црна, за OLED
@@ -2416,6 +2427,9 @@ theme-dark-ember-blurb = Топли угаљ, ћилибар
 theme-dark-moss-blurb = Шумска зеленоцрна
 theme-dark-aubergine-blurb = Шљивоцрна, јоргован
 theme-dark-oxblood-blurb = Винскоцрна, корал
+theme-dark-midnight-blurb = Дубока тамноплава, небоплава
+theme-dark-lagoon-blurb = Дубока плавозелена, аквамарин
+theme-dark-neon-blurb = Скоро црна, јарко ружичаста
 
 ## texnames.ts
 

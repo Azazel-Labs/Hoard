@@ -2135,12 +2135,23 @@ theme-ember = Kor
 theme-moss = Yosun
 theme-aubergine = Patlıcan
 theme-oxblood = Bordo
+theme-sky = Gökyüzü
+theme-mint = Nane
+theme-apricot = Kayısı
+theme-lemon = Limon
+theme-midnight = Gece Yarısı
+theme-lagoon = Lagün
+theme-neon = Neon
 theme-light-slate-blurb = Serin mavi-gri
 theme-light-paper-blurb = Sade nötr gri
 theme-light-linen-blurb = Sıcak krem, kehribar
 theme-light-sage-blurb = Yumuşak yeşil
 theme-light-lilac-blurb = Soluk menekşe
 theme-light-blush-blurb = Tozlu gül
+theme-light-sky-blurb = Berrak gök mavisi
+theme-light-mint-blurb = Serin su yeşili nane
+theme-light-apricot-blurb = Yumuşak şeftali, turuncu
+theme-light-lemon-blurb = Soluk sarı, aşı boyası
 theme-dark-graphite-blurb = Nötr gri, renk tonu yok
 theme-dark-slate-blurb = Mavi-gri
 theme-dark-obsidian-blurb = Siyaha yakın, OLED için
@@ -2148,6 +2159,9 @@ theme-dark-ember-blurb = Sıcak kömür, kehribar
 theme-dark-moss-blurb = Orman yeşili-siyah
 theme-dark-aubergine-blurb = Erik siyahı, leylak
 theme-dark-oxblood-blurb = Şarap siyahı, mercan
+theme-dark-midnight-blurb = Derin lacivert, gök mavisi
+theme-dark-lagoon-blurb = Derin petrol yeşili, su yeşili
+theme-dark-neon-blurb = Neredeyse siyah, canlı pembe
 
 ## texnames.ts
 

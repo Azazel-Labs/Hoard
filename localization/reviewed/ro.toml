@@ -12860,6 +12860,10 @@ translation = "Încadrare"
 source = "Wrap long lines (W)"
 translation = "Încadrați rândurile lungi (W)"
 
+[messages.theme-apricot]
+source = "Apricot"
+translation = "Caisă"
+
 [messages.theme-aubergine]
 source = "Aubergine"
 translation = "Vânătă"
@@ -12880,9 +12884,21 @@ translation = "Cărbune cald, chihlimbar"
 source = "Neutral gray, no tint"
 translation = "Gri neutru, fără nuanță"
 
+[messages.theme-dark-lagoon-blurb]
+source = "Deep teal, aqua"
+translation = "Turcoaz închis, acvamarin"
+
+[messages.theme-dark-midnight-blurb]
+source = "Deep navy, sky blue"
+translation = "Bleumarin intens, albastru-cer"
+
 [messages.theme-dark-moss-blurb]
 source = "Forest green-black"
 translation = "Verde de pădure spre negru"
+
+[messages.theme-dark-neon-blurb]
+source = "Near black, hot pink"
+translation = "Aproape negru, roz aprins"
 
 [messages.theme-dark-obsidian-blurb]
 source = "Near black, for OLED"
@@ -12904,9 +12920,25 @@ translation = "Jar"
 source = "Graphite"
 translation = "Grafit"
 
+[messages.theme-lagoon]
+source = "Lagoon"
+translation = "Lagună"
+
+[messages.theme-lemon]
+source = "Lemon"
+translation = "Lămâie"
+
+[messages.theme-light-apricot-blurb]
+source = "Soft peach, orange"
+translation = "Piersică delicată, portocaliu"
+
 [messages.theme-light-blush-blurb]
 source = "Dusty rose"
 translation = "Roz prăfuit"
+
+[messages.theme-light-lemon-blurb]
+source = "Pale yellow, ochre"
+translation = "Galben pal, ocru"
 
 [messages.theme-light-lilac-blurb]
 source = "Pale violet"
@@ -12916,6 +12948,10 @@ translation = "Violet pal"
 source = "Warm cream, amber"
 translation = "Crem cald, chihlimbar"
 
+[messages.theme-light-mint-blurb]
+source = "Cool aqua mint"
+translation = "Mentă acvamarin răcoroasă"
+
 [messages.theme-light-paper-blurb]
 source = "Plain neutral gray"
 translation = "Gri neutru simplu"
@@ -12923,6 +12959,10 @@ translation = "Gri neutru simplu"
 [messages.theme-light-sage-blurb]
 source = "Soft green"
 translation = "Verde moale"
+
+[messages.theme-light-sky-blurb]
+source = "Clear sky blue"
+translation = "Albastru-cer limpede"
 
 [messages.theme-light-slate-blurb]
 source = "Cool blue-gray"
@@ -12936,9 +12976,21 @@ translation = "Liliac"
 source = "Linen"
 translation = "In"
 
+[messages.theme-midnight]
+source = "Midnight"
+translation = "Miezul nopții"
+
+[messages.theme-mint]
+source = "Mint"
+translation = "Mentă"
+
 [messages.theme-moss]
 source = "Moss"
 translation = "Mușchi"
+
+[messages.theme-neon]
+source = "Neon"
+translation = "Neon"
 
 [messages.theme-obsidian]
 source = "Obsidian"
@@ -12955,6 +13007,10 @@ translation = "Hârtie"
 [messages.theme-sage]
 source = "Sage"
 translation = "Salvie"
+
+[messages.theme-sky]
+source = "Sky"
+translation = "Cer"
 
 [messages.theme-slate]
 source = "Slate"

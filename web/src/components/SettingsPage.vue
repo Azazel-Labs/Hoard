@@ -298,7 +298,7 @@ onBeforeUnmount(() => {
           />
         </div>
       </div>
-      <div v-else class="inner" :class="{ wide: current === 'store-files' }">
+      <div v-else class="inner" :class="{ wide: current === 'store-files', roomy: current === 'performance' }">
         <header class="phead">
           <span class="pglyph" aria-hidden="true"><SettingsGlyph :page="page.id" :size="22" /></span>
           <div class="ptext">
@@ -358,8 +358,10 @@ onBeforeUnmount(() => {
 .inner { max-width: 50rem; padding: 1.6rem 2rem 5rem; }
 /* The format wizard shows a file beside its form. */
 .inner.wide { max-width: 80rem; }
+/* Performance's charts and the table of routes have more to show than a page of settings; its text keeps its width. */
+.inner.roomy { max-width: 72rem; }
 /* The page's heading: its icon on an accent tile, the anchor the eye lands on first. */
-.phead { display: flex; align-items: center; gap: 0.95rem; margin-bottom: 1.5rem; }
+.phead { display: flex; align-items: flex-start; gap: 0.95rem; margin-bottom: 1.5rem; }
 .pglyph {
   flex: none; display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 12px; color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));

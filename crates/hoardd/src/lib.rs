@@ -269,13 +269,8 @@ pub async fn run(cfg: Config) -> Result<()> {
     clip::start(&state, effective.clip, effective.clip_hosted.clone());
     clap::start(&state, effective.clap);
     convert::start_blender(&state, false);
-    unreal_editor::start(
-        &effective.unreal,
-        &effective.unreal_image,
-        effective.ghcr.clone(),
-        state.cfg.tools_dir(),
-        tools::editor_downloads(&state.cfg),
-    );
+    // Starts Unreal Editor's download too, once a GitHub sign-in that ran out while Hoard was off has been renewed.
+    tokio::spawn(api::keep_github_fresh(Arc::clone(&state)));
     updates::start(effective.update_check && !state.cfg.desktop);
     updates::start_hook(&state);
     analyze::warm_renderer();

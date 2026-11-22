@@ -17,6 +17,8 @@ const REPO: &str = "ghcr.io/epicgames/unreal-engine";
 const TREE: &str = "home/ue4/UnrealEngine";
 const EDITOR: &str = "Engine/Binaries/Linux/UnrealEditor";
 pub(crate) const DEFAULT_IMAGE: &str = "5.8";
+/// Hoard's GitHub OAuth app, for signing in to GitHub by its device flow (no secret: the device flow needs none).
+pub(crate) const GITHUB_CLIENT_ID: &str = "Ov23lijmQuu0zfqGeZUn";
 static SLOT: Slot<Tool> = Slot::new();
 
 #[derive(Clone, Debug)]
@@ -297,7 +299,7 @@ fn unresolved(e: anyhow::Error) -> anyhow::Error {
     let what = if missing {
         "Can't run crane, which downloads Unreal Editor (it comes with Hoard's Docker image)"
     } else if has(&["No matching credentials", "UNAUTHORIZED", "authentication required"]) {
-        "Hoard downloads Unreal Editor from Epic's private images on GitHub (ghcr.io), and GitHub wants a sign-in for them that this server doesn't have. Link your GitHub account to your Epic Games account, then enter your GitHub user name and a token with read:packages under Unreal Editor in Settings → Tools"
+        "Hoard downloads Unreal Editor from Epic's private images on GitHub (ghcr.io), and GitHub wants a sign-in for them that this server doesn't have. Link your GitHub account to your Epic Games account, then choose Connect GitHub under Unreal Editor in Settings → Tools (or enter a token with read:packages there)"
     } else if has(&["DENIED", "denied", "403"]) {
         "GitHub turned down the sign-in for Epic's Unreal Editor images: the GitHub account needs to be linked to an Epic Games account, with the EpicGames organization's invitation accepted, and its token needs read:packages"
     } else if has(&["MANIFEST_UNKNOWN", "manifest unknown", "NAME_UNKNOWN"]) {

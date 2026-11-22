@@ -4,6 +4,7 @@ import { reactive, ref } from 'vue'
 import { ApiError, type ToolSetting, api } from '../api'
 import { t } from '../i18n'
 import { showError, showOk } from '../ui'
+import GitHubConnect from './GitHubConnect.vue'
 import ResetButton from './ResetButton.vue'
 import { useSettings } from './settingsContext'
 
@@ -46,12 +47,10 @@ function toolChanged(tool: ToolSetting): boolean {
 }
 
 const unrealImage = ref('5.8')
-/** The GitHub account Unreal Editor is downloaded as; the token is typed afresh, never shown. */
-const github = reactive({ user: '', token: '' })
+/** The Connect GitHub dialog is open (for who Unreal Editor is downloaded as). */
+const connecting = ref(false)
 onTake((next) => {
   unrealImage.value = next.unreal_image.value
-  github.user = next.unreal_github?.user ?? ''
-  github.token = ''
   for (const k of ['blender', 'ffmpeg', 'unreal'] as const) {
     chosen[k] = k !== 'ffmpeg' && !next[k].can_download && modeOf(next[k].value) === 'auto' ? 'path' : modeOf(next[k].value)
     paths[k] = modeOf(next[k].value) === 'path' ? next[k].value : ''
@@ -63,11 +62,6 @@ function pick(k: ToolKey, m: Mode) {
   if (m === 'off') void save({ [k]: 'off' })
   else if (m === 'auto') void save({ [k]: 'auto', ...(k === 'unreal' ? { unreal_image: unrealImage.value.trim() } : {}) })
   // A path waits for "Use".
-}
-function saveGithub() {
-  const user = github.user.trim()
-  const token = github.token.trim()
-  void save({ ghcr_user: user || null, ...(token ? { ghcr_token: token } : {}) }, t('settings-unreal-github-saved'))
 }
 function forgetGithub() {
   void save({ ghcr_user: null, ghcr_token: null }, t('settings-unreal-github-forgotten'))
@@ -125,48 +119,31 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
     </div>
     <p class="what">{{ tool.key === 'unreal' && !s.unreal.can_download ? t('settings-editor-path', { tool: tool.title }) : tool.what }}</p>
     <p v-if="tool.key === 'blender' && !s.blender.can_download" class="hint">{{ t('settings-editor-path', { tool: tool.title }) }}</p>
+    <div v-if="tool.key === 'unreal' && s.unreal.can_download" class="github" data-testid="unreal-github-row">
+      <span v-if="s.unreal_github?.has_token" class="avatar" aria-hidden="true">{{ (s.unreal_github.user || '?').slice(0, 1).toUpperCase() }}</span>
+      <span class="who">
+        <template v-if="s.unreal_github?.has_token">
+          <strong>{{ t('settings-unreal-github-as', { user: s.unreal_github.user }) }}</strong>
+          <small>{{ t('settings-unreal-github-as-what') }}</small>
+        </template>
+        <template v-else>
+          <span>{{ t('settings-unreal-github-none') }}</span>
+          <small>{{ s.unreal_github?.from_server ? t('settings-unreal-github-from-server') : t('settings-unreal-github-none-what') }}</small>
+        </template>
+      </span>
+      <button class="btn" :class="{ ghost: s.unreal_github?.has_token }" type="button" :disabled="busy" @click="connecting = true">
+        {{ s.unreal_github?.has_token ? t('settings-unreal-github-change') : t('settings-unreal-github-connect') }}
+      </button>
+      <button v-if="s.unreal_github?.has_token || s.unreal_github?.user" class="btn ghost" type="button" :disabled="busy" @click="forgetGithub">
+        {{ t('settings-unreal-github-forget') }}
+      </button>
+    </div>
     <form v-if="tool.key === 'unreal' && s.unreal.can_download" class="path" @submit.prevent="save({ unreal_image: unrealImage.trim() })">
       <label for="unreal-image">{{ t('settings-unreal-image') }}</label>
       <input id="unreal-image" v-model="unrealImage" class="field mono" type="text" spellcheck="false" placeholder="5.8" :disabled="busy" />
       <button class="btn" type="submit" :disabled="busy || !unrealImage.trim() || unrealImage.trim() === s.unreal_image.value">{{ t('settings-use') }}</button>
       <ResetButton v-if="s.unreal_image.saved" :to="s.unreal_image.default" :disabled="busy" @reset="save({ unreal_image: null })" />
     </form>
-    <details v-if="tool.key === 'unreal' && s.unreal.can_download" class="github" :open="chosen.unreal === 'auto' && !s.unreal_github?.has_token && !s.unreal_github?.from_server">
-      <summary>{{ t('settings-unreal-github') }}</summary>
-      <p class="hint">{{ t('settings-unreal-github-why') }}</p>
-      <ol class="steps">
-        <li>
-          {{ t('settings-unreal-github-step-link') }}
-          <a href="https://www.unrealengine.com/en-US/ue-on-github" target="_blank" rel="noopener noreferrer">{{ t('settings-unreal-github-step-link-go') }}</a>
-        </li>
-        <li>{{ t('settings-unreal-github-step-invite') }}</li>
-        <li>
-          {{ t('settings-unreal-github-step-token') }}
-          <a href="https://github.com/settings/tokens/new?scopes=read:packages&amp;description=Hoard%20(Unreal%20Editor)" target="_blank" rel="noopener noreferrer">{{ t('settings-unreal-github-step-token-go') }}</a>
-        </li>
-        <li>{{ t('settings-unreal-github-step-enter') }}</li>
-      </ol>
-      <form class="creds" data-testid="unreal-github" @submit.prevent="saveGithub">
-        <label for="ghcr-user">{{ t('settings-unreal-github-user') }}</label>
-        <input id="ghcr-user" v-model="github.user" class="field mono" type="text" autocomplete="username" spellcheck="false" :disabled="busy" />
-        <label for="ghcr-token">{{ t('settings-unreal-github-token') }}</label>
-        <input
-          id="ghcr-token"
-          v-model="github.token"
-          class="field mono"
-          type="password"
-          autocomplete="new-password"
-          spellcheck="false"
-          :placeholder="s.unreal_github?.has_token ? t('settings-unreal-github-token-kept') : 'ghp_…'"
-          :disabled="busy"
-        />
-        <div class="buttons">
-          <button class="btn" type="submit" :disabled="busy || !github.user.trim() || (!github.token.trim() && !s.unreal_github?.has_token)">{{ t('settings-unreal-github-save') }}</button>
-          <button v-if="s.unreal_github?.has_token || s.unreal_github?.user" class="btn ghost" type="button" :disabled="busy" @click="forgetGithub">{{ t('settings-unreal-github-forget') }}</button>
-        </div>
-      </form>
-      <p v-if="s.unreal_github?.from_server && !s.unreal_github?.has_token" class="hint">{{ t('settings-unreal-github-from-server') }}</p>
-    </details>
     <div class="modes" role="radiogroup" :aria-label="tool.title">
       <label>
         <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'off'" :disabled="busy" @change="pick(tool.key, 'off')" />
@@ -225,6 +202,7 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
       </div>
     </div>
   </section>
+  <GitHubConnect v-if="connecting" @close="connecting = false" />
 </template>
 
 <style scoped src="./settingsForm.css"></style>
@@ -232,12 +210,18 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
 <style scoped>
 .path { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
 .path .field { flex: 1; min-width: 0; }
-.github { margin-top: 0.7rem; }
-.github summary { cursor: pointer; font-weight: 600; }
-.github .steps { margin: 0.5rem 0; padding-left: 1.3rem; display: grid; gap: 0.3rem; }
-.github .creds { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.45rem 0.6rem; align-items: center; margin-top: 0.5rem; }
-.github .creds .buttons { grid-column: 1 / -1; display: flex; gap: 0.5rem; justify-content: flex-end; }
-@media (max-width: 520px) {
-  .github .creds { grid-template-columns: minmax(0, 1fr); }
+/* Who Unreal Editor is downloaded as: a row with what to do about it. */
+.github {
+  display: flex; align-items: center; gap: 0.7rem; margin: 0.7rem 0; padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--raised);
 }
+.github .avatar {
+  flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+  background: color-mix(in oklab, var(--accent) 22%, transparent); color: var(--text); font-weight: 700;
+}
+.github .who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.github .who strong { font-weight: 600; overflow-wrap: anywhere; }
+.github .who small { color: var(--muted); font-size: var(--step--1); }
+.github .btn { flex: none; }
+@media (max-width: 480px) { .github { flex-wrap: wrap; } .github .who { flex-basis: calc(100% - 3rem); } }
 </style>

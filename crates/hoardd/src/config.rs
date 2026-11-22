@@ -101,6 +101,11 @@ pub struct Config {
     #[arg(long, env = "HOARD_UNREAL_IMAGE", default_value = crate::unreal_editor::DEFAULT_IMAGE)]
     pub(crate) unreal_image: String,
 
+    /// The GitHub OAuth app (its client ID) that "Sign in with GitHub" connects through for Unreal Editor downloads,
+    /// by GitHub's device flow. Empty: only a token typed in by hand.
+    #[arg(long, env = "HOARD_GITHUB_CLIENT_ID", default_value = crate::unreal_editor::GITHUB_CLIENT_ID)]
+    pub(crate) github_client_id: String,
+
     /// Convert Unreal packages to common formats after ingest: textures to PNG/EXR, sounds to WAV, materials to
     /// JSON, all with Hoard's own reader. Meshes and animations wait for `hoard unreal-worker` (Unreal Editor).
     #[arg(skip = UnrealConvert::Keep)]

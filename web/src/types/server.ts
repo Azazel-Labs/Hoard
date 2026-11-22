@@ -353,6 +353,18 @@ export interface CertCheck {
 }
 
 /** The ChatGPT account the server tags through, if it's signed in (`GET /api/admin/chatgpt`). */
+/** A code to enter at GitHub to connect it for Unreal Editor downloads, and where. */
+export interface GitHubCode {
+  code: string
+  url: string
+  /** Seconds between asking whether it's been entered. */
+  interval: number
+  expires_in: number
+}
+
+/** Whether the code has been entered at GitHub yet. */
+export type GitHubPoll = { state: 'waiting' | 'expired' | 'denied' } | { state: 'done'; user: string; settings: Settings }
+
 export interface ChatGptStatus {
   signed_in: boolean
   email?: string | null
@@ -399,7 +411,7 @@ export interface Settings {
   unreal: ToolSetting
   unreal_image: OptionSetting<string>
   /** Who Epic's private Unreal Editor images are downloaded as; the token itself is never sent back. */
-  unreal_github: { user: string; has_token: boolean; from_server: boolean }
+  unreal_github: { user: string; has_token: boolean; from_server: boolean; /** "Sign in with GitHub" can be offered. */ device: boolean }
   ffmpeg: ToolSetting
   unreal_convert: { value: UnrealConvert; default: UnrealConvert; saved: boolean }
   llm: {

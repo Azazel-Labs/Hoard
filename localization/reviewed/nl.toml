@@ -4376,6 +4376,18 @@ translation = "dit heeft één frame, of te veel om naast elkaar te zetten"
 source = "give a full path"
 translation = "geef een volledig pad op"
 
+[messages.error-github-no-app]
+source = "This server has no GitHub app to sign in through; use a token instead."
+translation = "Deze server heeft geen GitHub-app om mee in te loggen; gebruik liever een token."
+
+[messages.error-github-refused]
+source = "GitHub turned the sign-in down: { $reason }"
+translation = "GitHub heeft het inloggen geweigerd: { $reason }"
+
+[messages.error-github-unreachable]
+source = "Can’t reach GitHub."
+translation = "GitHub is niet bereikbaar."
+
 [messages.error-hoard-seen]
 source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
 translation = "de schat kan hoogstens 32 soorten assets bijhouden, elk met een naam in kleine letters"
@@ -10874,28 +10886,92 @@ source = "Unreal packages"
 translation = "Unreal-packages"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
-translation = "Downloadt Epics Linux x86-64-editor eenmalig naar de gereedschapsmap van Hoard. Hij neemt tientallen GB schijfruimte in en vereist een GitHub-account dat Epic heeft toegelaten (zie GitHub-aanmelding)."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in."
+translation = "Downloadt de Linux x86-64-editor van Epic eenmalig naar de toolsmap van Hoard. Hij neemt tientallen GB schijfruimte in en vereist een GitHub-account dat Epic heeft toegelaten."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Installeert Unreal Editor voor het exportproces. Start het proces apart om assets te exporteren."
 
-[messages.settings-unreal-github]
-source = "GitHub sign-in"
-translation = "GitHub-aanmelding"
+[messages.settings-unreal-github-again]
+source = "Get a new code"
+translation = "Nieuwe code ophalen"
+
+[messages.settings-unreal-github-as]
+source = "Connected as { $user }"
+translation = "Gekoppeld als { $user }"
+
+[messages.settings-unreal-github-as-what]
+source = "Unreal Editor is downloaded as this GitHub account."
+translation = "Unreal Editor wordt gedownload als dit GitHub-account."
+
+[messages.settings-unreal-github-before]
+source = "Before you start"
+translation = "Voordat je begint"
+
+[messages.settings-unreal-github-before-what]
+source = "Link GitHub to your Epic Games account and accept the EpicGames invitation GitHub emails you."
+translation = "Koppel GitHub aan je Epic Games-account en accepteer de uitnodiging van EpicGames die GitHub je mailt."
+
+[messages.settings-unreal-github-change]
+source = "Change…"
+translation = "Wijzigen…"
+
+[messages.settings-unreal-github-connect]
+source = "Connect GitHub…"
+translation = "GitHub koppelen…"
+
+[messages.settings-unreal-github-connect-title]
+source = "Connect GitHub"
+translation = "GitHub koppelen"
+
+[messages.settings-unreal-github-connect-why]
+source = "Epic shares Unreal Editor with GitHub accounts linked to Epic Games. Hoard asks only to read packages."
+translation = "Epic deelt Unreal Editor met GitHub-accounts die aan Epic Games gekoppeld zijn. Hoard vraagt alleen om pakketten te lezen."
+
+[messages.settings-unreal-github-connected]
+source = "Connected as { $user }; trying the download again"
+translation = "Gekoppeld als { $user }; downloaden wordt opnieuw geprobeerd"
+
+[messages.settings-unreal-github-denied]
+source = "The sign-in was cancelled at GitHub."
+translation = "Het inloggen is op GitHub geannuleerd."
+
+[messages.settings-unreal-github-enter-code]
+source = "After clicking, GitHub opens in a new tab. Enter this code there."
+translation = "Na de klik opent GitHub in een nieuw tabblad. Voer daar deze code in."
+
+[messages.settings-unreal-github-expired]
+source = "That code has run out."
+translation = "Die code is verlopen."
+
+[messages.settings-unreal-github-failed]
+source = "Couldn’t get a code from GitHub."
+translation = "Kon geen code van GitHub krijgen."
 
 [messages.settings-unreal-github-forget]
-source = "Forget"
-translation = "Vergeten"
+source = "Disconnect"
+translation = "Ontkoppelen"
 
 [messages.settings-unreal-github-forgotten]
-source = "GitHub sign-in forgotten"
-translation = "GitHub-aanmelding vergeten"
+source = "GitHub disconnected"
+translation = "GitHub ontkoppeld"
 
 [messages.settings-unreal-github-from-server]
 source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
 translation = "Deze server heeft ook een eigen aanmelding gekregen (GHCR_TOKEN_FILE of DOCKER_CONFIG); die wordt gebruikt als hier niets is opgeslagen."
+
+[messages.settings-unreal-github-no-password]
+source = "No password reaches Hoard"
+translation = "Er komt geen wachtwoord bij Hoard"
+
+[messages.settings-unreal-github-none]
+source = "GitHub isn’t connected"
+translation = "GitHub is niet gekoppeld"
+
+[messages.settings-unreal-github-none-what]
+source = "Needed to download the editor."
+translation = "Nodig om de editor te downloaden."
 
 [messages.settings-unreal-github-save]
 source = "Save sign-in"
@@ -10905,17 +10981,9 @@ translation = "Aanmelding opslaan"
 source = "GitHub sign-in saved; trying the download again"
 translation = "GitHub-aanmelding opgeslagen; de download wordt opnieuw geprobeerd"
 
-[messages.settings-unreal-github-step-enter]
-source = "Enter your GitHub user name and the token here, then choose Automatic."
-translation = "Vul hier je GitHub-gebruikersnaam en het token in en kies dan “Automatisch”."
-
-[messages.settings-unreal-github-step-invite]
-source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
-translation = "Accepteer de uitnodiging voor de organisatie EpicGames die GitHub je mailt (het kan een paar minuten duren voordat die aankomt)."
-
-[messages.settings-unreal-github-step-link]
-source = "Link your GitHub account to your Epic Games account."
-translation = "Koppel je GitHub-account aan je Epic Games-account."
+[messages.settings-unreal-github-sign-in]
+source = "Sign in with GitHub"
+translation = "Inloggen met GitHub"
 
 [messages.settings-unreal-github-step-link-go]
 source = "How to link them"
@@ -10937,13 +11005,21 @@ translation = "Token"
 source = "Saved (type a new one to replace it)"
 translation = "Opgeslagen (typ een nieuw om het te vervangen)"
 
+[messages.settings-unreal-github-use-sign-in]
+source = "Sign in with GitHub instead"
+translation = "Liever inloggen met GitHub"
+
+[messages.settings-unreal-github-use-token]
+source = "Use a token instead"
+translation = "Liever een token gebruiken"
+
 [messages.settings-unreal-github-user]
 source = "GitHub user name"
 translation = "GitHub-gebruikersnaam"
 
-[messages.settings-unreal-github-why]
-source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
-translation = "Epic publiceert de Linux-editor als privé-image in het pakketregister van GitHub (ghcr.io), en Hoard downloadt hem daarvandaan met crane, dat bij Hoard wordt meegeleverd. GitHub geeft hem alleen aan accounts die Epic heeft toegelaten, dus Hoard heeft er een nodig om hem mee te downloaden. Hoard bewaart het token bij zijn andere instellingen en gebruikt het nergens anders voor."
+[messages.settings-unreal-github-waiting]
+source = "Waiting for GitHub…"
+translation = "Wachten op GitHub…"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

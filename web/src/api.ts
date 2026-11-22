@@ -9,7 +9,7 @@ import type {
 } from './types/library'
 import type {
   AccessToken, Account, AccountSource, ActivityItem, AuthConfig, AuthSettings, AuthStatus, CertCheck, ChatGptStatus,
-  Connection, LiveApp, ExampleFile, FormatTrial, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
+  Connection, LiveApp, ExampleFile, FormatTrial, GitHubCode, GitHubPoll, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
   LibraryLocation, LocalModels, LocationList, Maintenance, ModelInfo, NewLocation, OAuthConfig, ProblemReport, Profile,
   Role,
   Settings, SettingsPatch, StoreFormats, UnreadFiles, UpdateHookCall, UpdateStatus,
@@ -294,6 +294,11 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, action, model }),
     }),
+  /** Start connecting GitHub for Unreal Editor downloads: a code to enter at GitHub. */
+  githubStart: () => request<GitHubCode>('/api/admin/unreal/github/start', { method: 'POST' }),
+  /** Whether that code has been entered; once it has, the settings with the sign-in saved. */
+  githubPoll: () => request<GitHubPoll>('/api/admin/unreal/github/poll', { method: 'POST' }),
+  githubCancel: () => request<unknown>('/api/admin/unreal/github/cancel', { method: 'POST' }),
   chatgpt: () => request<ChatGptStatus>('/api/admin/chatgpt'),
   /** The address to open to sign in; `port` is the one the browser reaches Hoard on. */
   chatgptStart: (port: number) =>

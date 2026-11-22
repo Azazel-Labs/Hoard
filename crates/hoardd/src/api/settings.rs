@@ -89,6 +89,8 @@ fn settings_json_sync(state: &AppState) -> Value {
             "user": saved.ghcr_user.as_deref().unwrap_or(""),
             "has_token": saved.ghcr_token.as_deref().is_some_and(|t| !t.trim().is_empty()),
             "from_server": std::env::var_os("GHCR_TOKEN_FILE").is_some() || std::env::var_os("DOCKER_CONFIG").is_some(),
+            // Whether "Sign in with GitHub" can be offered (an OAuth app to sign in through).
+            "device": !cfg.github_client_id.trim().is_empty(),
         },
         "unreal_convert": {
             "value": now.unreal_convert,
@@ -320,6 +322,15 @@ fn soundfont_name(sent: &str) -> String {
     format!("{}.sf2", if stem.is_empty() { "soundfont" } else { stem })
 }
 
+/// Settings, and the models an LLM setting could use. (Sending a SoundFont is in the main router, for its size limit.)
+pub(super) fn admin_router() -> axum::Router<AppState> {
+    use axum::routing::{get, post};
+    axum::Router::new()
+        .route("/api/admin/settings", get(get_settings).put(put_settings))
+        .route("/api/admin/llm/models", post(llm_models))
+        .route("/api/admin/llm/local", post(llm_local))
+}
+
 pub(super) async fn get_settings(State(state): State<AppState>) -> Json<Value> {
     Json(settings_json(&state).await)
 }
@@ -327,6 +338,15 @@ pub(super) async fn get_settings(State(state): State<AppState>) -> Json<Value> {
 /// Change settings: a JSON object of the ones to change, `null` to go back to the server's flag. Whatever changed
 /// takes effect at once (a tool switched on starts looking for, or downloading, its program).
 pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -> ApiResult<Json<Value>> {
+    let mut patch = patch;
+    // A token typed in (or forgotten) isn't the signed-in one, so what refreshed that goes with it.
+    if let Some(p) = patch.as_object_mut()
+        && p.contains_key("ghcr_token")
+        && !p.contains_key("ghcr_refresh")
+    {
+        p.insert("ghcr_refresh".into(), Value::Null);
+        p.insert("ghcr_expires".into(), Value::Null);
+    }
     let st = std::sync::Arc::clone(&state);
     let (before, after) = db::call(&state.pool, move |c| match st.settings.update(&st.cfg, c, &patch) {
         Ok(v) => Ok(Ok(v)),

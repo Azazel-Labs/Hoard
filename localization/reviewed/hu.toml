@@ -4301,6 +4301,18 @@ translation = "ennek egyetlen képkockája van, vagy túl sok ahhoz, hogy el leh
 source = "give a full path"
 translation = "adjon meg teljes elérési utat"
 
+[messages.error-github-no-app]
+source = "This server has no GitHub app to sign in through; use a token instead."
+translation = "Ezen a szerveren nincs GitHub-alkalmazás a bejelentkezéshez; használj inkább tokent."
+
+[messages.error-github-refused]
+source = "GitHub turned the sign-in down: { $reason }"
+translation = "A GitHub elutasította a bejelentkezést: { $reason }"
+
+[messages.error-github-unreachable]
+source = "Can’t reach GitHub."
+translation = "A GitHub nem érhető el."
+
 [messages.error-hoard-seen]
 source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
 translation = "a kincs legfeljebb 32 assetfajtát tarthat nyilván, mindegyiket kisbetűs névvel"
@@ -10710,28 +10722,92 @@ source = "Unreal packages"
 translation = "Unreal-csomagfájlok"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
-translation = "Egyszer letölti az Epic Linux x86-64 szerkesztőjét a Hoard eszközmappájába. Több tíz GB lemezterületet foglal, és olyan GitHub-fiókot igényel, amelyet az Epic beengedett (lásd: GitHub-bejelentkezés)."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in."
+translation = "Egyszer letölti az Epic Linux x86-64-es szerkesztőjét a Hoard eszközmappájába. Több tíz GB lemezterületet foglal, és olyan GitHub-fiók kell hozzá, amelyet az Epic beengedett."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Telepíti az Unreal Editort az exportáló folyamathoz. Az elemek exportálásához külön indítsa el a folyamatot."
 
-[messages.settings-unreal-github]
-source = "GitHub sign-in"
-translation = "GitHub-bejelentkezés"
+[messages.settings-unreal-github-again]
+source = "Get a new code"
+translation = "Új kód kérése"
+
+[messages.settings-unreal-github-as]
+source = "Connected as { $user }"
+translation = "Összekapcsolva: { $user }"
+
+[messages.settings-unreal-github-as-what]
+source = "Unreal Editor is downloaded as this GitHub account."
+translation = "Az Unreal Editor ezzel a GitHub-fiókkal töltődik le."
+
+[messages.settings-unreal-github-before]
+source = "Before you start"
+translation = "Mielőtt belekezdesz"
+
+[messages.settings-unreal-github-before-what]
+source = "Link GitHub to your Epic Games account and accept the EpicGames invitation GitHub emails you."
+translation = "Kapcsold össze a GitHubot az Epic Games-fiókoddal, és fogadd el az EpicGames meghívóját, amelyet a GitHub e-mailben küld."
+
+[messages.settings-unreal-github-change]
+source = "Change…"
+translation = "Módosítás…"
+
+[messages.settings-unreal-github-connect]
+source = "Connect GitHub…"
+translation = "GitHub összekapcsolása…"
+
+[messages.settings-unreal-github-connect-title]
+source = "Connect GitHub"
+translation = "GitHub összekapcsolása"
+
+[messages.settings-unreal-github-connect-why]
+source = "Epic shares Unreal Editor with GitHub accounts linked to Epic Games. Hoard asks only to read packages."
+translation = "Az Epic az Epic Gameshez kapcsolt GitHub-fiókokkal osztja meg az Unreal Editort. A Hoard csak csomagok olvasását kéri."
+
+[messages.settings-unreal-github-connected]
+source = "Connected as { $user }; trying the download again"
+translation = "Összekapcsolva: { $user }; a letöltés újrapróbálása"
+
+[messages.settings-unreal-github-denied]
+source = "The sign-in was cancelled at GitHub."
+translation = "A bejelentkezést a GitHubon megszakították."
+
+[messages.settings-unreal-github-enter-code]
+source = "After clicking, GitHub opens in a new tab. Enter this code there."
+translation = "Kattintás után a GitHub új lapon nyílik meg. Ott írd be ezt a kódot."
+
+[messages.settings-unreal-github-expired]
+source = "That code has run out."
+translation = "A kód lejárt."
+
+[messages.settings-unreal-github-failed]
+source = "Couldn’t get a code from GitHub."
+translation = "Nem sikerült kódot kapni a GitHubtól."
 
 [messages.settings-unreal-github-forget]
-source = "Forget"
-translation = "Elfelejtés"
+source = "Disconnect"
+translation = "Leválasztás"
 
 [messages.settings-unreal-github-forgotten]
-source = "GitHub sign-in forgotten"
-translation = "GitHub-bejelentkezés elfelejtve"
+source = "GitHub disconnected"
+translation = "GitHub leválasztva"
 
 [messages.settings-unreal-github-from-server]
 source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
 translation = "Ez a szerver saját bejelentkezést is kapott (GHCR_TOKEN_FILE vagy DOCKER_CONFIG); ezt használja, ha itt nincs mentve egy sem."
+
+[messages.settings-unreal-github-no-password]
+source = "No password reaches Hoard"
+translation = "Semmilyen jelszó nem jut el a Hoardhoz"
+
+[messages.settings-unreal-github-none]
+source = "GitHub isn’t connected"
+translation = "A GitHub nincs összekapcsolva"
+
+[messages.settings-unreal-github-none-what]
+source = "Needed to download the editor."
+translation = "A szerkesztő letöltéséhez kell."
 
 [messages.settings-unreal-github-save]
 source = "Save sign-in"
@@ -10741,17 +10817,9 @@ translation = "Bejelentkezés mentése"
 source = "GitHub sign-in saved; trying the download again"
 translation = "GitHub-bejelentkezés mentve; a letöltés újrapróbálása folyamatban"
 
-[messages.settings-unreal-github-step-enter]
-source = "Enter your GitHub user name and the token here, then choose Automatic."
-translation = "Adja meg itt GitHub-felhasználónevét és a tokent, majd válassza az „Automatikus” lehetőséget."
-
-[messages.settings-unreal-github-step-invite]
-source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
-translation = "Fogadja el az EpicGames szervezetbe szóló meghívást, amelyet a GitHub e-mailben küld (néhány percbe telhet, mire megérkezik)."
-
-[messages.settings-unreal-github-step-link]
-source = "Link your GitHub account to your Epic Games account."
-translation = "Kapcsolja össze GitHub-fiókját az Epic Games-fiókjával."
+[messages.settings-unreal-github-sign-in]
+source = "Sign in with GitHub"
+translation = "Bejelentkezés GitHubbal"
 
 [messages.settings-unreal-github-step-link-go]
 source = "How to link them"
@@ -10773,13 +10841,21 @@ translation = "Token"
 source = "Saved (type a new one to replace it)"
 translation = "Mentve (cseréjéhez írjon be egy újat)"
 
+[messages.settings-unreal-github-use-sign-in]
+source = "Sign in with GitHub instead"
+translation = "Inkább bejelentkezés GitHubbal"
+
+[messages.settings-unreal-github-use-token]
+source = "Use a token instead"
+translation = "Inkább token használata"
+
 [messages.settings-unreal-github-user]
 source = "GitHub user name"
 translation = "GitHub-felhasználónév"
 
-[messages.settings-unreal-github-why]
-source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
-translation = "Az Epic a Linux-szerkesztőt privát konténerképként teszi közzé a GitHub csomagregiszterében (ghcr.io), és a Hoard onnan tölti le a crane segítségével, amely a Hoarddal együtt érkezik. A GitHub csak olyan fiókoknak adja ki, amelyeket az Epic beengedett, ezért a Hoardnak szüksége van egy ilyen fiókra a letöltéshez. A Hoard a tokent a többi beállításával együtt tárolja, és semmi másra nem használja."
+[messages.settings-unreal-github-waiting]
+source = "Waiting for GitHub…"
+translation = "Várakozás a GitHubra…"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

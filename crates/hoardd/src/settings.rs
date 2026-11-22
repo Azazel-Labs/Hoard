@@ -101,6 +101,12 @@ pub(crate) struct Saved {
     pub(crate) ghcr_user: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) ghcr_token: Option<String>,
+    /// For a token from signing in with GitHub (which lasts hours): what gets it a new one, and when it runs out (Unix
+    /// seconds). Neither, for a token typed in.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ghcr_refresh: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ghcr_expires: Option<u64>,
     /// `off`, `auto` or a path.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) ffmpeg: Option<String>,
@@ -225,6 +231,7 @@ const SECRETS: &[&str] = &[
     "s3_secret_key",
     "s3_headers",
     "ghcr_token",
+    "ghcr_refresh",
 ];
 
 /// Reads a retired setting and throws it away.

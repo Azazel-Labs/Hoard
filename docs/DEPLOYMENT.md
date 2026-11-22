@@ -372,11 +372,17 @@ the Docker image). GitHub only hands it to accounts Epic has let in, so before e
 
 1. Link your GitHub account to your Epic Games account ([Epic's guide](https://www.unrealengine.com/en-US/ue-on-github)),
    and accept the EpicGames organization's invitation that GitHub emails you.
-2. Make a GitHub token (classic) with only `read:packages`.
-3. Enter your GitHub user name and the token under **Settings → Tools → Unreal Editor → GitHub sign-in**. The token is
-   kept with Hoard's other settings (sealed with the system keychain in the desktop app) and never sent back to the portal.
+2. Under **Settings → Tools → Unreal Editor**, choose **Connect GitHub…**, then **Sign in with GitHub**. GitHub opens in
+   a new tab; enter the code Hoard shows there and allow it. Hoard asks GitHub only for `read:packages`, by GitHub's
+   device flow, so no password reaches Hoard and the server needn't be reachable from GitHub. Or choose **Use a token
+   instead** and enter your GitHub user name and a token (classic) with only `read:packages`.
 
-Instead of step 3, you can mount a read-only token file readable by Hoard's service account and set `GHCR_USER` and
+The token is kept with Hoard's other settings (sealed with the system keychain in the desktop app) and never sent back
+to the portal. A token from signing in lasts eight hours, and Hoard renews it before then while it runs; after six
+months switched off, connect GitHub again. Sign-in goes through Hoard's GitHub OAuth app; `HOARD_GITHUB_CLIENT_ID` / `--github-client-id` names
+another (its device flow must be turned on), and an empty one leaves only the token.
+
+Instead of step 2, you can mount a read-only token file readable by Hoard's service account and set `GHCR_USER` and
 `GHCR_TOKEN_FILE` on the container, or mount the service account's existing Docker credentials and set `DOCKER_CONFIG`
 to their directory; these are used when no sign-in is saved in Settings, and crane's normal credential lookup after
 that.

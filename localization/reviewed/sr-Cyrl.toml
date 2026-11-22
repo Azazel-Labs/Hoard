@@ -4417,6 +4417,18 @@ translation = "ово има једну сличицу или превише д�
 source = "give a full path"
 translation = "наведите пуну путању"
 
+[messages.error-github-no-app]
+source = "This server has no GitHub app to sign in through; use a token instead."
+translation = "Овај сервер нема GitHub апликацију за пријаву; користи токен."
+
+[messages.error-github-refused]
+source = "GitHub turned the sign-in down: { $reason }"
+translation = "GitHub је одбио пријаву: { $reason }"
+
+[messages.error-github-unreachable]
+source = "Can’t reach GitHub."
+translation = "GitHub није доступан."
+
 [messages.error-hoard-seen]
 source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
 translation = "благо може да бележи највише 32 врсте ресурса, свака названа малим словима"
@@ -10988,28 +11000,92 @@ source = "Unreal packages"
 translation = "Unreal пакети"
 
 [messages.settings-unreal-download]
-source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in (see GitHub sign-in)."
-translation = "Једном преузима Epic Linux x86-64 уређивач у фасциклу алата Hoard-а. Заузима десетине GB на диску и захтева GitHub налог коме је Epic одобрио приступ (погледајте Пријава на GitHub)."
+source = "Downloads Epic’s Linux x86-64 editor, once, into Hoard’s tools folder. It takes tens of GB of disk space, and a GitHub account Epic has let in."
+translation = "Једном преузима Epic-ов Linux x86-64 едитор у Hoard-ову фасциклу алата. Заузима десетине GB на диску и захтева GitHub налог који је Epic примио."
 
 [messages.settings-unreal-editor-what]
 source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
 translation = "Инсталира Unreal Editor за процес извоза. Покрените га засебно да бисте извезли ресурсе."
 
-[messages.settings-unreal-github]
-source = "GitHub sign-in"
-translation = "Пријава на GitHub"
+[messages.settings-unreal-github-again]
+source = "Get a new code"
+translation = "Нови код"
+
+[messages.settings-unreal-github-as]
+source = "Connected as { $user }"
+translation = "Повезано као { $user }"
+
+[messages.settings-unreal-github-as-what]
+source = "Unreal Editor is downloaded as this GitHub account."
+translation = "Unreal Editor се преузима преко овог GitHub налога."
+
+[messages.settings-unreal-github-before]
+source = "Before you start"
+translation = "Пре него што почнеш"
+
+[messages.settings-unreal-github-before-what]
+source = "Link GitHub to your Epic Games account and accept the EpicGames invitation GitHub emails you."
+translation = "Повежи GitHub са својим Epic Games налогом и прихвати позивницу EpicGames коју ти GitHub шаље имејлом."
+
+[messages.settings-unreal-github-change]
+source = "Change…"
+translation = "Промени…"
+
+[messages.settings-unreal-github-connect]
+source = "Connect GitHub…"
+translation = "Повежи GitHub…"
+
+[messages.settings-unreal-github-connect-title]
+source = "Connect GitHub"
+translation = "Повежи GitHub"
+
+[messages.settings-unreal-github-connect-why]
+source = "Epic shares Unreal Editor with GitHub accounts linked to Epic Games. Hoard asks only to read packages."
+translation = "Epic дели Unreal Editor са GitHub налозима повезаним са Epic Games. Hoard тражи само читање пакета."
+
+[messages.settings-unreal-github-connected]
+source = "Connected as { $user }; trying the download again"
+translation = "Повезано као { $user }; преузимање се поново покушава"
+
+[messages.settings-unreal-github-denied]
+source = "The sign-in was cancelled at GitHub."
+translation = "Пријава је отказана на GitHub-у."
+
+[messages.settings-unreal-github-enter-code]
+source = "After clicking, GitHub opens in a new tab. Enter this code there."
+translation = "Након клика GitHub се отвара у новој картици. Тамо унеси овај код."
+
+[messages.settings-unreal-github-expired]
+source = "That code has run out."
+translation = "Код је истекао."
+
+[messages.settings-unreal-github-failed]
+source = "Couldn’t get a code from GitHub."
+translation = "Није могуће добити код од GitHub-а."
 
 [messages.settings-unreal-github-forget]
-source = "Forget"
-translation = "Заборави"
+source = "Disconnect"
+translation = "Прекини везу"
 
 [messages.settings-unreal-github-forgotten]
-source = "GitHub sign-in forgotten"
-translation = "GitHub пријава је заборављена"
+source = "GitHub disconnected"
+translation = "Веза са GitHub-ом прекинута"
 
 [messages.settings-unreal-github-from-server]
 source = "This server was also given a sign-in of its own (GHCR_TOKEN_FILE or DOCKER_CONFIG); it’s used when none is saved here."
 translation = "Овај сервер је добио и сопствену пријаву (GHCR_TOKEN_FILE или DOCKER_CONFIG); она се користи када овде ниједна није сачувана."
+
+[messages.settings-unreal-github-no-password]
+source = "No password reaches Hoard"
+translation = "Ниједна лозинка не стиже до Hoard-а"
+
+[messages.settings-unreal-github-none]
+source = "GitHub isn’t connected"
+translation = "GitHub није повезан"
+
+[messages.settings-unreal-github-none-what]
+source = "Needed to download the editor."
+translation = "Потребно за преузимање едитора."
 
 [messages.settings-unreal-github-save]
 source = "Save sign-in"
@@ -11019,17 +11095,9 @@ translation = "Сачувај пријаву"
 source = "GitHub sign-in saved; trying the download again"
 translation = "GitHub пријава је сачувана; преузимање се поново покушава"
 
-[messages.settings-unreal-github-step-enter]
-source = "Enter your GitHub user name and the token here, then choose Automatic."
-translation = "Овде унесите своје GitHub корисничко име и токен, а затим изаберите „Аутоматски“."
-
-[messages.settings-unreal-github-step-invite]
-source = "Accept the invitation to the EpicGames organization that GitHub emails you (it can take a few minutes to arrive)."
-translation = "Прихватите позивницу у организацију EpicGames коју вам GitHub шаље е-поштом (може да потраје неколико минута док не стигне)."
-
-[messages.settings-unreal-github-step-link]
-source = "Link your GitHub account to your Epic Games account."
-translation = "Повежите свој GitHub налог са својим Epic Games налогом."
+[messages.settings-unreal-github-sign-in]
+source = "Sign in with GitHub"
+translation = "Пријави се преко GitHub-а"
 
 [messages.settings-unreal-github-step-link-go]
 source = "How to link them"
@@ -11051,13 +11119,21 @@ translation = "Токен"
 source = "Saved (type a new one to replace it)"
 translation = "Сачувано (унесите нови да бисте га заменили)"
 
+[messages.settings-unreal-github-use-sign-in]
+source = "Sign in with GitHub instead"
+translation = "Пријави се преко GitHub-а"
+
+[messages.settings-unreal-github-use-token]
+source = "Use a token instead"
+translation = "Користи токен"
+
 [messages.settings-unreal-github-user]
 source = "GitHub user name"
 translation = "GitHub корисничко име"
 
-[messages.settings-unreal-github-why]
-source = "Epic publishes the Linux editor as a private image on GitHub’s package registry (ghcr.io), and Hoard downloads it from there with crane, which comes with Hoard. GitHub only hands it to accounts that Epic has let in, so Hoard needs one to download it as. Hoard keeps the token with its other settings and uses it for nothing else."
-translation = "Epic објављује Linux уређивач као приватну слику у GitHub-овом регистру пакета (ghcr.io), а Hoard га одатле преузима помоћу алата crane, који долази уз Hoard. GitHub га даје само налозима којима је Epic одобрио приступ, па је Hoard-у потребан налог преко ког ће га преузети. Hoard чува токен са осталим подешавањима и не користи га ни за шта друго."
+[messages.settings-unreal-github-waiting]
+source = "Waiting for GitHub…"
+translation = "Чека се GitHub…"
 
 [messages.settings-unreal-image]
 source = "Unreal version or image"

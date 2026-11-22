@@ -21,12 +21,14 @@ mod bundles;
 mod collections;
 mod convert;
 mod files;
+mod github;
 mod packs;
 mod settings;
 mod site;
 mod stats;
 
 pub(crate) use files::serve_blob;
+pub(crate) use github::keep_fresh as keep_github_fresh;
 pub(crate) use packs::{default_pack_name, pack_name_from_files};
 pub(crate) use stats::keep_reports;
 
@@ -86,7 +88,8 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/issues", get(crate::issues::list))
         .route("/api/admin/issues/retry", post(crate::issues::retry))
         .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))
-        .route("/api/admin/settings", get(settings::get_settings).put(settings::put_settings))
+        .merge(settings::admin_router())
+        .merge(github::admin_router())
         .route("/api/admin/soundfont", post(settings::upload_soundfont).layer(upload_limit()))
         .route("/api/admin/conversions/preview", post(convert::conversions_preview))
         .route("/api/admin/conversions/run", post(convert::conversions_run))
@@ -102,8 +105,6 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/locations/{id}/empty", post(locations::empty_location))
         .route("/api/admin/locations/rebalance", post(locations::rebalance))
         .route("/api/admin/fs", get(locations::browse))
-        .route("/api/admin/llm/models", post(settings::llm_models))
-        .route("/api/admin/llm/local", post(settings::llm_local))
         .route("/api/admin/chatgpt", get(crate::chatgpt::get_status))
         .route("/api/admin/chatgpt/start", post(crate::chatgpt::start))
         .route("/api/admin/chatgpt/finish", post(crate::chatgpt::finish))

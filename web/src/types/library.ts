@@ -469,6 +469,8 @@ export interface Stats {
   conversion_cache_limit?: number
   /** Space thumbnails, model views and audio previews take. */
   preview_bytes?: number
+  /** The sizes are from before the library last changed; new ones are on their way, so ask again shortly. */
+  sizes_refreshing?: boolean
   /** The editors this build fetches when a conversion needs one: `blender`, `unreal`. */
   editor_downloads?: string[]
 }

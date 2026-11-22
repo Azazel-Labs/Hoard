@@ -59,20 +59,26 @@ async function convertAll() {
 }
 onMounted(followConvert)
 onUnmounted(() => clearTimeout(convertTimer))
-// How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
+// How much the server keeps around for previews and conversions, fetched when the Performance page opens. The server
+// answers with the sizes it last worked out and works out new ones behind that when the library has changed (after
+// Shrink thumbnails, say), so it's asked again until they're current. Only a few times: a busy library is never quite.
 const usage = ref<Stats | null>(null)
-async function loadUsage() {
+let usageTimer: ReturnType<typeof setTimeout> | undefined
+async function loadUsage(again = 6) {
+  clearTimeout(usageTimer)
   try {
     usage.value = await api.stats()
+    if (usage.value.sizes_refreshing && again > 0) usageTimer = setTimeout(() => loadUsage(again - 1), 2500)
   } catch {
     usage.value = null
   }
 }
-onMounted(loadUsage)
+onMounted(() => loadUsage())
+onUnmounted(() => clearTimeout(usageTimer))
 // A smaller cache limit trims in the background; show what's left once it has.
 watch(
   () => s.value.options.conversion_cache_mb.value,
-  () => setTimeout(loadUsage, 1500),
+  () => setTimeout(() => loadUsage(), 1500),
 )
 </script>
 

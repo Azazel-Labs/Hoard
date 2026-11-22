@@ -49,7 +49,9 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             .filter(|&(_, can)| downloads && can)
             .map(|(name, _)| name.to_owned())
             .collect();
-    let sizes = SIZES.get(&state.pool).await?.value;
+    let kept = SIZES.get(&state.pool).await?;
+    // Out of date also while what's kept is too new to be made again yet: Shrink thumbnails can finish just after.
+    let (sizes, sizes_refreshing) = (kept.value, kept.refreshing || SIZES.changed());
     let s = db::read(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
         // Counts are of the library; the archive has its own two.
@@ -84,6 +86,7 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             conversion_cache_bytes: sizes.conversion_cache_bytes,
             conversion_cache_limit,
             preview_bytes: sizes.preview_bytes,
+            sizes_refreshing,
             editor_downloads,
         })
     })

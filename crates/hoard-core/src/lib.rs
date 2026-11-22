@@ -1063,6 +1063,10 @@ pub struct Stats {
     /// Space taken by thumbnails, model views and audio previews (the local cache).
     #[serde(default)]
     pub preview_bytes: u64,
+    /// The sizes above are from before the library last changed, and new ones are being worked out: ask again in a
+    /// moment for them.
+    #[serde(default)]
+    pub sizes_refreshing: bool,
     /// The editors this build fetches itself when a conversion needs one (`blender`, `unreal`; the Docker image);
     /// elsewhere they are found where they are installed.
     #[serde(default)]

@@ -1,11 +1,13 @@
 name: auto-release
 # After ci passes on a push to main:
-#   - usually                                        ->  tag the next version and release it (release.yml), moving :edge;
-#   - the pushed commit's message has #skip-release  ->  just publish ghcr.io/<owner>/hoard:edge and :sha-<short>.
+#   - usually                                                   ->  publish ghcr.io/<owner>/hoard:edge and :sha-<short>;
+#   - a commit since the last tag says #release, #minor or #major  ->  tag the next version and release it (release.yml),
+#                                                                    moving :edge.
+# So releases come when asked for, each gathering every commit since the one before, rather than one per push.
 # Releasing only adds a vX.Y.Z tag: no files are changed and nothing is committed to main, so your next push never
 # has to pull a bot commit first. Builds read their version from the tag (HOARD_VERSION).
 # The release notes are the commit subjects since the last tag (scripts/release-notes.sh).
-# The bump is patch by default; "#minor" or "#major" in any commit message since the last tag overrides it.
+# #release bumps the patch version, #minor the minor and #major the major; the biggest one asked for wins.
 #
 # The tag is pushed with GITHUB_TOKEN, which deliberately doesn't trigger workflows, so release.yml is called here
 # rather than run a second time from the tag push.
@@ -60,16 +62,16 @@ jobs:
           # An :edge build reports the release it's built on, plus where it is (not "newer" than that release).
           echo "edge-version=${current}+edge.$short" >> "$GITHUB_OUTPUT"
 
-          if git log -1 --format=%B | grep -qi '#skip-release'; then
-            echo "#skip-release; publishing :edge only"
-            echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
-          fi
           if [ -n "$last" ] && [ "$(git rev-list --count "$last..HEAD")" = 0 ]; then
             echo "$last is already main's tip; nothing to release"
             echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
           log="$(git log --format=%B ${last:+$last..}HEAD)"
+          if ! grep -qiE '#(release|minor|major)\b' <<< "$log"; then
+            echo "no #release, #minor or #major since ${last:-the start}; publishing :edge only"
+            echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
           IFS=. read -r major minor patch <<< "${current%%-*}"
           if [ -z "$last" ]; then version="$current"                    # the first release is Cargo.toml's version
           elif grep -qi '#major' <<< "$log"; then version="$((major + 1)).0.0"

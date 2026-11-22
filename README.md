@@ -241,9 +241,9 @@ cargo xtask sample --upload  # generate the sample pack and upload it
 cargo xtask web              # build the portal into web/dist
 ```
 
-Releases are automatic and change no files. Each push to `main` that passes CI is tagged with the next patch version
-(`#minor` or `#major` in a commit message bumps that instead; `#skip-release` only refreshes the `:edge` image), and
-the tag builds the binaries, the container image and the GitHub release. Builds take their version from the tag.
+Releases change no files. Each push to `main` that passes CI refreshes the `:edge` image; when a commit since the last
+release says `#release` (or `#minor` or `#major`, to bump those instead of the patch version), CI tags the next version,
+and the tag builds the binaries, the container image and the GitHub release. Builds take their version from the tag.
 
 ### Tests
 

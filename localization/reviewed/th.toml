@@ -1765,6 +1765,18 @@ translation = "วางแพ็กแอสเซ็ตที่ใดก็�
 source = "Yours"
 translation = "ของคุณ"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "ระยะห่าง"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "โปร่งสบาย"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "กะทัดรัด"
+
 [messages.appearance-language]
 source = "Language"
 translation = "ภาษา"
@@ -1772,6 +1784,86 @@ translation = "ภาษา"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "ตามเบราว์เซอร์ ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "สว่างหรือมืด"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "ระบบ"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "ข้อความและระยะห่าง"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "ใหญ่"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "ปกติ"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "ขนาดข้อความ"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "เล็ก"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "ชนิดไฟล์บนภาพ"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "ชนิดและขนาด (พิกเซล ความยาว สามเหลี่ยม)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "เล่นแอนิเมชันขณะที่ตัวชี้อยู่เหนือภาพ"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "ชื่อ"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "ไทล์"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "สิ่งที่แต่ละไทล์ในคลังแสดงนอกจากภาพ"
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "งานเบื้องหลัง"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "แถบด้านบน"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "ซ่อนสิ่งที่คุณไม่ได้ใช้ / ยังคงไปที่ช่องค้นหา และ { $keys } ยังคงเปิดแผงคำสั่ง"
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "ไมโครโฟนในช่องค้นหา สำหรับค้นหาเสียงด้วยการทำเสียงนั้น"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "ปุ่มแผงคำสั่ง ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "คำใบ้ / ในช่องค้นหา"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "สวิตช์สว่างและมืด"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10189,8 +10281,8 @@ source = "Appearance"
 translation = "รูปลักษณ์"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "ธีมที่เบราว์เซอร์นี้ใช้เมื่อเป็นโหมดสว่างและโหมดมืด บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น"
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "ภาษา ธีม ขนาดข้อความและระยะห่าง และสิ่งที่ไทล์และแถบด้านบนแสดง บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น"
 
 [messages.settings-page-auth]
 source = "Authentication"

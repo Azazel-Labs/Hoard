@@ -436,6 +436,29 @@ server-update-no-answer = 30초 안에 응답이 없습니다
 
 appearance-language = 언어
 appearance-language-auto = 브라우저 언어({ $name })
+appearance-scheme = 밝게 또는 어둡게
+appearance-scheme-system = 시스템
+appearance-size-section = 글자와 간격
+appearance-text-size = 글자 크기
+appearance-text-small = 작게
+appearance-text-normal = 보통
+appearance-text-large = 크게
+appearance-density = 간격
+appearance-density-comfortable = 넉넉하게
+appearance-density-compact = 촘촘하게
+appearance-tiles = 타일
+appearance-tiles-what = 라이브러리의 각 타일이 그림 외에 보여 주는 것.
+appearance-tile-names = 이름
+appearance-tile-details = 종류와 크기(픽셀, 길이, 삼각형)
+appearance-tile-badges = 그림 위의 파일 형식
+appearance-tile-motion = 포인터를 올려 두는 동안 애니메이션 재생
+appearance-top-bar = 상단 막대
+appearance-top-bar-what = 쓰지 않는 것은 숨기세요. /는 계속 검색 상자로 이동하고 { $keys }는 계속 명령 팔레트를 엽니다.
+appearance-top-activity = 백그라운드 작업
+appearance-top-theme = 밝게/어둡게 전환
+appearance-top-mic = 검색 상자의 마이크(소리를 내서 비슷한 소리 찾기)
+appearance-top-slash = 검색 상자의 / 힌트
+appearance-top-palette = 명령 팔레트 버튼({ $keys })
 
 ## 루트
 
@@ -2368,7 +2391,7 @@ settings-find = 설정 찾기
 settings-find-none = “{ $query }”에 맞는 설정이 없습니다.
 settings-load-failed = 설정을 불러오지 못했습니다: { $error }
 settings-page-appearance = 모양
-settings-page-appearance-blurb = 이 브라우저가 밝을 때와 어두울 때 사용하는 테마입니다. 이 브라우저에만 저장됩니다.
+settings-page-appearance-blurb = 언어, 테마, 글자 크기와 간격, 타일과 상단 막대에 보이는 것. 이 브라우저에만 저장됩니다.
 settings-page-dragon = 드래곤
 settings-page-dragon-blurb = 당신의 드래곤이 모은 보물: 라이브러리의 에셋 하나하나가 그 보물입니다.
 settings-page-library = 라이브러리

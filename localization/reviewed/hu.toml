@@ -1804,6 +1804,18 @@ translation = "Húzzon egy assetcsomagot bárhová erre az oldalra"
 source = "Yours"
 translation = "Saját"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Térköz"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Kényelmes"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Tömör"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Nyelv"
@@ -1811,6 +1823,86 @@ translation = "Nyelv"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "A böngészőé ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Világos vagy sötét"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Rendszer"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Szöveg és térköz"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Nagy"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normál"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Szövegméret"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Kicsi"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Fájltípus a képen"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Fajta és méret (képpont, hossz, háromszögek)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Animációk lejátszása, amíg a mutató rajtuk van"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Nevek"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Csempék"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Mit mutat a könyvtár minden csempéje a képén kívül."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Háttérmunka"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Felső sáv"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Hagyd el, amit nem használsz. A / továbbra is a keresőmezőbe visz, a { $keys } pedig továbbra is megnyitja a parancspalettát."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofon a keresőmezőben, hangok kereséséhez egy hang kiadásával"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Parancspaletta gomb ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "A / tipp a keresőmezőben"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Világos–sötét kapcsoló"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10274,8 +10366,8 @@ source = "Appearance"
 translation = "Megjelenés"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "A témák, amelyeket ez a böngésző világos és sötét módban használ. Csak ebben a böngészőben mentődnek."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Nyelv, témák, szövegméret és térköz, valamint hogy mit mutatnak a csempék és a felső sáv. Csak ebben a böngészőben mentve."
 
 [messages.settings-page-auth]
 source = "Authentication"

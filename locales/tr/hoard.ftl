@@ -436,6 +436,29 @@ server-update-no-answer = 30 saniye içinde yanıt gelmedi
 
 appearance-language = Dil
 appearance-language-auto = Tarayıcının dili ({ $name })
+appearance-scheme = Açık mı koyu mu
+appearance-scheme-system = Sistem
+appearance-size-section = Metin ve aralıklar
+appearance-text-size = Metin boyutu
+appearance-text-small = Küçük
+appearance-text-normal = Normal
+appearance-text-large = Büyük
+appearance-density = Aralıklar
+appearance-density-comfortable = Ferah
+appearance-density-compact = Sıkı
+appearance-tiles = Kutucuklar
+appearance-tiles-what = Kitaplıktaki her kutucuğun resminin yanında gösterdikleri.
+appearance-tile-names = Adlar
+appearance-tile-details = Tür ve boyut (piksel, süre, üçgen)
+appearance-tile-badges = Resmin üzerinde dosya türü
+appearance-tile-motion = İşaretçi üzerindeyken animasyonları oynat
+appearance-top-bar = Üst çubuk
+appearance-top-bar-what = Kullanmadıklarını gizle. / yine arama kutusuna götürür, { $keys } yine komut paletini açar.
+appearance-top-activity = Arka plan işleri
+appearance-top-theme = Açık ve koyu düğmesi
+appearance-top-mic = Arama kutusunda mikrofon, bir ses çıkararak sesleri bulmak için
+appearance-top-slash = Arama kutusundaki / ipucu
+appearance-top-palette = Komut paleti düğmesi ({ $keys })
 
 ## Kök
 
@@ -2444,7 +2467,7 @@ settings-find = Ayar bul
 settings-find-none = “{ $query }” ile eşleşen ayar yok.
 settings-load-failed = Ayarlar yüklenemedi: { $error }
 settings-page-appearance = Görünüm
-settings-page-appearance-blurb = Bu tarayıcının açık ve koyu moddayken giydiği temalar. Yalnızca bu tarayıcıda kaydedilir.
+settings-page-appearance-blurb = Dil, temalar, metin boyutu ve aralıklar, kutucukların ve üst çubuğun gösterdikleri. Yalnızca bu tarayıcıda kaydedilir.
 settings-page-dragon = Ejderha
 settings-page-dragon-blurb = Ejderhanın hazinesi: kütüphanedeki her varlık hazinenin bir parçası.
 settings-page-library = Kütüphane

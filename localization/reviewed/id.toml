@@ -1777,6 +1777,18 @@ translation = "Jatuhkan paket aset di mana saja di halaman ini"
 source = "Yours"
 translation = "Milik Anda"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Jarak"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Lega"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Rapat"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Bahasa"
@@ -1784,6 +1796,86 @@ translation = "Bahasa"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Bahasa browser ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Terang atau gelap"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Sistem"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Teks dan jarak"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Besar"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normal"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Ukuran teks"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Kecil"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Jenis file di atas gambar"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Jenis dan ukuran (piksel, durasi, segitiga)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Putar animasi saat penunjuk berada di atasnya"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Nama"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Ubin"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Apa yang ditampilkan setiap ubin di pustaka selain gambarnya."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Pekerjaan latar belakang"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Bilah atas"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Sembunyikan yang tidak Anda pakai. / tetap membuka kotak pencarian, dan { $keys } tetap membuka palet perintah."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofon di kotak pencarian, untuk mencari suara dengan menirukannya"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Tombol palet perintah ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Petunjuk / di kotak pencarian"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Sakelar terang dan gelap"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10218,8 +10310,8 @@ source = "Appearance"
 translation = "Tampilan"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Tema yang dipakai browser ini saat terang dan saat gelap. Hanya disimpan di browser ini."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Bahasa, tema, ukuran teks dan jarak, serta apa yang ditampilkan ubin dan bilah atas. Hanya disimpan di browser ini."
 
 [messages.settings-page-auth]
 source = "Authentication"

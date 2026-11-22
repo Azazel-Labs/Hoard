@@ -1765,6 +1765,18 @@ translation = "このページのどこにでもアセットパックをドロ�
 source = "Yours"
 translation = "自分用"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "余白"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "ゆったり"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "コンパクト"
+
 [messages.appearance-language]
 source = "Language"
 translation = "言語"
@@ -1772,6 +1784,86 @@ translation = "言語"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "ブラウザーの言語（{ $name }）"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "ライトかダークか"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "システム"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "文字と余白"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "大"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "標準"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "文字の大きさ"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "小"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "画像上のファイル形式"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "種類とサイズ（ピクセル、長さ、三角形）"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "ポインターを重ねている間はアニメーションを再生"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "名前"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "タイル"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "ライブラリの各タイルが画像のほかに表示するもの。"
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "バックグラウンド処理"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "上部バー"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "使わないものは非表示にできます。非表示にしても / で検索ボックスに移動でき、{ $keys } でコマンドパレットを開けます。"
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "検索ボックスのマイク（音を出して似た音を探す）"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "コマンドパレットのボタン（{ $keys }）"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "検索ボックスの / のヒント"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "ライト／ダークの切り替え"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10200,8 +10292,8 @@ source = "Appearance"
 translation = "外観"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "このブラウザーがライトのときとダークのときに使うテーマです。このブラウザーにだけ保存されます。"
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "言語、テーマ、文字の大きさと余白、タイルと上部バーに表示するもの。このブラウザーにだけ保存されます。"
 
 [messages.settings-page-auth]
 source = "Authentication"

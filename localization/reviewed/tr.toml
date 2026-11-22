@@ -1792,6 +1792,18 @@ translation = "Bir varlık paketini bu sayfada herhangi bir yere bırakın"
 source = "Yours"
 translation = "Kişisel"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Aralıklar"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Ferah"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Sıkı"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Dil"
@@ -1799,6 +1811,86 @@ translation = "Dil"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Tarayıcının dili ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Açık mı koyu mu"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Sistem"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Metin ve aralıklar"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Büyük"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normal"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Metin boyutu"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Küçük"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Resmin üzerinde dosya türü"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Tür ve boyut (piksel, süre, üçgen)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "İşaretçi üzerindeyken animasyonları oynat"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Adlar"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Kutucuklar"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Kitaplıktaki her kutucuğun resminin yanında gösterdikleri."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Arka plan işleri"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Üst çubuk"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Kullanmadıklarını gizle. / yine arama kutusuna götürür, { $keys } yine komut paletini açar."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Arama kutusunda mikrofon, bir ses çıkararak sesleri bulmak için"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Komut paleti düğmesi ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Arama kutusundaki / ipucu"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Açık ve koyu düğmesi"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10246,8 +10338,8 @@ source = "Appearance"
 translation = "Görünüm"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Bu tarayıcının açık ve koyu moddayken giydiği temalar. Yalnızca bu tarayıcıda kaydedilir."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Dil, temalar, metin boyutu ve aralıklar, kutucukların ve üst çubuğun gösterdikleri. Yalnızca bu tarayıcıda kaydedilir."
 
 [messages.settings-page-auth]
 source = "Authentication"

@@ -436,6 +436,29 @@ server-update-no-answer = nenhuma resposta em 30 segundos
 
 appearance-language = Idioma
 appearance-language-auto = Do navegador ({ $name })
+appearance-scheme = Claro ou escuro
+appearance-scheme-system = Sistema
+appearance-size-section = Texto e espaçamento
+appearance-text-size = Tamanho do texto
+appearance-text-small = Pequeno
+appearance-text-normal = Normal
+appearance-text-large = Grande
+appearance-density = Espaçamento
+appearance-density-comfortable = Confortável
+appearance-density-compact = Compacto
+appearance-tiles = Blocos
+appearance-tiles-what = O que cada bloco da biblioteca mostra além da imagem.
+appearance-tile-names = Nomes
+appearance-tile-details = Tipo e tamanho (pixels, duração, triângulos)
+appearance-tile-badges = Tipo de arquivo sobre a imagem
+appearance-tile-motion = Reproduzir animações enquanto o ponteiro está sobre elas
+appearance-top-bar = Barra superior
+appearance-top-bar-what = Oculte o que você não usa. / continua levando à caixa de pesquisa e { $keys } continua abrindo a paleta de comandos.
+appearance-top-activity = Trabalho em segundo plano
+appearance-top-theme = Alternância entre claro e escuro
+appearance-top-mic = Microfone na caixa de pesquisa, para encontrar sons fazendo um
+appearance-top-slash = A dica / na caixa de pesquisa
+appearance-top-palette = Botão da paleta de comandos ({ $keys })
 
 ## Raiz
 
@@ -2644,7 +2667,7 @@ settings-find = Encontrar uma configuração
 settings-find-none = Nenhuma configuração corresponde a “{ $query }”.
 settings-load-failed = Não foi possível carregar as configurações: { $error }
 settings-page-appearance = Aparência
-settings-page-appearance-blurb = Os temas que este navegador usa quando está claro e quando está escuro. Salvo só neste navegador.
+settings-page-appearance-blurb = Idioma, temas, tamanho do texto e espaçamento, e o que os blocos e a barra superior mostram. Salvo somente neste navegador.
 settings-page-dragon = Dragão
 settings-page-dragon-blurb = O tesouro do seu dragão: cada recurso da biblioteca é uma peça dele.
 settings-page-library = Biblioteca

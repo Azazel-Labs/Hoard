@@ -436,6 +436,29 @@ server-update-no-answer = 30 秒內沒有回應
 
 appearance-language = 語言
 appearance-language-auto = 瀏覽器的語言（{ $name }）
+appearance-scheme = 淺色或深色
+appearance-scheme-system = 配合系統
+appearance-size-section = 文字與間距
+appearance-text-size = 文字大小
+appearance-text-small = 小
+appearance-text-normal = 標準
+appearance-text-large = 大
+appearance-density = 間距
+appearance-density-comfortable = 寬鬆
+appearance-density-compact = 緊湊
+appearance-tiles = 圖塊
+appearance-tiles-what = 資料庫中每個圖塊除圖片外還顯示的內容。
+appearance-tile-names = 名稱
+appearance-tile-details = 類型和尺寸（像素、長度、三角形）
+appearance-tile-badges = 圖片上的檔案類型
+appearance-tile-motion = 指標停留時播放動畫
+appearance-top-bar = 頂端列
+appearance-top-bar-what = 隱藏你不用的項目。按 / 仍可進入搜尋框，按 { $keys } 仍可開啟命令面板。
+appearance-top-activity = 背景工作
+appearance-top-theme = 淺色/深色切換
+appearance-top-mic = 搜尋框中的麥克風，發出聲音來尋找相似的聲音
+appearance-top-slash = 搜尋框中的 / 提示
+appearance-top-palette = 命令面板按鈕（{ $keys }）
 
 ## 根頁面
 
@@ -2401,7 +2424,7 @@ settings-find = 尋找設定
 settings-find-none = 沒有與「{ $query }」相符的設定。
 settings-load-failed = 無法載入設定：{ $error }
 settings-page-appearance = 外觀
-settings-page-appearance-blurb = 這個瀏覽器在淺色與深色模式下使用的主題。只儲存在這個瀏覽器中。
+settings-page-appearance-blurb = 語言、主題、文字大小與間距，以及圖塊和頂端列顯示的內容。只儲存在這個瀏覽器中。
 settings-page-dragon = 巨龍
 settings-page-dragon-blurb = 你的巨龍的寶藏：資源庫裡的每個資源都是其中一件寶物。
 settings-page-library = 素材庫

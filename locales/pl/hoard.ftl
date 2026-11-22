@@ -448,6 +448,29 @@ server-update-no-answer = brak odpowiedzi w ciągu 30 sekund
 
 appearance-language = Język
 appearance-language-auto = Jak w przeglądarce ({ $name })
+appearance-scheme = Jasny czy ciemny
+appearance-scheme-system = System
+appearance-size-section = Tekst i odstępy
+appearance-text-size = Rozmiar tekstu
+appearance-text-small = Mały
+appearance-text-normal = Normalny
+appearance-text-large = Duży
+appearance-density = Odstępy
+appearance-density-comfortable = Wygodne
+appearance-density-compact = Zwarte
+appearance-tiles = Kafelki
+appearance-tiles-what = Co każdy kafelek w bibliotece pokazuje oprócz obrazka.
+appearance-tile-names = Nazwy
+appearance-tile-details = Rodzaj i rozmiar (piksele, długość, trójkąty)
+appearance-tile-badges = Typ pliku na obrazku
+appearance-tile-motion = Odtwarzaj animacje, gdy kursor jest nad nimi
+appearance-top-bar = Górny pasek
+appearance-top-bar-what = Ukryj to, czego nie używasz. / nadal przenosi do pola wyszukiwania, a { $keys } nadal otwiera paletę poleceń.
+appearance-top-activity = Praca w tle
+appearance-top-theme = Przełącznik jasnego i ciemnego
+appearance-top-mic = Mikrofon w polu wyszukiwania, do szukania dźwięków przez wydanie jednego
+appearance-top-slash = Podpowiedź / w polu wyszukiwania
+appearance-top-palette = Przycisk palety poleceń ({ $keys })
 
 ## Root
 
@@ -2885,7 +2908,7 @@ settings-find = Znajdź ustawienie
 settings-find-none = Żadne ustawienie nie pasuje do „{ $query }”.
 settings-load-failed = Nie udało się załadować ustawień: { $error }
 settings-page-appearance = Wygląd
-settings-page-appearance-blurb = Motywy tej przeglądarki w trybie jasnym i ciemnym. Zapisywane tylko w tej przeglądarce.
+settings-page-appearance-blurb = Język, motywy, rozmiar tekstu i odstępy oraz to, co pokazują kafelki i górny pasek. Zapisywane tylko w tej przeglądarce.
 settings-page-dragon = Smok
 settings-page-dragon-blurb = Skarb twojego smoka: każdy zasób w bibliotece jest jego częścią.
 settings-page-library = Biblioteka

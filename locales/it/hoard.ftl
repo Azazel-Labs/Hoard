@@ -444,6 +444,29 @@ server-update-no-answer = nessuna risposta entro 30 secondi
 
 appearance-language = Lingua
 appearance-language-auto = Del browser ({ $name })
+appearance-scheme = Chiaro o scuro
+appearance-scheme-system = Sistema
+appearance-size-section = Testo e spaziatura
+appearance-text-size = Dimensione del testo
+appearance-text-small = Piccola
+appearance-text-normal = Normale
+appearance-text-large = Grande
+appearance-density = Spaziatura
+appearance-density-comfortable = Comoda
+appearance-density-compact = Compatta
+appearance-tiles = Riquadri
+appearance-tiles-what = Cosa mostra ogni riquadro della libreria oltre all’immagine.
+appearance-tile-names = Nomi
+appearance-tile-details = Tipo e dimensioni (pixel, durata, triangoli)
+appearance-tile-badges = Tipo di file sull’immagine
+appearance-tile-motion = Riproduci le animazioni quando il puntatore è sopra
+appearance-top-bar = Barra superiore
+appearance-top-bar-what = Togli ciò che non usi. / porta comunque alla casella di ricerca e { $keys } apre comunque la tavolozza dei comandi.
+appearance-top-activity = Attività in background
+appearance-top-theme = Interruttore chiaro/scuro
+appearance-top-mic = Microfono nella casella di ricerca, per trovare suoni facendone uno
+appearance-top-slash = Il suggerimento / nella casella di ricerca
+appearance-top-palette = Pulsante della tavolozza dei comandi ({ $keys })
 
 ## Radice
 
@@ -2651,7 +2674,7 @@ settings-find = Trova un’impostazione
 settings-find-none = Nessuna impostazione corrisponde a «{ $query }».
 settings-load-failed = Impossibile caricare le impostazioni: { $error }
 settings-page-appearance = Aspetto
-settings-page-appearance-blurb = I temi che questo browser usa quando è chiaro e quando è scuro. Salvati solo in questo browser.
+settings-page-appearance-blurb = Lingua, temi, dimensione del testo e spaziatura, e cosa mostrano i riquadri e la barra superiore. Salvato solo in questo browser.
 settings-page-dragon = Drago
 settings-page-dragon-blurb = Il tesoro del tuo drago: ogni asset della libreria ne è un pezzo.
 settings-page-library = Libreria

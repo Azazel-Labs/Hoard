@@ -1864,6 +1864,18 @@ translation = "Plasați un pachet de resurse oriunde pe această pagină"
 source = "Yours"
 translation = "Ale dvs."
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Spațiere"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Aerisită"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Compactă"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Limbă"
@@ -1871,6 +1883,86 @@ translation = "Limbă"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "A browserului ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Luminos sau întunecat"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Sistem"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Text și spațiere"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Mare"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normală"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Mărimea textului"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Mică"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Tipul fișierului pe imagine"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Tip și mărime (pixeli, durată, triunghiuri)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Redă animațiile cât timp cursorul e deasupra lor"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Nume"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Dale"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Ce arată fiecare dală din bibliotecă pe lângă imagine."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Lucru în fundal"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Bara de sus"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Ascunde ce nu folosești. / duce în continuare la caseta de căutare, iar { $keys } deschide în continuare paleta de comenzi."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Microfon în caseta de căutare, pentru a găsi sunete făcând unul"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Butonul paletei de comenzi ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Indiciul / din caseta de căutare"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Comutator luminos/întunecat"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10612,8 +10704,8 @@ source = "Appearance"
 translation = "Aspect"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Temele pe care le folosește acest browser când este luminos și când este întunecat. Salvate doar în acest browser."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Limbă, teme, mărimea textului și spațiere, plus ce arată dalele și bara de sus. Salvat doar în acest browser."
 
 [messages.settings-page-auth]
 source = "Authentication"

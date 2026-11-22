@@ -448,6 +448,29 @@ server-update-no-answer = нет ответа в течение 30 секунд
 
 appearance-language = Язык
 appearance-language-auto = Как в браузере ({ $name })
+appearance-scheme = Светлая или тёмная
+appearance-scheme-system = Как в системе
+appearance-size-section = Текст и отступы
+appearance-text-size = Размер текста
+appearance-text-small = Мелкий
+appearance-text-normal = Обычный
+appearance-text-large = Крупный
+appearance-density = Отступы
+appearance-density-comfortable = Просторно
+appearance-density-compact = Компактно
+appearance-tiles = Плитки
+appearance-tiles-what = Что каждая плитка библиотеки показывает помимо картинки.
+appearance-tile-names = Названия
+appearance-tile-details = Тип и размер (пиксели, длительность, треугольники)
+appearance-tile-badges = Тип файла на картинке
+appearance-tile-motion = Проигрывать анимации, пока над ними указатель
+appearance-top-bar = Верхняя панель
+appearance-top-bar-what = Уберите то, чем не пользуетесь. / по-прежнему переводит в поле поиска, а { $keys } по-прежнему открывает палитру команд.
+appearance-top-activity = Фоновая работа
+appearance-top-theme = Переключатель светлой и тёмной темы
+appearance-top-mic = Микрофон в поле поиска, чтобы искать звуки, издав похожий
+appearance-top-slash = Подсказка / в поле поиска
+appearance-top-palette = Кнопка палитры команд ({ $keys })
 
 ## Корень
 
@@ -2924,7 +2947,7 @@ settings-find = Найти настройку
 settings-find-none = Нет настроек, подходящих под «{ $query }».
 settings-load-failed = Не удалось загрузить настройки: { $error }
 settings-page-appearance = Оформление
-settings-page-appearance-blurb = Темы, которые этот браузер использует в светлом и в тёмном режиме. Сохраняется только в этом браузере.
+settings-page-appearance-blurb = Язык, темы, размер текста и отступы, а также что показывают плитки и верхняя панель. Сохраняется только в этом браузере.
 settings-page-dragon = Дракон
 settings-page-dragon-blurb = Сокровищница вашего дракона: каждый ассет в библиотеке — часть его сокровищ.
 settings-page-library = Библиотека

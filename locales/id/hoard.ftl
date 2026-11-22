@@ -436,6 +436,29 @@ server-update-no-answer = tidak ada jawaban dalam 30 detik
 
 appearance-language = Bahasa
 appearance-language-auto = Bahasa browser ({ $name })
+appearance-scheme = Terang atau gelap
+appearance-scheme-system = Sistem
+appearance-size-section = Teks dan jarak
+appearance-text-size = Ukuran teks
+appearance-text-small = Kecil
+appearance-text-normal = Normal
+appearance-text-large = Besar
+appearance-density = Jarak
+appearance-density-comfortable = Lega
+appearance-density-compact = Rapat
+appearance-tiles = Ubin
+appearance-tiles-what = Apa yang ditampilkan setiap ubin di pustaka selain gambarnya.
+appearance-tile-names = Nama
+appearance-tile-details = Jenis dan ukuran (piksel, durasi, segitiga)
+appearance-tile-badges = Jenis file di atas gambar
+appearance-tile-motion = Putar animasi saat penunjuk berada di atasnya
+appearance-top-bar = Bilah atas
+appearance-top-bar-what = Sembunyikan yang tidak Anda pakai. / tetap membuka kotak pencarian, dan { $keys } tetap membuka palet perintah.
+appearance-top-activity = Pekerjaan latar belakang
+appearance-top-theme = Sakelar terang dan gelap
+appearance-top-mic = Mikrofon di kotak pencarian, untuk mencari suara dengan menirukannya
+appearance-top-slash = Petunjuk / di kotak pencarian
+appearance-top-palette = Tombol palet perintah ({ $keys })
 
 ## Root
 
@@ -2427,7 +2450,7 @@ settings-find = Cari pengaturan
 settings-find-none = Tidak ada pengaturan yang cocok dengan “{ $query }”.
 settings-load-failed = Tidak dapat memuat pengaturan: { $error }
 settings-page-appearance = Tampilan
-settings-page-appearance-blurb = Tema yang dipakai browser ini saat terang dan saat gelap. Hanya disimpan di browser ini.
+settings-page-appearance-blurb = Bahasa, tema, ukuran teks dan jarak, serta apa yang ditampilkan ubin dan bilah atas. Hanya disimpan di browser ini.
 settings-page-dragon = Naga
 settings-page-dragon-blurb = Timbunan harta nagamu: setiap aset di pustaka adalah sepotong hartanya.
 settings-page-library = Pustaka

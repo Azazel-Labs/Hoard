@@ -368,6 +368,11 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
 .facet[aria-pressed='true'] { background: var(--text); color: var(--bg); border-color: var(--text); }
 .facet[aria-pressed='true'] .n { color: var(--bg); opacity: 0.6; }
 .more-facets { border-style: dashed; color: var(--muted); }
+/* Compact (Settings → Appearance): tighter rows and groups. */
+:root[data-density='compact'] .side section + section { margin-top: 0.6rem; }
+:root[data-density='compact'] .side h3 { margin-bottom: 0.25rem; }
+:root[data-density='compact'] .kinds button { padding-block: 0.15rem; }
+:root[data-density='compact'] .facet-tags { gap: 0.2rem; }
 
 @media (max-width: 900px) {
   .side-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }

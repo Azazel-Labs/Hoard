@@ -10,6 +10,7 @@ import { noteTileClick } from '../viewers'
 import { materialSummary } from '../materials'
 import { animatedSrc, PLAY_ON_TILE } from '../sprites'
 import { t } from '../i18n'
+import { shows } from '../prefs'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent]; similar: [] }>()
@@ -33,11 +34,11 @@ watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
 const starred = computed(() => mine.favorites.has(props.asset.id))
 // Animated pictures, and animations with a movie of them playing, move while the pointer is over them (unless
-// motion is unwelcome).
+// motion is unwelcome, or turned off in Settings → Appearance).
 const hovering = ref(false)
 const moving = computed(() => (hovering.value ? (animatedSrc(props.asset, PLAY_ON_TILE) ?? motionUrl(props.asset)) : null))
 function hoverPlay(on: boolean, e: PointerEvent) {
-  if (on && (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches)) return
+  if (on && (e.pointerType !== 'mouse' || !shows('tile-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches)) return
   hovering.value = on
 }
 
@@ -69,6 +70,7 @@ function onClick(e: MouseEvent) {
       class="hit"
       :data-id="asset.id"
       :aria-pressed="selected"
+      :title="shows('tile-names') ? undefined : asset.name"
       :aria-label="detail ? t('tile-label-detail', { name: asset.name, category: asset.category ?? asset.kind, detail }) : t('tile-label', { name: asset.name, category: asset.category ?? asset.kind })"
       @click="onClick"
       @contextmenu="onLongPress"
@@ -85,10 +87,10 @@ function onClick(e: MouseEvent) {
         />
         <KindGlyph v-else :kind="asset.kind" :size="44" />
         <span v-if="isCurrent" class="playhead" aria-hidden="true" />
-        <span class="ext mono">.{{ asset.ext || '?' }}</span>
+        <span v-if="shows('tile-badges')" class="ext mono">.{{ asset.ext || '?' }}</span>
       </span>
-      <span class="name">{{ asset.name }}</span>
-      <span class="sub">
+      <span v-if="shows('tile-names')" class="name">{{ asset.name }}</span>
+      <span v-if="shows('tile-details')" class="sub">
         <span>{{ asset.category ?? asset.kind }}</span>
         <span v-if="detail" class="mono">{{ detail }}</span>
       </span>
@@ -216,6 +218,8 @@ img.pixelated { image-rendering: pixelated; }
   overflow: hidden; white-space: nowrap;
 }
 .sub > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+:root[data-density='compact'] .hit { gap: 0; }
+:root[data-density='compact'] .name { margin-top: 0.2rem; }
 
 /* Overlay controls sit on the artwork's corners. */
 .overlay {

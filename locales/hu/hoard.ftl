@@ -436,6 +436,29 @@ server-update-no-answer = 30 másodpercen belül nem érkezett válasz
 
 appearance-language = Nyelv
 appearance-language-auto = A böngészőé ({ $name })
+appearance-scheme = Világos vagy sötét
+appearance-scheme-system = Rendszer
+appearance-size-section = Szöveg és térköz
+appearance-text-size = Szövegméret
+appearance-text-small = Kicsi
+appearance-text-normal = Normál
+appearance-text-large = Nagy
+appearance-density = Térköz
+appearance-density-comfortable = Kényelmes
+appearance-density-compact = Tömör
+appearance-tiles = Csempék
+appearance-tiles-what = Mit mutat a könyvtár minden csempéje a képén kívül.
+appearance-tile-names = Nevek
+appearance-tile-details = Fajta és méret (képpont, hossz, háromszögek)
+appearance-tile-badges = Fájltípus a képen
+appearance-tile-motion = Animációk lejátszása, amíg a mutató rajtuk van
+appearance-top-bar = Felső sáv
+appearance-top-bar-what = Hagyd el, amit nem használsz. A / továbbra is a keresőmezőbe visz, a { $keys } pedig továbbra is megnyitja a parancspalettát.
+appearance-top-activity = Háttérmunka
+appearance-top-theme = Világos–sötét kapcsoló
+appearance-top-mic = Mikrofon a keresőmezőben, hangok kereséséhez egy hang kiadásával
+appearance-top-slash = A / tipp a keresőmezőben
+appearance-top-palette = Parancspaletta gomb ({ $keys })
 
 ## Gyökér
 
@@ -2472,7 +2495,7 @@ settings-find = Beállítás keresése
 settings-find-none = Egy beállítás sem felel meg ennek: „{ $query }”.
 settings-load-failed = Nem sikerült betölteni a beállításokat: { $error }
 settings-page-appearance = Megjelenés
-settings-page-appearance-blurb = A témák, amelyeket ez a böngésző világos és sötét módban használ. Csak ebben a böngészőben mentődnek.
+settings-page-appearance-blurb = Nyelv, témák, szövegméret és térköz, valamint hogy mit mutatnak a csempék és a felső sáv. Csak ebben a böngészőben mentve.
 settings-page-dragon = Sárkány
 settings-page-dragon-blurb = A sárkányod kincse: a könyvtár minden eleme egy darabja.
 settings-page-library = Könyvtár

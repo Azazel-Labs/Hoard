@@ -6,7 +6,7 @@ import {
 import { filesFromDrop, groupsFromPicked, type Group } from './drop'
 import { KIND_LABEL, KIND_NAME } from './kinds'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
-import { prefs, toggleIn } from './prefs'
+import { prefs, shows, toggleIn } from './prefs'
 import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'
 import { mine, setFavorite, toggleFavorite } from './mine'
 import { loadProjects, projects } from './projects'
@@ -1409,8 +1409,8 @@ const commands = computed<Command[]>(() => {
           @compositionstart="composing = true"
           @compositionend="composing = false"
         />
-        <kbd class="slash" aria-hidden="true">/</kbd>
-        <MicButton />
+        <kbd v-if="shows('header-slash')" class="slash" aria-hidden="true">/</kbd>
+        <MicButton v-if="shows('header-mic')" />
       </div>
 
       <nav class="views" :aria-label="t('app-views')">
@@ -1431,8 +1431,8 @@ const commands = computed<Command[]>(() => {
         >
           <span class="dot" aria-hidden="true" /><span class="wide-only">{{ t('app-update') }} </span>{{ stats.update.version }}
         </a>
-        <ActivityIndicator />
-        <ThemeSwitch />
+        <ActivityIndicator v-if="shows('header-activity')" />
+        <ThemeSwitch v-if="shows('header-theme')" />
         <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">{{ t('app-sign-in') }}</button>
         <button
           v-if="archivedCount || view === 'archive'"
@@ -1464,7 +1464,7 @@ const commands = computed<Command[]>(() => {
             <circle cx="6" cy="11.5" r="1.6" />
           </svg>
         </button>
-        <button type="button" class="btn ghost cmdk" :title="t('app-palette-title', { keys: `${mod}K` })" @click="paletteOpen = true">
+        <button v-if="shows('header-palette')" type="button" class="btn ghost cmdk" :title="t('app-palette-title', { keys: `${mod}K` })" @click="paletteOpen = true">
           <kbd>{{ mod.replace('+', '') }}</kbd><kbd>K</kbd>
         </button>
         <template v-if="editor">
@@ -1777,13 +1777,13 @@ const commands = computed<Command[]>(() => {
 <style scoped>
 .app {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 15rem minmax(0, 1fr);
   grid-template-rows: auto auto 1fr;
   grid-template-areas: 'top top' 'token token' 'side main';
   height: 100vh;
   height: 100dvh;
 }
-.app.with-detail { grid-template-columns: 240px minmax(0, 1fr) minmax(340px, 420px); grid-template-areas: 'top top top' 'token token token' 'side main detail'; }
+.app.with-detail { grid-template-columns: 15rem minmax(0, 1fr) minmax(340px, 420px); grid-template-areas: 'top top top' 'token token token' 'side main detail'; }
 .app.with-detail.fitted { grid-template-columns: var(--side-w) minmax(0, 1fr) var(--detail-w); }
 .app.with-detail.fitted .grid { grid-template-columns: repeat(var(--fit-cols), var(--fit-col)); }
 .packs-pane, .archive-pane { grid-row: 3; grid-column: 1 / -1; overflow-y: auto; }
@@ -1831,6 +1831,8 @@ const commands = computed<Command[]>(() => {
   padding: 0 0.4em; border: 1px solid var(--line); border-radius: 3px; color: var(--faint); font: inherit; font-size: 0.75rem;
 }
 .search:focus-within .slash { display: none; }
+/* No microphone (turned off, or none to record with): the hint takes its place at the end. */
+.search:not(:has(.mic)) .slash { right: 0.7em; }
 .views { display: flex; gap: 0.15rem; }
 .views button {
   position: relative; border: 0; background: none; padding: 0.4em 0.75em; cursor: pointer; border-radius: var(--r-chip);
@@ -1894,6 +1896,11 @@ const commands = computed<Command[]>(() => {
 .supporting .linkbtn { font-size: inherit; color: var(--muted); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr)); gap: 1.1rem 0.9rem; }
 .hint { margin: 2.5rem 0 0; text-align: center; font-size: 0.75rem; color: var(--faint); }
+/* Compact (Settings → Appearance): less room around the tiles, the top bar and the bar over the grid. */
+:root[data-density='compact'] .grid { gap: 0.6rem 0.5rem; }
+:root[data-density='compact'] .top { padding-block: 0.35rem; }
+:root[data-density='compact'] .bar { padding-block: 0.45rem; }
+:root[data-density='compact'] .side { padding-top: 0.6rem; }
 
 /* Placeholder tiles while the first page loads. */
 .skeleton {

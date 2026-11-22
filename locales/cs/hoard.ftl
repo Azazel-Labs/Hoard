@@ -446,6 +446,29 @@ server-update-no-answer = žádná odpověď do 30 sekund
 
 appearance-language = Jazyk
 appearance-language-auto = Podle prohlížeče ({ $name })
+appearance-scheme = Světlý nebo tmavý
+appearance-scheme-system = Podle systému
+appearance-size-section = Text a rozestupy
+appearance-text-size = Velikost textu
+appearance-text-small = Malý
+appearance-text-normal = Normální
+appearance-text-large = Velký
+appearance-density = Rozestupy
+appearance-density-comfortable = Pohodlné
+appearance-density-compact = Kompaktní
+appearance-tiles = Dlaždice
+appearance-tiles-what = Co každá dlaždice v knihovně ukazuje kromě obrázku.
+appearance-tile-names = Názvy
+appearance-tile-details = Druh a velikost (pixely, délka, trojúhelníky)
+appearance-tile-badges = Typ souboru na obrázku
+appearance-tile-motion = Přehrávat animace, když je nad nimi ukazatel
+appearance-top-bar = Horní lišta
+appearance-top-bar-what = Vynechte, co nepoužíváte. / dál přejde do vyhledávacího pole a { $keys } dál otevře paletu příkazů.
+appearance-top-activity = Práce na pozadí
+appearance-top-theme = Přepínač světlého a tmavého vzhledu
+appearance-top-mic = Mikrofon ve vyhledávacím poli, k hledání zvuků tím, že nějaký vydáte
+appearance-top-slash = Nápověda / ve vyhledávacím poli
+appearance-top-palette = Tlačítko palety příkazů ({ $keys })
 
 ## Kořen
 
@@ -2865,7 +2888,7 @@ settings-find = Najít nastavení
 settings-find-none = Žádné nastavení neodpovídá „{ $query }“.
 settings-load-failed = Nastavení se nepodařilo načíst: { $error }
 settings-page-appearance = Vzhled
-settings-page-appearance-blurb = Motivy, které tento prohlížeč používá, když je světlý a když je tmavý. Ukládá se jen v tomto prohlížeči.
+settings-page-appearance-blurb = Jazyk, motivy, velikost textu a rozestupy a co ukazují dlaždice a horní lišta. Uloženo jen v tomto prohlížeči.
 settings-page-dragon = Drak
 settings-page-dragon-blurb = Poklad tvého draka: každý asset v knihovně je jeho kouskem.
 settings-page-library = Knihovna

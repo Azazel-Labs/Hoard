@@ -436,6 +436,29 @@ server-update-no-answer = no hubo respuesta en 30 segundos
 
 appearance-language = Idioma
 appearance-language-auto = El del navegador ({ $name })
+appearance-scheme = Claro u oscuro
+appearance-scheme-system = Sistema
+appearance-size-section = Texto y espaciado
+appearance-text-size = Tamaño del texto
+appearance-text-small = Pequeño
+appearance-text-normal = Normal
+appearance-text-large = Grande
+appearance-density = Espaciado
+appearance-density-comfortable = Cómodo
+appearance-density-compact = Compacto
+appearance-tiles = Mosaicos
+appearance-tiles-what = Lo que muestra cada mosaico de la biblioteca además de su imagen.
+appearance-tile-names = Nombres
+appearance-tile-details = Tipo y tamaño (píxeles, duración, triángulos)
+appearance-tile-badges = Tipo de archivo sobre la imagen
+appearance-tile-motion = Reproducir animaciones mientras el puntero está encima
+appearance-top-bar = Barra superior
+appearance-top-bar-what = Quita lo que no uses. / sigue llevando al cuadro de búsqueda y { $keys } sigue abriendo la paleta de comandos.
+appearance-top-activity = Trabajo en segundo plano
+appearance-top-theme = Selector de claro y oscuro
+appearance-top-mic = Micrófono en el cuadro de búsqueda, para encontrar sonidos haciendo uno
+appearance-top-slash = La pista / en el cuadro de búsqueda
+appearance-top-palette = Botón de la paleta de comandos ({ $keys })
 
 ## Raíz
 
@@ -2644,7 +2667,7 @@ settings-find = Buscar un ajuste
 settings-find-none = Ningún ajuste coincide con “{ $query }”.
 settings-load-failed = No se pudo cargar la configuración: { $error }
 settings-page-appearance = Apariencia
-settings-page-appearance-blurb = Los temas que usa este navegador cuando está en modo claro y en modo oscuro. Solo se guardan en este navegador.
+settings-page-appearance-blurb = Idioma, temas, tamaño del texto y espaciado, y lo que muestran los mosaicos y la barra superior. Se guarda solo en este navegador.
 settings-page-dragon = Dragón
 settings-page-dragon-blurb = El tesoro de tu dragón: cada recurso de la biblioteca es una pieza de él.
 settings-page-library = Biblioteca

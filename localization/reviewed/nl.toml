@@ -1828,6 +1828,18 @@ translation = "Zet een assetpakket ergens op deze pagina neer"
 source = "Yours"
 translation = "Van jou"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Ruimte"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Ruim"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Compact"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Taal"
@@ -1835,6 +1847,86 @@ translation = "Taal"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Die van de browser ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Licht of donker"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Systeem"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Tekst en ruimte"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Groot"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normaal"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Tekstgrootte"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Klein"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Bestandstype op de afbeelding"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Soort en grootte (pixels, duur, driehoeken)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Animaties afspelen terwijl de aanwijzer erboven is"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Namen"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Tegels"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Wat elke tegel in de bibliotheek naast de afbeelding laat zien."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Achtergrondwerk"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Bovenbalk"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Laat weg wat je niet gebruikt. / gaat nog steeds naar het zoekvak en { $keys } opent nog steeds het opdrachtpalet."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Microfoon in het zoekvak, om geluiden te vinden door er een te maken"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Knop voor het opdrachtpalet ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "De /-hint in het zoekvak"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Schakelaar voor licht en donker"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10438,8 +10530,8 @@ source = "Appearance"
 translation = "Weergave"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "De thema’s die deze browser draagt als hij licht is en als hij donker is. Alleen in deze browser opgeslagen."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Taal, thema’s, tekstgrootte en ruimte, en wat de tegels en de bovenbalk laten zien. Alleen in deze browser bewaard."
 
 [messages.settings-page-auth]
 source = "Authentication"

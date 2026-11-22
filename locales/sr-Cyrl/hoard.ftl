@@ -446,6 +446,29 @@ server-update-no-answer = нема одговора у року од 30 секу
 
 appearance-language = Језик
 appearance-language-auto = Као у прегледачу ({ $name })
+appearance-scheme = Светла или тамна
+appearance-scheme-system = Систем
+appearance-size-section = Текст и размаци
+appearance-text-size = Величина текста
+appearance-text-small = Мала
+appearance-text-normal = Обична
+appearance-text-large = Велика
+appearance-density = Размаци
+appearance-density-comfortable = Удобно
+appearance-density-compact = Збијено
+appearance-tiles = Плочице
+appearance-tiles-what = Шта свака плочица у библиотеци приказује осим слике.
+appearance-tile-names = Називи
+appearance-tile-details = Врста и величина (пиксели, трајање, троуглови)
+appearance-tile-badges = Тип датотеке на слици
+appearance-tile-motion = Пуштај анимације док је показивач изнад њих
+appearance-top-bar = Горња трака
+appearance-top-bar-what = Изоставите оно што не користите. / и даље води у поље за претрагу, а { $keys } и даље отвара палету команди.
+appearance-top-activity = Рад у позадини
+appearance-top-theme = Прекидач светле и тамне теме
+appearance-top-mic = Микрофон у пољу за претрагу, за тражење звукова тако што направите један
+appearance-top-slash = Наговештај / у пољу за претрагу
+appearance-top-palette = Дугме палете команди ({ $keys })
 
 ## Корен
 
@@ -2771,7 +2794,7 @@ settings-find = Пронађи подешавање
 settings-find-none = Ниједно подешавање не одговара „{ $query }“.
 settings-load-failed = Није могуће учитати подешавања: { $error }
 settings-page-appearance = Изглед
-settings-page-appearance-blurb = Теме које овај прегледач носи кад је светао и кад је таман. Чува се само у овом прегледачу.
+settings-page-appearance-blurb = Језик, теме, величина текста и размаци, и шта приказују плочице и горња трака. Чува се само у овом прегледачу.
 settings-page-dragon = Змај
 settings-page-dragon-blurb = Благо вашег змаја: сваки ресурс у библиотеци је део њега.
 settings-page-library = Библиотека

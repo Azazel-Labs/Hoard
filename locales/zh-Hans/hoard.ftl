@@ -436,6 +436,29 @@ server-update-no-answer = 30 秒内没有响应
 
 appearance-language = 语言
 appearance-language-auto = 跟随浏览器（{ $name }）
+appearance-scheme = 浅色或深色
+appearance-scheme-system = 跟随系统
+appearance-size-section = 文字与间距
+appearance-text-size = 文字大小
+appearance-text-small = 小
+appearance-text-normal = 标准
+appearance-text-large = 大
+appearance-density = 间距
+appearance-density-comfortable = 宽松
+appearance-density-compact = 紧凑
+appearance-tiles = 图块
+appearance-tiles-what = 资源库中每个图块除图片外还显示的内容。
+appearance-tile-names = 名称
+appearance-tile-details = 类型和尺寸（像素、时长、三角形）
+appearance-tile-badges = 图片上的文件类型
+appearance-tile-motion = 指针悬停时播放动画
+appearance-top-bar = 顶栏
+appearance-top-bar-what = 隐藏你不用的项目。按 / 仍可进入搜索框，按 { $keys } 仍可打开命令面板。
+appearance-top-activity = 后台任务
+appearance-top-theme = 浅色/深色切换
+appearance-top-mic = 搜索框中的麦克风，通过发出声音来查找相似的声音
+appearance-top-slash = 搜索框中的 / 提示
+appearance-top-palette = 命令面板按钮（{ $keys }）
 
 ## 根
 
@@ -2395,7 +2418,7 @@ settings-find = 查找设置
 settings-find-none = 没有与“{ $query }”匹配的设置。
 settings-load-failed = 无法加载设置：{ $error }
 settings-page-appearance = 外观
-settings-page-appearance-blurb = 此浏览器在浅色和深色模式下使用的主题。仅保存在此浏览器中。
+settings-page-appearance-blurb = 语言、主题、文字大小与间距，以及图块和顶栏显示的内容。仅保存在此浏览器中。
 settings-page-dragon = 巨龙
 settings-page-dragon-blurb = 你的巨龙的宝藏：资源库里的每个资源都是其中一件宝物。
 settings-page-library = 资源库

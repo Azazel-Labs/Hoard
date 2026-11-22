@@ -493,6 +493,33 @@ server-update-no-answer = no answer within 30 seconds
 appearance-language = Language
 # The option that follows the browser; $name is the language that picks, in itself.
 appearance-language-auto = Browser's ({ $name })
+# Light or dark, as the top bar's switch picks: always light, always dark, or following the system.
+appearance-scheme = Light or dark
+appearance-scheme-system = System
+appearance-size-section = Text and spacing
+appearance-text-size = Text size
+appearance-text-small = Small
+appearance-text-normal = Normal
+appearance-text-large = Large
+# How much room there is around things in the library.
+appearance-density = Spacing
+appearance-density-comfortable = Comfortable
+appearance-density-compact = Compact
+appearance-tiles = Tiles
+appearance-tiles-what = What each tile in the library shows besides its picture.
+appearance-tile-names = Names
+appearance-tile-details = Kind and size (pixels, length, triangles)
+appearance-tile-badges = File type on the picture
+appearance-tile-motion = Play animations while the pointer is over them
+appearance-top-bar = Top bar
+# $keys is the command palette's shortcut, like Ctrl+K.
+appearance-top-bar-what = Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette.
+appearance-top-activity = Background work
+appearance-top-theme = Light and dark switch
+appearance-top-mic = Microphone in the search box, for finding sounds by making one
+appearance-top-slash = The / hint in the search box
+# $keys is the command palette's shortcut, like Ctrl+K.
+appearance-top-palette = Command palette button ({ $keys })
 
 ## Root
 
@@ -2958,7 +2985,7 @@ settings-find-none = No setting matches “{ $query }”.
 settings-load-failed = Couldn't load the settings: { $error }
 # The pages down the side of Settings, each with the sentence under its heading.
 settings-page-appearance = Appearance
-settings-page-appearance-blurb = The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.
+settings-page-appearance-blurb = Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only.
 settings-page-dragon = Dragon
 settings-page-dragon-blurb = Your dragon’s hoard: every asset in the library is a piece of its treasure.
 settings-page-library = Library

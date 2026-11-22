@@ -436,6 +436,29 @@ server-update-no-answer = 30 秒以内に応答がありません
 
 appearance-language = 言語
 appearance-language-auto = ブラウザーの言語（{ $name }）
+appearance-scheme = ライトかダークか
+appearance-scheme-system = システム
+appearance-size-section = 文字と余白
+appearance-text-size = 文字の大きさ
+appearance-text-small = 小
+appearance-text-normal = 標準
+appearance-text-large = 大
+appearance-density = 余白
+appearance-density-comfortable = ゆったり
+appearance-density-compact = コンパクト
+appearance-tiles = タイル
+appearance-tiles-what = ライブラリの各タイルが画像のほかに表示するもの。
+appearance-tile-names = 名前
+appearance-tile-details = 種類とサイズ（ピクセル、長さ、三角形）
+appearance-tile-badges = 画像上のファイル形式
+appearance-tile-motion = ポインターを重ねている間はアニメーションを再生
+appearance-top-bar = 上部バー
+appearance-top-bar-what = 使わないものは非表示にできます。非表示にしても / で検索ボックスに移動でき、{ $keys } でコマンドパレットを開けます。
+appearance-top-activity = バックグラウンド処理
+appearance-top-theme = ライト／ダークの切り替え
+appearance-top-mic = 検索ボックスのマイク（音を出して似た音を探す）
+appearance-top-slash = 検索ボックスの / のヒント
+appearance-top-palette = コマンドパレットのボタン（{ $keys }）
 
 ## ルート
 
@@ -2395,7 +2418,7 @@ settings-find = 設定を探す
 settings-find-none = 「{ $query }」に一致する設定はありません。
 settings-load-failed = 設定を読み込めませんでした: { $error }
 settings-page-appearance = 外観
-settings-page-appearance-blurb = このブラウザーがライトのときとダークのときに使うテーマです。このブラウザーにだけ保存されます。
+settings-page-appearance-blurb = 言語、テーマ、文字の大きさと余白、タイルと上部バーに表示するもの。このブラウザーにだけ保存されます。
 settings-page-dragon = ドラゴン
 settings-page-dragon-blurb = あなたのドラゴンの宝の山。ライブラリのアセットひとつひとつがその宝です。
 settings-page-library = ライブラリ

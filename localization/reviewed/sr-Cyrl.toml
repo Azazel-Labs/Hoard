@@ -1848,6 +1848,18 @@ translation = "Превуците пакет ресурса било где на
 source = "Yours"
 translation = "Ваше"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Размаци"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Удобно"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Збијено"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Језик"
@@ -1855,6 +1867,86 @@ translation = "Језик"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Као у прегледачу ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Светла или тамна"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Систем"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Текст и размаци"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Велика"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Обична"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Величина текста"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Мала"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Тип датотеке на слици"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Врста и величина (пиксели, трајање, троуглови)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Пуштај анимације док је показивач изнад њих"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Називи"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Плочице"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Шта свака плочица у библиотеци приказује осим слике."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Рад у позадини"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Горња трака"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Изоставите оно што не користите. / и даље води у поље за претрагу, а { $keys } и даље отвара палету команди."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Микрофон у пољу за претрагу, за тражење звукова тако што направите један"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Дугме палете команди ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Наговештај / у пољу за претрагу"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Прекидач светле и тамне теме"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10552,8 +10644,8 @@ source = "Appearance"
 translation = "Изглед"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Теме које овај прегледач носи кад је светао и кад је таман. Чува се само у овом прегледачу."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Језик, теме, величина текста и размаци, и шта приказују плочице и горња трака. Чува се само у овом прегледачу."
 
 [messages.settings-page-auth]
 source = "Authentication"

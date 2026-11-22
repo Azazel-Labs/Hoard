@@ -440,6 +440,29 @@ server-update-no-answer = καμία απάντηση εντός 30 δευτερ
 
 appearance-language = Γλώσσα
 appearance-language-auto = Του προγράμματος περιήγησης ({ $name })
+appearance-scheme = Φωτεινό ή σκοτεινό
+appearance-scheme-system = Σύστημα
+appearance-size-section = Κείμενο και αποστάσεις
+appearance-text-size = Μέγεθος κειμένου
+appearance-text-small = Μικρό
+appearance-text-normal = Κανονικό
+appearance-text-large = Μεγάλο
+appearance-density = Αποστάσεις
+appearance-density-comfortable = Άνετες
+appearance-density-compact = Συμπαγείς
+appearance-tiles = Πλακίδια
+appearance-tiles-what = Τι δείχνει κάθε πλακίδιο της βιβλιοθήκης εκτός από την εικόνα του.
+appearance-tile-names = Ονόματα
+appearance-tile-details = Είδος και μέγεθος (pixel, διάρκεια, τρίγωνα)
+appearance-tile-badges = Τύπος αρχείου πάνω στην εικόνα
+appearance-tile-motion = Αναπαραγωγή κινούμενων εικόνων όσο ο δείκτης είναι πάνω τους
+appearance-top-bar = Επάνω γραμμή
+appearance-top-bar-what = Παραλείψτε ό,τι δεν χρησιμοποιείτε. Το / εξακολουθεί να πηγαίνει στο πεδίο αναζήτησης και το { $keys } εξακολουθεί να ανοίγει την παλέτα εντολών.
+appearance-top-activity = Εργασίες παρασκηνίου
+appearance-top-theme = Διακόπτης φωτεινού και σκοτεινού
+appearance-top-mic = Μικρόφωνο στο πεδίο αναζήτησης, για να βρίσκετε ήχους κάνοντας έναν
+appearance-top-slash = Η υπόδειξη / στο πεδίο αναζήτησης
+appearance-top-palette = Κουμπί παλέτας εντολών ({ $keys })
 
 ## Root
 
@@ -2720,7 +2743,7 @@ settings-find = Εύρεση ρύθμισης
 settings-find-none = Καμία ρύθμιση δεν ταιριάζει με «{ $query }».
 settings-load-failed = Δεν ήταν δυνατή η φόρτωση των ρυθμίσεων: { $error }
 settings-page-appearance = Εμφάνιση
-settings-page-appearance-blurb = Τα θέματα που φοράει αυτό το πρόγραμμα περιήγησης όταν είναι φωτεινό και όταν είναι σκοτεινό. Αποθηκεύονται μόνο σε αυτό το πρόγραμμα περιήγησης.
+settings-page-appearance-blurb = Γλώσσα, θέματα, μέγεθος κειμένου και αποστάσεις, και τι δείχνουν τα πλακίδια και η επάνω γραμμή. Αποθηκεύεται μόνο σε αυτό το πρόγραμμα περιήγησης.
 settings-page-dragon = Δράκος
 settings-page-dragon-blurb = Ο θησαυρός του δράκου σας: κάθε στοιχείο της βιβλιοθήκης είναι ένα κομμάτι του.
 settings-page-library = Βιβλιοθήκη

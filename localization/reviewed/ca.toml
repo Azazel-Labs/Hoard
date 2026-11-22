@@ -1828,6 +1828,18 @@ translation = "Deixeu anar un paquet de recursos a qualsevol lloc d'aquesta pàg
 source = "Yours"
 translation = "Vostres"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Espaiat"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Còmode"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Compacte"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Llengua"
@@ -1835,6 +1847,86 @@ translation = "Llengua"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "La del navegador ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Clar o fosc"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Sistema"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Text i espaiat"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Gran"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normal"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Mida del text"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Petit"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Tipus de fitxer sobre la imatge"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Tipus i mida (píxels, durada, triangles)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Reprodueix les animacions mentre el punter hi és a sobre"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Noms"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Miniatures"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "El que mostra cada miniatura de la biblioteca a més de la imatge."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Feina en segon pla"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Barra superior"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Amaga el que no facis servir. / continua anant al quadre de cerca i { $keys } continua obrint la paleta d'ordres."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Micròfon al quadre de cerca, per trobar sons fent-ne un"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Botó de la paleta d'ordres ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "La indicació / al quadre de cerca"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Commutador de clar i fosc"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10439,8 +10531,8 @@ source = "Appearance"
 translation = "Aparença"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Els temes que fa servir aquest navegador quan està en mode clar i en mode fosc. Només es desa en aquest navegador."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Idioma, temes, mida del text i espaiat, i el que mostren les miniatures i la barra superior. Només es desa en aquest navegador."
 
 [messages.settings-page-auth]
 source = "Authentication"

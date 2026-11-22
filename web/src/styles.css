@@ -140,6 +140,10 @@
 }
 
 :root[data-scheme='light'] { color-scheme: light; }
+/* Text size (Settings → Appearance): nearly everything is sized in rem, so the whole page scales with the writing,
+   as zooming would; tiles keep the width the slider gives them. */
+:root[data-text='small'] { font-size: 14px; }
+:root[data-text='large'] { font-size: 18px; }
 
 :root {
   accent-color: var(--accent);

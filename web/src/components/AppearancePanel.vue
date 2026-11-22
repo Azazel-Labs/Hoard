@@ -1,9 +1,10 @@
 <script setup lang="ts">
-// Appearance: this browser's language and its light and dark themes, saved here.
+// Appearance: this browser's language, its light and dark themes, how big the writing is, how roomy the page is,
+// and which parts of the tiles and the top bar show. All saved here, in this browser.
 import { onBeforeUnmount } from 'vue'
 import { LANGUAGES, languageName, preferredCatalog, t } from '../i18n'
-import { prefs } from '../prefs'
-import { DARK_THEMES, LIGHT_THEMES, previewScheme, themeFor, usedScheme } from '../theme'
+import { prefs, shows, toggleIn } from '../prefs'
+import { DARK_THEMES, LIGHT_THEMES, previewScheme, setTheme, themeFor, usedScheme } from '../theme'
 
 const browserLanguages = navigator.languages
 
@@ -22,55 +23,129 @@ function setLook(scheme: 'light' | 'dark', id: string) {
 }
 const endPreview = () => (previewScheme.value = null)
 onBeforeUnmount(endPreview)
+
+const SCHEMES = [
+  { value: 'system' as const, get label() { return t('appearance-scheme-system') } },
+  { value: 'light' as const, get label() { return t('settings-look-light') } },
+  { value: 'dark' as const, get label() { return t('settings-look-dark') } },
+]
+const TEXT_SIZES = [
+  { value: 'small' as const, get label() { return t('appearance-text-small') } },
+  { value: 'normal' as const, get label() { return t('appearance-text-normal') } },
+  { value: 'large' as const, get label() { return t('appearance-text-large') } },
+]
+const DENSITIES = [
+  { value: 'comfortable' as const, get label() { return t('appearance-density-comfortable') } },
+  { value: 'compact' as const, get label() { return t('appearance-density-compact') } },
+]
+const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
+/** What can be turned off, by the id `shows` knows it by (`prefs.hidden` lists the ones that are). */
+const HIDEABLE = {
+  tiles: [
+    { id: 'tile-names', get label() { return t('appearance-tile-names') } },
+    { id: 'tile-details', get label() { return t('appearance-tile-details') } },
+    { id: 'tile-badges', get label() { return t('appearance-tile-badges') } },
+    { id: 'tile-motion', get label() { return t('appearance-tile-motion') } },
+  ],
+  top: [
+    { id: 'header-activity', get label() { return t('appearance-top-activity') } },
+    { id: 'header-theme', get label() { return t('appearance-top-theme') } },
+    { id: 'header-mic', get label() { return t('appearance-top-mic') } },
+    { id: 'header-slash', get label() { return t('appearance-top-slash') } },
+    { id: 'header-palette', get label() { return t('appearance-top-palette', { keys: `${mod}K` }) } },
+  ],
+}
+const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
 </script>
 
 <template>
-  <section class="look" :aria-label="t('settings-themes')">
-    <div class="themes">
-      <label class="tlabel lang" for="language">{{ t('appearance-language') }}</label>
-      <select id="language" v-model="prefs.language" class="field lang">
-        <option value="auto">{{ t('appearance-language-auto', { name: languageName(preferredCatalog(browserLanguages, LANGUAGES) ?? 'en') }) }}</option>
-        <option v-for="code in LANGUAGES" :key="code" :value="code" :lang="code">{{ languageName(code) }}</option>
-      </select>
-    </div>
-    <div v-for="g in LOOKS" :key="g.scheme" class="themes">
-      <span class="tlabel">{{ g.label }}</span>
-      <div class="swatches" role="radiogroup" :aria-label="t('settings-look-group', { scheme: g.scheme })">
-        <label
-          v-for="theme in g.list"
-          :key="theme.id"
-          class="sw"
-          :class="[g.scheme, { on: themeFor(g.scheme).id === theme.id }]"
-          v-bind="{ [`data-${g.scheme}`]: theme.id }"
-          :title="theme.blurb"
-        >
-          <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === theme.id" @click="setLook(g.scheme, theme.id)" />
-          <span class="mini" aria-hidden="true">
-            <span class="bar" /><span class="ln" /><span class="ln short" /><span class="dot" />
-          </span>
-          <span class="nm">{{ theme.name }}</span>
-          <small>{{ theme.blurb }}</small>
+  <div class="body">
+    <section class="look" :aria-label="t('settings-themes')">
+      <div class="themes">
+        <label class="tlabel lang" for="language">{{ t('appearance-language') }}</label>
+        <select id="language" v-model="prefs.language" class="field lang">
+          <option value="auto">{{ t('appearance-language-auto', { name: languageName(preferredCatalog(browserLanguages, LANGUAGES) ?? 'en') }) }}</option>
+          <option v-for="code in LANGUAGES" :key="code" :value="code" :lang="code">{{ languageName(code) }}</option>
+        </select>
+      </div>
+      <div class="themes">
+        <span id="scheme" class="tlabel row">{{ t('appearance-scheme') }}</span>
+        <div class="modes" role="radiogroup" aria-labelledby="scheme">
+          <label v-for="m in SCHEMES" :key="m.value">
+            <input type="radio" name="scheme" :checked="prefs.theme === m.value" @change="setTheme(m.value, $event as MouseEvent)" />{{ m.label }}
+          </label>
+        </div>
+      </div>
+      <div v-for="g in LOOKS" :key="g.scheme" class="themes">
+        <span class="tlabel">{{ g.label }}</span>
+        <div class="swatches" role="radiogroup" :aria-label="t('settings-look-group', { scheme: g.scheme })">
+          <label
+            v-for="theme in g.list"
+            :key="theme.id"
+            class="sw"
+            :class="[g.scheme, { on: themeFor(g.scheme).id === theme.id }]"
+            v-bind="{ [`data-${g.scheme}`]: theme.id }"
+            :title="theme.blurb"
+          >
+            <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === theme.id" @click="setLook(g.scheme, theme.id)" />
+            <span class="mini" aria-hidden="true">
+              <span class="bar" /><span class="ln" /><span class="ln short" /><span class="dot" />
+            </span>
+            <span class="nm">{{ theme.name }}</span>
+            <small>{{ theme.blurb }}</small>
+          </label>
+        </div>
+      </div>
+      <p v-if="previewScheme" class="hint preview" role="status">
+        {{ t('settings-preview', { preview: previewScheme, used: usedScheme(), system: prefs.theme === 'system' ? 'yes' : 'no' }) }}
+        <button type="button" class="btn ghost" @click="endPreview">{{ t('settings-preview-back', { used: usedScheme() }) }}</button>
+      </p>
+      <p v-else-if="shows('header-theme')" class="hint">{{ t('settings-look-hint') }}</p>
+    </section>
+
+    <section>
+      <div class="sh"><h3>{{ t('appearance-size-section') }}</h3></div>
+      <div class="llm">
+        <span id="text-size" class="label">{{ t('appearance-text-size') }}</span>
+        <div class="modes" role="radiogroup" aria-labelledby="text-size">
+          <label v-for="m in TEXT_SIZES" :key="m.value">
+            <input v-model="prefs.textSize" type="radio" name="text-size" :value="m.value" />{{ m.label }}
+          </label>
+        </div>
+        <span id="density" class="label">{{ t('appearance-density') }}</span>
+        <div class="modes" role="radiogroup" aria-labelledby="density">
+          <label v-for="m in DENSITIES" :key="m.value">
+            <input v-model="prefs.density" type="radio" name="density" :value="m.value" />{{ m.label }}
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section v-for="(list, group) in HIDEABLE" :key="group">
+      <div class="sh"><h3>{{ group === 'tiles' ? t('appearance-tiles') : t('appearance-top-bar') }}</h3></div>
+      <p class="what">{{ group === 'tiles' ? t('appearance-tiles-what') : t('appearance-top-bar-what', { keys: `${mod}K` }) }}</p>
+      <div class="switches">
+        <label v-for="o in list" :key="o.id" class="check">
+          <input type="checkbox" :checked="shows(o.id)" @change="flip(o.id)" />
+          {{ o.label }}
         </label>
       </div>
-    </div>
-    <p v-if="previewScheme" class="hint preview" role="status">
-      {{ t('settings-preview', { preview: previewScheme, used: usedScheme(), system: prefs.theme === 'system' ? 'yes' : 'no' }) }}
-      <button type="button" class="btn ghost" @click="endPreview">{{ t('settings-preview-back', { used: usedScheme() }) }}</button>
-    </p>
-    <p v-else class="hint">{{ t('settings-look-hint') }}</p>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped src="./settingsForm.css"></style>
 
 <style scoped>
+.body { display: grid; gap: 1rem; }
 .hint.preview .btn { margin-left: 0.4rem; }
 
 /* Theme swatches: each label carries data-light / data-dark, so styles.css gives it that theme's --l-* / --d-*. */
 .themes { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.8rem; align-items: start; margin-bottom: 1.4rem; }
 .themes + .themes { padding-top: 1.2rem; border-top: 1px solid var(--line); }
 .tlabel { font-size: var(--step--1); font-weight: 550; color: var(--text); padding-top: 1.3rem; }
-.tlabel.lang { padding-top: 0; align-self: center; }
+.tlabel.lang, .tlabel.row { padding-top: 0; align-self: center; }
+.themes .modes { justify-self: start; }
 .field.lang { justify-self: start; min-width: 14rem; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.6rem; }
 .sw small { font-size: 0.68rem; color: var(--faint); font-weight: 400; line-height: 1.3; }

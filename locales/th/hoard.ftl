@@ -436,6 +436,29 @@ server-update-no-answer = ไม่มีการตอบกลับภาย
 
 appearance-language = ภาษา
 appearance-language-auto = ตามเบราว์เซอร์ ({ $name })
+appearance-scheme = สว่างหรือมืด
+appearance-scheme-system = ระบบ
+appearance-size-section = ข้อความและระยะห่าง
+appearance-text-size = ขนาดข้อความ
+appearance-text-small = เล็ก
+appearance-text-normal = ปกติ
+appearance-text-large = ใหญ่
+appearance-density = ระยะห่าง
+appearance-density-comfortable = โปร่งสบาย
+appearance-density-compact = กะทัดรัด
+appearance-tiles = ไทล์
+appearance-tiles-what = สิ่งที่แต่ละไทล์ในคลังแสดงนอกจากภาพ
+appearance-tile-names = ชื่อ
+appearance-tile-details = ชนิดและขนาด (พิกเซล ความยาว สามเหลี่ยม)
+appearance-tile-badges = ชนิดไฟล์บนภาพ
+appearance-tile-motion = เล่นแอนิเมชันขณะที่ตัวชี้อยู่เหนือภาพ
+appearance-top-bar = แถบด้านบน
+appearance-top-bar-what = ซ่อนสิ่งที่คุณไม่ได้ใช้ / ยังคงไปที่ช่องค้นหา และ { $keys } ยังคงเปิดแผงคำสั่ง
+appearance-top-activity = งานเบื้องหลัง
+appearance-top-theme = สวิตช์สว่างและมืด
+appearance-top-mic = ไมโครโฟนในช่องค้นหา สำหรับค้นหาเสียงด้วยการทำเสียงนั้น
+appearance-top-slash = คำใบ้ / ในช่องค้นหา
+appearance-top-palette = ปุ่มแผงคำสั่ง ({ $keys })
 
 ## Root
 
@@ -2398,7 +2421,7 @@ settings-find = ค้นหาการตั้งค่า
 settings-find-none = ไม่มีการตั้งค่าที่ตรงกับ “{ $query }”
 settings-load-failed = โหลดการตั้งค่าไม่ได้: { $error }
 settings-page-appearance = รูปลักษณ์
-settings-page-appearance-blurb = ธีมที่เบราว์เซอร์นี้ใช้เมื่อเป็นโหมดสว่างและโหมดมืด บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น
+settings-page-appearance-blurb = ภาษา ธีม ขนาดข้อความและระยะห่าง และสิ่งที่ไทล์และแถบด้านบนแสดง บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น
 settings-page-dragon = มังกร
 settings-page-dragon-blurb = ขุมสมบัติของมังกรคุณ: ไฟล์ทุกชิ้นในคลังคือสมบัติชิ้นหนึ่ง
 settings-page-library = คลัง

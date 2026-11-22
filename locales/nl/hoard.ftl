@@ -436,6 +436,29 @@ server-update-no-answer = geen antwoord binnen 30 seconden
 
 appearance-language = Taal
 appearance-language-auto = Die van de browser ({ $name })
+appearance-scheme = Licht of donker
+appearance-scheme-system = Systeem
+appearance-size-section = Tekst en ruimte
+appearance-text-size = Tekstgrootte
+appearance-text-small = Klein
+appearance-text-normal = Normaal
+appearance-text-large = Groot
+appearance-density = Ruimte
+appearance-density-comfortable = Ruim
+appearance-density-compact = Compact
+appearance-tiles = Tegels
+appearance-tiles-what = Wat elke tegel in de bibliotheek naast de afbeelding laat zien.
+appearance-tile-names = Namen
+appearance-tile-details = Soort en grootte (pixels, duur, driehoeken)
+appearance-tile-badges = Bestandstype op de afbeelding
+appearance-tile-motion = Animaties afspelen terwijl de aanwijzer erboven is
+appearance-top-bar = Bovenbalk
+appearance-top-bar-what = Laat weg wat je niet gebruikt. / gaat nog steeds naar het zoekvak en { $keys } opent nog steeds het opdrachtpalet.
+appearance-top-activity = Achtergrondwerk
+appearance-top-theme = Schakelaar voor licht en donker
+appearance-top-mic = Microfoon in het zoekvak, om geluiden te vinden door er een te maken
+appearance-top-slash = De /-hint in het zoekvak
+appearance-top-palette = Knop voor het opdrachtpalet ({ $keys })
 
 ## Root
 
@@ -2637,7 +2660,7 @@ settings-find = Een instelling zoeken
 settings-find-none = Geen instelling past bij ‘{ $query }’.
 settings-load-failed = Kon de instellingen niet laden: { $error }
 settings-page-appearance = Weergave
-settings-page-appearance-blurb = De thema’s die deze browser draagt als hij licht is en als hij donker is. Alleen in deze browser opgeslagen.
+settings-page-appearance-blurb = Taal, thema’s, tekstgrootte en ruimte, en wat de tegels en de bovenbalk laten zien. Alleen in deze browser bewaard.
 settings-page-dragon = Draak
 settings-page-dragon-blurb = De schat van je draak: elk asset in de bibliotheek is er een stuk van.
 settings-page-library = Bibliotheek

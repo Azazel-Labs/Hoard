@@ -436,6 +436,29 @@ server-update-no-answer = no hi ha hagut resposta en 30 segons
 
 appearance-language = Llengua
 appearance-language-auto = La del navegador ({ $name })
+appearance-scheme = Clar o fosc
+appearance-scheme-system = Sistema
+appearance-size-section = Text i espaiat
+appearance-text-size = Mida del text
+appearance-text-small = Petit
+appearance-text-normal = Normal
+appearance-text-large = Gran
+appearance-density = Espaiat
+appearance-density-comfortable = Còmode
+appearance-density-compact = Compacte
+appearance-tiles = Miniatures
+appearance-tiles-what = El que mostra cada miniatura de la biblioteca a més de la imatge.
+appearance-tile-names = Noms
+appearance-tile-details = Tipus i mida (píxels, durada, triangles)
+appearance-tile-badges = Tipus de fitxer sobre la imatge
+appearance-tile-motion = Reprodueix les animacions mentre el punter hi és a sobre
+appearance-top-bar = Barra superior
+appearance-top-bar-what = Amaga el que no facis servir. / continua anant al quadre de cerca i { $keys } continua obrint la paleta d'ordres.
+appearance-top-activity = Feina en segon pla
+appearance-top-theme = Commutador de clar i fosc
+appearance-top-mic = Micròfon al quadre de cerca, per trobar sons fent-ne un
+appearance-top-slash = La indicació / al quadre de cerca
+appearance-top-palette = Botó de la paleta d'ordres ({ $keys })
 
 ## Arrel
 
@@ -2644,7 +2667,7 @@ settings-find = Troba un paràmetre
 settings-find-none = Cap paràmetre coincideix amb «{ $query }».
 settings-load-failed = No s'ha pogut carregar la configuració: { $error }
 settings-page-appearance = Aparença
-settings-page-appearance-blurb = Els temes que fa servir aquest navegador quan està en mode clar i en mode fosc. Només es desa en aquest navegador.
+settings-page-appearance-blurb = Idioma, temes, mida del text i espaiat, i el que mostren les miniatures i la barra superior. Només es desa en aquest navegador.
 settings-page-dragon = Drac
 settings-page-dragon-blurb = El tresor del teu drac: cada recurs de la biblioteca n’és una peça.
 settings-page-library = Biblioteca

@@ -1832,6 +1832,18 @@ translation = "Pudota resurssipaketti mihin tahansa tälle sivulle"
 source = "Yours"
 translation = "Omat"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Välit"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Väljä"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Tiivis"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Kieli"
@@ -1839,6 +1851,86 @@ translation = "Kieli"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Selaimen kieli ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Vaalea vai tumma"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Järjestelmä"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Teksti ja välit"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Suuri"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normaali"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Tekstin koko"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Pieni"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Tiedostotyyppi kuvan päällä"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Laji ja koko (pikselit, kesto, kolmiot)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Toista animaatiot, kun osoitin on niiden päällä"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Nimet"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Ruudut"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Mitä kukin kirjaston ruutu näyttää kuvansa lisäksi."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Taustatyöt"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Yläpalkki"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Jätä pois, mitä et käytä. / vie edelleen hakukenttään, ja { $keys } avaa edelleen komentopaletin."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofoni hakukentässä, äänten etsimiseen tekemällä sellainen"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Komentopaletin painike ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "/-vihje hakukentässä"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Vaalean ja tumman vaihtaja"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10484,8 +10576,8 @@ source = "Appearance"
 translation = "Ulkoasu"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Teemat, joita tämä selain käyttää vaaleassa ja tummassa tilassa. Tallennetaan vain tähän selaimeen."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Kieli, teemat, tekstin koko ja välit sekä mitä ruudut ja yläpalkki näyttävät. Tallennetaan vain tähän selaimeen."
 
 [messages.settings-page-auth]
 source = "Authentication"

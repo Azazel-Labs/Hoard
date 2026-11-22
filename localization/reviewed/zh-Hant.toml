@@ -1768,6 +1768,18 @@ translation = "將素材包拖放到這個頁面的任何地方"
 source = "Yours"
 translation = "我的"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "間距"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "寬鬆"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "緊湊"
+
 [messages.appearance-language]
 source = "Language"
 translation = "語言"
@@ -1775,6 +1787,86 @@ translation = "語言"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "瀏覽器的語言（{ $name }）"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "淺色或深色"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "配合系統"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "文字與間距"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "大"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "標準"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "文字大小"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "小"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "圖片上的檔案類型"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "類型和尺寸（像素、長度、三角形）"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "指標停留時播放動畫"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "名稱"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "圖塊"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "資料庫中每個圖塊除圖片外還顯示的內容。"
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "背景工作"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "頂端列"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "隱藏你不用的項目。按 / 仍可進入搜尋框，按 { $keys } 仍可開啟命令面板。"
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "搜尋框中的麥克風，發出聲音來尋找相似的聲音"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "命令面板按鈕（{ $keys }）"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "搜尋框中的 / 提示"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "淺色/深色切換"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10192,8 +10284,8 @@ source = "Appearance"
 translation = "外觀"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "這個瀏覽器在淺色與深色模式下使用的主題。只儲存在這個瀏覽器中。"
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "語言、主題、文字大小與間距，以及圖塊和頂端列顯示的內容。只儲存在這個瀏覽器中。"
 
 [messages.settings-page-auth]
 source = "Authentication"

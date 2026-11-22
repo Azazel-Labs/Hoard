@@ -1765,6 +1765,18 @@ translation = "이 페이지 아무 곳에나 에셋 팩을 놓으세요"
 source = "Yours"
 translation = "내 항목"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "간격"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "넉넉하게"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "촘촘하게"
+
 [messages.appearance-language]
 source = "Language"
 translation = "언어"
@@ -1772,6 +1784,86 @@ translation = "언어"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "브라우저 언어({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "밝게 또는 어둡게"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "시스템"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "글자와 간격"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "크게"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "보통"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "글자 크기"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "작게"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "그림 위의 파일 형식"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "종류와 크기(픽셀, 길이, 삼각형)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "포인터를 올려 두는 동안 애니메이션 재생"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "이름"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "타일"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "라이브러리의 각 타일이 그림 외에 보여 주는 것."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "백그라운드 작업"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "상단 막대"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "쓰지 않는 것은 숨기세요. /는 계속 검색 상자로 이동하고 { $keys }는 계속 명령 팔레트를 엽니다."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "검색 상자의 마이크(소리를 내서 비슷한 소리 찾기)"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "명령 팔레트 버튼({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "검색 상자의 / 힌트"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "밝게/어둡게 전환"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10156,8 +10248,8 @@ source = "Appearance"
 translation = "모양"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "이 브라우저가 밝을 때와 어두울 때 사용하는 테마입니다. 이 브라우저에만 저장됩니다."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "언어, 테마, 글자 크기와 간격, 타일과 상단 막대에 보이는 것. 이 브라우저에만 저장됩니다."
 
 [messages.settings-page-auth]
 source = "Authentication"

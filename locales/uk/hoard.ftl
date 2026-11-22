@@ -448,6 +448,29 @@ server-update-no-answer = немає відповіді протягом 30 се
 
 appearance-language = Мова
 appearance-language-auto = Як у браузері ({ $name })
+appearance-scheme = Світла чи темна
+appearance-scheme-system = Як у системі
+appearance-size-section = Текст і відступи
+appearance-text-size = Розмір тексту
+appearance-text-small = Дрібний
+appearance-text-normal = Звичайний
+appearance-text-large = Великий
+appearance-density = Відступи
+appearance-density-comfortable = Просторо
+appearance-density-compact = Компактно
+appearance-tiles = Плитки
+appearance-tiles-what = Що кожна плитка бібліотеки показує, окрім зображення.
+appearance-tile-names = Назви
+appearance-tile-details = Тип і розмір (пікселі, тривалість, трикутники)
+appearance-tile-badges = Тип файлу на зображенні
+appearance-tile-motion = Відтворювати анімації, поки над ними вказівник
+appearance-top-bar = Верхня панель
+appearance-top-bar-what = Приберіть те, чим не користуєтеся. / і далі переводить у поле пошуку, а { $keys } і далі відкриває палітру команд.
+appearance-top-activity = Фонова робота
+appearance-top-theme = Перемикач світлої та темної теми
+appearance-top-mic = Мікрофон у полі пошуку, щоб шукати звуки, видавши схожий
+appearance-top-slash = Підказка / у полі пошуку
+appearance-top-palette = Кнопка палітри команд ({ $keys })
 
 ## Корінь
 
@@ -2973,7 +2996,7 @@ settings-find = Знайти налаштування
 settings-find-none = Немає налаштувань, що відповідають «{ $query }».
 settings-load-failed = Не вдалося завантажити налаштування: { $error }
 settings-page-appearance = Вигляд
-settings-page-appearance-blurb = Теми, які цей браузер використовує у світлому й темному режимах. Зберігаються лише в цьому браузері.
+settings-page-appearance-blurb = Мова, теми, розмір тексту й відступи, а також що показують плитки й верхня панель. Зберігається лише в цьому браузері.
 settings-page-dragon = Дракон
 settings-page-dragon-blurb = Скарбниця вашого дракона: кожен ресурс у бібліотеці — частина його скарбу.
 settings-page-library = Бібліотека

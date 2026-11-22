@@ -446,6 +446,29 @@ server-update-no-answer = niciun răspuns în 30 de secunde
 
 appearance-language = Limbă
 appearance-language-auto = A browserului ({ $name })
+appearance-scheme = Luminos sau întunecat
+appearance-scheme-system = Sistem
+appearance-size-section = Text și spațiere
+appearance-text-size = Mărimea textului
+appearance-text-small = Mică
+appearance-text-normal = Normală
+appearance-text-large = Mare
+appearance-density = Spațiere
+appearance-density-comfortable = Aerisită
+appearance-density-compact = Compactă
+appearance-tiles = Dale
+appearance-tiles-what = Ce arată fiecare dală din bibliotecă pe lângă imagine.
+appearance-tile-names = Nume
+appearance-tile-details = Tip și mărime (pixeli, durată, triunghiuri)
+appearance-tile-badges = Tipul fișierului pe imagine
+appearance-tile-motion = Redă animațiile cât timp cursorul e deasupra lor
+appearance-top-bar = Bara de sus
+appearance-top-bar-what = Ascunde ce nu folosești. / duce în continuare la caseta de căutare, iar { $keys } deschide în continuare paleta de comenzi.
+appearance-top-activity = Lucru în fundal
+appearance-top-theme = Comutator luminos/întunecat
+appearance-top-mic = Microfon în caseta de căutare, pentru a găsi sunete făcând unul
+appearance-top-slash = Indiciul / din caseta de căutare
+appearance-top-palette = Butonul paletei de comenzi ({ $keys })
 
 ## Rădăcină
 
@@ -2861,7 +2884,7 @@ settings-find = Găsește o setare
 settings-find-none = Nicio setare nu se potrivește cu „{ $query }”.
 settings-load-failed = Setările nu au putut fi încărcate: { $error }
 settings-page-appearance = Aspect
-settings-page-appearance-blurb = Temele pe care le folosește acest browser când este luminos și când este întunecat. Salvate doar în acest browser.
+settings-page-appearance-blurb = Limbă, teme, mărimea textului și spațiere, plus ce arată dalele și bara de sus. Salvat doar în acest browser.
 settings-page-dragon = Dragon
 settings-page-dragon-blurb = Comoara dragonului tău: fiecare resursă din bibliotecă e o bucată din ea.
 settings-page-library = Bibliotecă

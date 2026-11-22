@@ -1768,6 +1768,18 @@ translation = "Thả một gói tài nguyên vào bất kỳ đâu trên trang n
 source = "Yours"
 translation = "Của bạn"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Khoảng cách"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Thoáng"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Gọn"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Ngôn ngữ"
@@ -1775,6 +1787,86 @@ translation = "Ngôn ngữ"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Theo trình duyệt ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Sáng hay tối"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Hệ thống"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Chữ và khoảng cách"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Lớn"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Bình thường"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Cỡ chữ"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Nhỏ"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Loại tệp trên hình"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Loại và kích thước (điểm ảnh, độ dài, tam giác)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Phát hoạt ảnh khi con trỏ ở trên"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Tên"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Ô"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Những gì mỗi ô trong thư viện hiển thị ngoài hình ảnh."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Công việc nền"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Thanh trên cùng"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Ẩn những gì bạn không dùng. / vẫn đưa bạn đến ô tìm kiếm và { $keys } vẫn mở bảng lệnh."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Micrô trong ô tìm kiếm, để tìm âm thanh bằng cách tạo ra một âm"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Nút bảng lệnh ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Gợi ý / trong ô tìm kiếm"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Nút chuyển sáng và tối"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10186,8 +10278,8 @@ source = "Appearance"
 translation = "Giao diện"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Chủ đề trình duyệt này dùng khi ở chế độ sáng và khi ở chế độ tối. Chỉ lưu trong trình duyệt này."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Ngôn ngữ, chủ đề, cỡ chữ và khoảng cách, cùng những gì các ô và thanh trên cùng hiển thị. Chỉ được lưu trong trình duyệt này."
 
 [messages.settings-page-auth]
 source = "Authentication"

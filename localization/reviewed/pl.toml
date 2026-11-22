@@ -1872,6 +1872,18 @@ translation = "Upuść paczkę zasobów w dowolnym miejscu tej strony"
 source = "Yours"
 translation = "Moje"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Odstępy"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Wygodne"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Zwarte"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Język"
@@ -1879,6 +1891,86 @@ translation = "Język"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Jak w przeglądarce ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Jasny czy ciemny"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "System"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Tekst i odstępy"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Duży"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normalny"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Rozmiar tekstu"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Mały"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Typ pliku na obrazku"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Rodzaj i rozmiar (piksele, długość, trójkąty)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Odtwarzaj animacje, gdy kursor jest nad nimi"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Nazwy"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Kafelki"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Co każdy kafelek w bibliotece pokazuje oprócz obrazka."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Praca w tle"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Górny pasek"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Ukryj to, czego nie używasz. / nadal przenosi do pola wyszukiwania, a { $keys } nadal otwiera paletę poleceń."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofon w polu wyszukiwania, do szukania dźwięków przez wydanie jednego"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Przycisk palety poleceń ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Podpowiedź / w polu wyszukiwania"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Przełącznik jasnego i ciemnego"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10664,8 +10756,8 @@ source = "Appearance"
 translation = "Wygląd"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Motywy tej przeglądarki w trybie jasnym i ciemnym. Zapisywane tylko w tej przeglądarce."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Język, motywy, rozmiar tekstu i odstępy oraz to, co pokazują kafelki i górny pasek. Zapisywane tylko w tej przeglądarce."
 
 [messages.settings-page-auth]
 source = "Authentication"

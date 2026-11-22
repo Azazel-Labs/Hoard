@@ -436,6 +436,29 @@ server-update-no-answer = aucune réponse en 30 secondes
 
 appearance-language = Langue
 appearance-language-auto = Celle du navigateur ({ $name })
+appearance-scheme = Clair ou sombre
+appearance-scheme-system = Système
+appearance-size-section = Texte et espacement
+appearance-text-size = Taille du texte
+appearance-text-small = Petite
+appearance-text-normal = Normale
+appearance-text-large = Grande
+appearance-density = Espacement
+appearance-density-comfortable = Aéré
+appearance-density-compact = Compact
+appearance-tiles = Vignettes
+appearance-tiles-what = Ce que chaque vignette de la bibliothèque montre en plus de son image.
+appearance-tile-names = Noms
+appearance-tile-details = Type et taille (pixels, durée, triangles)
+appearance-tile-badges = Type de fichier sur l’image
+appearance-tile-motion = Lire les animations quand le pointeur les survole
+appearance-top-bar = Barre du haut
+appearance-top-bar-what = Masquez ce dont vous ne vous servez pas. / mène toujours au champ de recherche, et { $keys } ouvre toujours la palette de commandes.
+appearance-top-activity = Travail en arrière-plan
+appearance-top-theme = Bascule clair / sombre
+appearance-top-mic = Micro dans le champ de recherche, pour trouver des sons en en faisant un
+appearance-top-slash = L’indication / dans le champ de recherche
+appearance-top-palette = Bouton de la palette de commandes ({ $keys })
 
 ## Racine
 
@@ -2680,7 +2703,7 @@ settings-find = Trouver un réglage
 settings-find-none = Aucun réglage ne correspond à « { $query } ».
 settings-load-failed = Impossible de charger les paramètres : { $error }
 settings-page-appearance = Apparence
-settings-page-appearance-blurb = Les thèmes que ce navigateur porte en mode clair et en mode sombre. Enregistrés dans ce navigateur uniquement.
+settings-page-appearance-blurb = Langue, thèmes, taille du texte et espacement, et ce que montrent les vignettes et la barre du haut. Enregistré dans ce navigateur uniquement.
 settings-page-dragon = Dragon
 settings-page-dragon-blurb = Le trésor de votre dragon : chaque ressource de la bibliothèque en est une pièce.
 settings-page-library = Bibliothèque

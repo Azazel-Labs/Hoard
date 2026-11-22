@@ -436,6 +436,29 @@ server-update-no-answer = inget svar inom 30 sekunder
 
 appearance-language = Språk
 appearance-language-auto = Webbläsarens ({ $name })
+appearance-scheme = Ljust eller mörkt
+appearance-scheme-system = System
+appearance-size-section = Text och avstånd
+appearance-text-size = Textstorlek
+appearance-text-small = Liten
+appearance-text-normal = Normal
+appearance-text-large = Stor
+appearance-density = Avstånd
+appearance-density-comfortable = Luftigt
+appearance-density-compact = Kompakt
+appearance-tiles = Rutor
+appearance-tiles-what = Vad varje ruta i biblioteket visar förutom bilden.
+appearance-tile-names = Namn
+appearance-tile-details = Typ och storlek (pixlar, längd, trianglar)
+appearance-tile-badges = Filtyp på bilden
+appearance-tile-motion = Spela animationer medan pekaren är över dem
+appearance-top-bar = Toppfält
+appearance-top-bar-what = Ta bort det du inte använder. / går fortfarande till sökrutan och { $keys } öppnar fortfarande kommandopaletten.
+appearance-top-activity = Bakgrundsarbete
+appearance-top-theme = Växlare för ljust och mörkt
+appearance-top-mic = Mikrofon i sökrutan, för att hitta ljud genom att göra ett
+appearance-top-slash = /-tipset i sökrutan
+appearance-top-palette = Knapp för kommandopaletten ({ $keys })
 
 ## Rot
 
@@ -2641,7 +2664,7 @@ settings-find = Hitta en inställning
 settings-find-none = Ingen inställning matchar ”{ $query }”.
 settings-load-failed = Kunde inte läsa in inställningarna: { $error }
 settings-page-appearance = Utseende
-settings-page-appearance-blurb = Teman som den här webbläsaren använder när den är ljus och när den är mörk. Sparas bara i den här webbläsaren.
+settings-page-appearance-blurb = Språk, teman, textstorlek och avstånd, och vad rutorna och toppfältet visar. Sparas bara i den här webbläsaren.
 settings-page-dragon = Drake
 settings-page-dragon-blurb = Din drakes skatt: varje tillgång i biblioteket är en bit av den.
 settings-page-library = Bibliotek

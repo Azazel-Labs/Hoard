@@ -436,6 +436,29 @@ server-update-no-answer = không có phản hồi trong 30 giây
 
 appearance-language = Ngôn ngữ
 appearance-language-auto = Theo trình duyệt ({ $name })
+appearance-scheme = Sáng hay tối
+appearance-scheme-system = Hệ thống
+appearance-size-section = Chữ và khoảng cách
+appearance-text-size = Cỡ chữ
+appearance-text-small = Nhỏ
+appearance-text-normal = Bình thường
+appearance-text-large = Lớn
+appearance-density = Khoảng cách
+appearance-density-comfortable = Thoáng
+appearance-density-compact = Gọn
+appearance-tiles = Ô
+appearance-tiles-what = Những gì mỗi ô trong thư viện hiển thị ngoài hình ảnh.
+appearance-tile-names = Tên
+appearance-tile-details = Loại và kích thước (điểm ảnh, độ dài, tam giác)
+appearance-tile-badges = Loại tệp trên hình
+appearance-tile-motion = Phát hoạt ảnh khi con trỏ ở trên
+appearance-top-bar = Thanh trên cùng
+appearance-top-bar-what = Ẩn những gì bạn không dùng. / vẫn đưa bạn đến ô tìm kiếm và { $keys } vẫn mở bảng lệnh.
+appearance-top-activity = Công việc nền
+appearance-top-theme = Nút chuyển sáng và tối
+appearance-top-mic = Micrô trong ô tìm kiếm, để tìm âm thanh bằng cách tạo ra một âm
+appearance-top-slash = Gợi ý / trong ô tìm kiếm
+appearance-top-palette = Nút bảng lệnh ({ $keys })
 
 ## Gốc
 
@@ -2395,7 +2418,7 @@ settings-find = Tìm cài đặt
 settings-find-none = Không có cài đặt nào khớp với “{ $query }”.
 settings-load-failed = Không thể tải cài đặt: { $error }
 settings-page-appearance = Giao diện
-settings-page-appearance-blurb = Chủ đề trình duyệt này dùng khi ở chế độ sáng và khi ở chế độ tối. Chỉ lưu trong trình duyệt này.
+settings-page-appearance-blurb = Ngôn ngữ, chủ đề, cỡ chữ và khoảng cách, cùng những gì các ô và thanh trên cùng hiển thị. Chỉ được lưu trong trình duyệt này.
 settings-page-dragon = Rồng
 settings-page-dragon-blurb = Kho báu của rồng: mỗi tài nguyên trong thư viện là một món trong đó.
 settings-page-library = Thư viện

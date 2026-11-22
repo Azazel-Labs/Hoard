@@ -440,6 +440,29 @@ server-update-no-answer = keine Antwort innerhalb von 30 Sekunden
 
 appearance-language = Sprache
 appearance-language-auto = Wie im Browser ({ $name })
+appearance-scheme = Hell oder dunkel
+appearance-scheme-system = System
+appearance-size-section = Text und Abstände
+appearance-text-size = Textgröße
+appearance-text-small = Klein
+appearance-text-normal = Normal
+appearance-text-large = Groß
+appearance-density = Abstände
+appearance-density-comfortable = Großzügig
+appearance-density-compact = Kompakt
+appearance-tiles = Kacheln
+appearance-tiles-what = Was jede Kachel in der Bibliothek außer ihrem Bild zeigt.
+appearance-tile-names = Namen
+appearance-tile-details = Art und Größe (Pixel, Länge, Dreiecke)
+appearance-tile-badges = Dateityp auf dem Bild
+appearance-tile-motion = Animationen abspielen, solange der Zeiger darüber ist
+appearance-top-bar = Obere Leiste
+appearance-top-bar-what = Lass weg, was du nicht brauchst. / springt weiter ins Suchfeld, und { $keys } öffnet weiter die Befehlspalette.
+appearance-top-activity = Hintergrundarbeit
+appearance-top-theme = Umschalter für hell und dunkel
+appearance-top-mic = Mikrofon im Suchfeld, um Klänge zu finden, indem du einen machst
+appearance-top-slash = Der /-Hinweis im Suchfeld
+appearance-top-palette = Schaltfläche für die Befehlspalette ({ $keys })
 
 ## Root
 
@@ -2637,7 +2660,7 @@ settings-find = Einstellung finden
 settings-find-none = Keine Einstellung passt zu „{ $query }“.
 settings-load-failed = Die Einstellungen konnten nicht geladen werden: { $error }
 settings-page-appearance = Darstellung
-settings-page-appearance-blurb = Die Designs, die dieser Browser im hellen und im dunklen Modus trägt. Nur in diesem Browser gespeichert.
+settings-page-appearance-blurb = Sprache, Designs, Textgröße und Abstände sowie was die Kacheln und die obere Leiste zeigen. Nur in diesem Browser gespeichert.
 settings-page-dragon = Drache
 settings-page-dragon-blurb = Der Hort deines Drachen: Jedes Asset in der Bibliothek ist ein Stück seines Schatzes.
 settings-page-library = Bibliothek

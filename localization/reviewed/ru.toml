@@ -1878,6 +1878,18 @@ translation = "Перетащите пак ассетов в любое мест
 source = "Yours"
 translation = "Ваше"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Отступы"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Просторно"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Компактно"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Язык"
@@ -1885,6 +1897,86 @@ translation = "Язык"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Как в браузере ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Светлая или тёмная"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Как в системе"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Текст и отступы"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Крупный"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Обычный"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Размер текста"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Мелкий"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Тип файла на картинке"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Тип и размер (пиксели, длительность, треугольники)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Проигрывать анимации, пока над ними указатель"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Названия"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Плитки"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Что каждая плитка библиотеки показывает помимо картинки."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Фоновая работа"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Верхняя панель"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Уберите то, чем не пользуетесь. / по-прежнему переводит в поле поиска, а { $keys } по-прежнему открывает палитру команд."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Микрофон в поле поиска, чтобы искать звуки, издав похожий"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Кнопка палитры команд ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Подсказка / в поле поиска"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Переключатель светлой и тёмной темы"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10692,8 +10784,8 @@ source = "Appearance"
 translation = "Оформление"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Темы, которые этот браузер использует в светлом и в тёмном режиме. Сохраняется только в этом браузере."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Язык, темы, размер текста и отступы, а также что показывают плитки и верхняя панель. Сохраняется только в этом браузере."
 
 [messages.settings-page-auth]
 source = "Authentication"

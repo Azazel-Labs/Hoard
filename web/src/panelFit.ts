@@ -43,6 +43,8 @@ export function usePanelFit(els: PanelFitElements) {
     if (s) roomObserver.observe(s)
   })
   watch(els.grid, () => nextTick(measureRoom))
+  // Text size and density change the grid's padding and gap without resizing anything observed.
+  watch(() => [prefs.textSize, prefs.density], () => nextTick(measureRoom))
   /** Whether the screen is phone-narrow, where the panel covers the grid. */
   const isNarrow = ref(narrow.matches)
   const onNarrow = () => {

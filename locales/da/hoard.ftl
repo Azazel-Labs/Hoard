@@ -436,6 +436,29 @@ server-update-no-answer = intet svar inden for 30 sekunder
 
 appearance-language = Sprog
 appearance-language-auto = Browserens ({ $name })
+appearance-scheme = Lyst eller mørkt
+appearance-scheme-system = System
+appearance-size-section = Tekst og afstand
+appearance-text-size = Tekststørrelse
+appearance-text-small = Lille
+appearance-text-normal = Normal
+appearance-text-large = Stor
+appearance-density = Afstand
+appearance-density-comfortable = Luftig
+appearance-density-compact = Kompakt
+appearance-tiles = Felter
+appearance-tiles-what = Hvad hvert felt i biblioteket viser ud over billedet.
+appearance-tile-names = Navne
+appearance-tile-details = Type og størrelse (pixels, længde, trekanter)
+appearance-tile-badges = Filtype på billedet
+appearance-tile-motion = Afspil animationer, mens markøren er over dem
+appearance-top-bar = Topbjælke
+appearance-top-bar-what = Udelad det, du ikke bruger. / går stadig til søgefeltet, og { $keys } åbner stadig kommandopaletten.
+appearance-top-activity = Baggrundsarbejde
+appearance-top-theme = Skift mellem lyst og mørkt
+appearance-top-mic = Mikrofon i søgefeltet, til at finde lyde ved at lave en
+appearance-top-slash = /-tippet i søgefeltet
+appearance-top-palette = Knap til kommandopaletten ({ $keys })
 
 ## Rod
 
@@ -2639,7 +2662,7 @@ settings-find = Find en indstilling
 settings-find-none = Ingen indstilling passer til “{ $query }”.
 settings-load-failed = Kunne ikke indlæse indstillingerne: { $error }
 settings-page-appearance = Udseende
-settings-page-appearance-blurb = De temaer, denne browser bruger, når den er lys, og når den er mørk. Gemmes kun i denne browser.
+settings-page-appearance-blurb = Sprog, temaer, tekststørrelse og afstand, og hvad felterne og topbjælken viser. Gemmes kun i denne browser.
 settings-page-dragon = Drage
 settings-page-dragon-blurb = Din drages skat: hvert asset i biblioteket er et stykke af den.
 settings-page-library = Bibliotek

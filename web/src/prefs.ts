@@ -31,10 +31,16 @@ export interface Prefs {
   hoardArcade: boolean
   /** Settings → Tags lists the most used first, or A to Z. */
   tagSort: 'count' | 'name'
+  /** How big the writing is everywhere (Settings → Appearance): it scales the whole page, as zooming would. */
+  textSize: 'small' | 'normal' | 'large'
+  /** How much room there is around things: the grid, the sidebar, the top bar. */
+  density: 'comfortable' | 'compact'
+  /** Parts of the page turned off in Settings → Appearance, by id (see HIDEABLE in AppearancePanel.vue). */
+  hidden: string[]
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true, tagSort: 'count' }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true, tagSort: 'count', textSize: 'normal', density: 'comfortable', hidden: [] }
 
 function load(): Prefs {
   try {
@@ -58,6 +64,9 @@ watch(
   },
   { deep: true },
 )
+
+/** Whether a part of the page that can be turned off (`tile-names`, `header-mic`…) is on. */
+export const shows = (id: string) => !prefs.hidden.includes(id)
 
 export function toggleIn(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]

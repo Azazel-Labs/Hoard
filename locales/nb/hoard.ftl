@@ -436,6 +436,29 @@ server-update-no-answer = ikke noe svar innen 30 sekunder
 
 appearance-language = Språk
 appearance-language-auto = Nettleserens ({ $name })
+appearance-scheme = Lys eller mørk
+appearance-scheme-system = System
+appearance-size-section = Tekst og avstand
+appearance-text-size = Tekststørrelse
+appearance-text-small = Liten
+appearance-text-normal = Normal
+appearance-text-large = Stor
+appearance-density = Avstand
+appearance-density-comfortable = Luftig
+appearance-density-compact = Kompakt
+appearance-tiles = Fliser
+appearance-tiles-what = Hva hver flis i biblioteket viser i tillegg til bildet.
+appearance-tile-names = Navn
+appearance-tile-details = Type og størrelse (piksler, lengde, trekanter)
+appearance-tile-badges = Filtype på bildet
+appearance-tile-motion = Spill av animasjoner mens pekeren er over dem
+appearance-top-bar = Topplinje
+appearance-top-bar-what = Utelat det du ikke bruker. / går fortsatt til søkefeltet, og { $keys } åpner fortsatt kommandopaletten.
+appearance-top-activity = Bakgrunnsarbeid
+appearance-top-theme = Bryter for lys og mørk
+appearance-top-mic = Mikrofon i søkefeltet, for å finne lyder ved å lage en
+appearance-top-slash = /-hintet i søkefeltet
+appearance-top-palette = Knapp for kommandopaletten ({ $keys })
 
 ## Rot
 
@@ -2640,7 +2663,7 @@ settings-find = Finn en innstilling
 settings-find-none = Ingen innstilling passer til «{ $query }».
 settings-load-failed = Kunne ikke laste innstillingene: { $error }
 settings-page-appearance = Utseende
-settings-page-appearance-blurb = Temaene denne nettleseren bruker når den er lys og når den er mørk. Lagres bare i denne nettleseren.
+settings-page-appearance-blurb = Språk, temaer, tekststørrelse og avstand, og hva flisene og topplinjen viser. Lagres bare i denne nettleseren.
 settings-page-dragon = Drage
 settings-page-dragon-blurb = Dragens skatt: hver ressurs i biblioteket er en del av den.
 settings-page-library = Bibliotek

@@ -1862,6 +1862,18 @@ translation = "Přetáhněte balíček assetů kamkoli na tuto stránku"
 source = "Yours"
 translation = "Vaše"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Rozestupy"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Pohodlné"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Kompaktní"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Jazyk"
@@ -1869,6 +1881,86 @@ translation = "Jazyk"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Podle prohlížeče ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Světlý nebo tmavý"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "Podle systému"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Text a rozestupy"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Velký"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normální"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Velikost textu"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Malý"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Typ souboru na obrázku"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Druh a velikost (pixely, délka, trojúhelníky)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Přehrávat animace, když je nad nimi ukazatel"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Názvy"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Dlaždice"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Co každá dlaždice v knihovně ukazuje kromě obrázku."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Práce na pozadí"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Horní lišta"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Vynechte, co nepoužíváte. / dál přejde do vyhledávacího pole a { $keys } dál otevře paletu příkazů."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofon ve vyhledávacím poli, k hledání zvuků tím, že nějaký vydáte"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Tlačítko palety příkazů ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "Nápověda / ve vyhledávacím poli"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Přepínač světlého a tmavého vzhledu"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10630,8 +10722,8 @@ source = "Appearance"
 translation = "Vzhled"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Motivy, které tento prohlížeč používá, když je světlý a když je tmavý. Ukládá se jen v tomto prohlížeči."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Jazyk, motivy, velikost textu a rozestupy a co ukazují dlaždice a horní lišta. Uloženo jen v tomto prohlížeči."
 
 [messages.settings-page-auth]
 source = "Authentication"

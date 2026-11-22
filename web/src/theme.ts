@@ -65,6 +65,12 @@ function apply() {
 watch(() => prefs.theme, () => (previewScheme.value = null))
 watch(() => [prefs.theme, prefs.lightTheme, prefs.darkTheme, previewScheme.value], apply, { immediate: true })
 lightQuery.addEventListener('change', apply)
+// Text size and density (Settings → Appearance) go on <html> too, for styles.css and the components to follow.
+watch(
+  () => [prefs.textSize, prefs.density] as const,
+  ([text, density]) => Object.assign(document.documentElement.dataset, { text, density }),
+  { immediate: true },
+)
 
 /** Light, dark, or whichever the system is. */
 export const SCHEMES = [

@@ -436,6 +436,29 @@ server-update-no-answer = geen antwoord binne 30 sekondes nie
 
 appearance-language = Taal
 appearance-language-auto = Blaaier s'n ({ $name })
+appearance-scheme = Lig of donker
+appearance-scheme-system = Stelsel
+appearance-size-section = Teks en spasiëring
+appearance-text-size = Teksgrootte
+appearance-text-small = Klein
+appearance-text-normal = Normaal
+appearance-text-large = Groot
+appearance-density = Spasiëring
+appearance-density-comfortable = Gemaklik
+appearance-density-compact = Kompak
+appearance-tiles = Teëls
+appearance-tiles-what = Wat elke teël in die biblioteek behalwe sy prent wys.
+appearance-tile-names = Name
+appearance-tile-details = Soort en grootte (pieksels, lengte, driehoeke)
+appearance-tile-badges = Lêertipe op die prent
+appearance-tile-motion = Speel animasies terwyl die wyser daaroor is
+appearance-top-bar = Boonste balk
+appearance-top-bar-what = Laat weg wat jy nie gebruik nie. / gaan steeds na die soekkassie, en { $keys } maak steeds die opdragpalet oop.
+appearance-top-activity = Agtergrondwerk
+appearance-top-theme = Lig-en-donker-skakelaar
+appearance-top-mic = Mikrofoon in die soekkassie, om klanke te vind deur een te maak
+appearance-top-slash = Die /-wenk in die soekkassie
+appearance-top-palette = Opdragpaletknoppie ({ $keys })
 
 ## Wortel
 
@@ -2637,7 +2660,7 @@ settings-find = Vind ’n instelling
 settings-find-none = Geen instelling pas by “{ $query }” nie.
 settings-load-failed = Kon nie die instellings laai nie: { $error }
 settings-page-appearance = Voorkoms
-settings-page-appearance-blurb = Die temas wat hierdie blaaier dra wanneer dit lig en wanneer dit donker is. Net in hierdie blaaier gestoor.
+settings-page-appearance-blurb = Taal, temas, teksgrootte en spasiëring, en wat die teëls en die boonste balk wys. Net in hierdie blaaier gestoor.
 settings-page-dragon = Draak
 settings-page-dragon-blurb = Jou draak se skat: elke bate in die biblioteek is ’n stuk van sy skat.
 settings-page-library = Biblioteek

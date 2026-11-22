@@ -444,6 +444,29 @@ server-update-no-answer = ei vastausta 30 sekunnissa
 
 appearance-language = Kieli
 appearance-language-auto = Selaimen kieli ({ $name })
+appearance-scheme = Vaalea vai tumma
+appearance-scheme-system = Järjestelmä
+appearance-size-section = Teksti ja välit
+appearance-text-size = Tekstin koko
+appearance-text-small = Pieni
+appearance-text-normal = Normaali
+appearance-text-large = Suuri
+appearance-density = Välit
+appearance-density-comfortable = Väljä
+appearance-density-compact = Tiivis
+appearance-tiles = Ruudut
+appearance-tiles-what = Mitä kukin kirjaston ruutu näyttää kuvansa lisäksi.
+appearance-tile-names = Nimet
+appearance-tile-details = Laji ja koko (pikselit, kesto, kolmiot)
+appearance-tile-badges = Tiedostotyyppi kuvan päällä
+appearance-tile-motion = Toista animaatiot, kun osoitin on niiden päällä
+appearance-top-bar = Yläpalkki
+appearance-top-bar-what = Jätä pois, mitä et käytä. / vie edelleen hakukenttään, ja { $keys } avaa edelleen komentopaletin.
+appearance-top-activity = Taustatyöt
+appearance-top-theme = Vaalean ja tumman vaihtaja
+appearance-top-mic = Mikrofoni hakukentässä, äänten etsimiseen tekemällä sellainen
+appearance-top-slash = /-vihje hakukentässä
+appearance-top-palette = Komentopaletin painike ({ $keys })
 
 ## Juuri
 
@@ -2723,7 +2746,7 @@ settings-find = Etsi asetus
 settings-find-none = Mikään asetus ei vastaa hakua ”{ $query }”.
 settings-load-failed = Asetusten lataus epäonnistui: { $error }
 settings-page-appearance = Ulkoasu
-settings-page-appearance-blurb = Teemat, joita tämä selain käyttää vaaleassa ja tummassa tilassa. Tallennetaan vain tähän selaimeen.
+settings-page-appearance-blurb = Kieli, teemat, tekstin koko ja välit sekä mitä ruudut ja yläpalkki näyttävät. Tallennetaan vain tähän selaimeen.
 settings-page-dragon = Lohikäärme
 settings-page-dragon-blurb = Lohikäärmeesi aarre: jokainen kirjaston tiedosto on palanen sitä.
 settings-page-library = Kirjasto

@@ -1828,6 +1828,18 @@ translation = "Slipp en ressurspakke hvor som helst på denne siden"
 source = "Yours"
 translation = "Dine"
 
+[messages.appearance-density]
+source = "Spacing"
+translation = "Avstand"
+
+[messages.appearance-density-comfortable]
+source = "Comfortable"
+translation = "Luftig"
+
+[messages.appearance-density-compact]
+source = "Compact"
+translation = "Kompakt"
+
 [messages.appearance-language]
 source = "Language"
 translation = "Språk"
@@ -1835,6 +1847,86 @@ translation = "Språk"
 [messages.appearance-language-auto]
 source = "Browser's ({ $name })"
 translation = "Nettleserens ({ $name })"
+
+[messages.appearance-scheme]
+source = "Light or dark"
+translation = "Lys eller mørk"
+
+[messages.appearance-scheme-system]
+source = "System"
+translation = "System"
+
+[messages.appearance-size-section]
+source = "Text and spacing"
+translation = "Tekst og avstand"
+
+[messages.appearance-text-large]
+source = "Large"
+translation = "Stor"
+
+[messages.appearance-text-normal]
+source = "Normal"
+translation = "Normal"
+
+[messages.appearance-text-size]
+source = "Text size"
+translation = "Tekststørrelse"
+
+[messages.appearance-text-small]
+source = "Small"
+translation = "Liten"
+
+[messages.appearance-tile-badges]
+source = "File type on the picture"
+translation = "Filtype på bildet"
+
+[messages.appearance-tile-details]
+source = "Kind and size (pixels, length, triangles)"
+translation = "Type og størrelse (piksler, lengde, trekanter)"
+
+[messages.appearance-tile-motion]
+source = "Play animations while the pointer is over them"
+translation = "Spill av animasjoner mens pekeren er over dem"
+
+[messages.appearance-tile-names]
+source = "Names"
+translation = "Navn"
+
+[messages.appearance-tiles]
+source = "Tiles"
+translation = "Fliser"
+
+[messages.appearance-tiles-what]
+source = "What each tile in the library shows besides its picture."
+translation = "Hva hver flis i biblioteket viser i tillegg til bildet."
+
+[messages.appearance-top-activity]
+source = "Background work"
+translation = "Bakgrunnsarbeid"
+
+[messages.appearance-top-bar]
+source = "Top bar"
+translation = "Topplinje"
+
+[messages.appearance-top-bar-what]
+source = "Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette."
+translation = "Utelat det du ikke bruker. / går fortsatt til søkefeltet, og { $keys } åpner fortsatt kommandopaletten."
+
+[messages.appearance-top-mic]
+source = "Microphone in the search box, for finding sounds by making one"
+translation = "Mikrofon i søkefeltet, for å finne lyder ved å lage en"
+
+[messages.appearance-top-palette]
+source = "Command palette button ({ $keys })"
+translation = "Knapp for kommandopaletten ({ $keys })"
+
+[messages.appearance-top-slash]
+source = "The / hint in the search box"
+translation = "/-hintet i søkefeltet"
+
+[messages.appearance-top-theme]
+source = "Light and dark switch"
+translation = "Bryter for lys og mørk"
 
 [messages.archive-anyway]
 source = "Archive anyway"
@@ -10437,8 +10529,8 @@ source = "Appearance"
 translation = "Utseende"
 
 [messages.settings-page-appearance-blurb]
-source = "The themes this browser wears when it’s light and when it’s dark. Saved in this browser only."
-translation = "Temaene denne nettleseren bruker når den er lys og når den er mørk. Lagres bare i denne nettleseren."
+source = "Language, themes, text size and spacing, and what the tiles and the top bar show. Saved in this browser only."
+translation = "Språk, temaer, tekststørrelse og avstand, og hva flisene og topplinjen viser. Lagres bare i denne nettleseren."
 
 [messages.settings-page-auth]
 source = "Authentication"

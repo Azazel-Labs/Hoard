@@ -1076,4 +1076,16 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // again.
     "DELETE FROM derivatives WHERE kind IN ('motion', 'still')
        AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
+    // 99: a tile sheet whose note gives a space between tiles may have that space round its edge too (RTS Medieval's
+    // `Tilesheet info.txt`: 64 px tiles with 32 px between them, and 32 px round the outside), and is cut into its tiles
+    // all the same. Packs with a note about sheets that wasn't taken for one are looked through again.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND lower(a.ext) = 'txt' AND a.kind != 'sheet'
+                       AND lower(a.path) LIKE '%sheet%')
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                           AND j.status IN ('queued', 'running'));",
 ];

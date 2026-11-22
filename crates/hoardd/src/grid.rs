@@ -99,11 +99,13 @@ pub(crate) fn parse_note(text: &str) -> Option<Note> {
     })
 }
 
-/// Where an image's tiles are: their size, the space between them and how many columns and rows.
+/// Where an image's tiles are: their size, the space between them, the space before the first (none, or a border as
+/// wide as the space between) and how many columns and rows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Grid {
     pub(crate) tile: [u32; 2],
     pub(crate) spacing: u32,
+    pub(crate) margin: u32,
     pub(crate) cells: [u32; 2],
 }
 
@@ -111,8 +113,9 @@ impl Grid {
     /// Each cell's rectangle, row by row.
     pub(crate) fn rects(&self) -> impl Iterator<Item = [u32; 4]> + '_ {
         let [tw, th] = self.tile;
-        let s = self.spacing;
-        (0..self.cells[1]).flat_map(move |r| (0..self.cells[0]).map(move |c| [c * (tw + s), r * (th + s), tw, th]))
+        let (s, m) = (self.spacing, self.margin);
+        (0..self.cells[1])
+            .flat_map(move |r| (0..self.cells[0]).map(move |c| [m + c * (tw + s), m + r * (th + s), tw, th]))
     }
 }
 
@@ -123,17 +126,20 @@ fn doubled(name: &str) -> bool {
     n.contains("@2") || n.ends_with("2x") || n.contains("double") || n.contains("retina")
 }
 
-/// How many tiles of `t` fit along `w` with `s` between them: exactly, with or without space after the last.
-fn along(w: u32, t: u32, s: u32) -> Option<u32> {
+/// How many tiles of `t` fit along `w` with `s` between them, and how far in the first is: exactly, with or without
+/// space after the last, or with it all round (`RTS Medieval`'s sheet has a border as wide as the space between).
+fn along(w: u32, t: u32, s: u32) -> Option<(u32, u32)> {
     let step = t + s;
-    let n = if (w + s).is_multiple_of(step) {
-        (w + s) / step
+    let (n, margin) = if (w + s).is_multiple_of(step) {
+        ((w + s) / step, 0)
     } else if s > 0 && w.is_multiple_of(step) {
-        w / step
+        (w / step, 0)
+    } else if s > 0 && w > s && (w - s).is_multiple_of(step) {
+        ((w - s) / step, s)
     } else {
         return None;
     };
-    (n > 0).then_some(n)
+    (n > 0).then_some((n, margin))
 }
 
 /// The grid a note describes on an image of this name and size, if the image is on it. With the space between tiles,
@@ -153,9 +159,10 @@ pub(crate) fn fit(note: &Note, name: &str, size: [u32; 2]) -> Option<Grid> {
             spacings.push(0);
         }
         spacings.into_iter().find_map(|s| {
-            let cells = [along(size[0], tile[0], s)?, along(size[1], tile[1], s)?];
-            let right = note.cells.is_none_or(|c| c == cells) && cells[0] * cells[1] >= 2;
-            right.then_some(Grid { tile, spacing: s, cells })
+            let ((columns, left), (rows, top)) = (along(size[0], tile[0], s)?, along(size[1], tile[1], s)?);
+            let cells = [columns, rows];
+            let right = note.cells.is_none_or(|c| c == cells) && cells[0] * cells[1] >= 2 && left == top;
+            right.then_some(Grid { tile, spacing: s, margin: left, cells })
         })
     })
 }
@@ -181,7 +188,8 @@ pub(crate) fn empty(img: &RgbaImage, [x0, y0, w, h]: [u32; 4], background: Optio
 /// An image's tiles as an atlas page, named as Kenney names its loose tiles (`tile_0000`, counting every cell, the
 /// empty ones too), each under the image's name when the sheet has more than one. Empty cells are left out.
 pub(crate) fn page(img: &RgbaImage, grid: &Grid, image: &str, prefix: Option<&str>) -> Page {
-    let background = (grid.spacing > 0 && grid.tile[0] < img.width()).then(|| *img.get_pixel(grid.tile[0], 0));
+    let (gap, m) = (grid.margin + grid.tile[0], grid.margin);
+    let background = (grid.spacing > 0 && gap < img.width() && m < img.height()).then(|| *img.get_pixel(gap, m));
     let sprites = grid
         .rects()
         .enumerate()
@@ -297,10 +305,13 @@ mod tests {
     #[test]
     fn images_on_the_grid() {
         let town = Note { tile: [16, 16], double: None, spacing: 1, cells: Some([12, 11]) };
-        assert_eq!(fit(&town, "tilemap.png", [203, 186]), Some(Grid { tile: [16, 16], spacing: 1, cells: [12, 11] }));
+        assert_eq!(
+            fit(&town, "tilemap.png", [203, 186]),
+            Some(Grid { tile: [16, 16], spacing: 1, margin: 0, cells: [12, 11] })
+        );
         assert_eq!(
             fit(&town, "tilemap_packed.png", [192, 176]),
-            Some(Grid { tile: [16, 16], spacing: 0, cells: [12, 11] })
+            Some(Grid { tile: [16, 16], spacing: 0, margin: 0, cells: [12, 11] })
         );
         assert_eq!(fit(&town, "Preview.png", [918, 515]), None);
         assert_eq!(fit(&town, "tile_0000.png", [16, 16]), None);
@@ -312,7 +323,16 @@ mod tests {
         let rts = Note { tile: [64, 64], double: None, spacing: 0, cells: None };
         assert_eq!(fit(&rts, "scifi_tilesheet.png", [1152, 448]).map(|g| g.cells), Some([18, 7]));
         assert_eq!(fit(&rts, "scifi_tilesheet@2.png", [2304, 896]).map(|g| g.cells), Some([18, 7]));
-        let g = Grid { tile: [16, 16], spacing: 1, cells: [2, 2] };
+        // RTS Medieval's sheet has its 32 px space round the edge as well as between the tiles.
+        let medieval = Note { tile: [64, 64], double: None, spacing: 32, cells: None };
+        let bordered = Grid { tile: [64, 64], spacing: 32, margin: 32, cells: [18, 7] };
+        assert_eq!(fit(&medieval, "medieval_tilesheet.png", [1760, 704]), Some(bordered));
+        assert_eq!(
+            fit(&medieval, "RTS_medieval@2.png", [3520, 1408]).map(|g| (g.margin, g.cells)),
+            Some((64, [18, 7]))
+        );
+        assert_eq!(bordered.rects().nth(19), Some([128, 128, 64, 64]));
+        let g = Grid { tile: [16, 16], spacing: 1, margin: 0, cells: [2, 2] };
         assert_eq!(g.rects().collect::<Vec<_>>(), [[0, 0, 16, 16], [17, 0, 16, 16], [0, 17, 16, 16], [17, 17, 16, 16]]);
     }
 
@@ -332,7 +352,7 @@ mod tests {
                 img.put_pixel(xx, yy, Rgba([0, 0, 0, 0]));
             }
         }
-        let grid = Grid { tile: [4, 4], spacing: 1, cells: [2, 2] };
+        let grid = Grid { tile: [4, 4], spacing: 1, margin: 0, cells: [2, 2] };
         let names: Vec<String> = page(&img, &grid, "t.png", None).sprites.into_iter().map(|s| s.name).collect();
         assert_eq!(names, ["tile_0000", "tile_0002"]);
         let names: Vec<String> = page(&img, &grid, "t.png", Some("t")).sprites.into_iter().map(|s| s.name).collect();

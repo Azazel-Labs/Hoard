@@ -1072,7 +1072,8 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     ),
     // 98: an animation is drawn in a tiled room scaled to its character, and the camera follows one that travels (a
     // fall, a run that goes somewhere) instead of backing off to take in everywhere it goes, which drew it a speck.
-    // Its motion thumbnail and still are drawn again.
+    // One that goes somewhere carries a small trail of where along its top. Its motion thumbnail and still are drawn
+    // again.
     "DELETE FROM derivatives WHERE kind IN ('motion', 'still')
        AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
 ];

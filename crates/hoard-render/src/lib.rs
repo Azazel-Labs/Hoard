@@ -432,12 +432,18 @@ impl Renderer {
         let room = room(&posed, THREE_QUARTER, images.len()).context("model has no vertices")?;
         images.push(Some(tiles()));
         let cameras = clip_cameras(&posed, &room, THREE_QUARTER).context("model has no vertices")?;
+        let path = trail(&posed);
         posed
             .into_iter()
             .zip(cameras)
-            .map(|(mut draws, (globals, eye))| {
+            .enumerate()
+            .map(|(at, (mut draws, (globals, eye)))| {
                 draws.extend(room.iter().cloned());
-                self.render_from(&draws, &images, size, globals, eye)
+                let mut img = self.render_from(&draws, &images, size, globals, eye)?;
+                if let Some(path) = &path {
+                    draw_trail(&mut img, path, at);
+                }
+                Ok(img)
             })
             .collect()
     }
@@ -918,6 +924,130 @@ fn tiles() -> image::RgbaImage {
     })
 }
 
+/// A clip goes somewhere when its middle travels this much of the character's height: then its thumbnail carries a
+/// trail of where.
+const GOES: f32 = 0.3;
+
+/// Where a clip's character goes, frame by frame, seen from the side it goes most across: from the side along the way
+/// it heads (a fall, a run, a jump forward), or from above when it wanders around more than it rises and falls (a turn,
+/// a circle). Each point is the middle of its pose, in the plane of that view, y up. None when it stays put.
+fn trail(frames: &[Vec<Draw>]) -> Option<Vec<Vec2>> {
+    let mut tall = 0f32;
+    let mut middles = Vec::with_capacity(frames.len());
+    for frame in frames {
+        let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
+        for p in frame.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos)) {
+            lo = lo.min(p);
+            hi = hi.max(p);
+        }
+        if !lo.is_finite() {
+            return None;
+        }
+        tall = tall.max(hi.y - lo.y);
+        middles.push((lo + hi) / 2.0);
+    }
+    let n = middles.len() as f32;
+    let mean = middles.iter().sum::<Vec3>() / n;
+    let (lo, hi) = middles
+        .iter()
+        .fold((Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY)), |(l, h), p| (l.min(*p), h.max(*p)));
+    if middles.len() < 2 || (hi - lo).length() < tall.max(1e-6) * GOES {
+        return None;
+    }
+    // The way it heads across the floor: the long axis of where its middle goes, seen from above.
+    let (mut xx, mut xz, mut zz, mut yy) = (0f32, 0f32, 0f32, 0f32);
+    for p in middles.iter().map(|p| *p - mean) {
+        xx += p.x * p.x;
+        xz += p.x * p.z;
+        zz += p.z * p.z;
+        yy += p.y * p.y;
+    }
+    let angle = 0.5 * (2.0 * xz).atan2(xx - zz);
+    let mut along = Vec3::new(angle.cos(), 0.0, angle.sin());
+    let across = Vec3::new(-along.z, 0.0, along.x);
+    let spread = |axis: Vec3| middles.iter().map(|p| (*p - mean).dot(axis).powi(2)).sum::<f32>();
+    // Left to right, the way it goes.
+    if (middles[middles.len() - 1] - middles[0]).dot(along) < 0.0 {
+        along = -along;
+    }
+    let up = if spread(across) > yy { across } else { Vec3::Y };
+    Some(middles.iter().map(|p| Vec2::new((*p - mean).dot(along), (*p - mean).dot(up))).collect())
+}
+
+/// Draw a clip's trail small along the top of its frame `at`: the whole way faint, the stretch it's just come along
+/// brighter, and a dot where it is.
+fn draw_trail(img: &mut image::RgbaImage, path: &[Vec2], at: usize) {
+    #[expect(clippy::cast_precision_loss, reason = "a thumbnail's side")]
+    let side = img.width().min(img.height()) as f32;
+    let (lo, hi) = path
+        .iter()
+        .fold((Vec2::splat(f32::INFINITY), Vec2::splat(f32::NEG_INFINITY)), |(l, h), p| (l.min(*p), h.max(*p)));
+    let (box_w, box_h, top) = (side * 0.62, side * 0.11, side * 0.045);
+    let scale = (box_w / (hi.x - lo.x).max(1e-6)).min(box_h / (hi.y - lo.y).max(1e-6));
+    let mid = (lo + hi) / 2.0;
+    let screen: Vec<Vec2> = path
+        .iter()
+        .map(|p| Vec2::new(side / 2.0 + (p.x - mid.x) * scale, top + box_h / 2.0 - (p.y - mid.y) * scale))
+        .collect();
+    let line = (side / 160.0).max(1.0);
+    // How far back the bright stretch reaches, in frames.
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        clippy::cast_precision_loss,
+        reason = "a few frames"
+    )]
+    let tail = ((path.len() as f32 * 0.4).round() as usize).max(2);
+    let head = screen[at];
+    let pad = line * 4.0;
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, reason = "clamped to the image")]
+    let (x0, x1, y0, y1) = (
+        (side / 2.0 - box_w / 2.0 - pad).max(0.0) as u32,
+        ((side / 2.0 + box_w / 2.0 + pad) as u32).min(img.width() - 1),
+        (top - pad).max(0.0) as u32,
+        ((top + box_h + pad) as u32).min(img.height() - 1),
+    );
+    let blend = |px: &mut image::Rgba<u8>, rgb: [f32; 3], a: f32| {
+        for (c, v) in px.0.iter_mut().zip(rgb) {
+            *c = (f32::from(*c) * (1.0 - a) + v * a).round().clamp(0.0, 255.0) as u8;
+        }
+    };
+    for y in y0..=y1 {
+        for x in x0..=x1 {
+            #[expect(clippy::cast_precision_loss, reason = "a pixel of a thumbnail")]
+            let q = Vec2::new(x as f32 + 0.5, y as f32 + 0.5);
+            // Nearest the whole way, and nearest the bright stretch, with how fresh it is there (1 at the dot).
+            let (mut whole, mut bright, mut fresh) = (f32::INFINITY, f32::INFINITY, 0f32);
+            for (i, seg) in screen.windows(2).enumerate() {
+                let (d, t) = to_segment(q, seg[0], seg[1]);
+                whole = whole.min(d);
+                #[expect(clippy::cast_precision_loss, reason = "a few frames")]
+                let age = at as f32 - (i as f32 + t);
+                #[expect(clippy::cast_precision_loss, reason = "a few frames")]
+                if (0.0..tail as f32).contains(&age) && d < bright {
+                    bright = d;
+                    fresh = 1.0 - age / tail as f32;
+                }
+            }
+            let cover = |d: f32, half: f32| (half + 0.5 - d).clamp(0.0, 1.0);
+            let px = img.get_pixel_mut(x, y);
+            blend(px, [255.0; 3], cover(whole, line * 1.6) * 0.55);
+            blend(px, [46.0, 52.0, 64.0], cover(whole, line * 0.5) * 0.45);
+            blend(px, [32.0, 128.0, 112.0], cover(bright, line) * fresh.powf(0.8));
+            let dot = q.distance(head);
+            blend(px, [255.0; 3], cover(dot, line * 3.4));
+            blend(px, [32.0, 128.0, 112.0], cover(dot, line * 2.4));
+        }
+    }
+}
+
+/// How far `q` is from the segment from `a` to `b`, and how far along it the nearest point is, 0 to 1.
+fn to_segment(q: Vec2, a: Vec2, b: Vec2) -> (f32, f32) {
+    let ab = b - a;
+    let t = if ab.length_squared() > 0.0 { ((q - a).dot(ab) / ab.length_squared()).clamp(0.0, 1.0) } else { 0.0 };
+    (q.distance(a + ab * t), t)
+}
+
 /// The largest texture side uploaded for a render.
 const MAX_TEXTURE: u32 = 1024;
 
@@ -1089,6 +1219,37 @@ mod tests {
     use super::*;
 
     /// A box a unit across and two tall, `y` up from the ground, as one draw.
+    /// A jump forward: three units along, one up at the top.
+    fn leap(t: f32) -> Vec<Draw> {
+        shifted(figure(0.0), Vec3::new(3.0 * t, 4.0 * t * (1.0 - t), 0.0))
+    }
+
+    /// A lap of a circle three units across, on the floor.
+    fn circle(t: f32) -> Vec<Draw> {
+        let a = t * std::f32::consts::TAU;
+        shifted(figure(0.0), Vec3::new(1.5 * a.cos(), 0.0, 1.5 * a.sin()))
+    }
+
+    #[test]
+    fn a_trail_is_drawn_from_the_side_it_goes_most_across_and_not_at_all_when_it_stays_put() {
+        let idle: Vec<_> = (0..12).map(|k| figure(0.05 * (k as f32).sin())).collect();
+        assert!(trail(&idle).is_none());
+        // A fall is seen from the side: straight down.
+        let fall = trail(&(0..12).map(|k| figure(-10.0 * k as f32)).collect::<Vec<_>>()).unwrap();
+        assert!(fall.iter().all(|p| p.x.abs() < 1e-3));
+        assert!(fall[11].y < fall[0].y);
+        // A leap from the side, left to right, up and back down.
+        let leap = trail(&(0..12).map(|k| leap(k as f32 / 11.0)).collect::<Vec<_>>()).unwrap();
+        assert!(leap[11].x > leap[0].x);
+        assert!(leap[6].y > leap[0].y && leap[6].y > leap[11].y);
+        // A circle on the floor from above: as wide across as along.
+        let round = trail(&(0..12).map(|k| circle(k as f32 / 11.0)).collect::<Vec<_>>()).unwrap();
+        let span = |f: fn(&Vec2) -> f32| {
+            round.iter().map(f).fold(f32::NEG_INFINITY, f32::max) - round.iter().map(f).fold(f32::INFINITY, f32::min)
+        };
+        assert!(span(|p| p.y) > span(|p| p.x) * 0.8);
+    }
+
     fn figure(y: f32) -> Vec<Draw> {
         let vertices = (0..8)
             .map(|i| Vertex {
@@ -1128,17 +1289,25 @@ mod tests {
     fn room_shots() {
         let out = std::path::PathBuf::from(std::env::var("HOARD_ROOM_SHOTS").unwrap());
         let r = Renderer::new().unwrap();
-        let clips: [(&str, Vec<Vec<Draw>>); 2] = [
+        let clips: [(&str, Vec<Vec<Draw>>); 5] = [
             ("fall", (0..12).map(|k| figure(-40.0 * (k as f32 / 11.0).powi(2))).collect()),
             ("walk", (0..12).map(|k| shifted(figure(0.0), Vec3::new(0.6 * k as f32, 0.0, 0.0))).collect()),
+            ("leap", (0..12).map(|k| leap(k as f32 / 11.0)).collect()),
+            ("circle", (0..12).map(|k| circle(k as f32 / 11.0)).collect()),
+            ("idle", (0..12).map(|k| figure(0.05 * (k as f32).sin())).collect()),
         ];
         for (name, frames) in clips {
             let images = vec![Some(tiles())];
             let room = room(&frames, THREE_QUARTER, 0).unwrap();
             let cams = clip_cameras(&frames, &room, THREE_QUARTER).unwrap();
+            let path = trail(&frames);
             for (k, (mut f, (g, eye))) in frames.into_iter().zip(cams).enumerate() {
                 f.extend(room.iter().cloned());
-                r.render_from(&f, &images, 256, g, eye).unwrap().save(out.join(format!("{name}-{k:02}.png"))).unwrap();
+                let mut img = r.render_from(&f, &images, 256, g, eye).unwrap();
+                if let Some(path) = &path {
+                    draw_trail(&mut img, path, k);
+                }
+                img.save(out.join(format!("{name}-{k:02}.png"))).unwrap();
             }
         }
     }

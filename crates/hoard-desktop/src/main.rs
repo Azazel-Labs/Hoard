@@ -389,9 +389,16 @@ mod tests {
 
     #[test]
     fn a_copy_in_a_steam_library_is_steams() {
-        assert!(in_steam_library(Path::new(r"C:\Program Files (x86)\Steam\steamapps\common\Hoard\Hoard.exe")));
-        assert!(in_steam_library(Path::new("/home/me/.local/share/Steam/SteamApps/common/Hoard/usr/bin/hoard")));
-        assert!(!in_steam_library(Path::new(r"C:\Users\me\AppData\Local\Hoard\Hoard.exe")));
-        assert!(!in_steam_library(Path::new("/Applications/Hoard.app/Contents/MacOS/Hoard")));
+        // Each system's paths only split into folders on that system.
+        #[cfg(windows)]
+        {
+            assert!(in_steam_library(Path::new(r"C:\Program Files (x86)\Steam\steamapps\common\Hoard\Hoard.exe")));
+            assert!(!in_steam_library(Path::new(r"C:\Users\me\AppData\Local\Hoard\Hoard.exe")));
+        }
+        #[cfg(unix)]
+        {
+            assert!(in_steam_library(Path::new("/home/me/.local/share/Steam/SteamApps/common/Hoard/usr/bin/hoard")));
+            assert!(!in_steam_library(Path::new("/Applications/Hoard.app/Contents/MacOS/Hoard")));
+        }
     }
 }

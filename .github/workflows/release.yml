@@ -75,8 +75,21 @@ jobs:
         with: { ref: "refs/tags/${{ env.TAG }}" }
       - name: Latest stable, with the components rust-toolchain.toml lists
         run: rustup update --no-self-update stable && rustup toolchain install
+      # Windows builds on a Dev Drive (ReFS, with Defender out of the way): the same build, a good deal quicker
+      # than on the runner's NTFS disk. It's mounted beside the checkout, and the target directory goes on it.
+      - name: Put the target directory on a Dev Drive
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p ../dev
+          echo "CARGO_TARGET_DIR=$(cd .. && pwd -W)/dev/target" >> "$GITHUB_ENV"
+      - uses: samypr100/setup-dev-drive@v4
+        if: runner.os == 'Windows'
+        with: { drive-size: 60GB, mount-path: "${{ github.workspace }}/../dev", trusted-dev-drive: true }
       - uses: Swatinem/rust-cache@v2
-        with: { key: "${{ matrix.target }}" }
+        with:
+          key: "${{ matrix.target }}"
+          workspaces: ${{ runner.os == 'Windows' && '. -> ../dev/target' || '.' }}
       - run: cargo build --release --locked -p hoardd -p hoard
         env: { HOARD_VERSION: "${{ needs.check-version.outputs.version }}" }
       - uses: actions/download-artifact@v8
@@ -87,7 +100,8 @@ jobs:
           name="hoard-${{ needs.check-version.outputs.version }}-${{ matrix.target }}"
           mkdir -p "$name/web"
           exe=""; [[ "${{ matrix.target }}" == *windows* ]] && exe=".exe"
-          cp "target/release/hoardd$exe" "target/release/hoard$exe" "$name/"
+          out="${CARGO_TARGET_DIR:-target}/release"
+          cp "$out/hoardd$exe" "$out/hoard$exe" "$name/"
           cp -r web/dist "$name/web/dist"
           cp README.md LICENSE* "$name/" 2>/dev/null || true
           if [[ -n "$exe" ]]; then
@@ -118,8 +132,21 @@ jobs:
         with: { ref: "refs/tags/${{ env.TAG }}" }
       - name: Latest stable, with the components rust-toolchain.toml lists
         run: rustup update --no-self-update stable && rustup toolchain install
+      # Windows builds on a Dev Drive (ReFS, with Defender out of the way): the same build, a good deal quicker
+      # than on the runner's NTFS disk. It's mounted beside the checkout, and the target directory goes on it.
+      - name: Put the target directory on a Dev Drive
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p ../dev
+          echo "CARGO_TARGET_DIR=$(cd .. && pwd -W)/dev/target" >> "$GITHUB_ENV"
+      - uses: samypr100/setup-dev-drive@v4
+        if: runner.os == 'Windows'
+        with: { drive-size: 60GB, mount-path: "${{ github.workspace }}/../dev", trusted-dev-drive: true }
       - uses: Swatinem/rust-cache@v2
-        with: { key: "desktop-${{ matrix.target }}" }
+        with:
+          key: "desktop-${{ matrix.target }}"
+          workspaces: ${{ runner.os == 'Windows' && '. -> ../dev/target' || '.' }}
       - name: The web view's libraries
         if: runner.os == 'Linux'
         run: |
@@ -151,7 +178,7 @@ jobs:
       - name: Collect
         shell: bash
         run: |
-          b=target/release/bundle
+          b="${CARGO_TARGET_DIR:-target}/release/bundle"
           mkdir out
           shopt -s nullglob
           cp $b/nsis/*.exe* $b/dmg/*.dmg $b/appimage/*.AppImage* $b/deb/*.deb out/

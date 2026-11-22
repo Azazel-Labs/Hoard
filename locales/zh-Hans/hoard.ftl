@@ -2903,7 +2903,7 @@ settings-conversion-cache-unit = 最多保留；最久未使用的先删除
 
 settings-updates = 更新
 settings-version = 这是 Hoard { $version }。
-settings-update-check = 每隔几小时检查 GitHub 上是否有新版本
+settings-update-check = 每天检查一次 GitHub 上是否有新版本
 settings-desktop-updates = Hoard 每次启动时都会查找新版本，在后台下载，并在你退出时安装。
 settings-backups = 定时备份
 settings-backups-what = 数据库会自动备份，每次备份都会显示在下方的历史记录中。

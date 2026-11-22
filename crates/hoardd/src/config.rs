@@ -68,7 +68,7 @@ pub struct Config {
     #[arg(long)]
     pub(crate) https_off: bool,
 
-    /// Check GitHub every few hours for a newer Hoard release and say so in the portal. Sends nothing but the request
+    /// Check GitHub once a day for a newer Hoard release and say so in the portal. Sends nothing but the request
     /// (with a `hoard/<version>` user agent).
     #[arg(skip = true)]
     pub(crate) update_check: bool,

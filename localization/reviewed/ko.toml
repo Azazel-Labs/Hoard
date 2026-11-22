@@ -10872,8 +10872,8 @@ source = "What to do with .uasset files."
 translation = ".uasset 파일을 어떻게 할지 정합니다."
 
 [messages.settings-update-check]
-source = "Check GitHub every few hours for a new release"
-translation = "몇 시간마다 GitHub에서 새 릴리스 확인"
+source = "Check GitHub once a day for a new release"
+translation = "하루에 한 번 GitHub에서 새 릴리스 확인"
 
 [messages.settings-updates]
 source = "Updates"

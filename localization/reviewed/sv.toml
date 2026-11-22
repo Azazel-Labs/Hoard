@@ -11154,8 +11154,8 @@ source = "What to do with .uasset files."
 translation = "Vad som ska göras med .uasset-filer."
 
 [messages.settings-update-check]
-source = "Check GitHub every few hours for a new release"
-translation = "Kolla GitHub med några timmars mellanrum efter en ny version"
+source = "Check GitHub once a day for a new release"
+translation = "Kolla GitHub en gång om dagen efter en ny version"
 
 [messages.settings-updates]
 source = "Updates"

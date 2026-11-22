@@ -2994,7 +2994,7 @@ settings-conversion-cache-unit = legfeljebb ennyi marad meg; a legrégebben hasz
 
 settings-updates = Frissítések
 settings-version = Ez a Hoard { $version }.
-settings-update-check = Új kiadás keresése a GitHubon néhány óránként
+settings-update-check = Új kiadás keresése a GitHubon naponta egyszer
 settings-desktop-updates = A Hoard minden indításkor új kiadást keres, a háttérben letölti, és kilépéskor telepíti.
 settings-backups = Ütemezett biztonsági mentések
 settings-backups-what = Az adatbázis magától készít biztonsági mentést; mindegyik megjelenik lent az előzményekben.

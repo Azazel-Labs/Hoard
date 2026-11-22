@@ -3452,7 +3452,7 @@ settings-conversion-cache-unit = przechowywane maksymalnie; najdawniej używane 
 
 settings-updates = Aktualizacje
 settings-version = To jest Hoard { $version }.
-settings-update-check = Sprawdzaj co kilka godzin w GitHub, czy jest nowa wersja
+settings-update-check = Sprawdzaj raz dziennie w GitHub, czy jest nowa wersja
 settings-desktop-updates = Hoard przy każdym uruchomieniu szuka nowej wersji, pobiera ją w tle i instaluje, gdy go zamkniesz.
 settings-backups = Zaplanowane kopie zapasowe
 settings-backups-what = Baza danych sama robi swoje kopie zapasowe; każda pojawia się w historii poniżej.

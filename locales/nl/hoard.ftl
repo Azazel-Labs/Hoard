@@ -3165,7 +3165,7 @@ settings-conversion-cache-unit = maximaal bewaard; de minst recent gebruikte gaa
 
 settings-updates = Updates
 settings-version = Dit is Hoard { $version }.
-settings-update-check = Elke paar uur op GitHub controleren op een nieuwe versie
+settings-update-check = Eén keer per dag op GitHub controleren op een nieuwe versie
 settings-desktop-updates = Hoard zoekt bij elke start naar een nieuwe versie, downloadt die op de achtergrond en installeert hem wanneer je afsluit.
 settings-backups = Geplande back-ups
 settings-backups-what = De database maakt zelf back-ups; elke back-up staat in de geschiedenis hieronder.

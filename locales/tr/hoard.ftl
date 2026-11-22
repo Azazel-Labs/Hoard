@@ -2966,7 +2966,7 @@ settings-conversion-cache-unit = en fazla bu kadar saklanır; en uzun süredir k
 
 settings-updates = Güncellemeler
 settings-version = Bu, Hoard { $version }.
-settings-update-check = Yeni bir sürüm için birkaç saatte bir GitHub’ı denetle
+settings-update-check = Yeni bir sürüm için günde bir kez GitHub’ı denetle
 settings-desktop-updates = Hoard her açılışta yeni bir sürüm arar, arka planda indirir ve çıktığınızda kurar.
 settings-backups = Zamanlanmış yedekler
 settings-backups-what = Veritabanı kendi kendini yedekler; her yedek aşağıdaki geçmişte görünür.

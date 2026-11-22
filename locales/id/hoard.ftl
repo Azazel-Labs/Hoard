@@ -2935,7 +2935,7 @@ settings-conversion-cache-unit = disimpan paling banyak; yang paling lama tidak 
 
 settings-updates = Pembaruan
 settings-version = Ini Hoard { $version }.
-settings-update-check = Periksa GitHub setiap beberapa jam untuk rilis baru
+settings-update-check = Periksa GitHub sekali sehari untuk rilis baru
 settings-desktop-updates = Hoard mencari rilis baru setiap kali dimulai, mengunduhnya di latar belakang, dan memasangnya saat kamu keluar.
 settings-backups = Cadangan terjadwal
 settings-backups-what = Database mencadangkan dirinya sendiri; setiap cadangan muncul di riwayat di bawah.

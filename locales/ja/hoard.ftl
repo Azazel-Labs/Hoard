@@ -2903,7 +2903,7 @@ settings-conversion-cache-unit = まで保持。最も長く使われていな�
 
 settings-updates = 更新
 settings-version = これは Hoard { $version } です。
-settings-update-check = 数時間ごとに GitHub で新しいリリースを確認する
+settings-update-check = 1 日に 1 回 GitHub で新しいリリースを確認する
 settings-desktop-updates = Hoard は起動するたびに新しいリリースを探し、バックグラウンドでダウンロードして、終了するときにインストールします。
 settings-backups = 定期バックアップ
 settings-backups-what = データベースが自動でバックアップされます。各バックアップは下の履歴に表示されます。

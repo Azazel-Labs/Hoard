@@ -1,4 +1,4 @@
-//! Tells the portal when a newer Hoard release is out. Every six hours the server asks GitHub for the latest release
+//! Tells the portal when a newer Hoard release is out. Once a day the server asks GitHub for the latest release
 //! (pre-releases and drafts excluded); if it's newer than this build, `GET /api/stats` carries it as `update` and
 //! the portal shows a link to its notes. Nothing is installed: updating is pulling the new image (or binary), and
 //! the database migrates itself on the next start. Settings turns the check off.
@@ -20,7 +20,7 @@ use crate::i18n::tr;
 
 const LATEST_RELEASE: &str = "https://api.github.com/repos/Azazel-Labs/Hoard/releases/latest";
 const FIRST_CHECK: Duration = Duration::from_secs(60);
-const INTERVAL: Duration = Duration::from_hours(6);
+const INTERVAL: Duration = Duration::from_hours(24);
 /// How often to see whether the server is idle while an update waits.
 const IDLE_POLL: Duration = Duration::from_secs(60);
 /// Between calls for the same release after one fails.

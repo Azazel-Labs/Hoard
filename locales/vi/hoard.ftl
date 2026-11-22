@@ -2903,7 +2903,7 @@ settings-conversion-cache-unit = giữ tối đa; thứ ít được dùng gần
 
 settings-updates = Cập nhật
 settings-version = Đây là Hoard { $version }.
-settings-update-check = Kiểm tra GitHub vài giờ một lần để tìm bản phát hành mới
+settings-update-check = Kiểm tra GitHub mỗi ngày một lần để tìm bản phát hành mới
 settings-desktop-updates = Mỗi lần khởi động, Hoard tìm bản phát hành mới, tải về ở chế độ nền và cài đặt khi bạn thoát.
 settings-backups = Sao lưu theo lịch
 settings-backups-what = Cơ sở dữ liệu tự sao lưu; mỗi bản sao lưu hiện trong lịch sử bên dưới.

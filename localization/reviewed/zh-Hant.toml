@@ -10908,8 +10908,8 @@ source = "What to do with .uasset files."
 translation = "如何處理 .uasset 檔案。"
 
 [messages.settings-update-check]
-source = "Check GitHub every few hours for a new release"
-translation = "每隔幾小時檢查 GitHub 是否有新版本"
+source = "Check GitHub once a day for a new release"
+translation = "每天檢查一次 GitHub 是否有新版本"
 
 [messages.settings-updates]
 source = "Updates"

@@ -11268,8 +11268,8 @@ source = "What to do with .uasset files."
 translation = "Шта радити с .uasset датотекама."
 
 [messages.settings-update-check]
-source = "Check GitHub every few hours for a new release"
-translation = "Проверавај GitHub на сваких неколико сати за ново издање"
+source = "Check GitHub once a day for a new release"
+translation = "Проверавај GitHub једном дневно за ново издање"
 
 [messages.settings-updates]
 source = "Updates"

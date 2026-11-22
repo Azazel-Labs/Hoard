@@ -2906,7 +2906,7 @@ settings-conversion-cache-unit = เก็บไว้ไม่เกินน�
 
 settings-updates = การอัปเดต
 settings-version = นี่คือ Hoard { $version }
-settings-update-check = ตรวจหารุ่นใหม่บน GitHub ทุก ๆ สองสามชั่วโมง
+settings-update-check = ตรวจหารุ่นใหม่บน GitHub วันละครั้ง
 settings-desktop-updates = Hoard จะหารุ่นใหม่ทุกครั้งที่เปิด ดาวน์โหลดไว้เบื้องหลัง และติดตั้งเมื่อคุณปิดโปรแกรม
 settings-backups = การสำรองข้อมูลตามกำหนดเวลา
 settings-backups-what = ฐานข้อมูลจะสำรองตัวเองโดยอัตโนมัติ ข้อมูลสำรองแต่ละชุดจะแสดงในประวัติด้านล่าง

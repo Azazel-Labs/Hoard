@@ -3424,7 +3424,7 @@ settings-conversion-cache-unit = uchovává se nejvýše; nejdéle nepoužívan�
 
 settings-updates = Aktualizace
 settings-version = Toto je Hoard { $version }.
-settings-update-check = Každých pár hodin kontrolovat na GitHubu novou verzi
+settings-update-check = Jednou denně kontrolovat na GitHubu novou verzi
 settings-desktop-updates = Hoard při každém spuštění hledá novou verzi, stáhne ji na pozadí a nainstaluje ji, když ho ukončíte.
 settings-backups = Plánované zálohy
 settings-backups-what = Databáze se zálohuje sama; každá záloha se ukáže v historii níže.

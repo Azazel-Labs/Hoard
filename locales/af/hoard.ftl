@@ -3163,7 +3163,7 @@ settings-conversion-cache-unit = hoogstens gehou; die minste onlangs gebruikte g
 
 settings-updates = Bywerkings
 settings-version = Dit is Hoard { $version }.
-settings-update-check = Kyk elke paar uur op GitHub vir 'n nuwe weergawe
+settings-update-check = Kyk een keer per dag op GitHub vir 'n nuwe weergawe
 settings-desktop-updates = Hoard soek elke keer as dit begin na ’n nuwe weergawe, laai dit in die agtergrond af en installeer dit wanneer jy dit toemaak.
 settings-backups = Geskeduleerde rugsteun
 settings-backups-what = Die databasis maak self rugsteun; elke rugsteun wys in die geskiedenis hieronder.

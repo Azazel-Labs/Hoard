@@ -162,7 +162,7 @@ takes:
 | `…/hoard:1.3.0` | exactly that version |
 | `…/hoard:edge` | every green commit on `main`, between releases |
 
-The server asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that off
+The server asks GitHub once a day whether a newer release exists, for the badge in the header; switch that off
 in Settings → Maintenance → Updates.
 
 ### Updating automatically

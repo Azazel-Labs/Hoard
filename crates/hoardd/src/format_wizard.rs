@@ -201,7 +201,7 @@ async fn unread(state: &AppState) -> anyhow::Result<Vec<Unread>> {
             "SELECT a.id, a.path, a.pack_id, p.name, a.blob_hash FROM assets a
              JOIN blobs b ON b.hash = a.blob_hash JOIN packs p ON p.id = a.pack_id
              WHERE lower(a.ext) IN ({exts}) AND b.size <= ? AND p.status = 'ready'
-               AND a.archived_at IS NULL AND p.archived_at IS NULL
+               AND a.archived_at IS NULL AND p.archived_at IS NULL AND a.kind != 'sheet'
              ORDER BY p.name, a.path LIMIT 50000"
         ))?;
         let mut args: Vec<Sql> = TEXT_EXTS.iter().map(|e| Sql::from((*e).to_owned())).collect();

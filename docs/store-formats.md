@@ -8,7 +8,8 @@ means adding a TOML file and a sample, which makes a small PR.
 ## The wizard
 
 Settings → Store files lists the files in the library that look like a store's but that no format reads: names found
-in more than one pack, or named like `info`, `license` or `manifest`. "Teach Hoard this file" opens the wizard on one;
+in more than one pack, or named like `info`, `license` or `manifest`. Files already read as something else, such as a
+sprite sheet's atlas or a note of a tile sheet's grid, aren't listed. "Teach Hoard this file" opens the wizard on one;
 so does the same button in a text file's details.
 
 The file is shown beside a form. Name the store, then pick a field and click its value in the file. In JSON the

@@ -1366,10 +1366,34 @@ const commands = computed<Command[]>(() => {
     <header class="top" data-tauri-drag-region="deep">
       <a href="#" class="brand" :title="stats?.version ? t('app-home-version', { version: stats.version }) : t('app-home')" @click.prevent="goHome">
         <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
-          <rect x="3" y="3" width="12" height="12" rx="2.5" fill="var(--k-texture)" />
-          <rect x="17" y="3" width="12" height="12" rx="2.5" fill="var(--k-audio)" />
-          <rect x="3" y="17" width="12" height="12" rx="2.5" fill="var(--k-model)" />
-          <rect x="17" y="17" width="12" height="12" rx="2.5" fill="var(--k-font)" />
+          <g class="gem">
+            <polygon points="5.86,4.5 13.14,4.5 16,8.4 9.5,15.55 3,8.4" fill="var(--k-texture)" />
+            <polygon points="9.5,8.4 16,8.4 9.5,15.55" fill="#000" fill-opacity="0.3" />
+            <polygon points="3,8.4 5.86,4.5 8.2,4.5 7.16,8.4" fill="#fff" fill-opacity="0.25" />
+            <polygon points="8.2,4.5 10.8,4.5 11.84,8.4 7.16,8.4" fill="#fff" fill-opacity="0.5" />
+            <polygon points="10.8,4.5 13.14,4.5 16,8.4 11.84,8.4" fill="#000" fill-opacity="0.08" />
+          </g>
+          <g class="gem">
+            <polygon points="18.86,4.5 26.14,4.5 29,8.4 22.5,15.55 16,8.4" fill="var(--k-audio)" />
+            <polygon points="22.5,8.4 29,8.4 22.5,15.55" fill="#000" fill-opacity="0.3" />
+            <polygon points="16,8.4 18.86,4.5 21.2,4.5 20.16,8.4" fill="#fff" fill-opacity="0.25" />
+            <polygon points="21.2,4.5 23.8,4.5 24.84,8.4 20.16,8.4" fill="#fff" fill-opacity="0.5" />
+            <polygon points="23.8,4.5 26.14,4.5 29,8.4 24.84,8.4" fill="#000" fill-opacity="0.08" />
+          </g>
+          <g class="gem">
+            <polygon points="5.86,17.5 13.14,17.5 16,21.4 9.5,28.55 3,21.4" fill="var(--k-model)" />
+            <polygon points="9.5,21.4 16,21.4 9.5,28.55" fill="#000" fill-opacity="0.3" />
+            <polygon points="3,21.4 5.86,17.5 8.2,17.5 7.16,21.4" fill="#fff" fill-opacity="0.25" />
+            <polygon points="8.2,17.5 10.8,17.5 11.84,21.4 7.16,21.4" fill="#fff" fill-opacity="0.5" />
+            <polygon points="10.8,17.5 13.14,17.5 16,21.4 11.84,21.4" fill="#000" fill-opacity="0.08" />
+          </g>
+          <g class="gem">
+            <polygon points="18.86,17.5 26.14,17.5 29,21.4 22.5,28.55 16,21.4" fill="var(--k-font)" />
+            <polygon points="22.5,21.4 29,21.4 22.5,28.55" fill="#000" fill-opacity="0.3" />
+            <polygon points="16,21.4 18.86,17.5 21.2,17.5 20.16,21.4" fill="#fff" fill-opacity="0.25" />
+            <polygon points="21.2,17.5 23.8,17.5 24.84,21.4 20.16,21.4" fill="#fff" fill-opacity="0.5" />
+            <polygon points="23.8,17.5 26.14,17.5 29,21.4 24.84,21.4" fill="#000" fill-opacity="0.08" />
+          </g>
         </svg>
         <span>{{ siteName() }}</span>
       </a>
@@ -1801,12 +1825,12 @@ const commands = computed<Command[]>(() => {
   color: inherit; text-decoration: none; border-radius: 6px;
 }
 .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-/* Hover the logo and the bins jostle; the wordmark stays put. */
-.brand rect { transform-box: fill-box; transform-origin: center; transition: rotate var(--dur-3) var(--ease-pop), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
-.brand:hover rect:nth-of-type(1) { rotate: -10deg; translate: -1px -1px; }
-.brand:hover rect:nth-of-type(2) { rotate: 8deg; scale: 1.08; transition-delay: 30ms; }
-.brand:hover rect:nth-of-type(3) { rotate: 6deg; translate: -1px 1px; transition-delay: 60ms; }
-.brand:hover rect:nth-of-type(4) { rotate: -12deg; scale: 0.9; transition-delay: 90ms; }
+/* Hover the logo and the gems jostle; the wordmark stays put. */
+.brand .gem { transform-box: fill-box; transform-origin: center; transition: rotate var(--dur-3) var(--ease-pop), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
+.brand:hover .gem:nth-of-type(1) { rotate: -10deg; translate: -1px -1px; }
+.brand:hover .gem:nth-of-type(2) { rotate: 8deg; scale: 1.08; transition-delay: 30ms; }
+.brand:hover .gem:nth-of-type(3) { rotate: 6deg; translate: -1px 1px; transition-delay: 60ms; }
+.brand:hover .gem:nth-of-type(4) { rotate: -12deg; scale: 0.9; transition-delay: 90ms; }
 .search { position: relative; flex: 1; max-width: 640px; isolation: isolate; }
 .search .field { background: var(--bg); padding: 0.55em 4.2em 0.55em 2.1em; }
 /* The search text marked up, underneath the box: what's left out, `or`, a pack's name, a tag the library has. Gently,

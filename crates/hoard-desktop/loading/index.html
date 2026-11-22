@@ -13,13 +13,13 @@
       body { display: grid; place-items: center; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, sans-serif; }
       main { display: grid; justify-items: center; gap: 1.25rem; max-width: 36rem; padding: 0 1.5rem; text-align: center; }
       svg { width: 72px; height: 72px; }
-      svg rect.tile { animation: pulse 1.2s ease-in-out infinite; }
-      svg rect.tile:nth-of-type(3) { animation-delay: 0.15s; }
-      svg rect.tile:nth-of-type(5) { animation-delay: 0.3s; }
-      svg rect.tile:nth-of-type(4) { animation-delay: 0.45s; }
+      svg .tile { animation: pulse 1.2s ease-in-out infinite; }
+      svg .tile:nth-of-type(2) { animation-delay: 0.15s; }
+      svg .tile:nth-of-type(4) { animation-delay: 0.3s; }
+      svg .tile:nth-of-type(3) { animation-delay: 0.45s; }
       @keyframes pulse { 50% { opacity: 0.35; } }
-      @media (prefers-reduced-motion: reduce) { svg rect.tile { animation: none; } }
-      .failed svg rect.tile { animation: none; opacity: 0.35; }
+      @media (prefers-reduced-motion: reduce) { svg .tile { animation: none; } }
+      .failed svg .tile { animation: none; opacity: 0.35; }
       #error { display: none; margin: 0; color: var(--danger); white-space: pre-wrap; overflow-wrap: anywhere; }
       .failed #error { display: block; }
       /* The window has no frame of the system's: the page moves it, and these stand in for its buttons. */
@@ -38,12 +38,37 @@
       <button type="button" data-window="close" class="close"><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10" /></svg></button>
     </nav>
     <main data-tauri-drag-region="deep">
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="#1c2230" />
-        <rect class="tile" x="6" y="6" width="9" height="9" rx="2" fill="#5fb3a1" />
-        <rect class="tile" x="17" y="6" width="9" height="9" rx="2" fill="#c792ea" />
-        <rect class="tile" x="6" y="17" width="9" height="9" rx="2" fill="#e6b450" />
-        <rect class="tile" x="17" y="17" width="9" height="9" rx="2" fill="#7fb4e6" />
+      <svg viewBox="0 0 128 128" aria-hidden="true">
+        <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262f43" /><stop offset="1" stop-color="#161b27" /></linearGradient></defs>
+        <rect width="128" height="128" rx="28" fill="url(#bg)" />
+        <g class="tile">
+          <polygon points="24,35.4 43,35.4 43,56.3" fill="#5fb3a1" />
+          <polygon points="43,35.4 62,35.4 43,56.3" fill="#437d71" />
+          <polygon points="24,35.4 32.36,24 39.2,24 36.16,35.4" fill="#87c6b9" />
+          <polygon points="39.2,24 46.8,24 49.84,35.4 36.16,35.4" fill="#afd9d0" />
+          <polygon points="46.8,24 53.64,24 62,35.4 49.84,35.4" fill="#57a594" />
+        </g>
+        <g class="tile">
+          <polygon points="66,35.4 85,35.4 85,56.3" fill="#c792ea" />
+          <polygon points="85,35.4 104,35.4 85,56.3" fill="#8b66a4" />
+          <polygon points="66,35.4 74.36,24 81.2,24 78.16,35.4" fill="#d5adef" />
+          <polygon points="81.2,24 88.8,24 91.84,35.4 78.16,35.4" fill="#e3c9f5" />
+          <polygon points="88.8,24 95.64,24 104,35.4 91.84,35.4" fill="#b786d7" />
+        </g>
+        <g class="tile">
+          <polygon points="24,81.4 43,81.4 43,102.3" fill="#e6b450" />
+          <polygon points="43,81.4 62,81.4 43,102.3" fill="#a17e38" />
+          <polygon points="24,81.4 32.36,70 39.2,70 36.16,81.4" fill="#ecc77c" />
+          <polygon points="39.2,70 46.8,70 49.84,81.4 36.16,81.4" fill="#f3daa8" />
+          <polygon points="46.8,70 53.64,70 62,81.4 49.84,81.4" fill="#d4a64a" />
+        </g>
+        <g class="tile">
+          <polygon points="66,81.4 85,81.4 85,102.3" fill="#7fb4e6" />
+          <polygon points="85,81.4 104,81.4 85,102.3" fill="#597ea1" />
+          <polygon points="66,81.4 74.36,70 81.2,70 78.16,81.4" fill="#9fc7ec" />
+          <polygon points="81.2,70 88.8,70 91.84,81.4 78.16,81.4" fill="#bfdaf3" />
+          <polygon points="88.8,70 95.64,70 104,81.4 91.84,81.4" fill="#75a6d4" />
+        </g>
       </svg>
       <p id="error" role="alert"></p>
     </main>

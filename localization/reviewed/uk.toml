@@ -4847,6 +4847,10 @@ translation = "не вдалося завантажити { $model }: { $reason 
 source = "the model server: { $reason }"
 translation = "сервер моделей: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "анімовані мініатюри відтворюються з частотою 12, 24 або 30 кадрів на секунду"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "розділ «Що нового» може зберігати не більше 256 переглянутих новинок, кожна з назвою з малих літер, цифр і дефісів"
@@ -10932,6 +10936,18 @@ translation = "Вимкнено"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Ця програма"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Частота кадрів"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } кадр/с"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Плавніші ролики довше створюються й займають більше місця: за 24 кадр/с приблизно вдвічі більше, ніж за 12, а за 30 — ще більше. Після зміни всі вони створюються заново."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

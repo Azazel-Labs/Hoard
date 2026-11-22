@@ -110,7 +110,7 @@ pub(super) async fn report(State(state): State<AppState>) -> ApiResult<Json<Valu
         ),
         ("Sound search", on(now.clap).into()),
         ("Model thumbnails", on(now.render).into()),
-        ("Moving thumbnails", on(now.motion_thumbs).into()),
+        ("Moving thumbnails", if now.motion_thumbs { format!("on, {} fps", now.motion_fps) } else { "off".into() }),
         ("Guest browsing", on(now.guest_browsing).into()),
         ("Workers", now.workers.to_string()),
     ];

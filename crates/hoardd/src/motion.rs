@@ -22,8 +22,6 @@ use serde_json::{Map, Value, json};
 
 use crate::{AppState, db};
 
-/// Frames a second.
-const FPS: f64 = 12.0;
 /// The longest stretch of a clip played: a longer one is cut there.
 const MAX_SECS: f64 = 3.0;
 /// The frame's side, as a still thumbnail's.
@@ -166,7 +164,7 @@ async fn fill(state: &AppState) -> Result<()> {
         #[expect(clippy::cast_precision_loss, reason = "a fraction for a progress bar")]
         activity.progress(i as f32 / todo.len() as f32);
         let packs = PACKS_IN.load(Ordering::SeqCst);
-        match make(state, t, motion).await {
+        match make(state, t, motion, settings.motion_fps).await {
             Ok(()) => made += 1,
             // A pack that came in meanwhile asked for another round, which tries it again.
             Err(e) if e.is::<NoCharacter>() && PACKS_IN.load(Ordering::SeqCst) != packs => {}
@@ -223,8 +221,8 @@ pub(crate) async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Loc
 }
 
 /// Draw one animation: its still from the middle of the clip, which becomes its thumbnail (unless a browser drew
-/// one), and its motion thumbnail when `motion`.
-async fn make(state: &AppState, t: &Todo, motion: bool) -> Result<()> {
+/// one), and its motion thumbnail when `motion`, at `fps` frames a second.
+async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> {
     let (id, pack) = (t.id.clone(), t.pack_id.clone());
     let linked = db::call(&state.pool, move |c| {
         Ok(c.query_row(
@@ -259,7 +257,7 @@ async fn make(state: &AppState, t: &Todo, motion: bool) -> Result<()> {
             None => None,
         };
         let (webp, still) =
-            crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings, motion)).await??;
+            crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings, motion.then_some(fps))).await??;
         let motion = match webp {
             Some(webp) => Some(state.blobs.put_cache_bytes(webp).await?),
             None => None,
@@ -313,7 +311,7 @@ fn draw(
     clip: &Local,
     body: Option<&Local>,
     facings: (Facing, Facing),
-    motion: bool,
+    motion: Option<u32>,
 ) -> Result<(Option<Vec<u8>>, Vec<u8>)> {
     let from = crate::meshes::posable(&clip.path, &clip.ext, &clip.root)?;
     let (index, secs) = take(&from.json).context("it has no clip to play")?;
@@ -326,7 +324,12 @@ fn draw(
         (doc, index, facings.1)
     };
     crate::meshes::turn(&mut doc.json, facing);
-    let (frames, ms) = if motion { frames(&doc, index, secs)? } else { (vec![posed(&doc, index, middle(secs))?], 0) };
+    let fps = f64::from(motion.unwrap_or(crate::settings::DEFAULT_MOTION_FPS));
+    let (frames, ms) = if motion.is_some() {
+        frames(&doc, index, secs, fps)?
+    } else {
+        (vec![posed(&doc, index, middle(secs, fps))?], 0)
+    };
     let renderer = crate::analyze::renderer().context("model thumbnails are off")?;
     let guard = renderer.lock().unwrap_or_else(PoisonError::into_inner);
     // wgpu panics on what it finds invalid; that costs this clip its thumbnail, not the server.
@@ -334,7 +337,7 @@ fn draw(
         .map_err(|_| anyhow!("the renderer crashed"))??;
     drop(guard);
     let still = drawn.get(drawn.len() / 2).context("no frames")?.clone();
-    let webp = if motion { Some(encode(&drawn, ms)?) } else { None };
+    let webp = if motion.is_some() { Some(encode(&drawn, ms)?) } else { None };
     Ok((webp, crate::analyze::thumb_bytes(still, false)?))
 }
 
@@ -344,10 +347,10 @@ fn take(json: &Map<String, Value>) -> Option<(usize, f64)> {
     rig.clips.iter().enumerate().find(|(_, c)| c.secs >= crate::animations::POSE_SECS).map(|(i, c)| (i, c.secs))
 }
 
-/// The model posed at each frame of clip `index`, each as a GLB, and how long a frame shows in milliseconds.
-fn frames(doc: &Document<'_>, index: usize, secs: f64) -> Result<(Vec<Vec<u8>>, u32)> {
+/// The model posed at each frame of clip `index` at `fps`, each as a GLB, and how long a frame shows in milliseconds.
+fn frames(doc: &Document<'_>, index: usize, secs: f64, fps: f64) -> Result<(Vec<Vec<u8>>, u32)> {
     let span = secs.min(MAX_SECS);
-    let (count, ms) = timing(span);
+    let (count, ms) = timing(span, fps);
     let step = span / f64::from(count);
     let out = (0..count).map(|k| posed(doc, index, f64::from(k) * step)).collect::<Result<_>>()?;
     Ok((out, ms))
@@ -355,9 +358,9 @@ fn frames(doc: &Document<'_>, index: usize, secs: f64) -> Result<(Vec<Vec<u8>>, 
 
 /// The moment of a clip `secs` long its still shows: the middle of the stretch a motion thumbnail plays, which is the
 /// motion thumbnail's middle frame.
-fn middle(secs: f64) -> f64 {
+fn middle(secs: f64, fps: f64) -> f64 {
     let span = secs.min(MAX_SECS);
-    let (count, _) = timing(span);
+    let (count, _) = timing(span, fps);
     f64::from(count / 2) * span / f64::from(count)
 }
 
@@ -369,10 +372,10 @@ fn posed(doc: &Document<'_>, index: usize, time: f64) -> Result<Vec<u8>> {
     Ok(crate::meshes::to_glb(&mesh)?)
 }
 
-/// How many frames a stretch of `span` seconds has at [`FPS`] (two at least), and how long each shows.
+/// How many frames a stretch of `span` seconds has at `fps` (two at least), and how long each shows.
 #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, reason = "a few dozen frames of a few seconds")]
-fn timing(span: f64) -> (u32, u32) {
-    let count = ((span * FPS).round() as u32).max(2);
+fn timing(span: f64, fps: f64) -> (u32, u32) {
+    let count = ((span * fps).round() as u32).max(2);
     (count, ((span / f64::from(count)) * 1000.0).round().max(1.0) as u32)
 }
 
@@ -603,7 +606,7 @@ mod tests {
         assert_eq!(body.json["animations"][0]["channels"].as_array().unwrap().len(), 1, "morph weights are left out");
         assert!(x_at(&body, at, 0.0).abs() < 1e-5);
         assert!((x_at(&body, at, 0.5) - 2.5).abs() < 1e-4);
-        let (frames, ms) = frames(&body, at, secs).unwrap();
+        let (frames, ms) = frames(&body, at, secs, 12.0).unwrap();
         assert_eq!((frames.len(), ms), (12, 83));
     }
 
@@ -616,10 +619,12 @@ mod tests {
 
     #[test]
     fn a_long_clip_is_cut_and_a_short_one_has_two_frames() {
-        assert_eq!(timing(MAX_SECS), (36, 83));
-        assert_eq!(timing(0.1), (2, 50));
+        assert_eq!(timing(MAX_SECS, 12.0), (36, 83));
+        assert_eq!(timing(0.1, 12.0), (2, 50));
+        // Smoother is more frames, each shown for less time.
+        assert_eq!(timing(MAX_SECS, 30.0), (90, 33));
         // A still shows the middle of what a motion thumbnail plays.
-        assert_eq!((middle(1.0), middle(10.0), middle(0.1)), (0.5, 1.5, 0.05));
+        assert_eq!((middle(1.0, 12.0), middle(10.0, 12.0), middle(0.1, 12.0)), (0.5, 1.5, 0.05));
     }
 
     #[test]

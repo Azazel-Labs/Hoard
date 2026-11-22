@@ -4728,6 +4728,10 @@ translation = "kon { $model } niet downloaden: { $reason }"
 source = "the model server: { $reason }"
 translation = "de modelserver: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "bewegende miniaturen spelen af met 12, 24 of 30 beelden per seconde"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "wat is er nieuw kan hoogstens 256 geziene dingen bijhouden, elk met een naam in kleine letters, cijfers en koppeltekens"
@@ -10648,6 +10652,18 @@ translation = "Uit"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Dit programma"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Beeldsnelheid"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Vloeiendere filmpjes kosten meer tijd en ruimte: ongeveer twee keer zoveel bij 24 fps als bij 12, en nog meer bij 30. Als je dit wijzigt, worden ze allemaal opnieuw gemaakt."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

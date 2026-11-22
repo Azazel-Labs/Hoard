@@ -4728,6 +4728,10 @@ translation = "kon nie { $model } aflaai nie: { $reason }"
 source = "the model server: { $reason }"
 translation = "die modelbediener: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "bewegende duimnaels speel teen 12, 24 of 30 rame per sekonde"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "wat is nuut kan hoogstens 256 gesiene dinge hou, elk benoem in kleinletters, syfers en koppeltekens"
@@ -10643,6 +10647,18 @@ translation = "Af"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Hierdie program"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Raamtempo"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Gladder flieks neem langer om te maak en meer plek: omtrent twee keer soveel teen 24 fps as teen 12, en nog meer teen 30. As jy dit verander, word hulle almal weer gemaak."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

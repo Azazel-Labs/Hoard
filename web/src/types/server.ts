@@ -441,6 +441,7 @@ export interface Settings {
     thumb_avif: OptionSetting<boolean>
     /** Make a short looping movie of each animation for its tile. Off by default: it takes space and time. */
     motion_thumbs: OptionSetting<boolean>
+    motion_fps: OptionSetting<number>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
     /** How often the database backs itself up. */
@@ -606,6 +607,7 @@ export interface SettingsPatch {
   thumb_quality?: ThumbQuality | null
   thumb_avif?: boolean | null
   motion_thumbs?: boolean | null
+  motion_fps?: number | null
   conversion_cache_mb?: number | null
   backup_every?: BackupEvery | null
   backup_keep?: number | null

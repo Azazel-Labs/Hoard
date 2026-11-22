@@ -81,6 +81,9 @@ impl BackupEvery {
 
 /// How many scheduled backups are kept unless Settings says otherwise.
 pub(crate) const DEFAULT_BACKUP_KEEP: u32 = 7;
+/// The frame rates motion thumbnails can play at: smoother takes longer to draw and more room.
+pub(crate) const MOTION_FPS: [u32; 3] = [12, 24, 30];
+pub(crate) const DEFAULT_MOTION_FPS: u32 = 12;
 /// Most scheduled backups Settings can ask to keep.
 pub(crate) const MAX_BACKUP_KEEP: u32 = 365;
 
@@ -187,6 +190,9 @@ pub(crate) struct Saved {
     /// Animations' tiles play them when pointed at (`motion`): off until turned on, as each takes room and rendering.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) motion_thumbs: Option<bool>,
+    /// How many frames a second motion thumbnails play at: one of [`MOTION_FPS`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) motion_fps: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) conversion_cache_mb: Option<u64>,
     /// Back the database up on a schedule, as `hoard-auto-<time>.db` in the backups folder.
@@ -274,6 +280,7 @@ pub(crate) struct Effective {
     pub(crate) clip_hosted: Option<crate::hosted::Hosted>,
     pub(crate) clap: bool,
     pub(crate) motion_thumbs: bool,
+    pub(crate) motion_fps: u32,
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) thumb_avif: bool,
     pub(crate) conversion_cache_mb: u64,
@@ -379,6 +386,7 @@ impl Saved {
             }),
             clap: self.clap.unwrap_or(false),
             motion_thumbs: self.motion_thumbs.unwrap_or(false),
+            motion_fps: self.motion_fps.filter(|f| MOTION_FPS.contains(f)).unwrap_or(DEFAULT_MOTION_FPS),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             thumb_avif: self.thumb_avif.unwrap_or(false),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
@@ -466,6 +474,9 @@ impl Saved {
         }
         if self.conversion_cache_mb.is_some_and(|n| n < 100) {
             return Err(tr!("error-conversion-cache"));
+        }
+        if self.motion_fps.is_some_and(|f| !MOTION_FPS.contains(&f)) {
+            return Err(tr!("error-motion-fps"));
         }
         if self.backup_keep.is_some_and(|n| !(1..=MAX_BACKUP_KEEP).contains(&n)) {
             return Err(tr!("error-backup-keep", max = MAX_BACKUP_KEEP));

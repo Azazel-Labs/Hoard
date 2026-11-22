@@ -24,6 +24,9 @@ const gpuNote = computed(() => {
   return null
 })
 
+/** The frame rates moving thumbnails can be made at (the server's `MOTION_FPS`). */
+const MOTION_FPS = [12, 24, 30]
+
 // Labels and hints are getters, so they're in the language of the moment. `jpeg` and `avif` are the qualities
 // thumbnails are stored and sent at (`ThumbQuality` in crates/hoardd/src/settings.rs); Lossless is PNG, sent as it is.
 const THUMBS: { value: ThumbQuality; jpeg?: number; avif?: number; readonly label: string; readonly hint: string }[] = [
@@ -164,6 +167,29 @@ watch(
       </div>
     </div>
     <p class="what">{{ t('settings-motion-thumbs-what') }}</p>
+    <template v-if="s.options.motion_thumbs.value">
+      <div class="opt-row format">
+        <span id="motion-fps">{{ t('settings-motion-fps') }}</span>
+        <div class="modes" role="radiogroup" aria-labelledby="motion-fps">
+          <label v-for="f in MOTION_FPS" :key="f">
+            <input
+              type="radio"
+              name="motion-fps"
+              :checked="s.options.motion_fps.value === f"
+              :disabled="busy"
+              @change="save({ motion_fps: f })"
+            />{{ t('settings-motion-fps-option', { fps: f }) }}
+          </label>
+        </div>
+        <ResetButton
+          v-if="changed('motion_fps')"
+          :to="t('settings-motion-fps-option', { fps: s.options.motion_fps.default })"
+          :disabled="busy"
+          @reset="resetOpt('motion_fps')"
+        />
+      </div>
+      <p class="what">{{ t('settings-motion-fps-what') }}</p>
+    </template>
   </section>
 
   <section>

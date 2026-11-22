@@ -4625,6 +4625,10 @@ translation = "{ $model } indirilemedi: { $reason }"
 source = "the model server: { $reason }"
 translation = "model sunucusu: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "hareketli küçük resimler saniyede 12, 24 veya 30 karede oynatılır"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "yenilikler en fazla 256 görülen şey kaydedebilir, her biri küçük harfler, rakamlar ve kısa çizgilerle adlandırılmış olmalıdır"
@@ -10456,6 +10460,18 @@ translation = "Kapalı"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Bu program"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Kare hızı"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Daha akıcı videoların hazırlanması daha uzun sürer ve daha çok yer kaplar: 24 fps’de 12’ye göre yaklaşık iki kat, 30’da daha da fazla. Değiştirirseniz hepsi yeniden hazırlanır."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

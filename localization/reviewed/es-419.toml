@@ -4728,6 +4728,10 @@ translation = "no se pudo descargar { $model }: { $reason }"
 source = "the model server: { $reason }"
 translation = "el servidor de modelos: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "las miniaturas animadas se reproducen a 12, 24 o 30 fotogramas por segundo"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "las novedades pueden registrar como máximo 256 elementos vistos, cada uno con un nombre en minúsculas, dígitos y guiones"
@@ -10658,6 +10662,18 @@ translation = "Desactivado"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Este programa"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Velocidad de fotogramas"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Las animaciones más fluidas tardan más en crearse y ocupan más espacio: alrededor del doble a 24 fps que a 12, y aún más a 30. Si la cambias, se vuelven a crear todas."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

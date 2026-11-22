@@ -4584,6 +4584,10 @@ translation = "không thể tải xuống { $model }: { $reason }"
 source = "the model server: { $reason }"
 translation = "máy chủ mô hình: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "hình thu nhỏ động phát ở 12, 24 hoặc 30 khung hình mỗi giây"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "mục có gì mới chỉ ghi được tối đa 256 điều đã xem, mỗi điều đặt tên bằng chữ thường, chữ số và dấu gạch nối"
@@ -10393,6 +10397,18 @@ translation = "Tắt"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Chương trình này"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Tốc độ khung hình"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Video càng mượt thì càng mất nhiều thời gian tạo và tốn nhiều dung lượng: ở 24 fps khoảng gấp đôi so với 12, và ở 30 còn nhiều hơn nữa. Khi thay đổi, tất cả sẽ được tạo lại."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

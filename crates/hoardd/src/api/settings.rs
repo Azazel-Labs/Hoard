@@ -145,6 +145,7 @@ fn settings_json_sync(state: &AppState) -> Value {
             "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
             "store_lookup": option(now.store_lookup, true, saved.store_lookup.is_some()),
             "motion_thumbs": option(now.motion_thumbs, false, saved.motion_thumbs.is_some()),
+            "motion_fps": option(now.motion_fps, crate::settings::DEFAULT_MOTION_FPS, saved.motion_fps.is_some()),
             "thumb_quality": option(
                 now.thumb_quality,
                 crate::settings::ThumbQuality::default(),
@@ -392,6 +393,15 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
     }
     if (after.motion_thumbs && !before.motion_thumbs) || (after.render && !before.render) {
         crate::motion::kick(&state);
+    } else if after.motion_thumbs && after.motion_fps != before.motion_fps {
+        // Drawn again at the new rate: the old ones go, and each tile shows its still until its new one is made.
+        let st = std::sync::Arc::clone(&state);
+        tokio::spawn(async move {
+            match crate::motion::remove_all(&st).await {
+                Ok(()) => crate::motion::kick(&st),
+                Err(e) => tracing::warn!(error = %format!("{e:#}"), "couldn't remove motion thumbnails"),
+            }
+        });
     } else if before.motion_thumbs && !after.motion_thumbs {
         let st = std::sync::Arc::clone(&state);
         tokio::spawn(async move {

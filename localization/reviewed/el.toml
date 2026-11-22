@@ -4740,6 +4740,10 @@ translation = "δεν ήταν δυνατή η λήψη του { $model }: { $re
 source = "the model server: { $reason }"
 translation = "ο διακομιστής μοντέλων: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "οι κινούμενες μικρογραφίες παίζουν με 12, 24 ή 30 καρέ το δευτερόλεπτο"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "τα νέα μπορούν να καταγράψουν έως 256 ειδωμένα πράγματα, το καθένα με όνομα σε πεζά γράμματα, ψηφία και παύλες"
@@ -10708,6 +10712,18 @@ translation = "Ανενεργό"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Αυτό το πρόγραμμα"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Ρυθμός καρέ"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Οι πιο ομαλές ταινίες χρειάζονται περισσότερο χρόνο και χώρο: περίπου διπλάσιο στα 24 fps από ό,τι στα 12, και ακόμη περισσότερο στα 30. Αν τον αλλάξετε, δημιουργούνται όλες ξανά."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

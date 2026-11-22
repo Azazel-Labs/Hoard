@@ -4587,6 +4587,10 @@ translation = "ดาวน์โหลด { $model } ไม่ได้: { $rea
 source = "the model server: { $reason }"
 translation = "เซิร์ฟเวอร์โมเดล: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "ภาพขนาดย่อแบบเคลื่อนไหวเล่นที่ 12, 24 หรือ 30 เฟรมต่อวินาที"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "มีอะไรใหม่บันทึกสิ่งที่เห็นแล้วได้สูงสุด 256 รายการ แต่ละรายการตั้งชื่อด้วยตัวพิมพ์เล็ก ตัวเลข และขีดกลาง"
@@ -10396,6 +10400,18 @@ translation = "ปิด"
 [messages.settings-mode-path]
 source = "This program"
 translation = "โปรแกรมนี้"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "อัตราเฟรม"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "ยิ่งลื่นไหลยิ่งใช้เวลาสร้างนานและใช้พื้นที่มากขึ้น ที่ 24 fps ใช้ประมาณสองเท่าของ 12 และที่ 30 ใช้มากกว่านั้นอีก เมื่อเปลี่ยนค่านี้ ระบบจะสร้างใหม่ทั้งหมด"
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

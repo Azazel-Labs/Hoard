@@ -4581,6 +4581,10 @@ translation = "{ $model }을(를) 다운로드할 수 없습니다: { $reason }"
 source = "the model server: { $reason }"
 translation = "모델 서버: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "움직이는 썸네일은 초당 12, 24 또는 30 프레임으로 재생됩니다"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "새로운 기능에는 확인한 항목을 최대 256개까지 기록할 수 있으며, 각각 소문자, 숫자, 하이픈으로 된 이름이어야 합니다"
@@ -10363,6 +10367,18 @@ translation = "끄기"
 [messages.settings-mode-path]
 source = "This program"
 translation = "이 프로그램"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "프레임 속도"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "더 부드러울수록 만드는 데 시간이 오래 걸리고 공간도 더 차지합니다. 24 fps는 12 fps의 약 두 배이고 30 fps는 그보다 더 큽니다. 바꾸면 모두 다시 만듭니다."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

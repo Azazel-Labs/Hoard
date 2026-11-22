@@ -4774,6 +4774,10 @@ translation = "преузимање модела { $model } није успел�
 source = "the model server: { $reason }"
 translation = "сервер модела: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "покретне сличице се приказују брзином од 12, 24 или 30 кадрова у секунди"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "„Шта је ново“ може да бележи највише 256 виђених ствари, свака названа малим словима, цифрама и цртицама"
@@ -10767,6 +10771,18 @@ translation = "Искључено"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Овај програм"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Брзина кадрова"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Глаткији снимци се дуже праве и заузимају више простора: отприлике двоструко више на 24 fps него на 12, а још више на 30. Када је промените, сви се праве поново."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

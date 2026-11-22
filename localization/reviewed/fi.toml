@@ -4740,6 +4740,10 @@ translation = "mallin { $model } lataus epäonnistui: { $reason }"
 source = "the model server: { $reason }"
 translation = "mallipalvelin: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "liikkuvat pikkukuvat toistuvat 12, 24 tai 30 kuvan sekuntinopeudella"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "uutuuksista voi tallentaa enintään 256 nähtyä asiaa, kunkin nimettynä pienin kirjaimin, numeroin ja yhdysmerkein"
@@ -10698,6 +10702,18 @@ translation = "Pois"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Tämä ohjelma"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Kuvataajuus"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Sulavammat videot vievät enemmän aikaa ja tilaa: noin kaksinkertaisesti 24 fps:llä verrattuna 12:een ja vielä enemmän 30:llä. Kun muutat sitä, ne kaikki tehdään uudelleen."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

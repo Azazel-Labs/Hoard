@@ -4615,6 +4615,10 @@ translation = "tidak dapat mengunduh { $model }: { $reason }"
 source = "the model server: { $reason }"
 translation = "server model: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "gambar mini bergerak diputar pada 12, 24, atau 30 bingkai per detik"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "yang baru dapat mencatat paling banyak 256 hal yang sudah dilihat, masing-masing dinamai dengan huruf kecil, angka, dan tanda hubung"
@@ -10425,6 +10429,18 @@ translation = "Mati"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Program ini"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Laju bingkai"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Animasi yang lebih halus butuh waktu lebih lama dan ruang lebih banyak: sekitar dua kali lipat pada 24 fps dibanding 12, dan lebih banyak lagi pada 30. Mengubahnya akan membuat ulang semuanya."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

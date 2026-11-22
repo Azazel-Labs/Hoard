@@ -4809,6 +4809,10 @@ translation = "{ $model } nu a putut fi descărcat: { $reason }"
 source = "the model server: { $reason }"
 translation = "serverul de modele: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "miniaturile animate rulează la 12, 24 sau 30 de cadre pe secundă"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "noutățile pot înregistra cel mult 256 de lucruri văzute, fiecare numit cu litere mici, cifre și cratime"
@@ -10831,6 +10835,18 @@ translation = "Dezactivat"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Acest program"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Rată de cadre"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Animațiile mai fluide durează mai mult de creat și ocupă mai mult spațiu: cam de două ori mai mult la 24 fps decât la 12, și și mai mult la 30. Dacă o schimbați, toate sunt create din nou."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

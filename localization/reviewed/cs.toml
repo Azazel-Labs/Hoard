@@ -4795,6 +4795,10 @@ translation = "nepodařilo se stáhnout { $model }: { $reason }"
 source = "the model server: { $reason }"
 translation = "server modelů: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "pohyblivé náhledy běží rychlostí 12, 24 nebo 30 snímků za sekundu"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "novinky mohou zaznamenat nejvýše 256 zobrazených položek, každou pojmenovanou malými písmeny, číslicemi a spojovníky"
@@ -10854,6 +10858,18 @@ translation = "Vypnuto"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Tento program"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Snímková frekvence"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Plynulejší videa se vytvářejí déle a zabírají víc místa: při 24 fps zhruba dvakrát tolik než při 12 a při 30 ještě víc. Po změně se všechna vytvoří znovu."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

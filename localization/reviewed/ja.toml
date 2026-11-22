@@ -4590,6 +4590,10 @@ translation = "{ $model } をダウンロードできませんでした: { $reas
 source = "the model server: { $reason }"
 translation = "モデルサーバー: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "動くサムネイルのフレームレートは 12、24、30 fps のいずれかです"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "新着情報に記録できる確認済みの項目は 256 件までで、それぞれ小文字、数字、ハイフンの名前が必要です"
@@ -10407,6 +10411,18 @@ translation = "オフ"
 [messages.settings-mode-path]
 source = "This program"
 translation = "このプログラム"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "フレームレート"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "滑らかにするほど作成に時間がかかり、容量も増えます。24 fps では 12 fps のおよそ 2 倍、30 fps ではさらに増えます。変更するとすべて作り直されます。"
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

@@ -4587,6 +4587,10 @@ translation = "无法下载 { $model }：{ $reason }"
 source = "the model server: { $reason }"
 translation = "模型服务器：{ $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "动态缩略图的帧率只能是每秒 12、24 或 30 帧"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "新功能最多可记录 256 项已看过的内容，每项都须以小写字母、数字和连字符命名"
@@ -10407,6 +10411,18 @@ translation = "关闭"
 [messages.settings-mode-path]
 source = "This program"
 translation = "指定程序"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "帧率"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } 帧/秒"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "越流畅，生成所需的时间越长，占用的空间也越多：24 帧/秒大约是 12 帧/秒的两倍，30 帧/秒还要更多。更改后会全部重新生成。"
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

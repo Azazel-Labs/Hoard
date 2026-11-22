@@ -4728,6 +4728,10 @@ translation = "kunde inte ladda ner { $model }: { $reason }"
 source = "the model server: { $reason }"
 translation = "modellservern: { $reason }"
 
+[messages.error-motion-fps]
+source = "moving thumbnails play at 12, 24 or 30 frames a second"
+translation = "rörliga miniatyrer spelas upp med 12, 24 eller 30 bilder per sekund"
+
 [messages.error-news-seen]
 source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
 translation = "nyheter kan registrera högst 256 sedda saker, var och en namngiven med små bokstäver, siffror och bindestreck"
@@ -10652,6 +10656,18 @@ translation = "Av"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Det här programmet"
+
+[messages.settings-motion-fps]
+source = "Frame rate"
+translation = "Bildfrekvens"
+
+[messages.settings-motion-fps-option]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.settings-motion-fps-what]
+source = "Smoother movies take longer to make and more room: about twice as much at 24 fps as at 12, and more again at 30. Changing it makes them all again."
+translation = "Mjukare filmer tar längre tid att göra och mer plats: ungefär dubbelt så mycket vid 24 fps som vid 12, och ännu mer vid 30. Ändrar du den görs alla om."
 
 [messages.settings-motion-thumbs]
 source = "Moving thumbnails for animations"

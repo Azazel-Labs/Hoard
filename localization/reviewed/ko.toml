@@ -10300,8 +10300,8 @@ translation = """
     } 테마로 돌아가기"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "지금 미리보기가 { $size }를 차지합니다."
+source = "Previews: { $size }"
+translation = "미리 보기: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10448,8 +10448,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "그리드에서는 괜찮고, 가까이 보면 약간 흐립니다."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "새 썸네일과 모델 뷰를 저장하는 방식입니다. 투명도가 있는 것과 픽셀 아트는 항상 PNG입니다. 이미 있는 썸네일을 줄이려면 유지 관리에서 썸네일 줄이기를 실행하세요."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "새 썸네일과 모델 뷰에 적용됩니다. 투명한 것과 픽셀 아트는 PNG로 유지됩니다. 기존 썸네일은 유지 관리의 썸네일 줄이기로 다시 만듭니다."
 
 [messages.settings-title]
 source = "Settings"

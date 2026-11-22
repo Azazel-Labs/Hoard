@@ -10582,8 +10582,8 @@ Terug naar { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Voorbeelden nemen nu { $size } in beslag."
+source = "Previews: { $size }"
+translation = "Voorbeelden: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10730,8 +10730,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Prima in het raster; van dichtbij een beetje zacht."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Hoe nieuwe miniaturen en modelweergaven worden opgeslagen. Die met transparantie, en pixelart, zijn altijd PNG. Voer Miniaturen verkleinen uit bij Onderhoud om de miniaturen die je al hebt te verkleinen."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Voor nieuwe miniaturen en modelweergaven. Transparante en pixelart blijven PNG. Miniaturen verkleinen bij Onderhoud maakt de bestaande opnieuw."
 
 [messages.settings-title]
 source = "Settings"

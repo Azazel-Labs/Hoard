@@ -10362,8 +10362,8 @@ Kembali ke tema { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Pratinjau kini memakan { $size }."
+source = "Previews: { $size }"
+translation = "Pratinjau: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10510,8 +10510,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Cukup di kisi; sedikit buram dari dekat."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Cara gambar mini dan tampilan model baru disimpan. Gambar dengan transparansi, dan pixel art, selalu PNG. Untuk memperkecil yang sudah ada, jalankan Perkecil gambar mini di Pemeliharaan."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Untuk gambar mini dan tampilan model baru. Yang transparan dan pixel art tetap PNG. Perkecil gambar mini di Pemeliharaan membuat ulang yang sudah ada."
 
 [messages.settings-title]
 source = "Settings"

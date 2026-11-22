@@ -10579,8 +10579,8 @@ Tilbage til { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Forhåndsvisninger fylder { $size } nu."
+source = "Previews: { $size }"
+translation = "Forhåndsvisninger: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10727,8 +10727,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Fint i gitteret; lidt blødt tæt på."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Hvordan nye miniaturer og modelvisninger gemmes. Dem med gennemsigtighed og pixelkunst er altid PNG. For at formindske dem, du allerede har, skal du køre Formindsk miniaturer under Vedligeholdelse."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Til nye miniaturer og modelvisninger. Gennemsigtige og pixelkunst forbliver PNG. Formindsk miniaturer under Vedligeholdelse laver dem, du har, om."
 
 [messages.settings-title]
 source = "Settings"

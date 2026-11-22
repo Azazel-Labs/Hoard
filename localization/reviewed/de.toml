@@ -10579,8 +10579,8 @@ Zurück zum { $used ->
     } Design"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Vorschauen belegen derzeit { $size }."
+source = "Previews: { $size }"
+translation = "Vorschauen: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10727,8 +10727,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Im Raster in Ordnung; aus der Nähe etwas weich."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Wie neue Vorschaubilder und Modellansichten gespeichert werden. Bilder mit Transparenz und Pixel-Art sind immer PNG. Um vorhandene zu verkleinern, führen Sie „Vorschaubilder verkleinern“ unter Wartung aus."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Für neue Vorschaubilder und Modellansichten. Transparente und Pixel-Art bleiben PNG. „Vorschaubilder verkleinern“ unter Wartung erstellt vorhandene neu."
 
 [messages.settings-title]
 source = "Settings"

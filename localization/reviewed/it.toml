@@ -10596,8 +10596,8 @@ Torna al tema { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Ora le anteprime occupano { $size }."
+source = "Previews: { $size }"
+translation = "Anteprime: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10744,8 +10744,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Vanno bene nella griglia; un po' morbide da vicino."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Come vengono salvate le nuove miniature e viste dei modelli. Quelle con trasparenza, e la pixel art, sono sempre PNG. Per ridurre quelle che hai già, esegui Riduci le miniature in Manutenzione."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Per nuove miniature e viste dei modelli. Quelle trasparenti e la pixel art restano PNG. Riduci le miniature in Manutenzione rifà quelle che hai."
 
 [messages.settings-title]
 source = "Settings"

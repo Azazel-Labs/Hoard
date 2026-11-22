@@ -10390,8 +10390,8 @@ translation = """
     } temaya dön"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Önizlemeler şu anda { $size } yer kaplıyor."
+source = "Previews: { $size }"
+translation = "Önizlemeler: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10538,8 +10538,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Izgarada iyi; yakından biraz yumuşak."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Yeni küçük resimlerin ve model görünümlerinin nasıl saklandığı. Saydamlık içerenler ve piksel sanatı her zaman PNG olur. Mevcut olanları küçültmek için Bakım bölümünde Küçük resimleri küçült görevini çalıştırın."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Yeni küçük resimler ve model görünümleri için. Saydam olanlar ve piksel sanatı PNG kalır. Bakım'daki Küçük resimleri küçült görevi mevcut olanları yeniden oluşturur."
 
 [messages.settings-title]
 source = "Settings"

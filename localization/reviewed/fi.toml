@@ -10628,8 +10628,8 @@ Takaisin { $used ->
     } teemaan"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Esikatselut vievät nyt { $size }."
+source = "Previews: { $size }"
+translation = "Esikatselut: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10776,8 +10776,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Riittää ruudukossa; hieman pehmeä läheltä."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Miten uudet pikkukuvat ja mallinäkymät tallennetaan. Läpinäkyvät kuvat ja pikseligrafiikka ovat aina PNG-muodossa. Pienentääksesi jo olemassa olevat aja Ylläpito-sivulla Pienennä pikkukuvat."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Uusille pikkukuville ja mallinäkymille. Läpinäkyvät ja pikseligrafiikka pysyvät PNG-muodossa. Ylläpidon Pienennä pikkukuvat tekee olemassa olevat uudelleen."
 
 [messages.settings-title]
 source = "Settings"

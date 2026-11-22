@@ -10608,8 +10608,8 @@ Revenir au thème { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Les aperçus occupent actuellement { $size }."
+source = "Previews: { $size }"
+translation = "Aperçus : { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10756,8 +10756,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Bien dans la grille ; un peu flou de près."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Comment les nouvelles miniatures et vues de modèles sont stockées. Celles avec transparence, et le pixel art, sont toujours en PNG. Pour réduire celles que vous avez déjà, lancez Réduire les miniatures dans Maintenance."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Pour les nouvelles miniatures et vues de modèles. Les transparentes et le pixel art restent en PNG. Réduire les miniatures dans Maintenance refait celles que vous avez."
 
 [messages.settings-title]
 source = "Settings"

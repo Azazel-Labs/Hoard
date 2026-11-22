@@ -10857,8 +10857,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Зараз попередні перегляди займають { $size }."
+source = "Previews: { $size }"
+translation = "Попередні перегляди: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -11005,8 +11005,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Добре в сітці; трохи розмито зблизька."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Як зберігаються нові мініатюри та вигляди моделей. Зображення з прозорістю та піксель-арт завжди в PNG. Щоб зменшити наявні, запустіть «Зменшити мініатюри» в розділі «Обслуговування»."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Для нових мініатюр і виглядів моделей. Прозорі та піксель-арт лишаються в PNG. «Зменшити мініатюри» в «Обслуговуванні» створює наявні заново."
 
 [messages.settings-title]
 source = "Settings"

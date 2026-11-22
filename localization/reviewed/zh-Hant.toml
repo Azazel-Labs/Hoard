@@ -10336,8 +10336,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "預覽目前佔用 { $size }。"
+source = "Previews: { $size }"
+translation = "預覽：{ $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10484,8 +10484,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "在格線中沒問題；近看會有點模糊。"
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "新縮圖與模型視圖的儲存方式。有透明度的圖片與像素畫一律使用 PNG。若要縮小現有的縮圖，請在「維護」中執行「縮小縮圖」。"
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "適用於新的縮圖與模型視圖。有透明度的圖片與像素畫維持 PNG。「維護」中的「縮小縮圖」會重新產生現有的縮圖。"
 
 [messages.settings-title]
 source = "Settings"

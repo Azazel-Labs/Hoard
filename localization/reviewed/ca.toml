@@ -10583,8 +10583,8 @@ Torna al { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Ara les previsualitzacions ocupen { $size }."
+source = "Previews: { $size }"
+translation = "Previsualitzacions: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10731,8 +10731,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Bé a la graella; una mica borroses de prop."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Com es desen les miniatures i les vistes de models noves. Les que tenen transparència, i el pixel art, sempre són PNG. Per reduir les que ja teniu, executeu Redueix les miniatures a Manteniment."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Per a miniatures i vistes de models noves. Les transparents i el pixel art es queden en PNG. Redueix les miniatures a Manteniment refà les que ja teniu."
 
 [messages.settings-title]
 source = "Settings"

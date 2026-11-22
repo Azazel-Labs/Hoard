@@ -108,7 +108,7 @@ watch(
     </div>
     <p class="what">
       {{ t('settings-thumbs-what') }}
-      <template v-if="usage?.preview_bytes !== undefined">{{ t('settings-previews-size', { size: humanBytes(usage.preview_bytes) }) }}</template>
+      <span v-if="usage?.preview_bytes !== undefined" class="size">{{ t('settings-previews-size', { size: humanBytes(usage.preview_bytes) }) }}</span>
     </p>
     <div class="opt-row format">
       <span id="thumbs-format">{{ t('settings-thumbs-format') }}</span>
@@ -212,4 +212,10 @@ watch(
 .avif { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.6rem; }
 .avif .what { margin: 0; }
 .avif .btn { flex: none; }
+/* How much space previews take, set apart from the text so it catches the eye. */
+.size {
+  display: inline-block; margin-left: 0.3em; padding: 0.05em 0.45em;
+  border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--raised);
+  color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
 </style>

@@ -10333,8 +10333,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "ตอนนี้ตัวอย่างใช้พื้นที่ { $size }"
+source = "Previews: { $size }"
+translation = "ภาพตัวอย่าง: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10481,8 +10481,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "ดูดีในตาราง แต่จะนุ่มไปเล็กน้อยเมื่อดูใกล้ ๆ"
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "วิธีจัดเก็บภาพย่อและมุมมองโมเดลใหม่ ภาพที่มีความโปร่งใสและพิกเซลอาร์ตจะเป็น PNG เสมอ หากต้องการย่อขนาดภาพที่มีอยู่แล้ว ให้เรียกใช้ ย่อขนาดภาพย่อ ในการบำรุงรักษา"
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "สำหรับภาพย่อและมุมมองโมเดลใหม่ ภาพโปร่งใสและพิกเซลอาร์ตยังคงเป็น PNG ย่อขนาดภาพย่อ ในการบำรุงรักษาจะสร้างภาพที่มีอยู่ใหม่"
 
 [messages.settings-title]
 source = "Settings"

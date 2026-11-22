@@ -10696,8 +10696,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Прегледи сада заузимају { $size }."
+source = "Previews: { $size }"
+translation = "Прегледи: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10844,8 +10844,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Добро у мрежи; мало мутно изблиза."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Како се чувају нове сличице и прикази модела. Оне с провидношћу и пиксел-арт су увек PNG. Да бисте смањили постојеће, покрените „Смањи сличице“ у Одржавању."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "За нове сличице и приказе модела. Провидне и пиксел-арт остају PNG. „Смањи сличице“ у Одржавању поново прави постојеће."
 
 [messages.settings-title]
 source = "Settings"

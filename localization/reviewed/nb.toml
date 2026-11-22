@@ -10581,8 +10581,8 @@ Tilbake til { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Forhåndsvisninger tar { $size } nå."
+source = "Previews: { $size }"
+translation = "Forhåndsvisninger: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10729,8 +10729,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Greit i rutenettet; litt mykt på nært hold."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Hvordan nye miniatyrbilder og modellvisninger lagres. De med gjennomsiktighet, og pikselgrafikk, er alltid PNG. For å krympe de du allerede har, kjør «Krymp miniatyrbilder» i Vedlikehold."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "For nye miniatyrbilder og modellvisninger. Gjennomsiktige og pikselgrafikk forblir PNG. «Krymp miniatyrbilder» i Vedlikehold lager dem du har på nytt."
 
 [messages.settings-title]
 source = "Settings"

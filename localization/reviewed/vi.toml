@@ -10330,8 +10330,8 @@ Quay lại chế độ { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Bản xem trước hiện chiếm { $size }."
+source = "Previews: { $size }"
+translation = "Bản xem trước: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10478,8 +10478,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Ổn trong lưới; hơi mờ khi xem gần."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Cách lưu ảnh thu nhỏ và ảnh xem mô hình mới. Ảnh có độ trong suốt và ảnh pixel art luôn là PNG. Để thu nhỏ những ảnh bạn đã có, hãy chạy Thu nhỏ ảnh thu nhỏ trong Bảo trì."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Cho ảnh thu nhỏ và ảnh xem mô hình mới. Ảnh trong suốt và pixel art vẫn là PNG. Thu nhỏ ảnh thu nhỏ trong Bảo trì sẽ làm lại những ảnh bạn đã có."
 
 [messages.settings-title]
 source = "Settings"

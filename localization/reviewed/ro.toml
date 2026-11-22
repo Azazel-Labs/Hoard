@@ -10756,8 +10756,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Previzualizările ocupă acum { $size }."
+source = "Previews: { $size }"
+translation = "Previzualizări: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10904,8 +10904,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Bune în grilă; puțin neclare de aproape."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Cum sunt stocate miniaturile și vederile modelelor noi. Cele cu transparență și pixel art sunt întotdeauna PNG. Pentru a le micșora pe cele pe care le aveți deja, rulați Micșorare a miniaturilor în Întreținere."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Pentru miniaturi și vederi de modele noi. Cele transparente și pixel art rămân PNG. Micșorare a miniaturilor din Întreținere le refac pe cele existente."
 
 [messages.settings-title]
 source = "Settings"

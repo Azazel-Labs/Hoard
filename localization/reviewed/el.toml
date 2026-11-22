@@ -10638,8 +10638,8 @@ translation = """
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Οι προεπισκοπήσεις καταλαμβάνουν τώρα { $size }."
+source = "Previews: { $size }"
+translation = "Προεπισκοπήσεις: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10786,8 +10786,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Καλές στο πλέγμα· λίγο θολές από κοντά."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Πώς αποθηκεύονται οι νέες μικρογραφίες και οι όψεις μοντέλων. Όσες έχουν διαφάνεια, καθώς και το pixel art, είναι πάντα PNG. Για να μικρύνετε όσες έχετε ήδη, εκτελέστε τη «Σμίκρυνση μικρογραφιών» στη Συντήρηση."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Για νέες μικρογραφίες και όψεις μοντέλων. Όσες έχουν διαφάνεια και το pixel art μένουν PNG. Η «Σμίκρυνση μικρογραφιών» στη Συντήρηση ξαναφτιάχνει όσες έχετε."
 
 [messages.settings-title]
 source = "Settings"

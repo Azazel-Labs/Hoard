@@ -3451,9 +3451,9 @@ settings-gpu-software = No GPU found, so in software ({ $renderer })
 settings-gpu-none = No GPU or software renderer found, so models get no thumbnails
 settings-thumbs = Thumbnails
 # “Shrink thumbnails” is a task in Maintenance.
-settings-thumbs-what = How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance.
-# $size is a size like 1.2 GB.
-settings-previews-size = Previews take { $size } now.
+settings-thumbs-what = For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have.
+# Shown in a chip after the text above. $size is a size like 1.2 GB, how much space previews take now.
+settings-previews-size = Previews: { $size }
 # The note after choosing: $quality is the choice.
 settings-thumbs-saved = Thumbnails: { $quality }
 # Above the choices: thumbnails go to browsers as JPEG or AVIF.

@@ -10774,8 +10774,8 @@ Zpět na { $used ->
     }"""
 
 [messages.settings-previews-size]
-source = "Previews take { $size } now."
-translation = "Náhledy teď zabírají { $size }."
+source = "Previews: { $size }"
+translation = "Náhledy: { $size }"
 
 [messages.settings-public-url]
 source = "Public address"
@@ -10922,8 +10922,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "V mřížce v pořádku; zblízka trochu měkké."
 
 [messages.settings-thumbs-what]
-source = "How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG. To shrink the ones you already have, run Shrink thumbnails in Maintenance."
-translation = "Jak se ukládají nové miniatury a pohledy na modely. Ty s průhledností a pixel art jsou vždy PNG. Chcete-li zmenšit ty, které už máte, spusťte v Údržbě Zmenšit miniatury."
+source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
+translation = "Pro nové miniatury a pohledy na modely. Průhledné a pixel art zůstávají v PNG. Zmenšit miniatury v Údržbě předělá ty stávající."
 
 [messages.settings-title]
 source = "Settings"

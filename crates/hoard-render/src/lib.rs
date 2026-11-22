@@ -15,7 +15,7 @@
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use glam::{Mat3, Mat4, Vec3};
+use glam::{Mat3, Mat4, Vec2, Vec3};
 use wgpu::util::DeviceExt;
 
 const RENDER_SIZE: u32 = 512;
@@ -146,7 +146,7 @@ enum Alpha {
 }
 
 /// One draw call's worth of baked geometry.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Draw {
     vertices: Vec<Vertex>,
     indices: Vec<u32>,
@@ -415,8 +415,9 @@ impl Renderer {
         self.render(&bake(&doc, &buffers), &gltf_images(&images), size, THREE_QUARTER)
     }
 
-    /// Render the frames of a clip, each a self-contained GLB of the model posed at one moment, from one camera that
-    /// frames the model wherever it goes during the clip, so it moves in the picture and the picture doesn't move.
+    /// Render the frames of a clip, each a self-contained GLB of the model posed at one moment. One camera frames the
+    /// model wherever it goes during the clip, so it moves in the picture and the picture doesn't move; but when it
+    /// travels far (a fall, a run that goes somewhere), the camera follows it instead, so it isn't drawn a speck.
     /// The frames are one model posed, so they share its textures: those are read from the first.
     pub fn render_frames(&self, frames: &[Vec<u8>], size: u32) -> Result<Vec<image::RgbaImage>> {
         let Some((first, rest)) = frames.split_first() else { return Ok(Vec::new()) };
@@ -427,10 +428,18 @@ impl Renderer {
             let buffers = gltf::import_buffers(&g.document, None, g.blob).context("read glTF buffers")?;
             posed.push(bake(&g.document, &buffers));
         }
-        let images = gltf_images(&images);
-        let all: Vec<&Draw> = posed.iter().flatten().collect();
-        let (globals, eye) = camera(&all, THREE_QUARTER).context("model has no vertices")?;
-        posed.iter().map(|draws| self.render_from(draws, &images, size, globals, eye)).collect()
+        let mut images = gltf_images(&images);
+        let room = room(&posed, THREE_QUARTER, images.len()).context("model has no vertices")?;
+        images.push(Some(tiles()));
+        let cameras = clip_cameras(&posed, &room, THREE_QUARTER).context("model has no vertices")?;
+        posed
+            .into_iter()
+            .zip(cameras)
+            .map(|(mut draws, (globals, eye))| {
+                draws.extend(room.iter().cloned());
+                self.render_from(&draws, &images, size, globals, eye)
+            })
+            .collect()
     }
 
     fn render(
@@ -673,43 +682,240 @@ fn centroid(d: &Draw) -> Vec3 {
 /// The browser takes the same picture when it upgrades a thumbnail (`snapshot` in `modelStage.ts`); keep the two
 /// in step.
 fn camera(draws: &[&Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
-    let (center, radius) = bounds(draws)?;
-    let dir = dir.normalize();
-    let fov = 35f32.to_radians();
-    // Straight-down views need a different up vector.
-    let up = if dir.y.abs() > 0.95 { Vec3::NEG_Z } else { Vec3::Y };
-    let right = up.cross(dir).normalize_or_zero();
-    let up = dir.cross(right);
-    // Each vertex in the camera's axes, about the bounding box center: across, up, and toward the camera.
-    let local = || draws.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos) - center);
+    let shot = Shot::of(draws, dir, None)?;
+    Some(shot.view(shot.dist))
+}
+
+/// The camera's field of view, top to bottom.
+const FOV_DEG: f32 = 35.0;
+
+/// How a camera looking from `dir` takes in some draws: where it aims, how far back it has to stand for every vertex
+/// to fit inside [`FILL`] of the frame, and how near and far the model reaches along its line of sight.
+#[derive(Clone, Copy)]
+struct Shot {
+    dir: Vec3,
+    right: Vec3,
+    up: Vec3,
+    target: Vec3,
+    dist: f32,
+    /// The nearest and farthest vertex along `dir` (toward the camera), from `target`.
+    near_z: f32,
+    far_z: f32,
+    radius: f32,
+}
+
+impl Shot {
+    /// Aimed at `target`, or else at the middle of the silhouette from `dir`.
+    fn of(draws: &[&Draw], dir: Vec3, target: Option<Vec3>) -> Option<Shot> {
+        let (center, radius) = bounds(draws)?;
+        let dir = dir.normalize();
+        // Straight-down views need a different up vector.
+        let up = if dir.y.abs() > 0.95 { Vec3::NEG_Z } else { Vec3::Y };
+        let right = up.cross(dir).normalize_or_zero();
+        let up = dir.cross(right);
+        let points = || draws.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos));
+        let target = target.unwrap_or_else(|| {
+            // The silhouette's middle: each vertex across and up from the bounding box center.
+            let (mut lo, mut hi) = (Vec2::splat(f32::INFINITY), Vec2::splat(f32::NEG_INFINITY));
+            for p in points().map(|p| p - center) {
+                let q = Vec2::new(p.dot(right), p.dot(up));
+                lo = lo.min(q);
+                hi = hi.max(q);
+            }
+            center + right * f32::midpoint(lo.x, hi.x) + up * f32::midpoint(lo.y, hi.y)
+        });
+        // Back off until every vertex is inside the frame.
+        let t = (FOV_DEG.to_radians() / 2.0).tan() * FILL;
+        let (mut near_z, mut far_z) = (f32::NEG_INFINITY, f32::INFINITY);
+        let mut reach = 0f32;
+        for p in points().map(|p| p - target) {
+            let (x, y, z) = (p.dot(right), p.dot(up), p.dot(dir));
+            near_z = near_z.max(z);
+            far_z = far_z.min(z);
+            reach = reach.max(z + x.abs().max(y.abs()) / t);
+        }
+        let dist = reach.max(near_z + radius * 0.02);
+        Some(Shot { dir, right, up, target, dist, near_z, far_z, radius })
+    }
+
+    /// The same shot, seeing as far back as the farthest of `scenery` behind the model.
+    fn behind(mut self, scenery: &[Draw]) -> Shot {
+        for v in scenery.iter().flat_map(|d| &d.vertices) {
+            self.far_z = self.far_z.min((Vec3::from(v.pos) - self.target).dot(self.dir));
+        }
+        self
+    }
+
+    /// The view from `dist` back (as far as this shot needs, or farther), and where the camera is.
+    fn view(&self, dist: f32) -> (Globals, Vec3) {
+        let Shot { dir, right, up, target, near_z, far_z, radius, .. } = *self;
+        let eye = target + dir * dist;
+        let view = glam::camera::rh::view::look_at_mat4(eye, target, up);
+        // Key light over the camera's right shoulder, as the browser viewer's rides with its camera.
+        let light = (right * 1.2 + up * 1.6 + dir * 2.6).normalize();
+        // wgpu clip space is Z in [0, 1], Y up: the "directx" convention.
+        let near = (dist - near_z).max(radius * 0.001) * 0.5;
+        let proj = glam::camera::rh::proj::directx::perspective(FOV_DEG.to_radians(), 1.0, near, dist - far_z + radius);
+        let globals = Globals {
+            view_proj: (proj * view).to_cols_array_2d(),
+            light_dir: [light.x, light.y, light.z, 0.0],
+            eye: [eye.x, eye.y, eye.z, 1.0],
+        };
+        (globals, eye)
+    }
+}
+
+/// A clip travels when one camera for all of it would have to stand this much farther back than for its biggest
+/// pose: then the camera follows the character rather than framing everywhere it goes.
+const TRAVELS: f32 = 1.5;
+/// How much farther back than a still thumbnail's a clip's camera stands, so the room shows around the character.
+const ROOMY: f32 = 1.45;
+
+/// One camera per frame of a clip: the same one for all of them when the character stays about where it is, so it
+/// moves in a picture that holds still; when it travels (a fall, a run that goes somewhere), one that follows it at
+/// one distance, so it stays as big as it would be standing still.
+fn clip_cameras(frames: &[Vec<Draw>], room: &[Draw], dir: Vec3) -> Option<Vec<(Globals, Vec3)>> {
+    let all: Vec<&Draw> = frames.iter().flatten().collect();
+    let whole = Shot::of(&all, dir, None)?;
+    let each: Vec<Shot> =
+        frames.iter().map(|f| Shot::of(&f.iter().collect::<Vec<_>>(), dir, None)).collect::<Option<_>>()?;
+    let biggest = each.iter().map(|s| s.dist).fold(0f32, f32::max);
+    if whole.dist <= biggest * TRAVELS {
+        return Some(vec![whole.behind(room).view(whole.dist * ROOMY); frames.len()]);
+    }
+    let aims = steady(&each.iter().map(|s| s.target).collect::<Vec<_>>());
+    let follow: Vec<Shot> = frames
+        .iter()
+        .zip(aims)
+        .map(|(f, aim)| Shot::of(&f.iter().collect::<Vec<_>>(), dir, Some(aim)))
+        .collect::<Option<_>>()?;
+    let dist = follow.iter().map(|s| s.dist).fold(0f32, f32::max);
+    Some(follow.iter().map(|s| s.behind(room).view(dist * ROOMY)).collect())
+}
+
+/// A following camera's aims: the curve nearest the character's middles over the clip, at most a parabola, so the
+/// camera keeps pace with a fall or a run but a flailing arm doesn't shake it.
+fn steady(middles: &[Vec3]) -> Vec<Vec3> {
+    let n = middles.len();
+    if n < 3 {
+        return middles.to_vec();
+    }
+    let at = |i: usize| i as f32 / (n - 1) as f32;
+    // Least squares for a + b t + c t²: the normal equations, with the three axes solved at once.
+    let (mut m, mut rhs) = ([0f32; 5], [Vec3::ZERO; 3]);
+    for (i, p) in middles.iter().enumerate() {
+        let t = at(i);
+        for (k, s) in m.iter_mut().enumerate() {
+            *s += t.powi(k as i32);
+        }
+        for (k, r) in rhs.iter_mut().enumerate() {
+            *r += *p * t.powi(k as i32);
+        }
+    }
+    let a = Mat3::from_cols_array(&[m[0], m[1], m[2], m[1], m[2], m[3], m[2], m[3], m[4]]);
+    if a.determinant().abs() < 1e-9 {
+        return middles.to_vec();
+    }
+    let inv = a.inverse();
+    let coef: [Vec3; 3] = std::array::from_fn(|r| (0..3).map(|k| rhs[k] * inv.col(k)[r]).sum());
+    (0..n).map(|i| coef[0] + coef[1] * at(i) + coef[2] * at(i).powi(2)).collect()
+}
+
+/// The room an animation plays in: a tiled floor under the lowest the character gets, and the two walls behind it
+/// from `dir`, reaching past everywhere it goes, with tiles a quarter of its height. A camera that follows a fall or a
+/// run shows it going by them. Its draws wear image `tiles` (see [`tiles`]).
+fn room(frames: &[Vec<Draw>], dir: Vec3, tiles: usize) -> Option<Vec<Draw>> {
     let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
-    for p in local() {
-        let q = Vec3::new(p.dot(right), p.dot(up), p.dot(dir));
-        lo = lo.min(q);
-        hi = hi.max(q);
+    let mut tall = 0f32;
+    for frame in frames {
+        let (mut flo, mut fhi) = (f32::INFINITY, f32::NEG_INFINITY);
+        for p in frame.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos)) {
+            lo = lo.min(p);
+            hi = hi.max(p);
+            flo = flo.min(p.y);
+            fhi = fhi.max(p.y);
+        }
+        tall = tall.max(fhi - flo);
     }
-    // Aim at the middle of the silhouette, then back off until every vertex is inside the frame.
-    let (mx, my) = (f32::midpoint(lo.x, hi.x), f32::midpoint(lo.y, hi.y));
-    let target = center + right * mx + up * my;
-    let t = (fov / 2.0).tan() * FILL;
-    let mut dist = hi.z + radius * 0.02;
-    for p in local() {
-        let (x, y, z) = (p.dot(right) - mx, p.dot(up) - my, p.dot(dir));
-        dist = dist.max(z + x.abs().max(y.abs()) / t);
+    if !lo.is_finite() || !hi.is_finite() {
+        return None;
     }
-    let eye = target + dir * dist;
-    let view = glam::camera::rh::view::look_at_mat4(eye, target, up);
-    // Key light over the camera's right shoulder, as the browser viewer's rides with its camera.
-    let light = (right * 1.2 + up * 1.6 + dir * 2.6).normalize();
-    // wgpu clip space is Z in [0, 1], Y up: the "directx" convention.
-    let near = (dist - hi.z).max(radius * 0.001) * 0.5;
-    let proj = glam::camera::rh::proj::directx::perspective(fov, 1.0, near, dist - lo.z + radius);
-    let globals = Globals {
-        view_proj: (proj * view).to_cols_array_2d(),
-        light_dir: [light.x, light.y, light.z, 0.0],
-        eye: [eye.x, eye.y, eye.z, 1.0],
+    let size = (hi - lo).max_element().max(1e-4);
+    let tall = if tall > size * 1e-3 { tall } else { size };
+    let tile = tall / 4.0;
+    // The walls stand a little behind it, on the sides away from the camera; the floor runs on toward the camera and
+    // the walls on up, past the frame's edges.
+    let gap = tall * 0.4;
+    let (sx, sz) = (if dir.x >= 0.0 { -1.0 } else { 1.0 }, if dir.z >= 0.0 { -1.0 } else { 1.0 });
+    let wall_x = if sx < 0.0 { lo.x - gap } else { hi.x + gap };
+    let wall_z = if sz < 0.0 { lo.z - gap } else { hi.z + gap };
+    let far_x = if sx < 0.0 { hi.x + tall * 4.0 } else { lo.x - tall * 4.0 };
+    let far_z = if sz < 0.0 { hi.z + tall * 4.0 } else { lo.z - tall * 4.0 };
+    let (floor, top) = (lo.y, hi.y + tall * 2.0);
+    let uv = |a: f32, b: f32| [a / (tile * 2.0), b / (tile * 2.0)];
+    let quad = |corners: [Vec3; 4], normal: Vec3, uvs: [[f32; 2]; 4], color: [f32; 4]| Draw {
+        vertices: corners
+            .iter()
+            .zip(uvs)
+            .map(|(p, uv)| Vertex { pos: p.to_array(), normal: normal.to_array(), uv })
+            .collect(),
+        indices: vec![0, 1, 2, 0, 2, 3],
+        color,
+        texture: Some(tiles),
+        alpha: Alpha::Opaque,
+        transmission: 0.0,
+        metallic: 0.0,
+        roughness: 0.9,
+        metallic_roughness: None,
     };
-    Some((globals, eye))
+    let floor_quad = {
+        let c = [
+            Vec3::new(wall_x, floor, wall_z),
+            Vec3::new(far_x, floor, wall_z),
+            Vec3::new(far_x, floor, far_z),
+            Vec3::new(wall_x, floor, far_z),
+        ];
+        quad(c, Vec3::Y, c.map(|p| uv(p.x, p.z)), [1.0; 4])
+    };
+    let wall_across_x = {
+        // Facing along z, at `wall_z`.
+        let c = [
+            Vec3::new(wall_x, floor, wall_z),
+            Vec3::new(far_x, floor, wall_z),
+            Vec3::new(far_x, top, wall_z),
+            Vec3::new(wall_x, top, wall_z),
+        ];
+        quad(c, Vec3::new(0.0, 0.0, -sz), c.map(|p| uv(p.x, p.y)), [0.93, 0.93, 0.95, 1.0])
+    };
+    let wall_across_z = {
+        // Facing along x, at `wall_x`.
+        let c = [
+            Vec3::new(wall_x, floor, wall_z),
+            Vec3::new(wall_x, floor, far_z),
+            Vec3::new(wall_x, top, far_z),
+            Vec3::new(wall_x, top, wall_z),
+        ];
+        quad(c, Vec3::new(-sx, 0.0, 0.0), c.map(|p| uv(p.z, p.y)), [0.88, 0.88, 0.91, 1.0])
+    };
+    Some(vec![floor_quad, wall_across_x, wall_across_z])
+}
+
+/// The room's tiles: two by two of them, light and a shade darker with a fine line between, repeated across it.
+fn tiles() -> image::RgbaImage {
+    const SIDE: u32 = 32;
+    image::RgbaImage::from_fn(SIDE, SIDE, |x, y| {
+        let (cx, cy) = (x % (SIDE / 2), y % (SIDE / 2));
+        let grout = cx == 0 || cy == 0;
+        let dark = (x < SIDE / 2) != (y < SIDE / 2);
+        let v = if grout {
+            164
+        } else if dark {
+            184
+        } else {
+            196
+        };
+        image::Rgba([v, v, v + 6, 255])
+    })
 }
 
 /// The largest texture side uploaded for a render.
@@ -881,6 +1087,87 @@ fn bounds(draws: &[&Draw]) -> Option<(Vec3, f32)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A box a unit across and two tall, `y` up from the ground, as one draw.
+    fn figure(y: f32) -> Vec<Draw> {
+        let vertices = (0..8)
+            .map(|i| Vertex {
+                pos: [(i & 1) as f32 - 0.5, y + 2.0 * ((i >> 1) & 1) as f32, ((i >> 2) & 1) as f32 - 0.5],
+                normal: [0.0, 1.0, 0.0],
+                uv: [0.0, 0.0],
+            })
+            .collect();
+        vec![Draw {
+            vertices,
+            indices: vec![
+                0, 1, 3, 0, 3, 2, 4, 6, 7, 4, 7, 5, 0, 4, 5, 0, 5, 1, 2, 3, 7, 2, 7, 6, 0, 2, 6, 0, 6, 4, 1, 5, 7, 1,
+                7, 3,
+            ],
+            color: [0.85, 0.35, 0.25, 1.0],
+            texture: None,
+            alpha: Alpha::Opaque,
+            transmission: 0.0,
+            metallic: 0.0,
+            roughness: 1.0,
+            metallic_roughness: None,
+        }]
+    }
+
+    /// How much of the frame's height the draws take up from this camera.
+    fn height_on_screen(draws: &[Draw], globals: &Globals) -> f32 {
+        let m = Mat4::from_cols_array_2d(&globals.view_proj);
+        let ys = draws.iter().flat_map(|d| &d.vertices).map(|v| m.project_point3(Vec3::from(v.pos)).y);
+        let (lo, hi) = ys.fold((f32::INFINITY, f32::NEG_INFINITY), |(lo, hi), y| (lo.min(y), hi.max(y)));
+        (hi - lo) / 2.0
+    }
+
+    /// Draws a fall and a sway in the room to `HOARD_ROOM_SHOTS` (a folder), to look at: `cargo test -p hoard-render
+    /// room_shots -- --ignored`.
+    #[test]
+    #[ignore = "writes pictures to look at"]
+    fn room_shots() {
+        let out = std::path::PathBuf::from(std::env::var("HOARD_ROOM_SHOTS").unwrap());
+        let r = Renderer::new().unwrap();
+        let clips: [(&str, Vec<Vec<Draw>>); 2] = [
+            ("fall", (0..12).map(|k| figure(-40.0 * (k as f32 / 11.0).powi(2))).collect()),
+            ("walk", (0..12).map(|k| shifted(figure(0.0), Vec3::new(0.6 * k as f32, 0.0, 0.0))).collect()),
+        ];
+        for (name, frames) in clips {
+            let images = vec![Some(tiles())];
+            let room = room(&frames, THREE_QUARTER, 0).unwrap();
+            let cams = clip_cameras(&frames, &room, THREE_QUARTER).unwrap();
+            for (k, (mut f, (g, eye))) in frames.into_iter().zip(cams).enumerate() {
+                f.extend(room.iter().cloned());
+                r.render_from(&f, &images, 256, g, eye).unwrap().save(out.join(format!("{name}-{k:02}.png"))).unwrap();
+            }
+        }
+    }
+
+    fn shifted(mut draws: Vec<Draw>, by: Vec3) -> Vec<Draw> {
+        for v in draws.iter_mut().flat_map(|d| &mut d.vertices) {
+            v.pos = (Vec3::from(v.pos) + by).to_array();
+        }
+        draws
+    }
+
+    #[test]
+    fn a_clip_that_stays_put_has_one_camera_and_one_that_travels_is_followed() {
+        let standing =
+            height_on_screen(&figure(0.0), &camera(&figure(0.0).iter().collect::<Vec<_>>(), THREE_QUARTER).unwrap().0);
+
+        // A hop: one camera for the whole clip, so the picture holds still.
+        let hop: Vec<Vec<Draw>> = (0..12).map(|k| figure(0.05 * k as f32)).collect();
+        let cams = clip_cameras(&hop, &[], THREE_QUARTER).unwrap();
+        assert!(cams.iter().all(|(g, _)| g.view_proj == cams[0].0.view_proj));
+
+        // A fall of twenty times its height: followed, and drawn as big as standing still, not a speck.
+        let fall: Vec<Vec<Draw>> = (0..12).map(|k| figure(-40.0 * (k as f32 / 11.0).powi(2))).collect();
+        let cams = clip_cameras(&fall, &[], THREE_QUARTER).unwrap();
+        for (frame, (g, _)) in fall.iter().zip(&cams) {
+            let h = height_on_screen(frame, g);
+            assert!(h > standing * 0.6 && h <= 1.0, "{h} on screen, {standing} standing");
+        }
+    }
 
     #[test]
     fn glass_is_read_from_transmission() {

@@ -697,17 +697,11 @@ fn what_was_made_from_an_animated_fbx_is_made_again() {
         conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
     };
     // The still FBX, the GLB animation and the thumbnail keep theirs. The take's are dropped when it's made again,
-    // which its file's contents, no longer the ones it was made from, will have happen.
+    // which its file's contents, no longer the ones it was made from, will have happen. (Every animation's motion
+    // thumbnail is drawn again later anyway, in its room.)
     assert_eq!(
         strings("SELECT asset_id || ' ' || kind FROM derivatives ORDER BY asset_id, kind"),
-        [
-            "crate as:view:0:glb",
-            "hero as:thumb.avif:abc",
-            "jump as:view:0:glb",
-            "jump motion",
-            "run as:view:0:glb",
-            "run motion"
-        ]
+        ["crate as:view:0:glb", "hero as:thumb.avif:abc", "jump as:view:0:glb", "run as:view:0:glb"]
     );
     assert_eq!(
         strings(

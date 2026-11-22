@@ -5,8 +5,9 @@
 //!
 //! A clip shipped without a mesh (`run.fbx`) is played on a character it fits (the first its pack ships it for, or
 //! else the first with its skeleton in any pack): its keys are copied onto that character's bones, matched by name.
-//! The character is posed at each frame by polysmelt and drawn by the thumbnail renderer from one camera for the whole
-//! clip, so the character moves in the picture and the picture holds still.
+//! The character is posed at each frame by polysmelt and drawn by the thumbnail renderer in a tiled room scaled to it.
+//! A clip that stays put is drawn from one camera, so the character moves and the room holds still. One that travels
+//! (a fall, a run that goes somewhere) is followed, so the character stays big and the tiles stream past.
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};

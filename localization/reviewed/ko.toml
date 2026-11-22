@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "파일 추가"
 [messages.app-add-files-short]
 source = "Add"
 translation = "추가"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-클릭하면 제외"
 
 [messages.app-archive]
 source = "Archive"
@@ -1432,8 +1436,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }”을(를) 저장했습니다. 필터의 내 항목에 있습니다"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = '바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = '바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께 · pack:숲: 팩 이름에서'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

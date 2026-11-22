@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "ad3400b109e27c8b3126e8135f966d862d2dfdc0bfdd5b2d4e62347dd50fec72"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Ajouter des fichiers"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Ajouter"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-clic pour l’exclure"
 
 [messages.app-archive]
 source = "Archive"
@@ -1477,8 +1481,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "« { $name } » enregistrée : elle se trouve dans Filtres, sous Les vôtres"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'roche or pierre : l’un ou l’autre · -mousse : exclure · "mousse sèche" : ces mots ensemble'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'roche or pierre : l’un ou l’autre · -mousse : exclure · "mousse sèche" : ces mots ensemble · pack:forêt : dans le nom d’un pack'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

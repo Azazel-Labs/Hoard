@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "88c93caf26ca85de6ac9eb500324a8632ade96bb5f63645e32297d86befc8f7a"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Fájlok hozzáadása"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Hozzáadás"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-kattintással kihagyja"
 
 [messages.app-archive]
 source = "Archive"
@@ -1449,8 +1453,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Mentve: „{ $name }”. A Szűrők között, a Saját alatt találja"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt · pack:erdő: egy csomag nevében'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "3890c90fa88633a6ab70ef57bf24cb23df5f0ca93b1323895034945b5971b327"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Thêm tệp"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Thêm"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-nhấp để loại trừ"
 
 [messages.app-archive]
 source = "Archive"
@@ -1435,8 +1439,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Đã lưu “{ $name }”: nằm trong Bộ lọc, mục Của bạn"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau · pack:rừng: trong tên gói'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

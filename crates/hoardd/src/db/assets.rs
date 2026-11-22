@@ -402,7 +402,15 @@ pub(crate) fn asset_thumb(conn: &Connection, id: &str) -> Result<Option<String>>
     Ok(conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0)).optional()?.flatten())
 }
 
-/// Rebuild the FTS row for one asset from its current fields + tags. The fields of the library's own go in with
+/// A pack's words in the search index besides its name (`p` being the pack): its tags, as an asset's are, and
+/// `unreal` where it has Unreal packages. The packs and their counts keep the rows up to date as they change (step 97
+/// of the migrations, which has its own copy of this).
+const PACK_TAGS: &str = "concat_ws(' ', (SELECT group_concat(replace(replace(value, ':', ' '), '-', ' '), ' ')
+                                    FROM json_each(CASE WHEN json_valid(p.tags) THEN p.tags ELSE '[]' END)),
+                              CASE WHEN EXISTS (SELECT 1 FROM pack_kinds k WHERE k.pack_id = p.id AND k.unreal > 0)
+                                   THEN 'unreal' END)";
+
+/// Rebuild the FTS row for one asset from its current fields + tags, and its pack's name and tags. The fields of the library's own go in with
 /// its description, each as its name and value: `biome desert` is found by either word.
 ///
 /// The row is kept by number in `assets.fts_row`, found and replaced by that: the index can't look rows up by its
@@ -415,13 +423,16 @@ pub(crate) fn reindex_asset(conn: &Connection, id: &str) -> Result<()> {
         conn.execute("DELETE FROM assets_fts WHERE rowid = ?1", [row])?;
     }
     let added = conn.execute(
-        "INSERT INTO assets_fts (rowid, asset_id, name, words, category, description, tags)
-         SELECT ?2, a.id, a.name, a.words, COALESCE(a.category, ''),
-                concat_ws(' ', a.description, a.source_description, a.ai_description,
-                          (SELECT group_concat(key || ' ' || value, ' ') FROM asset_fields f WHERE f.asset_id = a.id)),
-                COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
-                          FROM asset_tags t WHERE t.asset_id = a.id), '')
-         FROM assets a WHERE a.id = ?1",
+        &format!(
+            "INSERT INTO assets_fts (rowid, asset_id, name, words, category, description, tags, pack_name, pack_tags)
+             SELECT ?2, a.id, a.name, a.words, COALESCE(a.category, ''),
+                    concat_ws(' ', a.description, a.source_description, a.ai_description,
+                              (SELECT group_concat(key || ' ' || value, ' ') FROM asset_fields f WHERE f.asset_id = a.id)),
+                    COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
+                              FROM asset_tags t WHERE t.asset_id = a.id), ''),
+                    COALESCE(p.name, ''), {PACK_TAGS}
+             FROM assets a LEFT JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1"
+        ),
         rusqlite::params![id, row],
     )?;
     if added == 1 && row.is_none() {

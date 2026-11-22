@@ -11,6 +11,7 @@ import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from '.
 import { mine, setFavorite, toggleFavorite } from './mine'
 import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
+import { knownTags, leaveOut, marked, pieces, type Piece } from './searchSyntax'
 import { DARK_THEMES, LIGHT_THEMES, SCHEMES, setTheme, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
@@ -99,6 +100,29 @@ function setupDone() {
   refreshPacks()
 }
 const searchInput = ref<HTMLInputElement | null>(null)
+/** What's typed in the search box, read as the server reads it, for marking it up underneath as it's typed. */
+const qMarks = ref<HTMLElement | null>(null)
+const composing = ref(false)
+const qPieces = computed(() => {
+  // The library's tags are only fetched once something's typed.
+  const tags = filters.q.trim() ? knownTags() : null
+  return pieces(filters.q, (w) => !!tags?.has(w.toLowerCase()))
+})
+// Not while an input method is putting a word together: the text in the box isn't in `filters.q` until it's done.
+const qMarked = computed(() => !composing.value && marked(qPieces.value))
+/** A piece's marks (`-`, `pack:`) and the rest of it. */
+function pieceParts(p: Piece): [string, string] {
+  const all = filters.q.slice(p.start, p.end)
+  const marks = p.kind === 'word' ? (p.not ? 1 : 0) + (p.pack ? 5 : 0) : 0
+  return [all.slice(0, marks), all.slice(marks)]
+}
+/** Keep the marked-up copy scrolled as far as the box, when the text is wider than it. */
+function syncMarks() {
+  void nextTick(() => {
+    if (qMarks.value && searchInput.value) qMarks.value.scrollLeft = searchInput.value.scrollLeft
+  })
+}
+watch(() => filters.q, syncMarks)
 const fileInput = ref<HTMLInputElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
 /** The filters column, a drawer on phones that can be swiped shut. */
@@ -331,8 +355,18 @@ async function pollPacks() {
 
 // ------------------------------------------------------------------ filters
 
-function toggleTag(tag: string) {
-  filters.tags = filters.tags.includes(tag) ? filters.tags.filter((t) => t !== tag) : [...filters.tags, tag]
+/** Narrow to a tag, or stop; alt-clicked (`leave`), leave whatever has it out instead. */
+function toggleTag(tag: string, leave = false) {
+  if (leave) {
+    filters.tags = filters.tags.filter((t) => t !== tag)
+    filters.q = leaveOut(filters.q, tag)
+  } else filters.tags = filters.tags.includes(tag) ? filters.tags.filter((t) => t !== tag) : [...filters.tags, tag]
+  view.value = 'library'
+}
+/** Search without a pack's assets: alt-clicking its name. */
+function leavePack(name: string) {
+  if (filters.pack?.name === name) filters.pack = null
+  filters.q = leaveOut(filters.q, name, true)
   view.value = 'library'
 }
 function setKind(kind: string) {
@@ -1346,11 +1380,21 @@ const commands = computed<Command[]>(() => {
           <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" />
           <path d="m10.5 10.5 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
+        <div ref="qMarks" class="field q-marks" aria-hidden="true">
+          <template v-if="qMarked">
+            <span
+              v-for="p in qPieces"
+              :key="p.start"
+              :class="{ 'q-or': p.kind === 'or', 'q-not': p.not, 'q-pack': p.pack, 'q-tag': p.tag }"
+            ><span v-if="pieceParts(p)[0]" class="q-mark">{{ pieceParts(p)[0] }}</span>{{ pieceParts(p)[1] }}</span>
+          </template>
+        </div>
         <input
           id="q"
           ref="searchInput"
           v-model="filters.q"
           class="field"
+          :class="{ marked: qMarked }"
           type="search"
           :placeholder="searchPlaceholder"
           :title="filters.kind === 'audio' ? t('app-imitation-title') : t('app-search-syntax-title')"
@@ -1358,6 +1402,12 @@ const commands = computed<Command[]>(() => {
           enterkeyhint="search"
           @focus="view = 'library'"
           @keydown.down.prevent="moveFocus('ArrowRight')"
+          @scroll="syncMarks"
+          @keyup="syncMarks"
+          @pointerup="syncMarks"
+          @blur="syncMarks"
+          @compositionstart="composing = true"
+          @compositionend="composing = false"
         />
         <kbd class="slash" aria-hidden="true">/</kbd>
         <MicButton />
@@ -1619,6 +1669,7 @@ const commands = computed<Command[]>(() => {
         @browse-collection="browseCollection"
         @browse-project="browseProject"
         @browse-pack="browsePack"
+        @leave-pack="leavePack"
         @updated="onUpdated"
         @tag="toggleTag"
         @error="showError"
@@ -1756,8 +1807,24 @@ const commands = computed<Command[]>(() => {
 .brand:hover rect:nth-of-type(2) { rotate: 8deg; scale: 1.08; transition-delay: 30ms; }
 .brand:hover rect:nth-of-type(3) { rotate: 6deg; translate: -1px 1px; transition-delay: 60ms; }
 .brand:hover rect:nth-of-type(4) { rotate: -12deg; scale: 0.9; transition-delay: 90ms; }
-.search { position: relative; flex: 1; max-width: 640px; }
+.search { position: relative; flex: 1; max-width: 640px; isolation: isolate; }
 .search .field { background: var(--bg); padding: 0.55em 4.2em 0.55em 2.1em; }
+/* The search text marked up, underneath the box: what's left out, `or`, a pack's name, a tag the library has. Gently,
+   in colour and lines only, so every letter stays exactly under the one typed. */
+.search input.field { background: transparent; }
+.search input.field.marked { color: transparent; caret-color: var(--text); }
+.search input.field.marked::selection { color: transparent; }
+.q-marks {
+  position: absolute; inset: 0; z-index: -1; border: 1px solid transparent; border-radius: var(--r-chip);
+  white-space: pre; overflow: hidden; pointer-events: none;
+}
+.q-mark, .q-or { color: var(--faint); }
+.q-not {
+  color: color-mix(in srgb, var(--danger) 65%, var(--text));
+  text-decoration: line-through 1px color-mix(in srgb, var(--danger) 40%, transparent);
+}
+.q-pack { color: color-mix(in srgb, var(--accent) 65%, var(--text)); }
+.q-tag { text-decoration: underline dotted 1px color-mix(in srgb, var(--accent) 60%, transparent); text-underline-offset: 3px; }
 .search-icon { position: absolute; left: 0.7em; top: 50%; translate: 0 -50%; color: var(--faint); pointer-events: none; }
 .slash {
   position: absolute; right: 2.4em; top: 50%; translate: 0 -50%; pointer-events: none;

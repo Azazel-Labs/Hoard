@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "bd7cd34aed4768345a5f9fea614ee34f51ffb924aa266c18a1b392a66b52d3b0"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Afegeix fitxers"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Afegeix"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt+clic per excloure-ho"
 
 [messages.app-archive]
 source = "Archive"
@@ -1469,8 +1473,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "S'ha desat «{ $name }»: és a Filtres, a Vostres"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'roca or pedra: una de les dues · -molsa: exclou-la · "molsa seca": aquestes paraules juntes'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = """roca or pedra: una de les dues · -molsa: exclou-la · "molsa seca": aquestes paraules juntes · pack:bosc: al nom d'un paquet"""
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

@@ -673,7 +673,8 @@ app-search-label = Căutați resurse
 app-search-placeholder = Căutați nume, căi, etichete
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună
+app-search-syntax-title = stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună · pack:pădure: în numele unui pachet
+app-alt-leave-out = Alt-clic pentru a-l omite
 app-views = Vizualizări
 app-library = Bibliotecă
 app-packs = Pachete

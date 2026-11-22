@@ -593,7 +593,8 @@ app-search-label = 搜尋素材
 app-search-placeholder = 搜尋名稱、路徑、標籤
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = 岩石 or 石頭：二選一 · -苔蘚：排除 · "乾苔蘚"：這些詞一起出現
+app-search-syntax-title = 岩石 or 石頭：二選一 · -苔蘚：排除 · "乾苔蘚"：這些詞一起出現 · pack:森林：素材包名稱中
+app-alt-leave-out = Alt+點擊可排除
 app-views = 檢視
 app-library = 素材庫
 app-packs = 素材包

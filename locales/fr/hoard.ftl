@@ -650,7 +650,8 @@ app-search-label = Rechercher des ressources
 app-search-placeholder = Rechercher noms, chemins, étiquettes
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = roche or pierre : l’un ou l’autre · -mousse : exclure · "mousse sèche" : ces mots ensemble
+app-search-syntax-title = roche or pierre : l’un ou l’autre · -mousse : exclure · "mousse sèche" : ces mots ensemble · pack:forêt : dans le nom d’un pack
+app-alt-leave-out = Alt-clic pour l’exclure
 app-views = Vues
 app-library = Bibliothèque
 app-packs = Packs

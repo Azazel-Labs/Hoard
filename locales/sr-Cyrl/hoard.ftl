@@ -661,7 +661,8 @@ app-search-label = Претражи ресурсе
 app-search-placeholder = Претражи називе, путање, ознаке
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = стена or камен: једно од та два · -маховина: изостави · "сува маховина": ове речи заједно
+app-search-syntax-title = стена or камен: једно од та два · -маховина: изостави · "сува маховина": ове речи заједно · pack:шума: у имену пакета
+app-alt-leave-out = Alt-клик да изоставите
 app-views = Прикази
 app-library = Библиотека
 app-packs = Пакети

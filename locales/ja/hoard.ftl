@@ -590,7 +590,8 @@ app-search-label = アセットを検索
 app-search-placeholder = 名前、パス、タグを検索
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = 岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて
+app-search-syntax-title = 岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて · pack:森: パック名で
+app-alt-leave-out = Alt+クリックで除外
 app-views = ビュー
 app-library = ライブラリ
 app-packs = パック

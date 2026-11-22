@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "ba53414f761bfe22b8de76cd70f11c6ffe1e1dd97c499b1280e56b909a994a6c"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Adăugați fișiere"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Adăugați"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-clic pentru a-l omite"
 
 [messages.app-archive]
 source = "Archive"
@@ -1494,8 +1498,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "„{ $name }” a fost salvată: o găsiți în Filtre, la Ale dvs."
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'stâncă or piatră: una dintre ele · -mușchi: omiteți · "mușchi uscat": aceste cuvinte împreună · pack:pădure: în numele unui pachet'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

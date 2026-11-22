@@ -626,7 +626,8 @@ app-search-label = Assetek keresése
 app-search-placeholder = Keresés név, elérési út, címke szerint
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt
+app-search-syntax-title = szikla or kő: az egyik a kettő közül · -moha: kihagyás · "száraz moha": ezek a szavak együtt · pack:erdő: egy csomag nevében
+app-alt-leave-out = Alt-kattintással kihagyja
 app-views = Nézetek
 app-library = Könyvtár
 app-packs = Csomagok

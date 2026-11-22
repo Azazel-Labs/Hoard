@@ -642,7 +642,8 @@ app-search-label = Søk i ressurser
 app-search-placeholder = Søk i navn, baner, tagger
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = stein or fjell: en av dem · -mose: utelat · "tørr mose": disse ordene sammen
+app-search-syntax-title = stein or fjell: en av dem · -mose: utelat · "tørr mose": disse ordene sammen · pack:skog: i navnet på en pakke
+app-alt-leave-out = Alt-klikk for å utelate det
 app-views = Visninger
 app-library = Bibliotek
 app-packs = Pakker

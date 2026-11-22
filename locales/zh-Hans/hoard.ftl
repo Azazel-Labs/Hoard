@@ -593,7 +593,8 @@ app-search-label = 搜索资源
 app-search-placeholder = 搜索名称、路径、标签
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = 岩石 or 石头：二选一 · -苔藓：排除 · "干苔藓"：这些词一起出现
+app-search-syntax-title = 岩石 or 石头：二选一 · -苔藓：排除 · "干苔藓"：这些词一起出现 · pack:森林：资源包名称中
+app-alt-leave-out = Alt+点击可排除
 app-views = 视图
 app-library = 资源库
 app-packs = 资源包

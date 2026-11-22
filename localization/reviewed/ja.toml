@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "5233f0609e7721ae824ccf9f7322ac9190df0638f3f2e758257bc57e3fa1c214"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "ファイルを追加"
 [messages.app-add-files-short]
 source = "Add"
 translation = "追加"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt+クリックで除外"
 
 [messages.app-archive]
 source = "Archive"
@@ -1432,8 +1436,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "「{ $name }」を保存しました。フィルターの「自分用」にあります"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = '岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = '岩 or 石: どちらか · -苔: 除外 · "乾いた苔": この語をまとめて · pack:森: パック名で'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

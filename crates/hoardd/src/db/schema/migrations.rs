@@ -13,6 +13,41 @@ macro_rules! needed_82 {
     };
 }
 
+/// A pack's words for the search index besides its name, as step 97 has them: its tags (`:` and `-` as spaces, as
+/// an asset's are) and `unreal` where it has Unreal packages. Frozen with that step.
+macro_rules! pack_tags_97 {
+    ($tags:literal, $id:literal) => {
+        concat!(
+            "concat_ws(' ', (SELECT group_concat(replace(replace(value, ':', ' '), '-', ' '), ' ')
+                              FROM json_each(CASE WHEN json_valid(",
+            $tags,
+            ") THEN ",
+            $tags,
+            " ELSE '[]' END)),
+                        CASE WHEN EXISTS (SELECT 1 FROM pack_kinds k WHERE k.pack_id = ",
+            $id,
+            " AND k.unreal > 0)
+                             THEN 'unreal' END)"
+        )
+    };
+}
+/// Put a pack's words back in the search rows of all its assets (see step 97). Frozen with that step.
+macro_rules! pack_words_97 {
+    ($id:literal) => {
+        concat!(
+            "UPDATE assets_fts SET (pack_name, pack_tags) =
+                 (SELECT p.name, ",
+            pack_tags_97!("p.tags", "p.id"),
+            " FROM packs p WHERE p.id = ",
+            $id,
+            ")
+               WHERE rowid IN (SELECT fts_row FROM assets WHERE pack_id = ",
+            $id,
+            " AND fts_row IS NOT NULL);"
+        )
+    };
+}
+
 /// Changes since the baseline, oldest first. Step `i` takes the database from `BASELINE_VERSION + i` to
 /// `BASELINE_VERSION + i + 1`, inside one transaction, so a failing step leaves the database untouched.
 ///
@@ -998,4 +1033,41 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      CREATE INDEX oauth_grants_user ON oauth_grants (user_id);
      CREATE INDEX oauth_grants_client ON oauth_grants (client_id);
      CREATE INDEX issues_location ON issues (location_id);",
+    // 97: each asset is found by its pack's name and tags too, and by `unreal` where its pack has Unreal packages,
+    // in two columns of the search index of their own: `-sci-fi` leaves out everything in a pack called "Sci-Fi
+    // Kit", and `-unreal` the FBX files and textures that come with Unreal packages. The index is made again with
+    // them (an FTS5 table can't take a column), each row keeping its number; the pack keeps them up to date.
+    concat!(
+        "DROP TRIGGER assets_fts_gone;
+         CREATE VIRTUAL TABLE assets_fts_next USING fts5(
+             asset_id UNINDEXED, name, words, category, description, tags, pack_name, pack_tags,
+             tokenize = 'unicode61 remove_diacritics 2'
+         );
+         CREATE TEMP TABLE pack_words AS SELECT p.id, p.name, ",
+        pack_tags_97!("p.tags", "p.id"),
+        " AS tags FROM packs p;
+         INSERT INTO assets_fts_next (rowid, asset_id, name, words, category, description, tags, pack_name, pack_tags)
+           SELECT f.rowid, f.asset_id, f.name, f.words, f.category, f.description, f.tags, COALESCE(w.name, ''), COALESCE(w.tags, '')
+             FROM assets a JOIN assets_fts f ON f.rowid = a.fts_row LEFT JOIN temp.pack_words w ON w.id = a.pack_id;
+         DROP TABLE temp.pack_words;
+         DROP TABLE assets_fts;
+         ALTER TABLE assets_fts_next RENAME TO assets_fts;
+         CREATE TRIGGER assets_fts_gone AFTER DELETE ON assets WHEN old.fts_row IS NOT NULL BEGIN
+             DELETE FROM assets_fts WHERE rowid = old.fts_row;
+         END;
+         CREATE TRIGGER packs_words_changed AFTER UPDATE OF name, tags ON packs
+           WHEN old.name IS NOT new.name OR old.tags IS NOT new.tags BEGIN ",
+        pack_words_97!("new.id"),
+        " END;
+         CREATE TRIGGER pack_kinds_unreal_added AFTER INSERT ON pack_kinds WHEN new.unreal > 0 BEGIN ",
+        pack_words_97!("new.pack_id"),
+        " END;
+         CREATE TRIGGER pack_kinds_unreal_changed AFTER UPDATE OF unreal ON pack_kinds
+           WHEN (old.unreal > 0) != (new.unreal > 0) BEGIN ",
+        pack_words_97!("new.pack_id"),
+        " END;
+         CREATE TRIGGER pack_kinds_unreal_gone AFTER DELETE ON pack_kinds WHEN old.unreal > 0 BEGIN ",
+        pack_words_97!("old.pack_id"),
+        " END;"
+    ),
 ];

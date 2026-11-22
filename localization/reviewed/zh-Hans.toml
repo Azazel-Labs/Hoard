@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "dfa154e4e2c244ac9b5bd0c069e7aef203d0da135fdc9b3c5f3448615a30c08f"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "添加文件"
 [messages.app-add-files-short]
 source = "Add"
 translation = "添加"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt+点击可排除"
 
 [messages.app-archive]
 source = "Archive"
@@ -1435,8 +1439,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "已保存“{ $name }”：位于“筛选”中的“我的”下"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = '岩石 or 石头：二选一 · -苔藓：排除 · "干苔藓"：这些词一起出现'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = '岩石 or 石头：二选一 · -苔藓：排除 · "干苔藓"：这些词一起出现 · pack:森林：资源包名称中'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

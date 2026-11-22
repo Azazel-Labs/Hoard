@@ -642,7 +642,8 @@ app-search-label = Cerca recursos
 app-search-placeholder = Cerca noms, camins, etiquetes
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = roca or pedra: una de les dues · -molsa: exclou-la · "molsa seca": aquestes paraules juntes
+app-search-syntax-title = roca or pedra: una de les dues · -molsa: exclou-la · "molsa seca": aquestes paraules juntes · pack:bosc: al nom d'un paquet
+app-alt-leave-out = Alt+clic per excloure-ho
 app-views = Vistes
 app-library = Biblioteca
 app-packs = Paquets

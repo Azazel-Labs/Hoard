@@ -7,6 +7,7 @@ import { clearFilters, filterQuery, filters, fromSaved, hasFilters, heardNoise, 
 import { t } from '../i18n'
 import { findKey, keyName } from '../keys'
 import { changeSearch, mine, saveSearch } from '../mine'
+import { pieces, withoutPiece } from '../searchSyntax'
 import { showOk, useTween } from '../ui'
 import TagChip from './TagChip.vue'
 
@@ -25,6 +26,8 @@ const tempoLabel = computed(() => {
   if (lo !== '' && hi !== '') return `${lo}–${hi}`
   return lo !== '' ? `${lo}+` : hi !== '' ? `≤${hi}` : ''
 })
+/** What the search box leaves out (`-moss`, `-pack:"Sci-Fi Kit"`): a chip each, so it shows and is easy to take back. */
+const leftOut = computed(() => pieces(filters.q).filter((p) => p.not))
 const chosenKey = computed(() => (filters.key ? findKey(filters.key) : undefined))
 
 const naming = ref(false)
@@ -76,6 +79,14 @@ async function updateBasis() {
     <TagChip v-if="chosenKey" :tag="`key:${keyName(chosenKey)}${filters.mixKeys ? ' ±' : ''}`" removable @remove="filters.key = ''" />
     <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
     <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="filters.tags = filters.tags.filter((x) => x !== t)" />
+    <TagChip
+      v-for="p in leftOut"
+      :key="`not-${p.start}`"
+      class="left-out"
+      :tag="`not:${p.pack ? 'pack:' : ''}${p.text}`"
+      removable
+      @remove="filters.q = withoutPiece(filters.q, p)"
+    />
     <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
     <template v-if="member && hasFilters && !savedNow">
       <form v-if="naming" class="savesearch" @submit.prevent="saveCurrent">
@@ -94,6 +105,8 @@ async function updateBasis() {
 
 <style scoped>
 .count { font-size: var(--step--1); color: var(--muted); margin-right: 0.35rem; font-variant-numeric: tabular-nums; }
+.left-out { border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+.left-out :deep(.value) { text-decoration: line-through 1px color-mix(in srgb, var(--danger) 55%, transparent); }
 .savesearch { display: inline-flex; gap: 0.3rem; align-items: center; }
 .savesearch .field { width: 12rem; padding-block: 0.2rem; }
 </style>

@@ -650,7 +650,8 @@ app-search-label = Hae resursseja
 app-search-placeholder = Hae nimiä, polkuja, tunnisteita
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = kallio or kivi: jompikumpi · -sammal: jätä pois · "kuiva sammal": nämä sanat yhdessä
+app-search-syntax-title = kallio or kivi: jompikumpi · -sammal: jätä pois · "kuiva sammal": nämä sanat yhdessä · pack:metsä: paketin nimessä
+app-alt-leave-out = Alt-napsautus jättää sen pois
 app-views = Näkymät
 app-library = Kirjasto
 app-packs = Paketit

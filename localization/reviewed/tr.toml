@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Dosya ekle"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Ekle"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Hariç tutmak için Alt-tıklayın"
 
 [messages.app-archive]
 source = "Archive"
@@ -1437,8 +1441,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” kaydedildi: Filtreler’de, Kişisel altında"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte · pack:orman: bir paketin adında'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

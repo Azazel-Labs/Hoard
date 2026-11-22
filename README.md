@@ -603,8 +603,12 @@ turned. Downloads stay as they were made.
 
 **Searching.** The search box finds what has every word you type, each as the start of a word (`rock` finds
 "rocks"). `rock or stone` finds either, `-moss` leaves out anything with "moss" in it, and `"dry moss"` finds those
-words together as they are. A tag searches as itself: `-set:forest` leaves out that set. Image and sound search look
-for the words without the marks. Your own fields are searched by name and value (`desert` finds an asset whose biome
+words together as they are. A tag searches as itself: `-set:forest` leaves out that set. A pack's name and tags count
+for its assets too, alongside a word of their own: `robot forest` finds robots in a pack about forests, and `-sci-fi`
+leaves out everything in a pack named or tagged sci-fi. `pack:woodland` looks only at pack names and `-pack:"Robot
+Pack"` leaves that pack out. Alt-click a tag in the Filters column or an asset's details, or the name of its pack, to
+leave it out. What's left out shows as a chip above the grid, and the search box colors what it understood: what's
+left out, `or`, a pack, a tag the library has. Image and sound search look for the words without the marks. Your own fields are searched by name and value (`desert` finds an asset whose biome
 is desert). The library can be put in order by rating, best first, and Rated in the Filters column narrows it to
 what has at least the stars you pick. A search can be saved under a name in the Filters column, renamed there, updated
 with what you've changed since, and made what the library opens to.

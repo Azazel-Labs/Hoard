@@ -602,7 +602,8 @@ app-search-label = Cari aset
 app-search-placeholder = Cari nama, path, tag
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama
+app-search-syntax-title = batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama · pack:hutan: di nama paket
+app-alt-leave-out = Alt-klik untuk mengabaikannya
 app-views = Tampilan
 app-library = Pustaka
 app-packs = Paket

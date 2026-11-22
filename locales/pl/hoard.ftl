@@ -676,7 +676,8 @@ app-search-label = Szukaj zasobów
 app-search-placeholder = Szukaj nazw, ścieżek, tagów
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = skała or kamień: jedno z dwóch · -mech: pomiń · "suchy mech": te słowa razem
+app-search-syntax-title = skała or kamień: jedno z dwóch · -mech: pomiń · "suchy mech": te słowa razem · pack:las: w nazwie paczki
+app-alt-leave-out = Alt+klik, aby pominąć
 app-views = Widoki
 app-library = Biblioteka
 app-packs = Paczki

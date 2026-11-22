@@ -22,7 +22,8 @@ const emit = defineEmits<{
   collection: [c: Collection]
   search: [s: SavedSearch]
   kind: [kind: string]
-  tag: [tag: string]
+  /** `leave`: alt-clicked, to leave it out rather than narrow to it. */
+  tag: [tag: string, leave?: boolean]
 }>()
 
 /** Values shown per filter group before "more". */
@@ -274,9 +275,9 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
             type="button"
             class="facet"
             :class="{ long: facetLabel(g.ns, f.value).length > 30 }"
-            :title="facetLabel(g.ns, f.value).length > 30 ? facetLabel(g.ns, f.value) : undefined"
+            :title="facetLabel(g.ns, f.value).length > 30 ? `${facetLabel(g.ns, f.value)} · ${t('app-alt-leave-out')}` : t('app-alt-leave-out')"
             :aria-pressed="filters.tags.includes(f.value)"
-            @click="emit('tag', f.value)"
+            @click="emit('tag', f.value, $event.altKey)"
           >
             <span class="fl">{{ facetLabel(g.ns, f.value) }}</span><span class="n mono">{{ f.count }}</span>
           </button>

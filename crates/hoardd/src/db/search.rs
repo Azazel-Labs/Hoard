@@ -18,13 +18,21 @@ fn fts_query(q: &str) -> Option<String> {
 #[derive(Debug, Default, PartialEq)]
 struct Words {
     /// Every word, each as the start of a word (`rock` finds `rocks`); `a or b` either; `"a b"` those words together
-    /// as they are. A word with dashes or colons in it (`sci-fi`, `set:forest`) is its parts together.
+    /// as they are. A word with dashes or colons in it (`sci-fi`, `set:forest`) is its parts together. `pack:forest`
+    /// is a word of the pack's name.
+    ///
+    /// Words are found in an asset's pack's name and tags too, as long as one of them is the asset's own: `robot
+    /// forest` finds a robot in a forest pack, but `forest` alone doesn't find everything in that pack.
     find: Option<String>,
-    /// Anything with any of the words after a `-` (`-moss`, `-"dry moss"`).
+    /// Anything with any of the words after a `-` (`-moss`, `-"dry moss"`, `-pack:"Sci-Fi Kit"`), its pack's
+    /// included: `-sci-fi` leaves out everything in a pack called "Sci-Fi Kit".
     without: Option<String>,
     /// What to find without the marks: the words for image and sound search to look for.
     plain: String,
 }
+
+/// The columns of the search index that are an asset's own, rather than its pack's.
+const OWN_COLUMNS: &str = "{name words category description tags}";
 
 fn words(q: &str) -> Words {
     /// One word or phrase, as FTS5 has it.
@@ -34,6 +42,7 @@ fn words(q: &str) -> Words {
         (!parts.is_empty()).then(|| format!("\"{}\"{}", parts.join(" "), if exact { "" } else { "*" }))
     }
     let mut find: Vec<Vec<String>> = Vec::new();
+    let (mut own, mut terms) = (Vec::new(), 0);
     let mut without = Vec::new();
     let mut plain = Vec::new();
     let (mut either, mut chars) = (false, q.chars().peekable());
@@ -47,6 +56,10 @@ fn words(q: &str) -> Words {
         if not {
             chars.next();
         }
+        let pack = chars.clone().take(5).collect::<String>().eq_ignore_ascii_case("pack:");
+        if pack {
+            chars.nth(4);
+        }
         let exact = chars.peek() == Some(&'"');
         let text: String = if exact {
             chars.next();
@@ -59,26 +72,39 @@ fn words(q: &str) -> Words {
             }
             w
         };
-        if !not && !exact && text.eq_ignore_ascii_case("or") {
+        if !not && !exact && !pack && text.eq_ignore_ascii_case("or") {
             either = true;
             continue;
         }
         let Some(t) = term(&text, exact) else { continue };
+        let t = if pack { format!("pack_name : {t}") } else { t };
         if not {
             without.push(t);
         } else {
+            if !pack {
+                own.push(t.clone());
+                plain.push(text.trim().to_owned());
+            }
+            terms += 1;
             match find.last_mut() {
                 Some(any) if either => any.push(t),
                 _ => find.push(vec![t]),
             }
-            plain.push(text.trim().to_owned());
         }
         either = false;
     }
-    let find = find
+    let mut find = find
         .into_iter()
         .map(|any| if any.len() == 1 { any.concat() } else { format!("({})", any.join(" OR ")) })
         .collect::<Vec<_>>();
+    if !own.is_empty() {
+        if find.len() == 1 && own.len() == terms {
+            // One word, or either of a few: the asset's own, or nothing.
+            find[0] = format!("{OWN_COLUMNS} : {}", find[0]);
+        } else {
+            find.push(format!("{OWN_COLUMNS} : ({})", own.join(" OR ")));
+        }
+    }
     Words {
         find: (!find.is_empty()).then(|| find.join(" AND ")),
         without: (!without.is_empty()).then(|| without.join(" OR ")),
@@ -126,12 +152,12 @@ pub(crate) enum Keys {
 /// The word matches, joined by their rows in the index (`assets.fts_row`): joined by its `asset_id` column, each
 /// match's contents were read for it. (`+` keeps SQLite from going through the library matching the words again
 /// for each asset, the row being something the index could look up.)
-const FTS_JOIN: &str = "JOIN (SELECT rowid AS row, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
+const FTS_JOIN: &str = "JOIN (SELECT rowid AS row, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0) AS rank
           FROM assets_fts WHERE assets_fts MATCH ?) f ON a.fts_row = +f.row";
 /// The word matches of a search by words and look together, worked out once into `temp.word_rank` (see
 /// [`search_ranked`]): joined as a subquery, SQLite can run the match again for every asset in the library.
 const WORD_RANK: &str = "INSERT INTO temp.word_rank (asset_id, rank)
-     SELECT a.id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0)
+     SELECT a.id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0)
        FROM assets_fts JOIN assets a ON a.fts_row = +assets_fts.rowid WHERE assets_fts MATCH ?1";
 
 /// The assets a search by words and look together can find, the word matches and those the look ranks, worked out
@@ -973,16 +999,44 @@ mod tests {
             (w.find.unwrap_or_default(), w.without.unwrap_or_default(), w.plain)
         };
         let s = |a: &str, b: &str, c: &str| (a.to_owned(), b.to_owned(), c.to_owned());
-        assert_eq!(w("Rock moss"), s(r#""rock"* AND "moss"*"#, "", "Rock moss"));
-        assert_eq!(w("rock or stone wall"), s(r#"("rock"* OR "stone"*) AND "wall"*"#, "", "rock stone wall"));
-        assert_eq!(w("rock | stone"), s(r#"("rock"* OR "stone"*)"#, "", "rock stone"));
-        assert_eq!(w(r#""dry moss" -wet -"red brick""#), s(r#""dry moss""#, r#""wet"* OR "red brick""#, "dry moss"));
-        assert_eq!(w("sci-fi -set:forest"), s(r#""sci fi"*"#, r#""set forest"*"#, "sci-fi"));
+        let own = |t: &str| format!("{{name words category description tags}} : {t}");
+        assert_eq!(
+            w("Rock moss"),
+            s(&format!(r#""rock"* AND "moss"* AND {}"#, own(r#"("rock"* OR "moss"*)"#)), "", "Rock moss")
+        );
+        assert_eq!(
+            w("rock or stone wall"),
+            s(
+                &format!(r#"("rock"* OR "stone"*) AND "wall"* AND {}"#, own(r#"("rock"* OR "stone"* OR "wall"*)"#)),
+                "",
+                "rock stone wall"
+            )
+        );
+        assert_eq!(w("rock | stone"), s(&own(r#"("rock"* OR "stone"*)"#), "", "rock stone"));
+        assert_eq!(
+            w(r#""dry moss" -wet -"red brick""#),
+            s(&own(r#""dry moss""#), r#""wet"* OR "red brick""#, "dry moss")
+        );
+        assert_eq!(w("sci-fi -set:forest"), s(&own(r#""sci fi"*"#), r#""set forest"*"#, "sci-fi"));
         assert_eq!(w("-moss"), s("", r#""moss"*"#, ""));
         // Marks with nothing to go with them are left be.
-        assert_eq!(w(r#"or - "" | rock or"#), s(r#""rock"*"#, "", "rock"));
-        assert_eq!(w(r#"door "and NOT"#), s(r#""door"* AND "and not""#, "", "door and NOT"));
-        assert_eq!(w("orc OR"), s(r#""orc"*"#, "", "orc"));
+        assert_eq!(w(r#"or - "" | rock or"#), s(&own(r#""rock"*"#), "", "rock"));
+        assert_eq!(
+            w(r#"door "and NOT"#),
+            s(&format!(r#""door"* AND "and not" AND {}"#, own(r#"("door"* OR "and not")"#)), "", "door and NOT")
+        );
+        assert_eq!(w("orc OR"), s(&own(r#""orc"*"#), "", "orc"));
+        // A pack by the words of its name.
+        assert_eq!(w(r#"Pack:"Forest Kit""#), s(r#"pack_name : "forest kit""#, "", ""));
+        assert_eq!(
+            w("robot pack:forest -pack:sci-fi"),
+            s(
+                &format!(r#""robot"* AND pack_name : "forest"* AND {}"#, own(r#"("robot"*)"#)),
+                r#"pack_name : "sci fi"*"#,
+                "robot"
+            )
+        );
+        assert_eq!(w("pack: rock"), s(&own(r#""rock"*"#), "", "rock"));
     }
 
     #[test]
@@ -1029,6 +1083,54 @@ mod tests {
         assert_eq!(found("-rock"), "c,d");
         assert_eq!(found(r#""rock dry""#), "");
         assert_eq!(found(r#""dry rock""#), "b");
+    }
+
+    #[test]
+    fn assets_are_found_and_left_out_by_their_packs_words() {
+        let conn = test_library();
+        conn.execute_batch(
+            r#"INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at, tags) VALUES
+               ('scifi', 'Sci-Fi Corridor Kit', 'ready', 'x', '[]'),
+               ('woods', 'Woodland', 'ready', 'x', '["biome:forest"]'),
+               ('ue', 'Robot Pack', 'ready', 'x', '[]');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('bot1', 'scifi', 'h', 'bot1.glb', 'robot', 'glb', 'model', 'x', 'x'),
+               ('wall', 'scifi', 'h', 'wall.png', 'wall', 'png', 'texture', 'x', 'x'),
+               ('bot2', 'woods', 'h', 'bot2.glb', 'robot', 'glb', 'model', 'x', 'x'),
+               ('tree', 'woods', 'h', 'tree.glb', 'tree', 'glb', 'model', 'x', 'x'),
+               ('bot3', 'ue', 'h', 'bot3.fbx', 'robot', 'fbx', 'model', 'x', 'x'),
+               ('bot4', 'ue', 'h', 'bot4.uasset', 'robot', 'uasset', 'model', 'x', 'x');"#,
+        )
+        .unwrap();
+        for id in ["bot1", "wall", "bot2", "tree", "bot3", "bot4"] {
+            crate::db::reindex_asset(&conn, id).unwrap();
+        }
+        let found = |text: &str| {
+            let mut ids = search(&conn, &SearchQuery { q: Some(text.into()), ..Default::default() }, false)
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|a| a.id)
+                .collect::<Vec<_>>();
+            ids.sort();
+            ids.join(",")
+        };
+        assert_eq!(found("robot"), "bot1,bot2,bot3,bot4");
+        assert_eq!(found("robot -sci-fi"), "bot2,bot3,bot4", "the pack's name");
+        assert_eq!(found("robot -unreal"), "bot1,bot2", "the FBX in a pack of Unreal packages too");
+        assert_eq!(found("robot forest"), "bot2", "the pack's tags, with a word of the asset's own");
+        assert_eq!(found("forest"), "", "but not the pack's words alone");
+        assert_eq!(found("woodland"), "");
+        assert_eq!(found("pack:woodland"), "bot2,tree");
+        assert_eq!(found(r#"robot -pack:"robot pack""#), "bot1,bot2");
+        // The pack keeps its assets' rows up to date.
+        conn.execute("UPDATE packs SET name = 'Space Station', tags = '[\"style:sci-fi\"]' WHERE id = 'woods'", [])
+            .unwrap();
+        assert_eq!(found("robot -sci-fi"), "bot3,bot4");
+        assert_eq!(found("robot forest"), "");
+        conn.execute("DELETE FROM assets WHERE id = 'bot4'", []).unwrap();
+        assert_eq!(found("robot -unreal"), "bot1,bot2,bot3", "no Unreal packages left in the pack");
     }
 
     #[test]

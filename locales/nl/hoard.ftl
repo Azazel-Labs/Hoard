@@ -642,7 +642,8 @@ app-search-label = Assets zoeken
 app-search-placeholder = Zoek in namen, paden, tags
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = rots or steen: een van beide · -mos: weglaten · "droog mos": deze woorden samen
+app-search-syntax-title = rots or steen: een van beide · -mos: weglaten · "droog mos": deze woorden samen · pack:bos: in de naam van een pakket
+app-alt-leave-out = Alt-klik om het weg te laten
 app-views = Weergaven
 app-library = Bibliotheek
 app-packs = Pakketten

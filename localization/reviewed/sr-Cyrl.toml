@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "c57db96716344aa847d7559e1fe2d5e482ceb243539e41e9ff1ff7eff455c08a"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Додај датотеке"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Додај"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-клик да изоставите"
 
 [messages.app-archive]
 source = "Archive"
@@ -1475,8 +1479,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Сачувано „{ $name }“: налази се у Филтерима, под Ваше"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'стена or камен: једно од та два · -маховина: изостави · "сува маховина": ове речи заједно'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'стена or камен: једно од та два · -маховина: изостави · "сува маховина": ове речи заједно · pack:шума: у имену пакета'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

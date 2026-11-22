@@ -590,7 +590,8 @@ app-search-label = 에셋 검색
 app-search-placeholder = 이름, 경로, 태그 검색
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = 바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께
+app-search-syntax-title = 바위 or 돌: 둘 중 하나 · -이끼: 제외 · "마른 이끼": 이 단어들을 함께 · pack:숲: 팩 이름에서
+app-alt-leave-out = Alt-클릭하면 제외
 app-views = 보기
 app-library = 라이브러리
 app-packs = 팩

@@ -654,7 +654,8 @@ app-search-label = Αναζήτηση στοιχείων
 app-search-placeholder = Αναζήτηση σε ονόματα, διαδρομές, ετικέτες
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί
+app-search-syntax-title = βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί · pack:δάσος: στο όνομα ενός πακέτου
+app-alt-leave-out = Alt-κλικ για παράλειψη
 app-views = Προβολές
 app-library = Βιβλιοθήκη
 app-packs = Πακέτα

@@ -683,7 +683,8 @@ app-search-label = Пошук ресурсів
 app-search-placeholder = Шукайте за назвами, шляхами, тегами
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = скеля or камінь: одне з двох · -мох: виключити · "сухий мох": ці слова разом
+app-search-syntax-title = скеля or камінь: одне з двох · -мох: виключити · "сухий мох": ці слова разом · pack:ліс: у назві пакета
+app-alt-leave-out = Alt-клік, щоб виключити
 app-views = Вигляди
 app-library = Бібліотека
 app-packs = Пакети

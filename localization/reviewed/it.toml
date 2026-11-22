@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "9d862807d65edad155017d981e0d93a0737530c3060f2a10e2ff6ec552a34b3f"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Aggiungi file"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Aggiungi"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-clic per escluderlo"
 
 [messages.app-archive]
 source = "Archive"
@@ -1469,8 +1473,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "«{ $name }» salvata: si trova in Filtri, sotto I tuoi"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = """roccia or pietra: l'una o l'altra · -muschio: escludi · "muschio secco": queste parole insieme"""
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = """roccia or pietra: l'una o l'altra · -muschio: escludi · "muschio secco": queste parole insieme · pack:bosco: nel nome di un pacchetto"""
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

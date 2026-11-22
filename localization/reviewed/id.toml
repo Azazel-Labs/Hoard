@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "5c145ad92a4f48b6321a4514298f54705660673c84778e6e1e3be88d52788269"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Tambah berkas"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Tambah"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-klik untuk mengabaikannya"
 
 [messages.app-archive]
 source = "Archive"
@@ -1444,8 +1448,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” disimpan: ada di Filter, di bawah Milik Anda"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'batu karang or batu: salah satu · -lumut: abaikan · "lumut kering": kata-kata ini bersama · pack:hutan: di nama paket'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "d0e6acc5bd4349cf2e38516e2111f5e558cb5c06ac0604e881c65c5a1160098e"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Dodaj pliki"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Dodaj"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt+klik, aby pominąć"
 
 [messages.app-archive]
 source = "Archive"
@@ -1495,8 +1499,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Zapisano „{ $name }”: jest w Filtrach, w sekcji Moje"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'skała or kamień: jedno z dwóch · -mech: pomiń · "suchy mech": te słowa razem'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'skała or kamień: jedno z dwóch · -mech: pomiń · "suchy mech": te słowa razem · pack:las: w nazwie paczki'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

@@ -642,7 +642,8 @@ app-search-label = Soek bates
 app-search-placeholder = Soek name, paaie, etikette
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam
+app-search-syntax-title = Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam · pack:bos: in 'n pakkie se naam
+app-alt-leave-out = Alt-klik om dit uit te los
 app-views = Aansigte
 app-library = Biblioteek
 app-packs = Pakke

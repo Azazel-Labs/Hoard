@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "06be0073be750dfbd46e059485a790380d99b9b0ee01c1343ffdf7c9430bdab5"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Tilføj filer"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Tilføj"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-klik for at udelade det"
 
 [messages.app-archive]
 source = "Archive"
@@ -1469,8 +1473,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Gemte »{ $name }«: den ligger i Filtre under Dine"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'klippe or sten: en af dem · -mos: udelad · "tør mos": disse ord sammen'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'klippe or sten: en af dem · -mos: udelad · "tør mos": disse ord sammen · pack:skov: i en pakkes navn'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

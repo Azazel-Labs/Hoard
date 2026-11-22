@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "9b9cdb0c0c213f51025310f204d8fd86748602acc18d04be07e8b2b164492a1d"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "เพิ่มไฟล์"
 [messages.app-add-files-short]
 source = "Add"
 translation = "เพิ่ม"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-คลิกเพื่อไม่รวม"
 
 [messages.app-archive]
 source = "Archive"
@@ -1432,8 +1436,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "บันทึก “{ $name }” แล้ว: อยู่ในตัวกรอง ใต้หัวข้อ ของคุณ"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน · pack:ป่า: ในชื่อแพ็ก'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

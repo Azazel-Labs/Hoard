@@ -671,7 +671,8 @@ app-search-label = Hledat assety
 app-search-placeholder = Hledat názvy, cesty, štítky
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = skála or kámen: jedno z obou · -mech: vynechat · "suchý mech": tato slova pohromadě
+app-search-syntax-title = skála or kámen: jedno z obou · -mech: vynechat · "suchý mech": tato slova pohromadě · pack:les: v názvu balíčku
+app-alt-leave-out = Alt+kliknutím vynecháte
 app-views = Zobrazení
 app-library = Knihovna
 app-packs = Balíčky

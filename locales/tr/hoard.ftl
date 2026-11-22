@@ -614,7 +614,8 @@ app-search-label = Varlıklarda ara
 app-search-placeholder = Ad, yol ya da etiket ara
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte
+app-search-syntax-title = kaya or taş: ikisinden biri · -yosun: hariç tut · "kuru yosun": bu kelimeler birlikte · pack:orman: bir paketin adında
+app-alt-leave-out = Hariç tutmak için Alt-tıklayın
 app-views = Görünümler
 app-library = Kütüphane
 app-packs = Paketler

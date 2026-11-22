@@ -642,7 +642,8 @@ app-search-label = Sök resurser
 app-search-placeholder = Sök namn, sökvägar, taggar
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = berg or sten: det ena eller det andra · -mossa: utelämna · "torr mossa": dessa ord tillsammans
+app-search-syntax-title = berg or sten: det ena eller det andra · -mossa: utelämna · "torr mossa": dessa ord tillsammans · pack:skog: i ett pakets namn
+app-alt-leave-out = Alt-klicka för att utelämna
 app-views = Vyer
 app-library = Bibliotek
 app-packs = Paket

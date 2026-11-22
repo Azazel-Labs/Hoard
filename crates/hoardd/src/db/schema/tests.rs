@@ -829,3 +829,46 @@ fn every_foreign_key_has_an_index() {
     }
     assert!(missing.is_empty(), "foreign keys without an index: {missing:#?}");
 }
+
+/// The search index is made again with each asset's pack's words: every row keeps its number and what it had, and
+/// renaming a pack, or its first Unreal package coming, changes its assets' rows.
+#[test]
+fn search_rows_get_their_packs_words() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let step = MIGRATIONS.iter().position(|m| m.contains("assets_fts_next")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..step]).unwrap();
+    conn.execute_batch(
+        r#"INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+         UPDATE packs SET name = 'Sci-Fi Kit', tags = '["style:hard-surface"]' WHERE id = 'p1';
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+           ('bot', 'p1', 'h', 'bot.fbx', 'robot', 'fbx', 'model', 'x', 'x');"#,
+    )
+    .unwrap();
+    conn.execute_batch(
+        "INSERT INTO assets_fts (asset_id, name, words, category, description, tags) VALUES ('bot', 'robot', '', '', '', '');
+         UPDATE assets SET fts_row = last_insert_rowid() WHERE id = 'bot';",
+    )
+    .unwrap();
+    let row: i64 = conn.query_row("SELECT fts_row FROM assets WHERE id = 'bot'", [], |r| r.get(0)).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+    let words = |c: &Connection| -> (i64, String, String, String) {
+        c.query_row("SELECT rowid, name, pack_name, pack_tags FROM assets_fts", [], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
+        })
+        .unwrap()
+    };
+    let w = |n: &str, p: &str, t: &str| (row, n.to_owned(), p.to_owned(), t.to_owned());
+    assert_eq!(words(&conn), w("robot", "Sci-Fi Kit", "style hard surface"));
+    conn.execute("UPDATE packs SET name = 'Mech Kit' WHERE id = 'p1'", []).unwrap();
+    assert_eq!(words(&conn), w("robot", "Mech Kit", "style hard surface"));
+    conn.execute(
+        "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+         VALUES ('ue', 'p1', 'h', 'bot.uasset', 'robot', 'uasset', 'texture', 'x', 'x')",
+        [],
+    )
+    .unwrap();
+    assert_eq!(words(&conn), w("robot", "Mech Kit", "style hard surface unreal"));
+    conn.execute("DELETE FROM assets WHERE id = 'ue'", []).unwrap();
+    assert_eq!(words(&conn), w("robot", "Mech Kit", "style hard surface"));
+}

@@ -646,7 +646,8 @@ app-search-label = Assets durchsuchen
 app-search-placeholder = Namen, Pfade, Tags durchsuchen
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = Fels or Stein: eins von beiden · -Moos: weglassen · "trockenes Moos": diese Wörter zusammen
+app-search-syntax-title = Fels or Stein: eins von beiden · -Moos: weglassen · "trockenes Moos": diese Wörter zusammen · pack:Wald: im Namen eines Pakets
+app-alt-leave-out = Alt-Klick, um es wegzulassen
 app-views = Ansichten
 app-library = Bibliothek
 app-packs = Pakete

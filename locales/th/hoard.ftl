@@ -590,7 +590,8 @@ app-search-label = ค้นหาแอสเซ็ต
 app-search-placeholder = ค้นหาชื่อ พาธ แท็ก
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน
+app-search-syntax-title = หิน or ก้อนหิน: อย่างใดอย่างหนึ่ง · -มอส: ไม่รวม · "มอสแห้ง": คำเหล่านี้ด้วยกัน · pack:ป่า: ในชื่อแพ็ก
+app-alt-leave-out = Alt-คลิกเพื่อไม่รวม
 app-views = มุมมอง
 app-library = คลัง
 app-packs = แพ็ก

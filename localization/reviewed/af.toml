@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "ac32481da99b685200b599a0b42111713ba8e1daf08ea7fad7d1e37e027f0a2c"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Voeg lêers by"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Voeg by"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-klik om dit uit te los"
 
 [messages.app-archive]
 source = "Archive"
@@ -1469,8 +1473,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "“{ $name }” gestoor: dit is in Filters, onder Joune"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = """Rots or klip: een van die twee · -mos: los uit · "droë mos": hierdie woorde saam · pack:bos: in 'n pakkie se naam"""
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

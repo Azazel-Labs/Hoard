@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
+source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
 translation = "4419cbdf5af1c5cd73dfc82dacc541ce70f5f08fd0dcf749135fda34c793eedf"
 
 [messages.about-blender]
@@ -691,6 +691,10 @@ translation = "Προσθήκη αρχείων"
 [messages.app-add-files-short]
 source = "Add"
 translation = "Προσθήκη"
+
+[messages.app-alt-leave-out]
+source = "Alt-click to leave it out"
+translation = "Alt-κλικ για παράλειψη"
 
 [messages.app-archive]
 source = "Archive"
@@ -1477,8 +1481,8 @@ source = "Saved “{ $name }”: it's in Filters, under Yours"
 translation = "Αποθηκεύτηκε η «{ $name }»: βρίσκεται στα Φίλτρα, στην ενότητα Δικά σας"
 
 [messages.app-search-syntax-title]
-source = 'rock or stone: either · -moss: leave it out · "dry moss": those words together'
-translation = 'βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί'
+source = """rock or stone: either · -moss: leave it out · "dry moss": those words together · pack:woods: in a pack's name"""
+translation = 'βράχος or πέτρα: το ένα ή το άλλο · -βρύο: παράλειψη · "ξερό βρύο": αυτές οι λέξεις μαζί · pack:δάσος: στο όνομα ενός πακέτου'
 
 [messages.app-search-updated]
 source = "Updated “{ $name }”"

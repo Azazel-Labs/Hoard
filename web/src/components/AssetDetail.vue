@@ -56,7 +56,7 @@ const props = defineProps<{
   full?: boolean
 }>()
 const emit = defineEmits<{
-  close: []; updated: [Asset]; tag: [string]; error: [string]; open: [string]; step: [number]
+  close: []; updated: [Asset]; tag: [string, boolean?]; error: [string]; open: [string]; step: [number]
   /** Move it to the archive (out of search until it's restored or deleted for good). */
   archive: []
   /** Add to a collection by id, or (with a name) create one first. */
@@ -66,6 +66,8 @@ const emit = defineEmits<{
   /** Show what this project (its name) has. */
   browseProject: [string]
   browsePack: [{ id: string; name: string }]
+  /** The pack's name alt-clicked: search without it. */
+  leavePack: [string]
   /** Find assets that look like this one. */
   similar: []
   /** Find assets with much of this color (hex). */
@@ -461,7 +463,12 @@ onBeforeUnmount(() => unswipe())
         <p class="where">
           <span>{{ asset.category ?? asset.kind }}</span>
           <span class="sep" aria-hidden="true">{{ t('asset-in-pack') }}</span>
-          <button type="button" class="pack linkish" @click="$emit('browsePack', { id: asset.pack_id, name: asset.pack_name })">{{ asset.pack_name }}</button>
+          <button
+            type="button"
+            class="pack linkish"
+            :title="t('app-alt-leave-out')"
+            @click="$event.altKey ? $emit('leavePack', asset.pack_name) : $emit('browsePack', { id: asset.pack_id, name: asset.pack_name })"
+          >{{ asset.pack_name }}</button>
         </p>
         <div class="nav">
           <!-- Stepping through results by button is for the full page; the side panel steps with the arrow keys. -->
@@ -662,7 +669,7 @@ onBeforeUnmount(() => unswipe())
           :source="vt.source"
           :removable="editor"
           :acceptable="editor && guess(vt.source)"
-          @click="$emit('tag', vt.tag)"
+          @click="$emit('tag', vt.tag, $event.altKey)"
           @remove="removeTag(vt.tag)"
           @accept="acceptTags([vt.tag])"
         />

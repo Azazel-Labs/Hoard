@@ -593,7 +593,8 @@ app-search-label = Tìm tài nguyên
 app-search-placeholder = Tìm theo tên, đường dẫn, thẻ
 # The search box's tooltip: what can be typed in it besides words. Keep the examples (rock, stone, moss, "dry moss") in
 # the language, and keep the `or`, the minus and the quotes as they are: the search reads those.
-app-search-syntax-title = đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau
+app-search-syntax-title = đá tảng or đá: một trong hai · -rêu: loại trừ · "rêu khô": các từ này cùng nhau · pack:rừng: trong tên gói
+app-alt-leave-out = Alt-nhấp để loại trừ
 app-views = Chế độ xem
 app-library = Thư viện
 app-packs = Gói

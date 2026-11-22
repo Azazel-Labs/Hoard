@@ -197,6 +197,7 @@ error-favorites-too-many = не больше 10 000 за раз
 error-saved-search-name = у сохранённого поиска должно быть название не длиннее 80 символов
 error-saved-search-too-long = этот поиск слишком длинный, чтобы его сохранить
 error-hoard-seen = клад может хранить не более 32 видов ассетов, каждый с названием из строчных букв
+error-news-seen = раздел «Что нового» может хранить не более 256 просмотренных новинок, каждая с названием из строчных букв, цифр и дефисов
 error-texture-pattern-map = В шаблоне названия текстуры нужен { "{" }map{ "}" }, иначе все карты материала получат одно и то же название
 error-texture-pattern-fields = В шаблоне названия текстуры можно использовать { "{" }name{ "}" }, { "{" }map{ "}" } и { "{" }size{ "}" }
 error-texture-name-chars = В названиях текстур не может быть < > : " / \ | ? или *
@@ -472,6 +473,9 @@ appearance-top-theme = Переключатель светлой и тёмной
 appearance-top-mic = Микрофон в поле поиска, чтобы искать звуки, издав похожий
 appearance-top-slash = Подсказка / в поле поиска
 appearance-top-palette = Кнопка палитры команд ({ $keys })
+appearance-news = Что нового
+appearance-news-what = Новое в Hoard отмечается мерцающей золотой точкой, пока вы его не увидите, а верхняя панель собирает всё новое в одном месте. Что вы уже видели, хранится в вашей учётной записи.
+appearance-news-point-out = Отмечать новое
 
 ## Корень
 
@@ -936,6 +940,10 @@ app-drop-hint = Каждый файл или папка верхнего уро�
 palette-group-go-to = Перейти
 palette-group-actions = Действия
 palette-group-theme = Тема
+palette-group-news = Что нового
+palette-news-show = Показать, что нового
+palette-news-mark-all = Отметить всё новое как просмотренное
+palette-news-keywords = новое новинки изменения функции возможности релиз обновление просмотрено new news
 palette-group-kinds = Виды
 palette-group-packs = Паки
 palette-group-collections = Коллекции
@@ -3575,6 +3583,59 @@ api-kind-other-name = другое
 
 ## Уведомления, диалоги и загрузка (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = Новое: { $count }
+news-button-title =
+    { $count ->
+        [one] { $count } новинка в Hoard
+        [few] { $count } новинки в Hoard
+        [many] { $count } новинок в Hoard
+       *[other] { $count } новинки в Hoard
+    }
+news-pip =
+    { $count ->
+        [1] Новое в Hoard
+        [one] Здесь { $count } новинка
+        [few] Здесь { $count } новинки
+        [many] Здесь { $count } новинок
+       *[other] Здесь { $count } новинки
+    }
+news-title = Новое в Hoard
+news-to-find =
+    { $count ->
+        [one] Осталось найти: { $count }
+        [few] Осталось найти: { $count }
+        [many] Осталось найти: { $count }
+       *[other] Осталось найти: { $count }
+    }
+news-close = Закрыть
+news-take-me = Перейти
+news-look-again = Посмотреть снова
+news-none = Пока ничего нового.
+news-seen-lately = Недавно просмотренное
+news-stop-pointing = Не отмечать новое
+news-point-out = Снова отмечать новое
+news-mark-all = Отметить всё как просмотренное
+news-marked-seen =
+    { $count ->
+        [one] { $count } новинка отмечена как просмотренная
+        [few] { $count } новинки отмечены как просмотренные
+        [many] { $count } новинок отмечены как просмотренные
+       *[other] { $count } новинки отмечены как просмотренные
+    }
+news-themes-title = Десять светлых и десять тёмных тем
+news-themes-body = К светлым темам добавились Sky, Mint, Apricot и Lemon, к тёмным — Midnight, Lagoon и Neon, а новое оформление расходится от плитки, которую вы выбрали.
+news-tiles-move-title = Плитки в движении
+news-tiles-move-body = Анимации и анимированные картинки на плитках библиотеки могут проигрываться всё время, а не только под указателем.
+news-motion-trails-title = Траектории движения в анимациях
+news-motion-trails-body = Миниатюра анимации прочерчивает путь персонажа, а точка показывает, где он сейчас.
+news-text-size-title = Размер текста и отступы
+news-text-size-body = Сделайте текст крупнее или мельче, страницу — просторнее или компактнее, и выберите, что показывают плитки и верхняя панель.
+news-tag-tree-title = Теги внутри тегов
+news-tag-tree-body = Поместите тег под более общий, и поиск по «транспорт» найдёт также «автомобиль» и «седан». В «Настройки → Теги» они показаны деревом.
+news-bulk-edit-title = Правка многих сразу
+news-bulk-edit-body = Выберите несколько ассетов и нажмите E, чтобы разом изменить их теги, лицензию, оценку и многое другое — с возможностью отмены.
+news-backups-title = Резервные копии по расписанию
+news-backups-body = Делайте резервную копию базы данных каждый день или каждую неделю, храните несколько последних и копируйте каждую в другую папку.
 ui-undo = Отменить
 ui-today = сегодня
 ui-yesterday = вчера

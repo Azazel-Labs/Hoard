@@ -197,6 +197,7 @@ error-favorites-too-many = cel mult 10.000 odată
 error-saved-search-name = o căutare salvată are nevoie de un nume de cel mult 80 de caractere
 error-saved-search-too-long = căutarea este prea lungă pentru a fi salvată
 error-hoard-seen = comoara poate înregistra cel mult 32 de tipuri de resurse, fiecare numit cu litere mici
+error-news-seen = noutățile pot înregistra cel mult 256 de lucruri văzute, fiecare numit cu litere mici, cifre și cratime
 error-texture-pattern-map = Șablonul pentru numele texturilor are nevoie de { "{" }map{ "}" }, altfel toate hărțile unui material ar primi același nume
 error-texture-pattern-fields = Șablonul pentru numele texturilor poate folosi { "{" }name{ "}" }, { "{" }map{ "}" } și { "{" }size{ "}" }
 error-texture-name-chars = Numele texturilor nu pot conține < > : " / \ | ? sau *
@@ -470,6 +471,9 @@ appearance-top-theme = Comutator luminos/întunecat
 appearance-top-mic = Microfon în caseta de căutare, pentru a găsi sunete făcând unul
 appearance-top-slash = Indiciul / din caseta de căutare
 appearance-top-palette = Butonul paletei de comenzi ({ $keys })
+appearance-news = Noutăți
+appearance-news-what = Lucrurile noi din Hoard primesc un punct auriu sclipitor până când le vedeți, iar bara de sus le adună într-un singur loc. Ce ați văzut se păstrează în contul dvs.
+appearance-news-point-out = Semnalează noutățile
 
 ## Rădăcină
 
@@ -916,6 +920,10 @@ app-drop-hint = Fiecare fișier sau dosar de pe primul nivel devine un pachet se
 palette-group-go-to = Mergeți la
 palette-group-actions = Acțiuni
 palette-group-theme = Temă
+palette-group-news = Noutăți
+palette-news-show = Afișați noutățile
+palette-news-mark-all = Marcați toate noutățile ca văzute
+palette-news-keywords = noutăți nou nouă schimbări funcții versiune văzute new news
 palette-group-kinds = Tipuri
 palette-group-packs = Pachete
 palette-group-collections = Colecții
@@ -3494,6 +3502,59 @@ api-kind-other-name = altele
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } noutate
+        [few] { $count } noutăți
+       *[other] { $count } de noutăți
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } noutate în Hoard
+        [few] { $count } noutăți în Hoard
+       *[other] { $count } de noutăți în Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nou în Hoard
+        [few] { $count } noutăți aici
+       *[other] { $count } de noutăți aici
+    }
+news-title = Nou în Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } de descoperit
+        [few] { $count } de descoperit
+       *[other] { $count } de descoperit
+    }
+news-close = Închide
+news-take-me = Du-mă acolo
+news-look-again = Priviți din nou
+news-none = Nimic nou de descoperit deocamdată.
+news-seen-lately = Văzute recent
+news-stop-pointing = Nu mai semnalați noutățile
+news-point-out = Semnalați din nou noutățile
+news-mark-all = Marcați totul ca văzut
+news-marked-seen =
+    { $count ->
+        [one] { $count } noutate marcată ca văzută
+        [few] { $count } noutăți marcate ca văzute
+       *[other] { $count } de noutăți marcate ca văzute
+    }
+news-themes-title = Zece teme luminoase și zece întunecate
+news-themes-body = Sky, Mint, Apricot și Lemon se alătură temelor luminoase, iar Midnight, Lagoon și Neon celor întunecate, iar noul aspect se răspândește din dala pe care o alegeți.
+news-tiles-move-title = Dale mereu în mișcare
+news-tiles-move-body = Animațiile și imaginile animate de pe dalele bibliotecii pot rula tot timpul, nu doar sub cursor.
+news-motion-trails-title = Urme de mișcare pe animații
+news-motion-trails-body = Miniatura unei animații trasează drumul pe care îl face personajul, cu un punct acolo unde se află acum.
+news-text-size-title = Mărimea textului și spațiere
+news-text-size-body = Măriți sau micșorați textul, faceți pagina mai aerisită sau mai compactă și alegeți ce arată dalele și bara de sus.
+news-tag-tree-title = Etichete în etichete
+news-tag-tree-body = Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Setări → Etichete le arată ca arbore.
+news-bulk-edit-title = Editați mai multe deodată
+news-bulk-edit-body = Selectați câteva resurse și apăsați E pentru a le schimba împreună etichetele, licența, evaluarea și altele, cu posibilitate de anulare.
+news-backups-title = Copii de rezervă programate
+news-backups-body = Faceți copii de rezervă ale bazei de date zilnic sau săptămânal, păstrați-le pe cele mai noi și copiați-le pe fiecare în alt dosar.
 ui-undo = Anulați
 ui-today = azi
 ui-yesterday = ieri

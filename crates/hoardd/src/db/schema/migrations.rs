@@ -1098,4 +1098,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
                        AND (lower(a.path) = 'license.txt' OR lower(a.path) LIKE '%/license.txt'))
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'read_files' AND j.pack_id = p.id
                            AND j.status IN ('queued', 'running'));",
+    // 101: what's new in Hoard that each person has seen (see `me`), and whether they want new things pointed out, as
+    // JSON, so a new browser doesn't light everything up again.
+    "ALTER TABLE users ADD COLUMN news_seen TEXT;",
 ];

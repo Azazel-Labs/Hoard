@@ -197,6 +197,7 @@ error-favorites-too-many = au plus 10 000 à la fois
 error-saved-search-name = une recherche enregistrée doit avoir un nom de 80 caractères au plus
 error-saved-search-too-long = cette recherche est trop longue pour être enregistrée
 error-hoard-seen = le trésor peut enregistrer au plus 32 types de ressources, chacun nommé en lettres minuscules
+error-news-seen = les nouveautés peuvent enregistrer au plus 256 éléments vus, chacun nommé en lettres minuscules, chiffres et traits d’union
 error-texture-pattern-map = Le modèle de nom des textures doit contenir { "{" }map{ "}" }, sinon toutes les cartes d’un matériau porteraient le même nom
 error-texture-pattern-fields = Le modèle de nom des textures peut utiliser { "{" }name{ "}" }, { "{" }map{ "}" } et { "{" }size{ "}" }
 error-texture-name-chars = Les noms de textures ne peuvent pas contenir < > : " / \ | ? ou *
@@ -460,6 +461,9 @@ appearance-top-theme = Bascule clair / sombre
 appearance-top-mic = Micro dans le champ de recherche, pour trouver des sons en en faisant un
 appearance-top-slash = L’indication / dans le champ de recherche
 appearance-top-palette = Bouton de la palette de commandes ({ $keys })
+appearance-news = Nouveautés
+appearance-news-what = Les nouveautés de Hoard portent une pastille dorée scintillante jusqu’à ce que vous les ayez vues, et la barre du haut les rassemble en un seul endroit. Ce que vous avez vu suit votre compte.
+appearance-news-point-out = Signaler les nouveautés
 
 ## Racine
 
@@ -878,6 +882,10 @@ app-drop-hint = Chaque fichier ou dossier de premier niveau devient un pack dist
 palette-group-go-to = Aller à
 palette-group-actions = Actions
 palette-group-theme = Thème
+palette-group-news = Nouveautés
+palette-news-show = Afficher les nouveautés
+palette-news-mark-all = Marquer toutes les nouveautés comme vues
+palette-news-keywords = nouveau nouveautés changements fonctionnalités version vu new news
 palette-group-kinds = Types
 palette-group-packs = Packs
 palette-group-collections = Collections
@@ -3292,6 +3300,54 @@ api-kind-other-name = autres
 
 ## Notifications, boîtes de dialogue et chargement (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } nouveauté
+       *[other] { $count } nouveautés
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } nouveauté dans Hoard
+       *[other] { $count } nouveautés dans Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nouveau dans Hoard
+       *[other] { $count } nouveautés ici
+    }
+news-title = Du nouveau dans Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } à découvrir
+       *[other] { $count } à découvrir
+    }
+news-close = Fermer
+news-take-me = M’y emmener
+news-look-again = Revoir
+news-none = Rien de nouveau à découvrir pour l’instant.
+news-seen-lately = Vu récemment
+news-stop-pointing = Ne plus signaler les nouveautés
+news-point-out = Signaler à nouveau les nouveautés
+news-mark-all = Tout marquer comme vu
+news-marked-seen =
+    { $count ->
+        [one] { $count } nouveauté marquée comme vue
+       *[other] { $count } nouveautés marquées comme vues
+    }
+news-themes-title = Dix thèmes clairs et dix thèmes sombres
+news-themes-body = Ciel, Menthe, Abricot et Citron rejoignent les thèmes clairs, Minuit, Lagon et Néon les sombres, et le nouveau look se diffuse depuis la vignette choisie.
+news-tiles-move-title = Des vignettes toujours animées
+news-tiles-move-body = Les animations et les images animées des vignettes de la bibliothèque peuvent être lues en permanence, pas seulement sous le pointeur.
+news-motion-trails-title = Trajectoires sur les animations
+news-motion-trails-body = La miniature d’une animation trace le chemin suivi par son personnage, avec un point là où il se trouve en ce moment.
+news-text-size-title = Taille du texte et espacement
+news-text-size-body = Agrandissez ou réduisez le texte, aérez ou resserrez la page, et choisissez ce que montrent les vignettes et la barre du haut.
+news-tag-tree-title = Des étiquettes dans les étiquettes
+news-tag-tree-body = Placez une étiquette sous une plus large, et chercher véhicule trouvera aussi voiture et berline. Paramètres → Étiquettes les affiche en arbre.
+news-bulk-edit-title = Modifier plusieurs ressources à la fois
+news-bulk-edit-body = Sélectionnez des ressources et appuyez sur E pour modifier ensemble leurs étiquettes, leur licence, leur note et plus encore, avec Annuler.
+news-backups-title = Sauvegardes planifiées
+news-backups-body = Sauvegardez la base de données chaque jour ou chaque semaine, gardez les plus récentes et copiez chacune dans un autre dossier.
 ui-undo = Annuler
 ui-today = aujourd’hui
 ui-yesterday = hier

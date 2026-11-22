@@ -197,6 +197,7 @@ error-favorites-too-many = nejvýše 10 000 najednou
 error-saved-search-name = uložené hledání potřebuje název o nejvýše 80 znacích
 error-saved-search-too-long = toto hledání je příliš dlouhé na uložení
 error-hoard-seen = poklad může zaznamenat nejvýše 32 druhů assetů, každý pojmenovaný malými písmeny
+error-news-seen = novinky mohou zaznamenat nejvýše 256 zobrazených položek, každou pojmenovanou malými písmeny, číslicemi a spojovníky
 error-texture-pattern-map = Vzor názvu textury potřebuje { "{" }map{ "}" }, jinak by všechny mapy materiálu dostaly stejný název
 error-texture-pattern-fields = Vzor názvu textury může používat { "{" }name{ "}" }, { "{" }map{ "}" } a { "{" }size{ "}" }
 error-texture-name-chars = Názvy textur nemohou obsahovat < > : " / \ | ? ani *
@@ -470,6 +471,9 @@ appearance-top-theme = Přepínač světlého a tmavého vzhledu
 appearance-top-mic = Mikrofon ve vyhledávacím poli, k hledání zvuků tím, že nějaký vydáte
 appearance-top-slash = Nápověda / ve vyhledávacím poli
 appearance-top-palette = Tlačítko palety příkazů ({ $keys })
+appearance-news = Novinky
+appearance-news-what = Novinky v Hoardu dostanou třpytivou zlatou tečku, dokud je neuvidíte, a horní lišta je shromáždí na jednom místě. To, co jste už viděli, se váže k vašemu účtu.
+appearance-news-point-out = Upozorňovat na novinky
 
 ## Kořen
 
@@ -914,6 +918,10 @@ app-drop-hint = Každý soubor nebo složka nejvyšší úrovně se stane samost
 palette-group-go-to = Přejít na
 palette-group-actions = Akce
 palette-group-theme = Motiv
+palette-group-news = Novinky
+palette-news-show = Zobrazit novinky
+palette-news-mark-all = Označit všechny novinky jako zobrazené
+palette-news-keywords = nové novinky změny funkce vydání zobrazené new news
 palette-group-kinds = Druhy
 palette-group-packs = Balíčky
 palette-group-collections = Kolekce
@@ -3508,6 +3516,64 @@ api-kind-other-name = ostatní
 
 ## Oznámení, dialogy a načítání (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } nová
+        [few] { $count } nové
+        [many] { $count } nové
+       *[other] { $count } nových
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } novinka v Hoardu
+        [few] { $count } novinky v Hoardu
+        [many] { $count } novinky v Hoardu
+       *[other] { $count } novinek v Hoardu
+    }
+news-pip =
+    { $count ->
+        [one] Nové v Hoardu
+        [few] { $count } novinky tady
+        [many] { $count } novinky tady
+       *[other] { $count } novinek tady
+    }
+news-title = Novinky v Hoardu
+news-to-find =
+    { $count ->
+        [one] { $count } k objevení
+        [few] { $count } k objevení
+        [many] { $count } k objevení
+       *[other] { $count } k objevení
+    }
+news-close = Zavřít
+news-take-me = Přejít tam
+news-look-again = Podívat se znovu
+news-none = Teď tu není nic nového k objevení.
+news-seen-lately = Nedávno zobrazené
+news-stop-pointing = Přestat upozorňovat na novinky
+news-point-out = Znovu upozorňovat na novinky
+news-mark-all = Označit vše jako zobrazené
+news-marked-seen =
+    { $count ->
+        [one] { $count } novinka označena jako zobrazená
+        [few] { $count } novinky označeny jako zobrazené
+        [many] { $count } novinky označeno jako zobrazené
+       *[other] { $count } novinek označeno jako zobrazené
+    }
+news-themes-title = Deset světlých a deset tmavých motivů
+news-themes-body = Ke světlým motivům přibyly Obloha, Máta, Meruňka a Citron, k tmavým Půlnoc, Laguna a Neon, a nový vzhled se rozlije od dlaždice, kterou vyberete.
+news-tiles-move-title = Dlaždice stále v pohybu
+news-tiles-move-body = Animace a animované obrázky na dlaždicích knihovny se mohou přehrávat pořád, nejen pod ukazatelem.
+news-motion-trails-title = Stopy pohybu u animací
+news-motion-trails-body = Miniatura animace kreslí dráhu, kterou urazí její postava, s tečkou tam, kde je právě teď.
+news-text-size-title = Velikost textu a rozestupy
+news-text-size-body = Zvětšete nebo zmenšete písmo, udělejte stránku vzdušnější nebo kompaktnější a vyberte, co ukazují dlaždice a horní lišta.
+news-tag-tree-title = Štítky ve štítcích
+news-tag-tree-body = Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Nastavení → Štítky je vykreslí jako strom.
+news-bulk-edit-title = Upravit mnoho najednou
+news-bulk-edit-body = Vyberte několik assetů a stisknutím E změňte jejich štítky, licenci, hodnocení a další najednou, i s možností Zpět.
+news-backups-title = Plánované zálohy
+news-backups-body = Zálohujte databázi každý den nebo každý týden, ponechte si pár nejnovějších a každou zkopírujte do jiné složky.
 ui-undo = Zpět
 ui-today = dnes
 ui-yesterday = včera

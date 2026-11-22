@@ -6,6 +6,7 @@ import { api, type Facet } from '../api'
 import { formatNumber, t } from '../i18n'
 import { prefs } from '../prefs'
 import { confirmDialog, showError, showOk } from '../ui'
+import NewPip from './NewPip.vue'
 import TagChip from './TagChip.vue'
 
 const emit = defineEmits<{ tag: [string]; changed: [] }>()
@@ -149,7 +150,7 @@ watch(moreEl, (el) => {
 <template>
   <div class="tags">
     <section v-if="tree.length">
-      <div class="sh"><h3>{{ t('tags-tree-heading') }}</h3></div>
+      <div class="sh"><h3>{{ t('tags-tree-heading') }}<NewPip id="tag-tree" /></h3></div>
       <p class="what">{{ t('tags-tree-what') }}</p>
       <ul class="list tree">
         <li v-for="row in tree" :key="row.key" :style="{ paddingInlineStart: `${row.depth * 1.25}rem` }">

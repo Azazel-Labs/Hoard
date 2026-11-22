@@ -197,6 +197,7 @@ error-favorites-too-many = paling banyak 10.000 sekaligus
 error-saved-search-name = pencarian tersimpan perlu nama paling banyak 80 karakter
 error-saved-search-too-long = pencarian itu terlalu panjang untuk disimpan
 error-hoard-seen = harta karun dapat mencatat paling banyak 32 jenis aset, masing-masing dinamai dengan huruf kecil
+error-news-seen = yang baru dapat mencatat paling banyak 256 hal yang sudah dilihat, masing-masing dinamai dengan huruf kecil, angka, dan tanda hubung
 error-texture-pattern-map = Pola nama tekstur perlu { "{" }map{ "}" }, atau semua map dari satu material akan mendapat nama yang sama
 error-texture-pattern-fields = Pola nama tekstur dapat memakai { "{" }name{ "}" }, { "{" }map{ "}" } dan { "{" }size{ "}" }
 error-texture-name-chars = Nama tekstur tidak boleh berisi < > : " / \ | ? atau *
@@ -460,6 +461,9 @@ appearance-top-theme = Sakelar terang dan gelap
 appearance-top-mic = Mikrofon di kotak pencarian, untuk mencari suara dengan menirukannya
 appearance-top-slash = Petunjuk / di kotak pencarian
 appearance-top-palette = Tombol palet perintah ({ $keys })
+appearance-news = Yang baru
+appearance-news-what = Hal baru di Hoard diberi titik emas berkilau sampai Anda melihatnya, dan bilah atas mengumpulkannya di satu tempat. Apa yang sudah Anda lihat tersimpan di akun Anda.
+appearance-news-point-out = Tandai hal baru
 
 ## Root
 
@@ -811,6 +815,10 @@ app-drop-hint = Setiap berkas atau folder tingkat atas menjadi paket tersendiri.
 palette-group-go-to = Buka
 palette-group-actions = Tindakan
 palette-group-theme = Tema
+palette-group-news = Yang baru
+palette-news-show = Tampilkan yang baru
+palette-news-mark-all = Tandai semua yang baru sebagai sudah dilihat
+palette-news-keywords = baru berita perubahan fitur rilis dilihat new news changes features release seen
 palette-group-kinds = Jenis
 palette-group-packs = Paket
 palette-group-collections = Koleksi
@@ -3019,6 +3027,47 @@ api-kind-other-name = lainnya
 
 ## Notifikasi, dialog, dan pemuatan (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } baru
+news-button-title =
+    { $count ->
+       *[other] { $count } hal baru di Hoard
+    }
+news-pip =
+    { $count ->
+        [1] Baru di Hoard
+       *[other] { $count } hal baru di sini
+    }
+news-title = Baru di Hoard
+news-to-find =
+    { $count ->
+       *[other] { $count } menunggu ditemukan
+    }
+news-close = Tutup
+news-take-me = Bawa saya ke sana
+news-look-again = Lihat lagi
+news-none = Tidak ada hal baru untuk saat ini.
+news-seen-lately = Dilihat baru-baru ini
+news-stop-pointing = Berhenti menandai hal baru
+news-point-out = Tandai hal baru lagi
+news-mark-all = Tandai semua sudah dilihat
+news-marked-seen =
+    { $count ->
+       *[other] { $count } hal ditandai sudah dilihat
+    }
+news-themes-title = Sepuluh tema terang dan sepuluh tema gelap
+news-themes-body = Langit, Mint, Aprikot, dan Lemon bergabung dengan tema terang, sedangkan Tengah Malam, Laguna, dan Neon dengan tema gelap, dan tampilan baru menyebar dari ubin yang Anda pilih.
+news-tiles-move-title = Ubin yang terus bergerak
+news-tiles-move-body = Animasi dan gambar bergerak di ubin pustaka dapat diputar terus-menerus, tidak hanya di bawah penunjuk.
+news-motion-trails-title = Jejak gerak pada animasi
+news-motion-trails-body = Gambar mini animasi menggambar jalur yang ditempuh karakternya, dengan titik di posisinya saat ini.
+news-text-size-title = Ukuran teks dan jarak
+news-text-size-body = Perbesar atau perkecil tulisan, buat halaman lebih lega atau lebih ringkas, dan pilih apa yang ditampilkan ubin dan bilah atas.
+news-tag-tree-title = Tag di dalam tag
+news-tag-tree-body = Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Pengaturan → Tag menampilkannya sebagai pohon.
+news-bulk-edit-title = Edit banyak sekaligus
+news-bulk-edit-body = Pilih beberapa aset lalu tekan E untuk mengubah tag, lisensi, peringkat, dan lainnya sekaligus, dengan Urungkan.
+news-backups-title = Cadangan terjadwal
+news-backups-body = Cadangkan basis data setiap hari atau setiap minggu, simpan beberapa yang terbaru, dan salin masing-masing ke folder lain.
 ui-undo = Urungkan
 ui-today = hari ini
 ui-yesterday = kemarin

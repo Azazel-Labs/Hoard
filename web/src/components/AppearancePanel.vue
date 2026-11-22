@@ -1,9 +1,12 @@
 <script setup lang="ts">
 // Appearance: this browser's language, its light and dark themes, how big the writing is, how roomy the page is,
-// and which parts of the tiles and the top bar show. All saved here, in this browser.
+// and which parts of the tiles and the top bar show. All saved here, in this browser, except whether what's new in
+// Hoard is pointed out, which follows the account (news.ts).
 import { onBeforeUnmount } from 'vue'
 import { LANGUAGES, languageName, preferredCatalog, t } from '../i18n'
 import { prefs, shows, toggleIn } from '../prefs'
+import { news, newsTray, setPointingOut } from '../news'
+import NewPip from './NewPip.vue'
 import { DARK_THEMES, LIGHT_THEMES, previewScheme, reveal, setTheme, themeFor, usedScheme } from '../theme'
 
 const browserLanguages = navigator.languages
@@ -63,6 +66,7 @@ const HIDEABLE = {
   ],
 }
 const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
+const showNews = () => (newsTray.value = true)
 </script>
 
 <template>
@@ -84,7 +88,7 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
         </div>
       </div>
       <div v-for="g in LOOKS" :key="g.scheme" class="themes">
-        <span class="tlabel">{{ g.label }}</span>
+        <span class="tlabel">{{ g.label }}<NewPip v-if="g.scheme === 'light'" id="themes-20" /></span>
         <div class="swatches" role="radiogroup" :aria-label="t('settings-look-group', { scheme: g.scheme })">
           <label
             v-for="theme in g.list"
@@ -111,7 +115,7 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
     </section>
 
     <section>
-      <div class="sh"><h3>{{ t('appearance-size-section') }}</h3></div>
+      <div class="sh"><h3>{{ t('appearance-size-section') }}<NewPip id="text-size" /></h3></div>
       <div class="llm">
         <span id="text-size" class="label">{{ t('appearance-text-size') }}</span>
         <div class="modes" role="radiogroup" aria-labelledby="text-size">
@@ -138,9 +142,21 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
         </label>
         <label v-if="group === 'tiles'" class="check">
           <input v-model="prefs.tilesAlwaysMove" type="checkbox" />
-          {{ t('appearance-tile-motion-always') }}
+          {{ t('appearance-tile-motion-always') }}<NewPip id="tiles-move" />
         </label>
       </div>
+    </section>
+
+    <section>
+      <div class="sh"><h3>{{ t('appearance-news') }}</h3></div>
+      <p class="what">{{ t('appearance-news-what') }}</p>
+      <div class="switches">
+        <label class="check">
+          <input type="checkbox" :checked="!news.off" @change="setPointingOut(news.off)" />
+          {{ t('appearance-news-point-out') }}
+        </label>
+      </div>
+      <button type="button" class="btn news-show" @click="showNews">{{ t('palette-news-show') }}</button>
     </section>
   </div>
 </template>
@@ -150,6 +166,7 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
 <style scoped>
 .body { display: grid; gap: 1rem; }
 .hint.preview .btn { margin-left: 0.4rem; }
+.news-show { margin-top: 0.2rem; }
 
 /* Theme swatches: each label carries data-light / data-dark, so styles.css gives it that theme's --l-* / --d-*. */
 .themes { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.8rem; align-items: start; margin-bottom: 1.4rem; }

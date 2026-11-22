@@ -14,6 +14,8 @@ import { isDesktop, may, refreshAuth } from '../auth'
 import { formatNumber, t } from '../i18n'
 import { formatMiB } from '../sizes'
 import { showError, showOk } from '../ui'
+import NewPip from './NewPip.vue'
+import { newOnPage } from '../news'
 import SettingsGlyph from './SettingsGlyph.vue'
 import SettingsPageBody from './SettingsPageBody.vue'
 import { type AnyOpt, type OptKey, type Opts, SETTINGS } from './settingsContext'
@@ -269,6 +271,7 @@ onBeforeUnmount(() => {
             <SettingsGlyph class="ico" :page="p.id" />
             <span class="lbl">{{ p.label }}</span>
             <span v-if="p.id === 'ai' && s" class="pip" :data-on="s.llm.enabled" aria-hidden="true" />
+            <NewPip :ids="newOnPage(p.id)" />
           </button>
         </li>
       </ul>

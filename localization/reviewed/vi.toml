@@ -1788,6 +1788,18 @@ translation = "Ngôn ngữ"
 source = "Browser's ({ $name })"
 translation = "Theo trình duyệt ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Có gì mới"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Đánh dấu những điều mới"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Những điều mới trong Hoard có một chấm vàng lấp lánh cho đến khi bạn xem, và thanh trên cùng gom chúng về một chỗ. Những gì bạn đã xem được lưu theo tài khoản của bạn."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Sáng hay tối"
@@ -4571,6 +4583,10 @@ translation = "không thể tải xuống { $model }: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "máy chủ mô hình: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "mục có gì mới chỉ ghi được tối đa 256 điều đã xem, mỗi điều đặt tên bằng chữ thường, chữ số và dấu gạch nối"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7637,6 +7653,147 @@ translation = "{ $note } trưởng"
 source = "{ $note } minor"
 translation = "{ $note } thứ"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Sao lưu cơ sở dữ liệu mỗi ngày hoặc mỗi tuần, giữ vài bản mới nhất và sao chép từng bản sang một thư mục khác."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Sao lưu theo lịch"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Chọn vài tài nguyên rồi nhấn E để đổi thẻ, giấy phép, xếp hạng và nhiều thứ khác cùng lúc, có thể hoàn tác."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Sửa nhiều mục cùng lúc"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "{ $count } mới"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } điều mới trong Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Đóng"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Xem lại"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Đánh dấu tất cả là đã xem"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+       *[other] Đã đánh dấu { $count } điều là đã xem
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Ảnh thu nhỏ của hoạt ảnh vẽ lại đường đi của nhân vật, kèm một chấm ở vị trí hiện tại."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Vệt chuyển động trên hoạt ảnh"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Hiện chưa có gì mới để khám phá."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Mới trong Hoard
+       *[other] { $count } điều mới ở đây
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Đánh dấu lại những điều mới"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Đã xem gần đây"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Ngừng đánh dấu những điều mới"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Cài đặt → Thẻ vẽ chúng thành dạng cây."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Thẻ lồng trong thẻ"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Đưa tôi đến đó"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Làm chữ to hơn hoặc nhỏ hơn, trang thoáng hơn hoặc gọn hơn, và chọn những gì các ô và thanh trên cùng hiển thị."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Cỡ chữ và khoảng cách"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Sky, Mint, Apricot và Lemon gia nhập các chủ đề sáng, còn Midnight, Lagoon và Neon gia nhập các chủ đề tối, và giao diện mới lan ra từ ô bạn chọn."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Mười chủ đề sáng và mười chủ đề tối"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Hoạt ảnh và ảnh động trên các ô thư viện có thể phát mọi lúc, không chỉ khi con trỏ ở trên."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Giữ các ô luôn chuyển động"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Mới trong Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+       *[other] Còn { $count } điều để khám phá
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tất cả các gói"
@@ -8431,6 +8588,10 @@ translation = "Đi tới"
 source = "Kinds"
 translation = "Loại"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Có gì mới"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Gói"
@@ -8482,6 +8643,18 @@ translation = "tài nguyên lưới trang chủ thư viện assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Chủ đề sáng: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "mới tin tức thay đổi tính năng phiên bản đã xem new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Đánh dấu mọi điều mới là đã xem"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Xem có gì mới"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

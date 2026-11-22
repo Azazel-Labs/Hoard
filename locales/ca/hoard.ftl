@@ -197,6 +197,7 @@ error-favorites-too-many = com a màxim 10.000 alhora
 error-saved-search-name = una cerca desada necessita un nom de 80 caràcters com a màxim
 error-saved-search-too-long = aquesta cerca és massa llarga per desar-la
 error-hoard-seen = el tresor pot registrar com a màxim 32 tipus de recurs, cadascun amb un nom en minúscules
+error-news-seen = les novetats poden registrar com a màxim 256 elements vistos, cadascun amb un nom en minúscules, xifres i guions
 error-texture-pattern-map = El patró de nom de textura necessita { "{" }map{ "}" }, o tots els mapes d'un material tindrien el mateix nom
 error-texture-pattern-fields = El patró de nom de textura pot fer servir { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }
 error-texture-name-chars = Els noms de textura no poden contenir < > : " / \ | ? ni *
@@ -460,6 +461,9 @@ appearance-top-theme = Commutador de clar i fosc
 appearance-top-mic = Micròfon al quadre de cerca, per trobar sons fent-ne un
 appearance-top-slash = La indicació / al quadre de cerca
 appearance-top-palette = Botó de la paleta d'ordres ({ $keys })
+appearance-news = Novetats
+appearance-news-what = Les novetats del Hoard porten un punt daurat que brilla fins que les veus, i la barra superior les aplega en un sol lloc. El que has vist va lligat al teu compte.
+appearance-news-point-out = Assenyala les novetats
 
 ## Arrel
 
@@ -866,6 +870,10 @@ app-drop-hint = Cada fitxer o carpeta de primer nivell es converteix en un paque
 palette-group-go-to = Ves a
 palette-group-actions = Accions
 palette-group-theme = Tema
+palette-group-news = Novetats
+palette-news-show = Mostra les novetats
+palette-news-mark-all = Marca totes les novetats com a vistes
+palette-news-keywords = nou novetats canvis funcions versió vist new news
 palette-group-kinds = Tipus
 palette-group-packs = Paquets
 palette-group-collections = Col·leccions
@@ -3254,6 +3262,54 @@ api-kind-other-name = altres
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } novetat
+       *[other] { $count } novetats
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } novetat al Hoard
+       *[other] { $count } novetats al Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nou al Hoard
+       *[other] { $count } novetats aquí
+    }
+news-title = Novetats al Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } per descobrir
+       *[other] { $count } per descobrir
+    }
+news-close = Tanca
+news-take-me = Porta-m’hi
+news-look-again = Torna-ho a veure
+news-none = Ara mateix no hi ha res de nou per descobrir.
+news-seen-lately = Vist fa poc
+news-stop-pointing = Deixa d’assenyalar les novetats
+news-point-out = Torna a assenyalar les novetats
+news-mark-all = Marca-ho tot com a vist
+news-marked-seen =
+    { $count ->
+        [one] S’ha marcat { $count } novetat com a vista
+       *[other] S’han marcat { $count } novetats com a vistes
+    }
+news-themes-title = Deu temes clars i deu de foscos
+news-themes-body = Cel, Menta, Albercoc i Llimona s’afegeixen als temes clars, i Mitjanit, Llacuna i Neó als foscos; el nou aspecte s’escampa des de la miniatura que triïs.
+news-tiles-move-title = Miniatures sempre en moviment
+news-tiles-move-body = Les animacions i les imatges animades de les miniatures de la biblioteca es poden reproduir tota l’estona, no només sota el punter.
+news-motion-trails-title = Trajectòries a les animacions
+news-motion-trails-body = La miniatura d’una animació traça el camí que fa el seu personatge, amb un punt on és ara mateix.
+news-text-size-title = Mida del text i espaiat
+news-text-size-body = Fes la lletra més gran o més petita i la pàgina més espaiosa o més compacta, i tria què mostren les miniatures i la barra superior.
+news-tag-tree-title = Etiquetes dins d’etiquetes
+news-tag-tree-body = Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Configuració → Etiquetes les mostra com un arbre.
+news-bulk-edit-title = Edita’n molts alhora
+news-bulk-edit-body = Selecciona uns quants recursos i prem E per canviar-ne alhora les etiquetes, la llicència, la valoració i més, amb Desfés.
+news-backups-title = Còpies de seguretat programades
+news-backups-body = Fes una còpia de seguretat de la base de dades cada dia o cada setmana, conserva les més recents i copia cadascuna a una altra carpeta.
 ui-undo = Desfés
 ui-today = avui
 ui-yesterday = ahir

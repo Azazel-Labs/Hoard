@@ -197,6 +197,7 @@ error-favorites-too-many = 一次最多 10,000 个
 error-saved-search-name = 已保存的搜索需要一个不超过 80 个字符的名称
 error-saved-search-too-long = 该搜索太长，无法保存
 error-hoard-seen = 宝藏最多可记录 32 种资源，每种都须以小写字母命名
+error-news-seen = 新功能最多可记录 256 项已看过的内容，每项都须以小写字母、数字和连字符命名
 error-texture-pattern-map = 纹理命名模式需要包含 { "{" }map{ "}" }，否则同一材质的所有贴图都会得到相同的名称
 error-texture-pattern-fields = 纹理命名模式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" } 和 { "{" }size{ "}" }
 error-texture-name-chars = 纹理名称不能包含 < > : " / \ | ? 或 *
@@ -460,6 +461,9 @@ appearance-top-theme = 浅色/深色切换
 appearance-top-mic = 搜索框中的麦克风，通过发出声音来查找相似的声音
 appearance-top-slash = 搜索框中的 / 提示
 appearance-top-palette = 命令面板按钮（{ $keys }）
+appearance-news = 新功能
+appearance-news-what = Hoard 中的新功能会带一个闪烁的金色圆点，直到你看过为止；顶栏会把它们集中在一处。你看过哪些内容会跟随你的账户。
+appearance-news-point-out = 提示新功能
 
 ## 根
 
@@ -802,6 +806,10 @@ app-drop-hint = 每个顶层文件或文件夹都会成为一个单独的资源�
 palette-group-go-to = 转到
 palette-group-actions = 操作
 palette-group-theme = 主题
+palette-group-news = 新功能
+palette-news-show = 查看新功能
+palette-news-mark-all = 将所有新功能标为已看过
+palette-news-keywords = 新 新功能 更新 变化 功能 版本 已看 new news
 palette-group-kinds = 类型
 palette-group-packs = 资源包
 palette-group-collections = 合集
@@ -2987,6 +2995,47 @@ api-kind-other-name = 其他资源
 
 ## 提示、对话框与加载（ui.ts、UiLayer.vue、lazy.ts）
 
+news-button = { $count } 项新功能
+news-button-title =
+    { $count ->
+       *[other] Hoard 有 { $count } 项新功能
+    }
+news-pip =
+    { $count ->
+        [1] Hoard 新功能
+       *[other] 这里有 { $count } 项新功能
+    }
+news-title = Hoard 新功能
+news-to-find =
+    { $count ->
+       *[other] 还有 { $count } 项待发现
+    }
+news-close = 关闭
+news-take-me = 带我去看
+news-look-again = 再看一次
+news-none = 暂时没有新功能可看。
+news-seen-lately = 最近看过
+news-stop-pointing = 不再提示新功能
+news-point-out = 重新提示新功能
+news-mark-all = 全部标为已看过
+news-marked-seen =
+    { $count ->
+       *[other] 已将 { $count } 项标为已看过
+    }
+news-themes-title = 十款浅色和十款深色主题
+news-themes-body = 浅色主题新增 Sky、Mint、Apricot 和 Lemon，深色主题新增 Midnight、Lagoon 和 Neon，新外观会从你选中的图块向外铺开。
+news-tiles-move-title = 让图块一直动起来
+news-tiles-move-body = 资源库图块上的动画和动图可以始终播放，而不仅在指针悬停时。
+news-motion-trails-title = 动画运动轨迹
+news-motion-trails-body = 动画的缩略图会描出角色走过的路径，并用一个圆点标出它当前的位置。
+news-text-size-title = 文字大小与间距
+news-text-size-body = 把文字调大或调小、页面调得宽松或紧凑，并选择图块和顶栏显示的内容。
+news-tag-tree-title = 标签套标签
+news-tag-tree-body = 把标签放到更宽泛的标签下，搜索“交通工具”时也能找到“汽车”和“轿车”。“设置 → 标签”会以树状图显示它们。
+news-bulk-edit-title = 批量编辑
+news-bulk-edit-body = 选中一些资源后按 E，即可一起更改它们的标签、许可证、评分等，并且可以撤销。
+news-backups-title = 定时备份
+news-backups-body = 每天或每周备份一次数据库，保留最新的几份，并把每份复制到另一个文件夹。
 ui-undo = 撤销
 ui-today = 今天
 ui-yesterday = 昨天

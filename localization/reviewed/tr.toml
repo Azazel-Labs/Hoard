@@ -1812,6 +1812,18 @@ translation = "Dil"
 source = "Browser's ({ $name })"
 translation = "Tarayıcının dili ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Yenilikler"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Yeni şeyleri işaretle"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Hoard’daki yeni şeyler, siz görene kadar parıldayan altın bir noktayla işaretlenir; üst çubuk da hepsini tek bir yerde toplar. Neleri gördüğünüz hesabınıza kaydedilir."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Açık mı koyu mu"
@@ -4612,6 +4624,10 @@ translation = "{ $model } indirilemedi: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "model sunucusu: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "yenilikler en fazla 256 görülen şey kaydedebilir, her biri küçük harfler, rakamlar ve kısa çizgilerle adlandırılmış olmalıdır"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7679,6 +7695,150 @@ translation = "{ $note } majör"
 source = "{ $note } minor"
 translation = "{ $note } minör"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Veritabanını her gün ya da her hafta yedekleyin, en yeni birkaç yedeği saklayın ve her birini başka bir klasöre kopyalayın."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Zamanlanmış yedekler"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Birkaç varlık seçin ve E’ye basarak etiketlerini, lisanslarını, puanlarını ve daha fazlasını birlikte değiştirin; hepsi geri alınabilir."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Birçoğunu birden düzenleyin"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "{ $count } yeni"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] Hoard’da { $count } yenilik
+       *[other] Hoard’da { $count } yenilik
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Kapat"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Yeniden bak"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Tümünü görüldü olarak işaretle"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } şey görüldü olarak işaretlendi
+       *[other] { $count } şey görüldü olarak işaretlendi
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Bir animasyonun küçük resmi, karakterin izlediği yolu çizer ve şu an nerede olduğunu bir noktayla gösterir."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Animasyonlarda hareket izleri"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Şu an keşfedilecek yeni bir şey yok."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Hoard’da yeni
+       *[other] Burada { $count } yenilik var
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Yeni şeyleri yeniden işaretle"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Son görülenler"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Yeni şeyleri işaretlemeyi bırak"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Ayarlar → Etiketler bunları bir ağaç olarak gösterir."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Etiket içinde etiket"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Beni oraya götür"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Yazıyı büyütün ya da küçültün, sayfayı daha ferah ya da daha sıkı yapın ve kutucuklarla üst çubuğun ne göstereceğini seçin."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Metin boyutu ve aralıklar"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Açık temalara Sky, Mint, Apricot ve Lemon, koyu temalara Midnight, Lagoon ve Neon katıldı; yeni görünüm de seçtiğiniz kutucuktan yayılıyor."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "On açık ve on koyu tema"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Kütüphane kutucuklarındaki animasyonlar ve hareketli resimler yalnızca işaretçinin altındayken değil, her zaman oynayabilir."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Kutucuklar hep hareketli"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Hoard’daki yenilikler"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] Keşfedilecek { $count } şey
+       *[other] Keşfedilecek { $count } şey
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tüm paketler"
@@ -8473,6 +8633,10 @@ translation = "Git"
 source = "Kinds"
 translation = "Türler"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Yenilikler"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Paketler"
@@ -8524,6 +8688,18 @@ translation = "varlıklar ızgara ana sayfa assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Açık tema: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "yeni yenilikler değişiklikler özellikler sürüm görüldü new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Tüm yenilikleri görüldü olarak işaretle"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Yenilikleri göster"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

@@ -197,6 +197,7 @@ error-favorites-too-many = tối đa 10.000 mục mỗi lần
 error-saved-search-name = tìm kiếm đã lưu cần có tên dài tối đa 80 ký tự
 error-saved-search-too-long = tìm kiếm đó quá dài để lưu
 error-hoard-seen = kho báu chỉ ghi được tối đa 32 loại tài nguyên, mỗi loại đặt tên bằng chữ thường
+error-news-seen = mục có gì mới chỉ ghi được tối đa 256 điều đã xem, mỗi điều đặt tên bằng chữ thường, chữ số và dấu gạch nối
 error-texture-pattern-map = Mẫu tên texture cần có { "{" }map{ "}" }, nếu không mọi map của một vật liệu sẽ có cùng tên
 error-texture-pattern-fields = Mẫu tên texture có thể dùng { "{" }name{ "}" }, { "{" }map{ "}" } và { "{" }size{ "}" }
 error-texture-name-chars = Tên texture không được chứa < > : " / \ | ? hoặc *
@@ -460,6 +461,9 @@ appearance-top-theme = Nút chuyển sáng và tối
 appearance-top-mic = Micrô trong ô tìm kiếm, để tìm âm thanh bằng cách tạo ra một âm
 appearance-top-slash = Gợi ý / trong ô tìm kiếm
 appearance-top-palette = Nút bảng lệnh ({ $keys })
+appearance-news = Có gì mới
+appearance-news-what = Những điều mới trong Hoard có một chấm vàng lấp lánh cho đến khi bạn xem, và thanh trên cùng gom chúng về một chỗ. Những gì bạn đã xem được lưu theo tài khoản của bạn.
+appearance-news-point-out = Đánh dấu những điều mới
 
 ## Gốc
 
@@ -802,6 +806,10 @@ app-drop-hint = Mỗi tệp hoặc thư mục cấp cao nhất sẽ thành một
 palette-group-go-to = Đi tới
 palette-group-actions = Thao tác
 palette-group-theme = Chủ đề
+palette-group-news = Có gì mới
+palette-news-show = Xem có gì mới
+palette-news-mark-all = Đánh dấu mọi điều mới là đã xem
+palette-news-keywords = mới tin tức thay đổi tính năng phiên bản đã xem new news
 palette-group-kinds = Loại
 palette-group-packs = Gói
 palette-group-collections = Bộ sưu tập
@@ -2987,6 +2995,47 @@ api-kind-other-name = loại khác
 
 ## Thông báo, hộp thoại và đang tải (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } mới
+news-button-title =
+    { $count ->
+       *[other] { $count } điều mới trong Hoard
+    }
+news-pip =
+    { $count ->
+        [1] Mới trong Hoard
+       *[other] { $count } điều mới ở đây
+    }
+news-title = Mới trong Hoard
+news-to-find =
+    { $count ->
+       *[other] Còn { $count } điều để khám phá
+    }
+news-close = Đóng
+news-take-me = Đưa tôi đến đó
+news-look-again = Xem lại
+news-none = Hiện chưa có gì mới để khám phá.
+news-seen-lately = Đã xem gần đây
+news-stop-pointing = Ngừng đánh dấu những điều mới
+news-point-out = Đánh dấu lại những điều mới
+news-mark-all = Đánh dấu tất cả là đã xem
+news-marked-seen =
+    { $count ->
+       *[other] Đã đánh dấu { $count } điều là đã xem
+    }
+news-themes-title = Mười chủ đề sáng và mười chủ đề tối
+news-themes-body = Sky, Mint, Apricot và Lemon gia nhập các chủ đề sáng, còn Midnight, Lagoon và Neon gia nhập các chủ đề tối, và giao diện mới lan ra từ ô bạn chọn.
+news-tiles-move-title = Giữ các ô luôn chuyển động
+news-tiles-move-body = Hoạt ảnh và ảnh động trên các ô thư viện có thể phát mọi lúc, không chỉ khi con trỏ ở trên.
+news-motion-trails-title = Vệt chuyển động trên hoạt ảnh
+news-motion-trails-body = Ảnh thu nhỏ của hoạt ảnh vẽ lại đường đi của nhân vật, kèm một chấm ở vị trí hiện tại.
+news-text-size-title = Cỡ chữ và khoảng cách
+news-text-size-body = Làm chữ to hơn hoặc nhỏ hơn, trang thoáng hơn hoặc gọn hơn, và chọn những gì các ô và thanh trên cùng hiển thị.
+news-tag-tree-title = Thẻ lồng trong thẻ
+news-tag-tree-body = Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Cài đặt → Thẻ vẽ chúng thành dạng cây.
+news-bulk-edit-title = Sửa nhiều mục cùng lúc
+news-bulk-edit-body = Chọn vài tài nguyên rồi nhấn E để đổi thẻ, giấy phép, xếp hạng và nhiều thứ khác cùng lúc, có thể hoàn tác.
+news-backups-title = Sao lưu theo lịch
+news-backups-body = Sao lưu cơ sở dữ liệu mỗi ngày hoặc mỗi tuần, giữ vài bản mới nhất và sao chép từng bản sang một thư mục khác.
 ui-undo = Hoàn tác
 ui-today = hôm nay
 ui-yesterday = hôm qua

@@ -197,6 +197,7 @@ error-favorites-too-many = 한 번에 최대 10,000개까지 가능합니다
 error-saved-search-name = 저장된 검색에는 80자 이하의 이름이 필요합니다
 error-saved-search-too-long = 검색이 너무 길어서 저장할 수 없습니다
 error-hoard-seen = 보물 더미에는 에셋 종류를 최대 32개까지 기록할 수 있으며, 각각 소문자 이름이어야 합니다
+error-news-seen = 새로운 기능에는 확인한 항목을 최대 256개까지 기록할 수 있으며, 각각 소문자, 숫자, 하이픈으로 된 이름이어야 합니다
 error-texture-pattern-map = 텍스처 이름 패턴에는 { "{" }map{ "}" }이 있어야 합니다. 그렇지 않으면 머티리얼의 모든 맵이 같은 이름을 갖게 됩니다
 error-texture-pattern-fields = 텍스처 이름 패턴에는 { "{" }name{ "}" }, { "{" }map{ "}" }, { "{" }size{ "}" }를 사용할 수 있습니다
 error-texture-name-chars = 텍스처 이름에는 < > : " / \ | ? * 를 쓸 수 없습니다
@@ -460,6 +461,9 @@ appearance-top-theme = 밝게/어둡게 전환
 appearance-top-mic = 검색 상자의 마이크(소리를 내서 비슷한 소리 찾기)
 appearance-top-slash = 검색 상자의 / 힌트
 appearance-top-palette = 명령 팔레트 버튼({ $keys })
+appearance-news = 새로운 기능
+appearance-news-what = Hoard의 새로운 것에는 확인하기 전까지 반짝이는 금색 점이 표시되고, 상단 막대가 한곳에 모아 보여 줍니다. 확인한 항목은 계정에 기록됩니다.
+appearance-news-point-out = 새로운 것 알려 주기
 
 ## 루트
 
@@ -799,6 +803,10 @@ app-drop-hint = 최상위 파일이나 폴더 하나하나가 각각 팩이 됩�
 palette-group-go-to = 이동
 palette-group-actions = 작업
 palette-group-theme = 테마
+palette-group-news = 새로운 기능
+palette-news-show = 새로운 기능 보기
+palette-news-mark-all = 새 항목을 모두 확인함으로 표시
+palette-news-keywords = 새로운 새 소식 변경 기능 릴리스 확인 new news changes features release seen
 palette-group-kinds = 종류
 palette-group-packs = 팩
 palette-group-collections = 컬렉션
@@ -2954,6 +2962,47 @@ api-kind-other-name = 기타
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = 새 항목 { $count }개
+news-button-title =
+    { $count ->
+       *[other] Hoard의 새 항목 { $count }개
+    }
+news-pip =
+    { $count ->
+        [1] Hoard의 새 항목
+       *[other] 이곳의 새 항목 { $count }개
+    }
+news-title = Hoard의 새로운 기능
+news-to-find =
+    { $count ->
+       *[other] 확인할 항목 { $count }개
+    }
+news-close = 닫기
+news-take-me = 바로 가기
+news-look-again = 다시 보기
+news-none = 지금은 새로운 항목이 없습니다.
+news-seen-lately = 최근에 확인함
+news-stop-pointing = 새로운 것 알려 주지 않기
+news-point-out = 새로운 것 다시 알려 주기
+news-mark-all = 모두 확인함으로 표시
+news-marked-seen =
+    { $count ->
+       *[other] 항목 { $count }개를 확인함으로 표시했습니다
+    }
+news-themes-title = 밝은 테마 10개와 어두운 테마 10개
+news-themes-body = 밝은 테마에 스카이, 민트, 애프리콧, 레몬이, 어두운 테마에 미드나이트, 라군, 네온이 추가되었고, 새 모습은 고른 타일에서부터 퍼져 나갑니다.
+news-tiles-move-title = 타일 계속 움직이기
+news-tiles-move-body = 라이브러리 타일의 애니메이션과 움직이는 그림을 포인터를 올리지 않아도 항상 재생할 수 있습니다.
+news-motion-trails-title = 애니메이션의 움직임 궤적
+news-motion-trails-body = 애니메이션 썸네일에 캐릭터가 지나가는 경로가 그려지고, 지금 있는 위치에 점이 표시됩니다.
+news-text-size-title = 글자 크기와 간격
+news-text-size-body = 글자를 크거나 작게, 페이지를 여유 있거나 촘촘하게 만들고, 타일과 상단 막대에 보여 줄 것을 고를 수 있습니다.
+news-tag-tree-title = 태그 안의 태그
+news-tag-tree-body = 태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그에서 트리로 보여 줍니다.
+news-bulk-edit-title = 여러 개를 한 번에 편집
+news-bulk-edit-body = 에셋 몇 개를 선택하고 E를 누르면 태그, 라이선스, 평점 등을 한꺼번에 바꿀 수 있고, 실행 취소도 됩니다.
+news-backups-title = 예약 백업
+news-backups-body = 데이터베이스를 매일 또는 매주 백업하고, 최신 백업 몇 개를 보관하며, 각각을 다른 폴더에도 복사합니다.
 ui-undo = 실행 취소
 ui-today = 오늘
 ui-yesterday = 어제

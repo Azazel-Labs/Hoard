@@ -388,6 +388,14 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ seen }),
     }),
+  /** Which of what's new in Hoard this account has seen, or null before it has seen any (see news.ts). */
+  news: () => request<{ news: { seen: Record<string, string>; off: boolean } | null }>('/api/me/news'),
+  setNews: (news: { seen: Record<string, string>; off: boolean }) =>
+    request<{ news: { seen: Record<string, string>; off: boolean } }>('/api/me/news', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(news),
+    }),
   connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
   mcpLive: () => request<{ live: LiveApp[] }>('/api/mcp/live'),
   disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),

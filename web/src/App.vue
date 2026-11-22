@@ -34,8 +34,10 @@ import ThemeSwitch from './components/ThemeSwitch.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import InsecureNotice from './components/InsecureNotice.vue'
+import NewsTray from './components/NewsTray.vue'
+import { markAllSeenWithUndo, markSeen, news, newsTray, type NewThing, unseen } from './news'
 import { archiveWithUndo, countText } from './archive'
-import { copyText, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
+import { copyText, reducedMotion, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { usePanelFit } from './panelFit'
 import { lazy } from './lazy'
@@ -632,6 +634,7 @@ const bulkOpen = ref(false)
 const bulkTargets = shallowRef<Asset[]>([])
 function openBulkEdit(focused?: Asset | null) {
   if (!mayEdit()) return
+  markSeen('bulk-edit')
   if (checked.value.length) bulkTargets.value = checked.value.map((id) => checkedSeen.value.get(id)).filter((a): a is Asset => !!a)
   else if (focused) bulkTargets.value = [focused]
   else return
@@ -1266,6 +1269,30 @@ function teachFile(a: Asset) {
   teach.value = { asset_id: a.id, pack_id: a.pack_id, pack_name: a.pack_name, path: a.path }
   openSettings('store-files')
 }
+const openNews = () => (newsTray.value = true)
+const closeNews = () => (newsTray.value = false)
+/** Take someone to something new (from the tray or the palette): to its page, scrolled to its pip. */
+function goToNew(n: NewThing) {
+  const w = n.where
+  if ('library' in w) {
+    // Nothing there to glint by: going to it is seeing it.
+    markSeen(n.id)
+    setView('library')
+    if (w.library.kind) filters.kind = w.library.kind
+    return
+  }
+  openSettings(w.settings)
+  // The page may still be loading: look for the pip a little while.
+  let tries = 0
+  const find = () => {
+    const pip = document.querySelector<HTMLElement>(`.settings-pane [data-new="${n.id}"]`)
+    if (pip) pip.scrollIntoView({ block: 'center', behavior: reducedMotion.matches ? 'auto' : 'smooth' })
+    else if (++tries < 20) setTimeout(find, 100)
+    // Nowhere on the page to point at (pips turned off, or a tag tree with nothing in it yet).
+    else markSeen(n.id)
+  }
+  void nextTick(find)
+}
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
   // The group names match the ones CommandPalette shows before anything is typed.
@@ -1343,7 +1370,15 @@ const commands = computed<Command[]>(() => {
   for (const c of collections.value) out.push({ id: `col:${c.id}`, group: collectionsGroup, label: c.name, run: () => browseCollection(c) })
   for (const p of projects.value) out.push({ id: `project:${p.id}`, group: projectsGroup, label: p.name, hint: formatNumber(p.assets), run: () => browseProject(p.name) })
   for (const sv of mine.searches) out.push({ id: `saved:${sv.id}`, group: savedGroup, label: sv.name, run: () => applySearch(sv) })
-  return out
+  // What's new: first while there's something to find, otherwise at the end, still there to look back at.
+  const newsGroup = t('palette-group-news')
+  const fresh = news.off ? [] : unseen.value
+  const whatsNew: Command[] = fresh.map((n) => ({ id: `new:${n.id}`, group: newsGroup, label: n.title(), hint: n.crumb().join(' › '), keywords: n.body(), run: () => goToNew(n) }))
+  whatsNew.push({ id: 'new:show', group: newsGroup, label: t('palette-news-show'), keywords: t('palette-news-keywords'), run: openNews })
+  if (unseen.value.length) {
+    whatsNew.push({ id: 'new:seen', group: newsGroup, label: t('palette-news-mark-all'), hint: formatNumber(unseen.value.length), keywords: t('palette-news-keywords'), run: markAllSeenWithUndo })
+  }
+  return fresh.length ? [...whatsNew, ...out] : [...out, ...whatsNew]
 })
 </script>
 
@@ -1455,6 +1490,17 @@ const commands = computed<Command[]>(() => {
         >
           <span class="dot" aria-hidden="true" /><span class="wide-only">{{ t('app-update') }} </span>{{ stats.update.version }}
         </a>
+        <button
+          v-if="!news.off && unseen.length"
+          type="button"
+          class="btn ghost news-btn"
+          :title="t('news-button-title', { count: unseen.length })"
+          :aria-label="t('news-button-title', { count: unseen.length })"
+          @click="openNews"
+        >
+          <span class="spark" aria-hidden="true">✦</span>
+          <span class="wide-only">{{ t('news-button', { count: unseen.length }) }}</span><span class="narrow-only">{{ formatNumber(unseen.length) }}</span>
+        </button>
         <ActivityIndicator v-if="shows('header-activity')" />
         <ThemeSwitch v-if="shows('header-theme')" />
         <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">{{ t('app-sign-in') }}</button>
@@ -1785,6 +1831,7 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
+    <NewsTray v-if="newsTray" @close="closeNews" @go="goToNew" />
     <BulkEditDialog
       v-if="bulkOpen"
       :assets="allMatching ? [] : bulkTargets"
@@ -1874,6 +1921,14 @@ const commands = computed<Command[]>(() => {
   font: inherit; font-size: 0.72rem; line-height: 1.5; text-align: center;
 }
 .update { color: var(--ok); text-decoration: none; white-space: nowrap; }
+/* What's new in Hoard: gold, like the pips it gathers. */
+.news-btn {
+  gap: 0.35em; white-space: nowrap; font-weight: 600;
+  color: color-mix(in srgb, #f2c55c 65%, var(--text));
+  background: rgb(242 197 92 / 0.14); border-color: rgb(242 197 92 / 0.5);
+}
+.news-btn:hover { background: rgb(242 197 92 / 0.24); }
+.news-btn .spark { color: #f2c55c; }
 .update .dot { flex: none; width: 0.5em; height: 0.5em; border-radius: 50%; background: currentColor; }
 .narrow-only { display: none; }
 

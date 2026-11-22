@@ -1785,6 +1785,18 @@ translation = "ภาษา"
 source = "Browser's ({ $name })"
 translation = "ตามเบราว์เซอร์ ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "มีอะไรใหม่"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "ชี้สิ่งใหม่ให้เห็น"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "สิ่งใหม่ใน Hoard จะมีจุดสีทองระยิบระยับจนกว่าคุณจะได้เห็น และแถบด้านบนจะรวบรวมไว้ในที่เดียว สิ่งที่คุณเห็นแล้วจะผูกกับบัญชีของคุณ"
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "สว่างหรือมืด"
@@ -4574,6 +4586,10 @@ translation = "ดาวน์โหลด { $model } ไม่ได้: { $rea
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "เซิร์ฟเวอร์โมเดล: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "มีอะไรใหม่บันทึกสิ่งที่เห็นแล้วได้สูงสุด 256 รายการ แต่ละรายการตั้งชื่อด้วยตัวพิมพ์เล็ก ตัวเลข และขีดกลาง"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7640,6 +7656,147 @@ translation = "{ $note } เมเจอร์"
 source = "{ $note } minor"
 translation = "{ $note } ไมเนอร์"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "สำรองฐานข้อมูลทุกวันหรือทุกสัปดาห์ เก็บชุดล่าสุดไว้ไม่กี่ชุด และคัดลอกแต่ละชุดไปยังโฟลเดอร์อื่น"
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "การสำรองข้อมูลตามกำหนดเวลา"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "เลือกแอสเซ็ตแล้วกด E เพื่อเปลี่ยนแท็ก สัญญาอนุญาต คะแนน และอื่น ๆ พร้อมกัน โดยเลิกทำได้"
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "แก้ไขหลายรายการพร้อมกัน"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "ใหม่ { $count } รายการ"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+       *[other] สิ่งใหม่ใน Hoard { $count } รายการ
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "ปิด"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "ดูอีกครั้ง"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "ทำเครื่องหมายว่าเห็นทั้งหมดแล้ว"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+       *[other] ทำเครื่องหมายว่าเห็นแล้ว { $count } รายการ
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "ภาพย่อของแอนิเมชันจะลากเส้นทางที่ตัวละครเคลื่อนที่ไป พร้อมจุดบอกตำแหน่งปัจจุบัน"
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "เส้นทางการเคลื่อนไหวบนแอนิเมชัน"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "ตอนนี้ยังไม่มีอะไรใหม่ให้ค้นพบ"
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] ใหม่ใน Hoard
+       *[other] มีสิ่งใหม่ { $count } รายการที่นี่
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "กลับมาชี้สิ่งใหม่อีกครั้ง"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "เห็นเมื่อเร็ว ๆ นี้"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "หยุดชี้สิ่งใหม่"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "ใส่แท็กไว้ใต้แท็กที่กว้างกว่า เพื่อให้ค้นหา “ยานพาหนะ” แล้วเจอ “รถยนต์” และ “รถเก๋ง” ด้วย การตั้งค่า → แท็ก จะแสดงแท็กเหล่านี้เป็นแผนผังต้นไม้"
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "แท็กซ้อนแท็ก"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "พาไปที่นั่น"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "ปรับตัวหนังสือให้ใหญ่ขึ้นหรือเล็กลง ปรับหน้าให้โปร่งขึ้นหรือกะทัดรัดขึ้น และเลือกสิ่งที่ไทล์และแถบด้านบนแสดง"
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "ขนาดข้อความและระยะห่าง"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Sky, Mint, Apricot และ Lemon มาร่วมกับธีมสว่าง ส่วน Midnight, Lagoon และ Neon มาร่วมกับธีมมืด และรูปลักษณ์ใหม่จะแผ่ออกจากไทล์ที่คุณเลือก"
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "ธีมสว่างสิบแบบและธีมมืดสิบแบบ"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "แอนิเมชันและภาพเคลื่อนไหวบนไทล์ในคลังเล่นได้ตลอดเวลา ไม่ใช่แค่ตอนที่ตัวชี้อยู่เหนือภาพ"
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "ให้ไทล์เคลื่อนไหวตลอด"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "ใหม่ใน Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+       *[other] รอให้ค้นพบ { $count } รายการ
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "แพ็กทั้งหมด"
@@ -8434,6 +8591,10 @@ translation = "ไปที่"
 source = "Kinds"
 translation = "ประเภท"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "มีอะไรใหม่"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "แพ็ก"
@@ -8485,6 +8646,18 @@ translation = "แอสเซ็ต ตาราง หน้าแรก asset
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "ธีมสว่าง: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "ใหม่ ข่าว การเปลี่ยนแปลง ฟีเจอร์ รุ่น อัปเดต เห็นแล้ว new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "ทำเครื่องหมายสิ่งใหม่ทั้งหมดว่าเห็นแล้ว"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "ดูว่ามีอะไรใหม่"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

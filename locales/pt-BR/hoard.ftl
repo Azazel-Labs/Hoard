@@ -197,6 +197,7 @@ error-favorites-too-many = no máximo 10.000 por vez
 error-saved-search-name = uma busca salva precisa de um nome de no máximo 80 caracteres
 error-saved-search-too-long = essa busca é longa demais para salvar
 error-hoard-seen = o tesouro pode registrar no máximo 32 tipos de asset, cada um com nome em letras minúsculas
+error-news-seen = as novidades podem registrar no máximo 256 itens vistos, cada um com nome em letras minúsculas, dígitos e hifens
 error-texture-pattern-map = O padrão de nome das texturas precisa de { "{" }map{ "}" }, senão todos os mapas de um material teriam o mesmo nome
 error-texture-pattern-fields = O padrão de nome das texturas pode usar { "{" }name{ "}" }, { "{" }map{ "}" } e { "{" }size{ "}" }
 error-texture-name-chars = Nomes de textura não podem ter < > : " / \ | ? nem *
@@ -460,6 +461,9 @@ appearance-top-theme = Alternância entre claro e escuro
 appearance-top-mic = Microfone na caixa de pesquisa, para encontrar sons fazendo um
 appearance-top-slash = A dica / na caixa de pesquisa
 appearance-top-palette = Botão da paleta de comandos ({ $keys })
+appearance-news = Novidades
+appearance-news-what = As novidades do Hoard ganham um ponto dourado cintilante até você vê-las, e a barra superior reúne todas em um só lugar. O que você já viu fica salvo na sua conta.
+appearance-news-point-out = Destacar novidades
 
 ## Raiz
 
@@ -866,6 +870,10 @@ app-drop-hint = Cada arquivo ou pasta de nível superior vira um pacote próprio
 palette-group-go-to = Ir para
 palette-group-actions = Ações
 palette-group-theme = Tema
+palette-group-news = Novidades
+palette-news-show = Mostrar novidades
+palette-news-mark-all = Marcar todas as novidades como vistas
+palette-news-keywords = novidades novo novos mudanças recursos versão vistos new news changes features release seen
 palette-group-kinds = Tipos
 palette-group-packs = Pacotes
 palette-group-collections = Coleções
@@ -3256,6 +3264,54 @@ api-kind-other-name = outros
 
 ## Avisos, diálogos e carregamento (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } novidade
+       *[other] { $count } novidades
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } novidade no Hoard
+       *[other] { $count } novidades no Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Novidade no Hoard
+       *[other] { $count } novidades aqui
+    }
+news-title = Novidades no Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } para descobrir
+       *[other] { $count } para descobrir
+    }
+news-close = Fechar
+news-take-me = Me leve até lá
+news-look-again = Ver de novo
+news-none = Nenhuma novidade para descobrir agora.
+news-seen-lately = Vistas recentemente
+news-stop-pointing = Parar de destacar novidades
+news-point-out = Voltar a destacar novidades
+news-mark-all = Marcar todas como vistas
+news-marked-seen =
+    { $count ->
+        [one] { $count } novidade marcada como vista
+       *[other] { $count } novidades marcadas como vistas
+    }
+news-themes-title = Dez temas claros e dez escuros
+news-themes-body = Céu, Menta, Damasco e Limão chegam aos temas claros e Meia-noite, Lagoa e Neon aos escuros, e o novo visual se espalha a partir do bloco que você escolher.
+news-tiles-move-title = Blocos sempre em movimento
+news-tiles-move-body = Animações e imagens animadas nos blocos da biblioteca podem ser reproduzidas o tempo todo, não só sob o ponteiro.
+news-motion-trails-title = Rastros de movimento nas animações
+news-motion-trails-body = A miniatura de uma animação traça o caminho que o personagem percorre, com um ponto onde ele está agora.
+news-text-size-title = Tamanho do texto e espaçamento
+news-text-size-body = Deixe o texto maior ou menor e a página mais espaçosa ou mais compacta, e escolha o que os blocos e a barra superior mostram.
+news-tag-tree-title = Tags dentro de tags
+news-tag-tree-body = Coloque uma tag dentro de outra mais ampla, para que buscar veículo encontre também carro e sedã. Configurações → Tags mostra todas como uma árvore.
+news-bulk-edit-title = Editar vários de uma vez
+news-bulk-edit-body = Selecione alguns assets e pressione E para mudar as tags, a licença, a avaliação e mais de todos de uma vez, com Desfazer.
+news-backups-title = Backups agendados
+news-backups-body = Faça backup do banco de dados todo dia ou toda semana, mantenha os mais recentes e copie cada um para outra pasta.
 ui-undo = Desfazer
 ui-today = hoje
 ui-yesterday = ontem

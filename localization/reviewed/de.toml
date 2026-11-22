@@ -1848,6 +1848,18 @@ translation = "Sprache"
 source = "Browser's ({ $name })"
 translation = "Wie im Browser ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Neuigkeiten"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Auf Neues hinweisen"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Neues in Hoard bekommt einen funkelnden goldenen Punkt, bis du es gesehen hast, und die obere Leiste sammelt alles an einem Ort. Was du gesehen hast, folgt deinem Konto."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Hell oder dunkel"
@@ -4715,6 +4727,10 @@ translation = "{ $model } konnte nicht heruntergeladen werden: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "der Modellserver: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "die Neuigkeiten können höchstens 256 gesehene Dinge festhalten, jedes mit einem Namen aus Kleinbuchstaben, Ziffern und Bindestrichen"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7836,6 +7852,150 @@ translation = "{ $note }-Dur"
 source = "{ $note } minor"
 translation = "{ $note }-Moll"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Sichere die Datenbank jeden Tag oder jede Woche, behalte die neuesten paar und kopiere jede Sicherung in einen anderen Ordner."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Geplante Sicherungen"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Wähle ein paar Assets aus und drück E, um ihre Tags, Lizenz, Bewertung und mehr gemeinsam zu ändern, mit Rückgängig."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Viele auf einmal bearbeiten"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "{ $count } neu"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } Neuheit in Hoard
+       *[other] { $count } Neuheiten in Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Schließen"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Noch mal ansehen"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Alle als gesehen markieren"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } Neuheit als gesehen markiert
+       *[other] { $count } Neuheiten als gesehen markiert
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Das Vorschaubild einer Animation zeichnet den Weg nach, den ihre Figur nimmt, mit einem Punkt dort, wo sie gerade ist."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Bewegungsspuren bei Animationen"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Gerade gibt es nichts Neues zu entdecken."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Neu in Hoard
+       *[other] { $count } Neuheiten hier
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Wieder auf Neues hinweisen"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Kürzlich gesehen"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Nicht mehr auf Neues hinweisen"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Stell ein Tag unter ein allgemeineres, dann findet die Suche nach Fahrzeug auch Auto und Limousine. Einstellungen → Tags zeigt sie als Baum."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Tags in Tags"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Bring mich hin"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Mach die Schrift größer oder kleiner und die Seite großzügiger oder kompakter, und wähle, was die Kacheln und die obere Leiste zeigen."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Textgröße und Abstände"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Himmel, Minze, Aprikose und Zitrone ergänzen die hellen Designs, Mitternacht, Lagune und Neon die dunklen, und der neue Look breitet sich von der Kachel aus, die du wählst."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Zehn helle und zehn dunkle Designs"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Animationen und animierte Bilder auf den Kacheln der Bibliothek können durchgehend laufen, nicht nur unter dem Zeiger."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Kacheln in Bewegung halten"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Neu in Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } zu entdecken
+       *[other] { $count } zu entdecken
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Alle Pakete"
@@ -8652,6 +8812,10 @@ translation = "Gehe zu"
 source = "Kinds"
 translation = "Arten"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Neuigkeiten"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Pakete"
@@ -8703,6 +8867,18 @@ translation = "assets raster start startseite grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Helles Design: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "neu neuigkeiten neuheiten änderungen funktionen version gesehen new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Alles Neue als gesehen markieren"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Neuigkeiten anzeigen"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

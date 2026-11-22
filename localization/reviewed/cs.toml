@@ -1882,6 +1882,18 @@ translation = "Jazyk"
 source = "Browser's ({ $name })"
 translation = "Podle prohlížeče ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Novinky"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Upozorňovat na novinky"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Novinky v Hoardu dostanou třpytivou zlatou tečku, dokud je neuvidíte, a horní lišta je shromáždí na jednom místě. To, co jste už viděli, se váže k vašemu účtu."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Světlý nebo tmavý"
@@ -4782,6 +4794,10 @@ translation = "nepodařilo se stáhnout { $model }: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "server modelů: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "novinky mohou zaznamenat nejvýše 256 zobrazených položek, každou pojmenovanou malými písmeny, číslicemi a spojovníky"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7958,6 +7974,164 @@ translation = "{ $note } dur"
 source = "{ $note } minor"
 translation = "{ $note } moll"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Zálohujte databázi každý den nebo každý týden, ponechte si pár nejnovějších a každou zkopírujte do jiné složky."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Plánované zálohy"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Vyberte několik assetů a stisknutím E změňte jejich štítky, licenci, hodnocení a další najednou, i s možností Zpět."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Upravit mnoho najednou"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = """
+{ $count ->
+        [one] { $count } nová
+        [few] { $count } nové
+        [many] { $count } nové
+       *[other] { $count } nových
+    }"""
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } novinka v Hoardu
+        [few] { $count } novinky v Hoardu
+        [many] { $count } novinky v Hoardu
+       *[other] { $count } novinek v Hoardu
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Zavřít"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Podívat se znovu"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Označit vše jako zobrazené"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } novinka označena jako zobrazená
+        [few] { $count } novinky označeny jako zobrazené
+        [many] { $count } novinky označeno jako zobrazené
+       *[other] { $count } novinek označeno jako zobrazené
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Miniatura animace kreslí dráhu, kterou urazí její postava, s tečkou tam, kde je právě teď."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Stopy pohybu u animací"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Teď tu není nic nového k objevení."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Nové v Hoardu
+        [few] { $count } novinky tady
+        [many] { $count } novinky tady
+       *[other] { $count } novinek tady
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Znovu upozorňovat na novinky"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Nedávno zobrazené"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Přestat upozorňovat na novinky"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Nastavení → Štítky je vykreslí jako strom."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Štítky ve štítcích"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Přejít tam"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Zvětšete nebo zmenšete písmo, udělejte stránku vzdušnější nebo kompaktnější a vyberte, co ukazují dlaždice a horní lišta."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Velikost textu a rozestupy"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Ke světlým motivům přibyly Obloha, Máta, Meruňka a Citron, k tmavým Půlnoc, Laguna a Neon, a nový vzhled se rozlije od dlaždice, kterou vyberete."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Deset světlých a deset tmavých motivů"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Animace a animované obrázky na dlaždicích knihovny se mohou přehrávat pořád, nejen pod ukazatelem."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Dlaždice stále v pohybu"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Novinky v Hoardu"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } k objevení
+        [few] { $count } k objevení
+        [many] { $count } k objevení
+       *[other] { $count } k objevení
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Všechny balíčky"
@@ -8805,6 +8979,10 @@ translation = "Přejít na"
 source = "Kinds"
 translation = "Druhy"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Novinky"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Balíčky"
@@ -8856,6 +9034,18 @@ translation = "assety mřížka domů assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Světlý motiv: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "nové novinky změny funkce vydání zobrazené new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Označit všechny novinky jako zobrazené"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Zobrazit novinky"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

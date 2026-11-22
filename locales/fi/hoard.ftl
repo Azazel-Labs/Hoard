@@ -197,6 +197,7 @@ error-favorites-too-many = enintään 10 000 kerrallaan
 error-saved-search-name = tallennettu haku tarvitsee enintään 80 merkin nimen
 error-saved-search-too-long = haku on liian pitkä tallennettavaksi
 error-hoard-seen = aarre voi tallentaa enintään 32 resurssilajia, kunkin nimettynä pienin kirjaimin
+error-news-seen = uutuuksista voi tallentaa enintään 256 nähtyä asiaa, kunkin nimettynä pienin kirjaimin, numeroin ja yhdysmerkein
 error-texture-pattern-map = Tekstuurin nimimallissa on oltava { "{" }map{ "}" }, muuten materiaalin jokainen kartta saisi saman nimen
 error-texture-pattern-fields = Tekstuurin nimimallissa voi käyttää kenttiä { "{" }name{ "}" }, { "{" }map{ "}" } ja { "{" }size{ "}" }
 error-texture-name-chars = Tekstuurien nimissä ei voi olla merkkejä < > : " / \ | ? tai *
@@ -468,6 +469,9 @@ appearance-top-theme = Vaalean ja tumman vaihtaja
 appearance-top-mic = Mikrofoni hakukentässä, äänten etsimiseen tekemällä sellainen
 appearance-top-slash = /-vihje hakukentässä
 appearance-top-palette = Komentopaletin painike ({ $keys })
+appearance-news = Uutta
+appearance-news-what = Hoardin uudet asiat saavat kimaltavan kultaisen pisteen, kunnes olet nähnyt ne, ja yläpalkki kokoaa ne yhteen paikkaan. Se, mitä olet nähnyt, seuraa tiliäsi.
+appearance-news-point-out = Huomauta uusista asioista
 
 ## Juuri
 
@@ -878,6 +882,10 @@ app-drop-hint = Jokaisesta ylimmän tason tiedostosta tai kansiosta tulee oma pa
 palette-group-go-to = Siirry
 palette-group-actions = Toiminnot
 palette-group-theme = Teema
+palette-group-news = Uutta
+palette-news-show = Näytä, mitä uutta
+palette-news-mark-all = Merkitse kaikki uusi nähdyksi
+palette-news-keywords = uusi uutta uutiset muutokset ominaisuudet julkaisu nähty new news
 palette-group-kinds = Tyypit
 palette-group-packs = Paketit
 palette-group-collections = Kokoelmat
@@ -3335,6 +3343,54 @@ api-kind-other-name = muut
 
 ## Ilmoitukset, valintaikkunat ja lataus
 
+news-button =
+    { $count ->
+        [one] { $count } uusi
+       *[other] { $count } uutta
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } uusi asia Hoardissa
+       *[other] { $count } uutta asiaa Hoardissa
+    }
+news-pip =
+    { $count ->
+        [one] Uutta Hoardissa
+       *[other] { $count } uutta asiaa täällä
+    }
+news-title = Uutta Hoardissa
+news-to-find =
+    { $count ->
+        [one] { $count } löydettävänä
+       *[other] { $count } löydettävänä
+    }
+news-close = Sulje
+news-take-me = Vie minut sinne
+news-look-again = Katso uudelleen
+news-none = Juuri nyt ei ole mitään uutta löydettävää.
+news-seen-lately = Äskettäin nähdyt
+news-stop-pointing = Lopeta uusista asioista huomauttaminen
+news-point-out = Huomauta taas uusista asioista
+news-mark-all = Merkitse kaikki nähdyiksi
+news-marked-seen =
+    { $count ->
+        [one] { $count } asia merkitty nähdyksi
+       *[other] { $count } asiaa merkitty nähdyiksi
+    }
+news-themes-title = Kymmenen vaaleaa ja kymmenen tummaa teemaa
+news-themes-body = Taivas, Minttu, Aprikoosi ja Sitruuna liittyvät vaaleisiin teemoihin ja Keskiyö, Laguuni ja Neon tummiin, ja uusi ulkoasu leviää valitsemastasi ruudusta.
+news-tiles-move-title = Pidä ruudut liikkeessä
+news-tiles-move-body = Kirjaston ruutujen animaatiot ja animoidut kuvat voivat toistua koko ajan, ei vain osoittimen alla.
+news-motion-trails-title = Liikeradat animaatioissa
+news-motion-trails-body = Animaation pikkukuva piirtää hahmon kulkeman reitin ja pisteen kohtaan, jossa se on juuri nyt.
+news-text-size-title = Tekstin koko ja välit
+news-text-size-body = Suurenna tai pienennä tekstiä, tee sivusta väljempi tai tiiviimpi ja valitse, mitä ruudut ja yläpalkki näyttävät.
+news-tag-tree-title = Tunnisteita tunnisteiden sisällä
+news-tag-tree-body = Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Asetukset → Tunnisteet piirtää ne puuksi.
+news-bulk-edit-title = Muokkaa montaa kerralla
+news-bulk-edit-body = Valitse resursseja ja paina E muuttaaksesi niiden tunnisteita, lisenssiä, arvosanaa ja muuta kerralla. Kumoa toimii myös.
+news-backups-title = Ajastetut varmuuskopiot
+news-backups-body = Varmuuskopioi tietokanta joka päivä tai joka viikko, säilytä muutama uusin ja kopioi jokainen toiseen kansioon.
 ui-undo = Kumoa
 ui-today = tänään
 ui-yesterday = eilen

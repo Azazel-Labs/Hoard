@@ -197,6 +197,7 @@ error-favorites-too-many = maksymalnie 10 000 naraz
 error-saved-search-name = zapisane wyszukiwanie musi mieć nazwę o długości maksymalnie 80 znaków
 error-saved-search-too-long = to wyszukiwanie jest zbyt długie, by je zapisać
 error-hoard-seen = skarb może zapisać najwyżej 32 rodzaje zasobów, każdy nazwany małymi literami
+error-news-seen = co nowego może zapisać najwyżej 256 obejrzanych rzeczy, każda nazwana małymi literami, cyframi i łącznikami
 error-texture-pattern-map = Wzorzec nazw tekstur musi zawierać { "{" }map{ "}" }, inaczej każda mapa materiału dostanie tę samą nazwę
 error-texture-pattern-fields = Wzorzec nazw tekstur może zawierać { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }
 error-texture-name-chars = Nazwy tekstur nie mogą zawierać znaków < > : " / \ | ? ani *
@@ -472,6 +473,9 @@ appearance-top-theme = Przełącznik jasnego i ciemnego
 appearance-top-mic = Mikrofon w polu wyszukiwania, do szukania dźwięków przez wydanie jednego
 appearance-top-slash = Podpowiedź / w polu wyszukiwania
 appearance-top-palette = Przycisk palety poleceń ({ $keys })
+appearance-news = Co nowego
+appearance-news-what = Nowości w Hoard dostają błyszczącą złotą kropkę, dopóki ich nie zobaczysz, a górny pasek zbiera je w jednym miejscu. To, co już obejrzane, jest zapisywane na koncie.
+appearance-news-point-out = Wskazuj nowości
 
 ## Root
 
@@ -930,6 +934,10 @@ app-drop-hint = Każdy plik lub folder najwyższego poziomu staje się osobną p
 palette-group-go-to = Przejdź do
 palette-group-actions = Działania
 palette-group-theme = Motyw
+palette-group-news = Co nowego
+palette-news-show = Pokaż, co nowego
+palette-news-mark-all = Oznacz wszystkie nowości jako obejrzane
+palette-news-keywords = nowe nowości zmiany funkcje wydanie obejrzane new news changes features release seen
 palette-group-kinds = Rodzaje
 palette-group-packs = Paczki
 palette-group-collections = Kolekcje
@@ -3536,6 +3544,64 @@ api-kind-other-name = inne
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } nowość
+        [few] { $count } nowości
+        [many] { $count } nowości
+       *[other] { $count } nowości
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } nowość w Hoard
+        [few] { $count } nowości w Hoard
+        [many] { $count } nowości w Hoard
+       *[other] { $count } nowości w Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nowość w Hoard
+        [few] { $count } nowości tutaj
+        [many] { $count } nowości tutaj
+       *[other] { $count } nowości tutaj
+    }
+news-title = Nowości w Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } do odkrycia
+        [few] { $count } do odkrycia
+        [many] { $count } do odkrycia
+       *[other] { $count } do odkrycia
+    }
+news-close = Zamknij
+news-take-me = Przejdź tam
+news-look-again = Zobacz ponownie
+news-none = Na razie nie ma nic nowego do odkrycia.
+news-seen-lately = Ostatnio obejrzane
+news-stop-pointing = Przestań wskazywać nowości
+news-point-out = Znów wskazuj nowości
+news-mark-all = Oznacz wszystkie jako obejrzane
+news-marked-seen =
+    { $count ->
+        [one] Oznaczono { $count } nowość jako obejrzaną
+        [few] Oznaczono { $count } nowości jako obejrzane
+        [many] Oznaczono { $count } nowości jako obejrzane
+       *[other] Oznaczono { $count } nowości jako obejrzane
+    }
+news-themes-title = Dziesięć jasnych i dziesięć ciemnych motywów
+news-themes-body = Do jasnych motywów dołączają Niebo, Mięta, Morela i Cytryna, a do ciemnych Północ, Laguna i Neon. Nowy wygląd rozlewa się od wybranego kafelka.
+news-tiles-move-title = Kafelki w ciągłym ruchu
+news-tiles-move-body = Animacje i animowane obrazki na kafelkach biblioteki mogą odtwarzać się cały czas, nie tylko pod kursorem.
+news-motion-trails-title = Ślady ruchu na animacjach
+news-motion-trails-body = Miniatura animacji kreśli drogę, którą pokonuje postać, z kropką w miejscu, gdzie jest teraz.
+news-text-size-title = Rozmiar tekstu i odstępy
+news-text-size-body = Powiększ lub pomniejsz tekst, zrób stronę przestronniejszą lub bardziej zwartą i wybierz, co pokazują kafelki i górny pasek.
+news-tag-tree-title = Tagi w tagach
+news-tag-tree-body = Umieść tag pod szerszym, a wyszukiwanie „pojazd” znajdzie też „samochód” i „sedan”. Ustawienia → Tagi pokazują je jako drzewo.
+news-bulk-edit-title = Edycja wielu naraz
+news-bulk-edit-body = Zaznacz kilka zasobów i naciśnij E, aby zmienić naraz ich tagi, licencję, ocenę i nie tylko, z możliwością cofnięcia.
+news-backups-title = Zaplanowane kopie zapasowe
+news-backups-body = Rób kopię zapasową bazy danych codziennie lub co tydzień, zachowuj kilka najnowszych i kopiuj każdą do innego folderu.
 ui-undo = Cofnij
 ui-today = dzisiaj
 ui-yesterday = wczoraj

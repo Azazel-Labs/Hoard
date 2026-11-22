@@ -197,6 +197,7 @@ error-favorites-too-many = højst 10.000 ad gangen
 error-saved-search-name = en gemt søgning skal have et navn på højst 80 tegn
 error-saved-search-too-long = den søgning er for lang til at gemme
 error-hoard-seen = skatten kan højst registrere 32 slags assets, hver navngivet med små bogstaver
+error-news-seen = nyheder kan højst registrere 256 sete ting, hver navngivet med små bogstaver, tal og bindestreger
 error-texture-pattern-map = Mønsteret for teksturnavne skal indeholde { "{" }map{ "}" }, ellers ville alle et materiales maps få samme navn
 error-texture-pattern-fields = Mønsteret for teksturnavne kan bruge { "{" }name{ "}" }, { "{" }map{ "}" } og { "{" }size{ "}" }
 error-texture-name-chars = Teksturnavne må ikke indeholde < > : " / \ | ? eller *
@@ -460,6 +461,9 @@ appearance-top-theme = Skift mellem lyst og mørkt
 appearance-top-mic = Mikrofon i søgefeltet, til at finde lyde ved at lave en
 appearance-top-slash = /-tippet i søgefeltet
 appearance-top-palette = Knap til kommandopaletten ({ $keys })
+appearance-news = Nyheder
+appearance-news-what = Nye ting i Hoard får en glimtende guldprik, indtil du har set dem, og topbjælken samler dem ét sted. Det, du har set, følger din konto.
+appearance-news-point-out = Gør opmærksom på nye ting
 
 ## Rod
 
@@ -866,6 +870,10 @@ app-drop-hint = Hver fil eller mappe på øverste niveau bliver sin egen pakke. 
 palette-group-go-to = Gå til
 palette-group-actions = Handlinger
 palette-group-theme = Tema
+palette-group-news = Nyheder
+palette-news-show = Vis nyheder
+palette-news-mark-all = Markér alt nyt som set
+palette-news-keywords = ny nyt nyheder ændringer funktioner udgivelse set new news
 palette-group-kinds = Typer
 palette-group-packs = Pakker
 palette-group-collections = Samlinger
@@ -3249,6 +3257,54 @@ api-kind-other-name = andet
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } ny
+       *[other] { $count } nye
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } ny ting i Hoard
+       *[other] { $count } nye ting i Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nyt i Hoard
+       *[other] { $count } nye ting her
+    }
+news-title = Nyt i Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } at finde
+       *[other] { $count } at finde
+    }
+news-close = Luk
+news-take-me = Tag mig derhen
+news-look-again = Se igen
+news-none = Der er intet nyt at finde lige nu.
+news-seen-lately = Set for nylig
+news-stop-pointing = Stop med at gøre opmærksom på nye ting
+news-point-out = Gør opmærksom på nye ting igen
+news-mark-all = Markér alt som set
+news-marked-seen =
+    { $count ->
+        [one] { $count } ting markeret som set
+       *[other] { $count } ting markeret som set
+    }
+news-themes-title = Ti lyse og ti mørke temaer
+news-themes-body = Himmel, Mynte, Abrikos og Citron slutter sig til de lyse temaer og Midnat, Lagune og Neon til de mørke, og det nye udseende breder sig ud fra det felt, du vælger.
+news-tiles-move-title = Hold felterne i bevægelse
+news-tiles-move-body = Animationer og animerede billeder på bibliotekets felter kan afspilles hele tiden, ikke kun under markøren.
+news-motion-trails-title = Bevægelsesspor på animationer
+news-motion-trails-body = En animations miniature tegner den vej, figuren tager, med en prik der, hvor den er lige nu.
+news-text-size-title = Tekststørrelse og afstand
+news-text-size-body = Gør skriften større eller mindre og siden mere luftig eller mere kompakt, og vælg, hvad felterne og topbjælken viser.
+news-tag-tree-title = Tags inden i tags
+news-tag-tree-body = Sæt et tag under et bredere, så en søgning på køretøj også finder bil og sedan. Indstillinger → Tags viser dem som et træ.
+news-bulk-edit-title = Rediger mange på én gang
+news-bulk-edit-body = Vælg nogle assets, og tryk på E for at ændre deres tags, licens, vurdering og mere på én gang, med Fortryd.
+news-backups-title = Planlagte sikkerhedskopier
+news-backups-body = Sikkerhedskopiér databasen hver dag eller hver uge, behold de nyeste og kopiér hver enkelt til en anden mappe.
 ui-undo = Fortryd
 ui-today = i dag
 ui-yesterday = i går

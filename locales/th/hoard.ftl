@@ -197,6 +197,7 @@ error-favorites-too-many = ครั้งละไม่เกิน 10,000 ร
 error-saved-search-name = การค้นหาที่บันทึกไว้ต้องมีชื่อยาวไม่เกิน 80 ตัวอักษร
 error-saved-search-too-long = การค้นหานี้ยาวเกินกว่าจะบันทึกได้
 error-hoard-seen = ขุมทรัพย์บันทึกแอสเซ็ตได้สูงสุด 32 ชนิด แต่ละชนิดตั้งชื่อด้วยตัวพิมพ์เล็ก
+error-news-seen = มีอะไรใหม่บันทึกสิ่งที่เห็นแล้วได้สูงสุด 256 รายการ แต่ละรายการตั้งชื่อด้วยตัวพิมพ์เล็ก ตัวเลข และขีดกลาง
 error-texture-pattern-map = รูปแบบชื่อเท็กซ์เจอร์ต้องมี { "{" }map{ "}" } ไม่เช่นนั้นทุกแมปของแมทีเรียลจะได้ชื่อเดียวกัน
 error-texture-pattern-fields = รูปแบบชื่อเท็กซ์เจอร์ใช้ { "{" }name{ "}" }, { "{" }map{ "}" } และ { "{" }size{ "}" } ได้
 error-texture-name-chars = ชื่อเท็กซ์เจอร์ต้องไม่มี < > : " / \ | ? หรือ *
@@ -460,6 +461,9 @@ appearance-top-theme = สวิตช์สว่างและมืด
 appearance-top-mic = ไมโครโฟนในช่องค้นหา สำหรับค้นหาเสียงด้วยการทำเสียงนั้น
 appearance-top-slash = คำใบ้ / ในช่องค้นหา
 appearance-top-palette = ปุ่มแผงคำสั่ง ({ $keys })
+appearance-news = มีอะไรใหม่
+appearance-news-what = สิ่งใหม่ใน Hoard จะมีจุดสีทองระยิบระยับจนกว่าคุณจะได้เห็น และแถบด้านบนจะรวบรวมไว้ในที่เดียว สิ่งที่คุณเห็นแล้วจะผูกกับบัญชีของคุณ
+appearance-news-point-out = ชี้สิ่งใหม่ให้เห็น
 
 ## Root
 
@@ -799,6 +803,10 @@ app-drop-hint = ไฟล์หรือโฟลเดอร์ระดับ�
 palette-group-go-to = ไปที่
 palette-group-actions = การทำงาน
 palette-group-theme = ธีม
+palette-group-news = มีอะไรใหม่
+palette-news-show = ดูว่ามีอะไรใหม่
+palette-news-mark-all = ทำเครื่องหมายสิ่งใหม่ทั้งหมดว่าเห็นแล้ว
+palette-news-keywords = ใหม่ ข่าว การเปลี่ยนแปลง ฟีเจอร์ รุ่น อัปเดต เห็นแล้ว new news
 palette-group-kinds = ประเภท
 palette-group-packs = แพ็ก
 palette-group-collections = คอลเลกชัน
@@ -2990,6 +2998,47 @@ api-kind-other-name = ประเภทอื่น
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = ใหม่ { $count } รายการ
+news-button-title =
+    { $count ->
+       *[other] สิ่งใหม่ใน Hoard { $count } รายการ
+    }
+news-pip =
+    { $count ->
+        [1] ใหม่ใน Hoard
+       *[other] มีสิ่งใหม่ { $count } รายการที่นี่
+    }
+news-title = ใหม่ใน Hoard
+news-to-find =
+    { $count ->
+       *[other] รอให้ค้นพบ { $count } รายการ
+    }
+news-close = ปิด
+news-take-me = พาไปที่นั่น
+news-look-again = ดูอีกครั้ง
+news-none = ตอนนี้ยังไม่มีอะไรใหม่ให้ค้นพบ
+news-seen-lately = เห็นเมื่อเร็ว ๆ นี้
+news-stop-pointing = หยุดชี้สิ่งใหม่
+news-point-out = กลับมาชี้สิ่งใหม่อีกครั้ง
+news-mark-all = ทำเครื่องหมายว่าเห็นทั้งหมดแล้ว
+news-marked-seen =
+    { $count ->
+       *[other] ทำเครื่องหมายว่าเห็นแล้ว { $count } รายการ
+    }
+news-themes-title = ธีมสว่างสิบแบบและธีมมืดสิบแบบ
+news-themes-body = Sky, Mint, Apricot และ Lemon มาร่วมกับธีมสว่าง ส่วน Midnight, Lagoon และ Neon มาร่วมกับธีมมืด และรูปลักษณ์ใหม่จะแผ่ออกจากไทล์ที่คุณเลือก
+news-tiles-move-title = ให้ไทล์เคลื่อนไหวตลอด
+news-tiles-move-body = แอนิเมชันและภาพเคลื่อนไหวบนไทล์ในคลังเล่นได้ตลอดเวลา ไม่ใช่แค่ตอนที่ตัวชี้อยู่เหนือภาพ
+news-motion-trails-title = เส้นทางการเคลื่อนไหวบนแอนิเมชัน
+news-motion-trails-body = ภาพย่อของแอนิเมชันจะลากเส้นทางที่ตัวละครเคลื่อนที่ไป พร้อมจุดบอกตำแหน่งปัจจุบัน
+news-text-size-title = ขนาดข้อความและระยะห่าง
+news-text-size-body = ปรับตัวหนังสือให้ใหญ่ขึ้นหรือเล็กลง ปรับหน้าให้โปร่งขึ้นหรือกะทัดรัดขึ้น และเลือกสิ่งที่ไทล์และแถบด้านบนแสดง
+news-tag-tree-title = แท็กซ้อนแท็ก
+news-tag-tree-body = ใส่แท็กไว้ใต้แท็กที่กว้างกว่า เพื่อให้ค้นหา “ยานพาหนะ” แล้วเจอ “รถยนต์” และ “รถเก๋ง” ด้วย การตั้งค่า → แท็ก จะแสดงแท็กเหล่านี้เป็นแผนผังต้นไม้
+news-bulk-edit-title = แก้ไขหลายรายการพร้อมกัน
+news-bulk-edit-body = เลือกแอสเซ็ตแล้วกด E เพื่อเปลี่ยนแท็ก สัญญาอนุญาต คะแนน และอื่น ๆ พร้อมกัน โดยเลิกทำได้
+news-backups-title = การสำรองข้อมูลตามกำหนดเวลา
+news-backups-body = สำรองฐานข้อมูลทุกวันหรือทุกสัปดาห์ เก็บชุดล่าสุดไว้ไม่กี่ชุด และคัดลอกแต่ละชุดไปยังโฟลเดอร์อื่น
 ui-undo = เลิกทำ
 ui-today = วันนี้
 ui-yesterday = เมื่อวาน

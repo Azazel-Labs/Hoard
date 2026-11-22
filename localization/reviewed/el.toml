@@ -1860,6 +1860,18 @@ translation = "Γλώσσα"
 source = "Browser's ({ $name })"
 translation = "Του προγράμματος περιήγησης ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Τι νέο υπάρχει"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Επισήμανση νέων πραγμάτων"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Τα νέα πράγματα στο Hoard έχουν μια λαμπερή χρυσή κουκκίδα μέχρι να τα δείτε, και η επάνω γραμμή τα συγκεντρώνει σε ένα σημείο. Ό,τι έχετε δει ακολουθεί τον λογαριασμό σας."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Φωτεινό ή σκοτεινό"
@@ -4727,6 +4739,10 @@ translation = "δεν ήταν δυνατή η λήψη του { $model }: { $re
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "ο διακομιστής μοντέλων: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "τα νέα μπορούν να καταγράψουν έως 256 ειδωμένα πράγματα, το καθένα με όνομα σε πεζά γράμματα, ψηφία και παύλες"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7877,6 +7893,154 @@ translation = "{ $note } μείζονα"
 source = "{ $note } minor"
 translation = "{ $note } ελάσσονα"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Αντίγραφο ασφαλείας της βάσης δεδομένων κάθε μέρα ή κάθε εβδομάδα: κρατήστε τα πιο πρόσφατα και αντιγράψτε το καθένα σε άλλον φάκελο."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Προγραμματισμένα αντίγραφα ασφαλείας"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Επιλέξτε μερικά στοιχεία και πατήστε E για να αλλάξετε μαζί τις ετικέτες, την άδεια χρήσης, τη βαθμολογία τους και άλλα, με δυνατότητα Αναίρεσης."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Επεξεργασία πολλών μαζί"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = """
+{ $count ->
+        [one] { $count } νέο
+       *[other] { $count } νέα
+    }"""
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } νέο πράγμα στο Hoard
+       *[other] { $count } νέα πράγματα στο Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Κλείσιμο"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Δείτε ξανά"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Σήμανση όλων ως ειδωμένων"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } πράγμα σημάνθηκε ως ειδωμένο
+       *[other] { $count } πράγματα σημάνθηκαν ως ειδωμένα
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Η μικρογραφία ενός animation χαράζει τη διαδρομή που κάνει ο χαρακτήρας του, με μια κουκκίδα εκεί που βρίσκεται τώρα."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Ίχνη κίνησης στα animation"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Δεν υπάρχει κάτι νέο για ανακάλυψη αυτή τη στιγμή."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Νέο στο Hoard
+       *[other] { $count } νέα πράγματα εδώ
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Επισήμανση νέων πραγμάτων ξανά"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Πρόσφατα ειδωμένα"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Διακοπή επισήμανσης νέων πραγμάτων"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Βάλτε μια ετικέτα κάτω από μια ευρύτερη, ώστε η αναζήτηση για όχημα να βρίσκει και αυτοκίνητο και σεντάν. Οι Ρυθμίσεις → Ετικέτες τις δείχνουν ως δέντρο."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Ετικέτες μέσα σε ετικέτες"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Μετάβαση εκεί"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Κάντε τα γράμματα μεγαλύτερα ή μικρότερα και τη σελίδα πιο ευρύχωρη ή πιο συμπαγή, και επιλέξτε τι δείχνουν τα πλακίδια και η επάνω γραμμή."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Μέγεθος κειμένου και αποστάσεις"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Τα Ουρανός, Μέντα, Βερίκοκο και Λεμόνι προστίθενται στα φωτεινά θέματα και τα Μεσάνυχτα, Λιμνοθάλασσα και Νέον στα σκοτεινά, και η νέα εμφάνιση απλώνεται από το πλακίδιο που επιλέγετε."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Δέκα φωτεινά και δέκα σκοτεινά θέματα"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Τα animation και οι κινούμενες εικόνες στα πλακίδια της βιβλιοθήκης μπορούν να παίζουν συνέχεια, όχι μόνο κάτω από τον δείκτη."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Πλακίδια σε συνεχή κίνηση"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Νέα στο Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } για ανακάλυψη
+       *[other] { $count } για ανακάλυψη
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Όλα τα πακέτα"
@@ -8711,6 +8875,10 @@ translation = "Μετάβαση"
 source = "Kinds"
 translation = "Τύποι"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Τι νέο υπάρχει"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Πακέτα"
@@ -8762,6 +8930,18 @@ translation = "στοιχεία πλέγμα αρχική assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Φωτεινό θέμα: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "νέο νέα νεότερα αλλαγές λειτουργίες έκδοση ειδωμένα new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Σήμανση όλων των νέων ως ειδωμένων"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Εμφάνιση των νέων"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

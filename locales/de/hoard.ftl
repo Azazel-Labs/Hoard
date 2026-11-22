@@ -197,6 +197,7 @@ error-favorites-too-many = höchstens 10.000 auf einmal
 error-saved-search-name = eine gespeicherte Suche braucht einen Namen mit höchstens 80 Zeichen
 error-saved-search-too-long = diese Suche ist zu lang zum Speichern
 error-hoard-seen = der Hort kann höchstens 32 Arten von Assets festhalten, jede mit einem Namen aus Kleinbuchstaben
+error-news-seen = die Neuigkeiten können höchstens 256 gesehene Dinge festhalten, jedes mit einem Namen aus Kleinbuchstaben, Ziffern und Bindestrichen
 error-texture-pattern-map = Das Muster für Texturnamen braucht { "{" }map{ "}" }, sonst bekämen alle Maps eines Materials denselben Namen
 error-texture-pattern-fields = Das Muster für Texturnamen kann { "{" }name{ "}" }, { "{" }map{ "}" } und { "{" }size{ "}" } verwenden
 error-texture-name-chars = Texturnamen dürfen kein < > : " / \ | ? oder * enthalten
@@ -464,6 +465,9 @@ appearance-top-theme = Umschalter für hell und dunkel
 appearance-top-mic = Mikrofon im Suchfeld, um Klänge zu finden, indem du einen machst
 appearance-top-slash = Der /-Hinweis im Suchfeld
 appearance-top-palette = Schaltfläche für die Befehlspalette ({ $keys })
+appearance-news = Neuigkeiten
+appearance-news-what = Neues in Hoard bekommt einen funkelnden goldenen Punkt, bis du es gesehen hast, und die obere Leiste sammelt alles an einem Ort. Was du gesehen hast, folgt deinem Konto.
+appearance-news-point-out = Auf Neues hinweisen
 
 ## Root
 
@@ -870,6 +874,10 @@ app-drop-hint = Jede Datei und jeder Ordner der obersten Ebene wird zu einem eig
 palette-group-go-to = Gehe zu
 palette-group-actions = Aktionen
 palette-group-theme = Design
+palette-group-news = Neuigkeiten
+palette-news-show = Neuigkeiten anzeigen
+palette-news-mark-all = Alles Neue als gesehen markieren
+palette-news-keywords = neu neuigkeiten neuheiten änderungen funktionen version gesehen new news
 palette-group-kinds = Arten
 palette-group-packs = Pakete
 palette-group-collections = Sammlungen
@@ -3249,6 +3257,50 @@ api-kind-other-name = Sonstiges
 
 ## Meldungen, Dialoge und Laden (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } neu
+news-button-title =
+    { $count ->
+        [one] { $count } Neuheit in Hoard
+       *[other] { $count } Neuheiten in Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Neu in Hoard
+       *[other] { $count } Neuheiten hier
+    }
+news-title = Neu in Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } zu entdecken
+       *[other] { $count } zu entdecken
+    }
+news-close = Schließen
+news-take-me = Bring mich hin
+news-look-again = Noch mal ansehen
+news-none = Gerade gibt es nichts Neues zu entdecken.
+news-seen-lately = Kürzlich gesehen
+news-stop-pointing = Nicht mehr auf Neues hinweisen
+news-point-out = Wieder auf Neues hinweisen
+news-mark-all = Alle als gesehen markieren
+news-marked-seen =
+    { $count ->
+        [one] { $count } Neuheit als gesehen markiert
+       *[other] { $count } Neuheiten als gesehen markiert
+    }
+news-themes-title = Zehn helle und zehn dunkle Designs
+news-themes-body = Himmel, Minze, Aprikose und Zitrone ergänzen die hellen Designs, Mitternacht, Lagune und Neon die dunklen, und der neue Look breitet sich von der Kachel aus, die du wählst.
+news-tiles-move-title = Kacheln in Bewegung halten
+news-tiles-move-body = Animationen und animierte Bilder auf den Kacheln der Bibliothek können durchgehend laufen, nicht nur unter dem Zeiger.
+news-motion-trails-title = Bewegungsspuren bei Animationen
+news-motion-trails-body = Das Vorschaubild einer Animation zeichnet den Weg nach, den ihre Figur nimmt, mit einem Punkt dort, wo sie gerade ist.
+news-text-size-title = Textgröße und Abstände
+news-text-size-body = Mach die Schrift größer oder kleiner und die Seite großzügiger oder kompakter, und wähle, was die Kacheln und die obere Leiste zeigen.
+news-tag-tree-title = Tags in Tags
+news-tag-tree-body = Stell ein Tag unter ein allgemeineres, dann findet die Suche nach Fahrzeug auch Auto und Limousine. Einstellungen → Tags zeigt sie als Baum.
+news-bulk-edit-title = Viele auf einmal bearbeiten
+news-bulk-edit-body = Wähle ein paar Assets aus und drück E, um ihre Tags, Lizenz, Bewertung und mehr gemeinsam zu ändern, mit Rückgängig.
+news-backups-title = Geplante Sicherungen
+news-backups-body = Sichere die Datenbank jeden Tag oder jede Woche, behalte die neuesten paar und kopiere jede Sicherung in einen anderen Ordner.
 ui-undo = Rückgängig
 ui-today = heute
 ui-yesterday = gestern

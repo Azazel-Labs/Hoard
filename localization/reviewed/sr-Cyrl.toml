@@ -1868,6 +1868,18 @@ translation = "Језик"
 source = "Browser's ({ $name })"
 translation = "Као у прегледачу ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Шта је ново"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Истичи новине"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Нове ствари у Hoard-у добијају светлуцаву златну тачку док их не видите, а горња трака их окупља на једном месту. Оно што сте видели прати ваш налог."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Светла или тамна"
@@ -4761,6 +4773,10 @@ translation = "преузимање модела { $model } није успел�
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "сервер модела: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "„Шта је ново“ може да бележи највише 256 виђених ствари, свака названа малим словима, цифрама и цртицама"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7902,6 +7918,155 @@ translation = "{ $note }-дур"
 source = "{ $note } minor"
 translation = "{ $note }-мол"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Правите резервну копију базе података сваког дана или сваке недеље, чувајте неколико најновијих и копирајте сваку у другу фасциклу."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Заказане резервне копије"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Изаберите неколико ресурса и притисните E да им заједно промените ознаке, лиценцу, оцену и још много тога, уз могућност опозива."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Измена више ресурса одједном"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "Ново: { $count }"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } новина у Hoard-у
+        [few] { $count } новине у Hoard-у
+       *[other] { $count } новина у Hoard-у
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Затвори"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Погледај поново"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Означи све као виђено"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } новина означена као виђена
+        [few] { $count } новине означене као виђене
+       *[other] { $count } новина означено као виђено
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Сличица анимације исцртава путању којом лик иде, с тачком тамо где је сада."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Трагови кретања на анимацијама"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Тренутно нема ничег новог."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Ново у Hoard-у
+        [one] { $count } новина овде
+        [few] { $count } новине овде
+       *[other] { $count } новина овде
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Поново истичи новине"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Недавно виђено"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Не истичи новине"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Ставите ознаку испод шире, па претрага за „возило“ налази и „аутомобил“ и „седан“. Подешавања → Ознаке их приказују као стабло."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Ознаке унутар ознака"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Води ме тамо"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Повећајте или смањите слова, учините страницу пространијом или збијенијом и изаберите шта приказују плочице и горња трака."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Величина текста и размаци"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Светлим темама придружују се Sky, Mint, Apricot и Lemon, а тамнима Midnight, Lagoon и Neon, и нови изглед се шири од плочице коју изаберете."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Десет светлих и десет тамних тема"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Анимације и анимиране слике на плочицама библиотеке могу да се пуштају све време, не само испод показивача."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Плочице у покрету"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Ново у Hoard-у"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] За откривање: { $count }
+        [few] За откривање: { $count }
+       *[other] За откривање: { $count }
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Сви пакети"
@@ -8742,6 +8907,10 @@ translation = "Иди на"
 source = "Kinds"
 translation = "Врсте"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Шта је ново"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Пакети"
@@ -8793,6 +8962,18 @@ translation = "ресурси мрежа почетна assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Светла тема: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "ново новине новости измене могућности издање виђено new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Означи све ново као виђено"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Прикажи шта је ново"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

@@ -1788,6 +1788,18 @@ translation = "語言"
 source = "Browser's ({ $name })"
 translation = "瀏覽器的語言（{ $name }）"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "新功能"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "提示新功能"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Hoard 中的新功能會帶著一個閃爍的金色圓點，直到你看過為止；頂端列會把它們集中在一處。你看過哪些內容會跟著你的帳號。"
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "淺色或深色"
@@ -4577,6 +4589,10 @@ translation = "無法下載 { $model }：{ $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "模型伺服器：{ $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "新功能最多可記錄 256 項已看過的內容，每項都須以小寫字母、數字和連字號命名"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7643,6 +7659,147 @@ translation = "{ $note } 大調"
 source = "{ $note } minor"
 translation = "{ $note } 小調"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "每天或每週備份一次資料庫，保留最新的幾份，並把每份複製到另一個資料夾。"
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "排程備份"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "選取一些素材後按 E，就能一起變更它們的標籤、授權、評分等，而且可以復原。"
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "批次編輯"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "{ $count } 項新功能"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+       *[other] Hoard 有 { $count } 項新功能
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "關閉"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "再看一次"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "全部標為已看過"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+       *[other] 已將 { $count } 項標為已看過
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "動畫的縮圖會描出角色走過的路徑，並用一個圓點標出它目前的位置。"
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "動畫運動軌跡"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "目前沒有新功能可看。"
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Hoard 新功能
+       *[other] 這裡有 { $count } 項新功能
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "重新提示新功能"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "最近看過"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "不再提示新功能"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "把標籤放到更廣泛的標籤下，搜尋「交通工具」時也能找到「汽車」和「轎車」。「設定 → 標籤」會以樹狀圖顯示它們。"
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "標籤中的標籤"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "帶我去看"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "把文字調大或調小、頁面調得寬鬆或緊湊，並選擇圖塊和頂端列顯示的內容。"
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "文字大小與間距"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "淺色主題新增 Sky、Mint、Apricot 和 Lemon，深色主題新增 Midnight、Lagoon 和 Neon，新外觀會從你選取的圖塊向外展開。"
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "十款淺色與十款深色主題"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "素材庫圖塊上的動畫和動態圖片可以一律播放，不只在指標停留時。"
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "讓圖塊一直動起來"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Hoard 新功能"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+       *[other] 還有 { $count } 項待發現
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "所有素材包"
@@ -8437,6 +8594,10 @@ translation = "前往"
 source = "Kinds"
 translation = "類型"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "新功能"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "素材包"
@@ -8488,6 +8649,18 @@ translation = "素材 格線 首頁 assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "淺色主題：{ $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "新 新功能 更新 變更 功能 版本 已看 new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "將所有新功能標為已看過"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "查看新功能"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

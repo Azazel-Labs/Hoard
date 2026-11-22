@@ -197,6 +197,7 @@ error-favorites-too-many = највише 10.000 одједном
 error-saved-search-name = сачувана претрага мора имати назив од највише 80 знакова
 error-saved-search-too-long = та претрага је предугачка да би се сачувала
 error-hoard-seen = благо може да бележи највише 32 врсте ресурса, свака названа малим словима
+error-news-seen = „Шта је ново“ може да бележи највише 256 виђених ствари, свака названа малим словима, цифрама и цртицама
 error-texture-pattern-map = Шаблон назива текстуре мора да садржи { "{" }map{ "}" }, иначе би све мапе једног материјала добиле исти назив
 error-texture-pattern-fields = Шаблон назива текстуре може да користи { "{" }name{ "}" }, { "{" }map{ "}" } и { "{" }size{ "}" }
 error-texture-name-chars = Називи текстура не могу да садрже < > : " / \ | ? или *
@@ -470,6 +471,9 @@ appearance-top-theme = Прекидач светле и тамне теме
 appearance-top-mic = Микрофон у пољу за претрагу, за тражење звукова тако што направите један
 appearance-top-slash = Наговештај / у пољу за претрагу
 appearance-top-palette = Дугме палете команди ({ $keys })
+appearance-news = Шта је ново
+appearance-news-what = Нове ствари у Hoard-у добијају светлуцаву златну тачку док их не видите, а горња трака их окупља на једном месту. Оно што сте видели прати ваш налог.
+appearance-news-point-out = Истичи новине
 
 ## Корен
 
@@ -900,6 +904,10 @@ app-drop-hint = Свака датотека или фасцикла највиш
 palette-group-go-to = Иди на
 palette-group-actions = Радње
 palette-group-theme = Тема
+palette-group-news = Шта је ново
+palette-news-show = Прикажи шта је ново
+palette-news-mark-all = Означи све ново као виђено
+palette-news-keywords = ново новине новости измене могућности издање виђено new news
 palette-group-kinds = Врсте
 palette-group-packs = Пакети
 palette-group-collections = Колекције
@@ -3404,6 +3412,55 @@ api-kind-other-name = остало
 
 ## Обавештења, дијалози и учитавање (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = Ново: { $count }
+news-button-title =
+    { $count ->
+        [one] { $count } новина у Hoard-у
+        [few] { $count } новине у Hoard-у
+       *[other] { $count } новина у Hoard-у
+    }
+news-pip =
+    { $count ->
+        [1] Ново у Hoard-у
+        [one] { $count } новина овде
+        [few] { $count } новине овде
+       *[other] { $count } новина овде
+    }
+news-title = Ново у Hoard-у
+news-to-find =
+    { $count ->
+        [one] За откривање: { $count }
+        [few] За откривање: { $count }
+       *[other] За откривање: { $count }
+    }
+news-close = Затвори
+news-take-me = Води ме тамо
+news-look-again = Погледај поново
+news-none = Тренутно нема ничег новог.
+news-seen-lately = Недавно виђено
+news-stop-pointing = Не истичи новине
+news-point-out = Поново истичи новине
+news-mark-all = Означи све као виђено
+news-marked-seen =
+    { $count ->
+        [one] { $count } новина означена као виђена
+        [few] { $count } новине означене као виђене
+       *[other] { $count } новина означено као виђено
+    }
+news-themes-title = Десет светлих и десет тамних тема
+news-themes-body = Светлим темама придружују се Sky, Mint, Apricot и Lemon, а тамнима Midnight, Lagoon и Neon, и нови изглед се шири од плочице коју изаберете.
+news-tiles-move-title = Плочице у покрету
+news-tiles-move-body = Анимације и анимиране слике на плочицама библиотеке могу да се пуштају све време, не само испод показивача.
+news-motion-trails-title = Трагови кретања на анимацијама
+news-motion-trails-body = Сличица анимације исцртава путању којом лик иде, с тачком тамо где је сада.
+news-text-size-title = Величина текста и размаци
+news-text-size-body = Повећајте или смањите слова, учините страницу пространијом или збијенијом и изаберите шта приказују плочице и горња трака.
+news-tag-tree-title = Ознаке унутар ознака
+news-tag-tree-body = Ставите ознаку испод шире, па претрага за „возило“ налази и „аутомобил“ и „седан“. Подешавања → Ознаке их приказују као стабло.
+news-bulk-edit-title = Измена више ресурса одједном
+news-bulk-edit-body = Изаберите неколико ресурса и притисните E да им заједно промените ознаке, лиценцу, оцену и још много тога, уз могућност опозива.
+news-backups-title = Заказане резервне копије
+news-backups-body = Правите резервну копију базе података сваког дана или сваке недеље, чувајте неколико најновијих и копирајте сваку у другу фасциклу.
 ui-undo = Опозови
 ui-today = данас
 ui-yesterday = јуче

@@ -1852,6 +1852,18 @@ translation = "Kieli"
 source = "Browser's ({ $name })"
 translation = "Selaimen kieli ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Uutta"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Huomauta uusista asioista"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Hoardin uudet asiat saavat kimaltavan kultaisen pisteen, kunnes olet nähnyt ne, ja yläpalkki kokoaa ne yhteen paikkaan. Se, mitä olet nähnyt, seuraa tiliäsi."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Vaalea vai tumma"
@@ -4727,6 +4739,10 @@ translation = "mallin { $model } lataus epäonnistui: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "mallipalvelin: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "uutuuksista voi tallentaa enintään 256 nähtyä asiaa, kunkin nimettynä pienin kirjaimin, numeroin ja yhdysmerkein"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7859,6 +7875,154 @@ translation = "{ $note }-duuri"
 source = "{ $note } minor"
 translation = "{ $note }-molli"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Varmuuskopioi tietokanta joka päivä tai joka viikko, säilytä muutama uusin ja kopioi jokainen toiseen kansioon."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Ajastetut varmuuskopiot"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Valitse resursseja ja paina E muuttaaksesi niiden tunnisteita, lisenssiä, arvosanaa ja muuta kerralla. Kumoa toimii myös."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Muokkaa montaa kerralla"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = """
+{ $count ->
+        [one] { $count } uusi
+       *[other] { $count } uutta
+    }"""
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } uusi asia Hoardissa
+       *[other] { $count } uutta asiaa Hoardissa
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Sulje"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Katso uudelleen"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Merkitse kaikki nähdyiksi"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } asia merkitty nähdyksi
+       *[other] { $count } asiaa merkitty nähdyiksi
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Animaation pikkukuva piirtää hahmon kulkeman reitin ja pisteen kohtaan, jossa se on juuri nyt."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Liikeradat animaatioissa"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Juuri nyt ei ole mitään uutta löydettävää."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Uutta Hoardissa
+       *[other] { $count } uutta asiaa täällä
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Huomauta taas uusista asioista"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Äskettäin nähdyt"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Lopeta uusista asioista huomauttaminen"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Asetukset → Tunnisteet piirtää ne puuksi."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Tunnisteita tunnisteiden sisällä"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Vie minut sinne"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Suurenna tai pienennä tekstiä, tee sivusta väljempi tai tiiviimpi ja valitse, mitä ruudut ja yläpalkki näyttävät."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Tekstin koko ja välit"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Taivas, Minttu, Aprikoosi ja Sitruuna liittyvät vaaleisiin teemoihin ja Keskiyö, Laguuni ja Neon tummiin, ja uusi ulkoasu leviää valitsemastasi ruudusta."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Kymmenen vaaleaa ja kymmenen tummaa teemaa"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Kirjaston ruutujen animaatiot ja animoidut kuvat voivat toistua koko ajan, ei vain osoittimen alla."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Pidä ruudut liikkeessä"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Uutta Hoardissa"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } löydettävänä
+       *[other] { $count } löydettävänä
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Kaikki paketit"
@@ -8693,6 +8857,10 @@ translation = "Siirry"
 source = "Kinds"
 translation = "Tyypit"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Uutta"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Paketit"
@@ -8744,6 +8912,18 @@ translation = "resurssit ruudukko koti alku assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Vaalea teema: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "uusi uutta uutiset muutokset ominaisuudet julkaisu nähty new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Merkitse kaikki uusi nähdyksi"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Näytä, mitä uutta"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

@@ -197,6 +197,7 @@ error-favorites-too-many = maks 10 000 om gangen
 error-saved-search-name = et lagret søk må ha et navn på maks 80 tegn
 error-saved-search-too-long = det søket er for langt til å lagres
 error-hoard-seen = skatten kan registrere høyst 32 typer ressurser, hver med et navn i små bokstaver
+error-news-seen = hva er nytt kan registrere høyst 256 sette ting, hver med et navn i små bokstaver, sifre og bindestreker
 error-texture-pattern-map = Mønsteret for teksturnavn må ha { "{" }map{ "}" }, ellers ville alle kartene til et materiale få samme navn
 error-texture-pattern-fields = Mønsteret for teksturnavn kan bruke { "{" }name{ "}" }, { "{" }map{ "}" } og { "{" }size{ "}" }
 error-texture-name-chars = Teksturnavn kan ikke inneholde < > : " / \ | ? eller *
@@ -460,6 +461,9 @@ appearance-top-theme = Bryter for lys og mørk
 appearance-top-mic = Mikrofon i søkefeltet, for å finne lyder ved å lage en
 appearance-top-slash = /-hintet i søkefeltet
 appearance-top-palette = Knapp for kommandopaletten ({ $keys })
+appearance-news = Hva er nytt
+appearance-news-what = Nye ting i Hoard får en glitrende gullprikk til du har sett dem, og topplinjen samler dem på ett sted. Hva du har sett, følger kontoen din.
+appearance-news-point-out = Fremhev nye ting
 
 ## Rot
 
@@ -866,6 +870,10 @@ app-drop-hint = Hver fil eller mappe på øverste nivå blir sin egen pakke. Gig
 palette-group-go-to = Gå til
 palette-group-actions = Handlinger
 palette-group-theme = Tema
+palette-group-news = Hva er nytt
+palette-news-show = Vis hva som er nytt
+palette-news-mark-all = Merk alt nytt som sett
+palette-news-keywords = nytt nyheter endringer funksjoner utgivelse sett new news changes features release seen
 palette-group-kinds = Typer
 palette-group-packs = Pakker
 palette-group-collections = Samlinger
@@ -3252,6 +3260,54 @@ api-kind-other-name = annet
 
 ## Varsler, dialoger og lasting (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } ny
+       *[other] { $count } nye
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } ny ting i Hoard
+       *[other] { $count } nye ting i Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nytt i Hoard
+       *[other] { $count } nye ting her
+    }
+news-title = Nytt i Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } å finne
+       *[other] { $count } å finne
+    }
+news-close = Lukk
+news-take-me = Ta meg dit
+news-look-again = Se igjen
+news-none = Ingenting nytt å finne akkurat nå.
+news-seen-lately = Sett nylig
+news-stop-pointing = Slutt å fremheve nye ting
+news-point-out = Fremhev nye ting igjen
+news-mark-all = Merk alt som sett
+news-marked-seen =
+    { $count ->
+        [one] { $count } ting merket som sett
+       *[other] { $count } ting merket som sett
+    }
+news-themes-title = Ti lyse og ti mørke temaer
+news-themes-body = Himmel, Mynte, Aprikos og Sitron slutter seg til de lyse temaene og Midnatt, Lagune og Neon til de mørke, og det nye utseendet sprer seg ut fra flisen du velger.
+news-tiles-move-title = Hold flisene i bevegelse
+news-tiles-move-body = Animasjoner og animerte bilder på flisene i biblioteket kan spilles av hele tiden, ikke bare under pekeren.
+news-motion-trails-title = Bevegelsesspor på animasjoner
+news-motion-trails-body = Miniatyrbildet til en animasjon tegner banen figuren følger, med en prikk der den er akkurat nå.
+news-text-size-title = Tekststørrelse og avstand
+news-text-size-body = Gjør skriften større eller mindre og siden luftigere eller mer kompakt, og velg hva flisene og topplinjen viser.
+news-tag-tree-title = Tagger inni tagger
+news-tag-tree-body = Legg en tagg under en bredere, så finner et søk på kjøretøy også bil og sedan. Innstillinger → Tagger tegner dem som et tre.
+news-bulk-edit-title = Rediger mange samtidig
+news-bulk-edit-body = Velg noen ressurser og trykk E for å endre tagger, lisens, vurdering og mer på én gang, med Angre.
+news-backups-title = Planlagte sikkerhetskopier
+news-backups-body = Ta sikkerhetskopi av databasen hver dag eller hver uke, behold de nyeste, og kopier hver av dem til en annen mappe.
 ui-undo = Angre
 ui-today = i dag
 ui-yesterday = i går

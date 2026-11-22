@@ -1898,6 +1898,18 @@ translation = "Язык"
 source = "Browser's ({ $name })"
 translation = "Как в браузере ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Что нового"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Отмечать новое"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Новое в Hoard отмечается мерцающей золотой точкой, пока вы его не увидите, а верхняя панель собирает всё новое в одном месте. Что вы уже видели, хранится в вашей учётной записи."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Светлая или тёмная"
@@ -4827,6 +4839,10 @@ translation = "не удалось скачать { $model }: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "сервер моделей: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "раздел «Что нового» может хранить не более 256 просмотренных новинок, каждая с названием из строчных букв, цифр и дефисов"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -8002,6 +8018,159 @@ translation = "{ $note } мажор"
 source = "{ $note } minor"
 translation = "{ $note } минор"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Делайте резервную копию базы данных каждый день или каждую неделю, храните несколько последних и копируйте каждую в другую папку."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Резервные копии по расписанию"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Выберите несколько ассетов и нажмите E, чтобы разом изменить их теги, лицензию, оценку и многое другое — с возможностью отмены."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Правка многих сразу"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "Новое: { $count }"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } новинка в Hoard
+        [few] { $count } новинки в Hoard
+        [many] { $count } новинок в Hoard
+       *[other] { $count } новинки в Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Закрыть"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Посмотреть снова"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Отметить всё как просмотренное"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } новинка отмечена как просмотренная
+        [few] { $count } новинки отмечены как просмотренные
+        [many] { $count } новинок отмечены как просмотренные
+       *[other] { $count } новинки отмечены как просмотренные
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "Миниатюра анимации прочерчивает путь персонажа, а точка показывает, где он сейчас."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Траектории движения в анимациях"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Пока ничего нового."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Новое в Hoard
+        [one] Здесь { $count } новинка
+        [few] Здесь { $count } новинки
+        [many] Здесь { $count } новинок
+       *[other] Здесь { $count } новинки
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Снова отмечать новое"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Недавно просмотренное"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Не отмечать новое"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Поместите тег под более общий, и поиск по «транспорт» найдёт также «автомобиль» и «седан». В «Настройки → Теги» они показаны деревом."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Теги внутри тегов"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Перейти"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Сделайте текст крупнее или мельче, страницу — просторнее или компактнее, и выберите, что показывают плитки и верхняя панель."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Размер текста и отступы"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "К светлым темам добавились Sky, Mint, Apricot и Lemon, к тёмным — Midnight, Lagoon и Neon, а новое оформление расходится от плитки, которую вы выбрали."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Десять светлых и десять тёмных тем"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Анимации и анимированные картинки на плитках библиотеки могут проигрываться всё время, а не только под указателем."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Плитки в движении"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Новое в Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] Осталось найти: { $count }
+        [few] Осталось найти: { $count }
+        [many] Осталось найти: { $count }
+       *[other] Осталось найти: { $count }
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Все паки"
@@ -8862,6 +9031,10 @@ translation = "Перейти"
 source = "Kinds"
 translation = "Виды"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Что нового"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Паки"
@@ -8913,6 +9086,18 @@ translation = "ассеты сетка главная assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Светлая тема: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "новое новинки изменения функции возможности релиз обновление просмотрено new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Отметить всё новое как просмотренное"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Показать, что нового"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

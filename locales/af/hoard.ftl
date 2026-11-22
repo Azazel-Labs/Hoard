@@ -197,6 +197,7 @@ error-favorites-too-many = hoogstens 10 000 op 'n slag
 error-saved-search-name = 'n gestoorde soektog het 'n naam van hoogstens 80 karakters nodig
 error-saved-search-too-long = daardie soektog is te lank om te stoor
 error-hoard-seen = die skat kan hoogstens 32 soorte bates hou, elk benoem in kleinletters
+error-news-seen = wat is nuut kan hoogstens 256 gesiene dinge hou, elk benoem in kleinletters, syfers en koppeltekens
 error-texture-pattern-map = Die tekstuurnaampatroon het { "{" }map{ "}" } nodig, anders kry elke kaart van 'n materiaal dieselfde naam
 error-texture-pattern-fields = Die tekstuurnaampatroon kan { "{" }name{ "}" }, { "{" }map{ "}" } en { "{" }size{ "}" } gebruik
 error-texture-name-chars = Tekstuurname kan nie < > : " / \ | ? of * bevat nie
@@ -460,6 +461,9 @@ appearance-top-theme = Lig-en-donker-skakelaar
 appearance-top-mic = Mikrofoon in die soekkassie, om klanke te vind deur een te maak
 appearance-top-slash = Die /-wenk in die soekkassie
 appearance-top-palette = Opdragpaletknoppie ({ $keys })
+appearance-news = Wat is nuut
+appearance-news-what = Nuwe dinge in Hoard kry ’n blink goue kolletjie totdat jy hulle gesien het, en die boonste balk versamel hulle op een plek. Wat jy gesien het, volg jou rekening.
+appearance-news-point-out = Wys nuwe dinge uit
 
 ## Wortel
 
@@ -866,6 +870,10 @@ app-drop-hint = Elke lêer of vouer op die boonste vlak word sy eie pak. Gigagre
 palette-group-go-to = Gaan na
 palette-group-actions = Aksies
 palette-group-theme = Tema
+palette-group-news = Wat is nuut
+palette-news-show = Wys wat nuut is
+palette-news-mark-all = Merk alles wat nuut is as gesien
+palette-news-keywords = nuut nuus veranderinge funksies vrystelling gesien new news
 palette-group-kinds = Soorte
 palette-group-packs = Pakke
 palette-group-collections = Versamelings
@@ -3247,6 +3255,50 @@ api-kind-other-name = ander
 
 ## Kennisgewings, dialoë en laai (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } nuut
+news-button-title =
+    { $count ->
+        [one] { $count } nuwe ding in Hoard
+       *[other] { $count } nuwe dinge in Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nuut in Hoard
+       *[other] { $count } nuwe dinge hier
+    }
+news-title = Nuut in Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } om te vind
+       *[other] { $count } om te vind
+    }
+news-close = Maak toe
+news-take-me = Neem my soontoe
+news-look-again = Kyk weer
+news-none = Niks nuuts om nou te vind nie.
+news-seen-lately = Onlangs gesien
+news-stop-pointing = Hou op om nuwe dinge uit te wys
+news-point-out = Wys weer nuwe dinge uit
+news-mark-all = Merk alles as gesien
+news-marked-seen =
+    { $count ->
+        [one] { $count } ding as gesien gemerk
+       *[other] { $count } dinge as gesien gemerk
+    }
+news-themes-title = Tien ligte en tien donker temas
+news-themes-body = Lug, Kruisement, Appelkoos en Suurlemoen sluit by die ligte temas aan en Middernag, Strandmeer en Neon by die donkeres, en die nuwe voorkoms versprei vanaf die teël wat jy kies.
+news-tiles-move-title = Hou teëls aan die beweeg
+news-tiles-move-body = Animasies en geanimeerde prente op die biblioteekteëls kan heeltyd speel, nie net onder die wyser nie.
+news-motion-trails-title = Bewegingspore op animasies
+news-motion-trails-body = ’n Animasie se duimnael trek die pad na wat sy karakter volg, met ’n kolletjie waar dit nou is.
+news-text-size-title = Teksgrootte en spasiëring
+news-text-size-body = Maak die skrif groter of kleiner en die bladsy ruimer of kompakter, en kies wat die teëls en die boonste balk wys.
+news-tag-tree-title = Etikette binne etikette
+news-tag-tree-body = Plaas ’n etiket onder ’n breër een, sodat ’n soektog na voertuig ook motor en sedan vind. Instellings → Etikette teken hulle as ’n boom.
+news-bulk-edit-title = Wysig baie tegelyk
+news-bulk-edit-body = Kies ’n paar bates en druk E om hul etikette, lisensie, gradering en meer saam te verander, met Ontdoen.
+news-backups-title = Geskeduleerde rugsteun
+news-backups-body = Rugsteun die databasis elke dag of elke week, hou die nuutste paar en kopieer elkeen na ’n ander vouer.
 ui-undo = Ontdoen
 ui-today = vandag
 ui-yesterday = gister

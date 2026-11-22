@@ -11,7 +11,7 @@ const emit = defineEmits<{ close: []; open: [Asset] }>()
 
 /** Groups shown before anything is typed; the long lists (packs, collections) wait for a query. App.vue names the
  *  groups with these same messages. */
-const idleGroups = computed(() => new Set([t('palette-group-go-to'), t('palette-group-actions'), t('palette-group-theme')]))
+const idleGroups = computed(() => new Set([t('palette-group-news'), t('palette-group-go-to'), t('palette-group-actions'), t('palette-group-theme')]))
 const PER_GROUP = 6
 
 interface Row {

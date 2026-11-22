@@ -1848,6 +1848,18 @@ translation = "Sprog"
 source = "Browser's ({ $name })"
 translation = "Browserens ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Nyheder"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Gør opmærksom på nye ting"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Nye ting i Hoard får en glimtende guldprik, indtil du har set dem, og topbjælken samler dem ét sted. Det, du har set, følger din konto."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Lyst eller mørkt"
@@ -4715,6 +4727,10 @@ translation = "kunne ikke downloade { $model }: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "modelserveren: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "nyheder kan højst registrere 256 sete ting, hver navngivet med små bogstaver, tal og bindestreger"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7836,6 +7852,154 @@ translation = "{ $note }-dur"
 source = "{ $note } minor"
 translation = "{ $note }-mol"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Sikkerhedskopiér databasen hver dag eller hver uge, behold de nyeste og kopiér hver enkelt til en anden mappe."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Planlagte sikkerhedskopier"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Vælg nogle assets, og tryk på E for at ændre deres tags, licens, vurdering og mere på én gang, med Fortryd."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Rediger mange på én gang"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = """
+{ $count ->
+        [one] { $count } ny
+       *[other] { $count } nye
+    }"""
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } ny ting i Hoard
+       *[other] { $count } nye ting i Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Luk"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Se igen"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Markér alt som set"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } ting markeret som set
+       *[other] { $count } ting markeret som set
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "En animations miniature tegner den vej, figuren tager, med en prik der, hvor den er lige nu."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Bevægelsesspor på animationer"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Der er intet nyt at finde lige nu."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Nyt i Hoard
+       *[other] { $count } nye ting her
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Gør opmærksom på nye ting igen"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Set for nylig"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Stop med at gøre opmærksom på nye ting"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Sæt et tag under et bredere, så en søgning på køretøj også finder bil og sedan. Indstillinger → Tags viser dem som et træ."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Tags inden i tags"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Tag mig derhen"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Gør skriften større eller mindre og siden mere luftig eller mere kompakt, og vælg, hvad felterne og topbjælken viser."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Tekststørrelse og afstand"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Himmel, Mynte, Abrikos og Citron slutter sig til de lyse temaer og Midnat, Lagune og Neon til de mørke, og det nye udseende breder sig ud fra det felt, du vælger."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Ti lyse og ti mørke temaer"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Animationer og animerede billeder på bibliotekets felter kan afspilles hele tiden, ikke kun under markøren."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Hold felterne i bevægelse"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Nyt i Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } at finde
+       *[other] { $count } at finde
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Alle pakker"
@@ -8654,6 +8818,10 @@ translation = "Gå til"
 source = "Kinds"
 translation = "Typer"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Nyheder"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Pakker"
@@ -8705,6 +8873,18 @@ translation = "assets gitter hjem forside grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Lyst tema: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "ny nyt nyheder ændringer funktioner udgivelse set new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Markér alt nyt som set"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Vis nyheder"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

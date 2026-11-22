@@ -18,6 +18,7 @@ import IssuesPanel from './IssuesPanel.vue'
 import LibraryStats from './LibraryStats.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import MaintenancePanel from './MaintenancePanel.vue'
+import NewPip from './NewPip.vue'
 import PerformancePanel from './PerformancePanel.vue'
 import ResetButton from './ResetButton.vue'
 import SearchPanel from './SearchPanel.vue'
@@ -163,7 +164,7 @@ const { s: settings, ready, busy, save, take, opts, saveOpt, resetOpt, changed }
         <UpdatesPanel v-if="!isDesktop()" :settings="settings" @saved="take" @unauthorized="emit('unauthorized')" />
       </section>
       <section>
-        <div class="sh"><h3>{{ t('settings-backups') }}</h3></div>
+        <div class="sh"><h3>{{ t('settings-backups') }}<NewPip id="backups" /></h3></div>
         <p class="what">{{ t('settings-backups-what') }}</p>
         <div class="llm opts">
           <label for="opt-backup-every">{{ t('settings-backup-every') }}</label>

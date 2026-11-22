@@ -197,6 +197,7 @@ error-favorites-too-many = 一次最多 10,000 個
 error-saved-search-name = 已儲存的搜尋需要最多 80 個字元的名稱
 error-saved-search-too-long = 這個搜尋太長，無法儲存
 error-hoard-seen = 寶藏最多可記錄 32 種素材，每種都須以小寫字母命名
+error-news-seen = 新功能最多可記錄 256 項已看過的內容，每項都須以小寫字母、數字和連字號命名
 error-texture-pattern-map = 貼圖名稱樣式需要包含 { "{" }map{ "}" }，否則材質的每張貼圖都會得到相同的名稱
 error-texture-pattern-fields = 貼圖名稱樣式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" } 和 { "{" }size{ "}" }
 error-texture-name-chars = 貼圖名稱不能包含 < > : " / \ | ? 或 *
@@ -460,6 +461,9 @@ appearance-top-theme = 淺色/深色切換
 appearance-top-mic = 搜尋框中的麥克風，發出聲音來尋找相似的聲音
 appearance-top-slash = 搜尋框中的 / 提示
 appearance-top-palette = 命令面板按鈕（{ $keys }）
+appearance-news = 新功能
+appearance-news-what = Hoard 中的新功能會帶著一個閃爍的金色圓點，直到你看過為止；頂端列會把它們集中在一處。你看過哪些內容會跟著你的帳號。
+appearance-news-point-out = 提示新功能
 
 ## 根頁面
 
@@ -802,6 +806,10 @@ app-drop-hint = 每個最上層的檔案或資料夾都會成為獨立的素材�
 palette-group-go-to = 前往
 palette-group-actions = 動作
 palette-group-theme = 主題
+palette-group-news = 新功能
+palette-news-show = 查看新功能
+palette-news-mark-all = 將所有新功能標為已看過
+palette-news-keywords = 新 新功能 更新 變更 功能 版本 已看 new news
 palette-group-kinds = 類型
 palette-group-packs = 素材包
 palette-group-collections = 收藏集
@@ -2993,6 +3001,47 @@ api-kind-other-name = 其他
 
 ## 通知、對話方塊與載入
 
+news-button = { $count } 項新功能
+news-button-title =
+    { $count ->
+       *[other] Hoard 有 { $count } 項新功能
+    }
+news-pip =
+    { $count ->
+        [1] Hoard 新功能
+       *[other] 這裡有 { $count } 項新功能
+    }
+news-title = Hoard 新功能
+news-to-find =
+    { $count ->
+       *[other] 還有 { $count } 項待發現
+    }
+news-close = 關閉
+news-take-me = 帶我去看
+news-look-again = 再看一次
+news-none = 目前沒有新功能可看。
+news-seen-lately = 最近看過
+news-stop-pointing = 不再提示新功能
+news-point-out = 重新提示新功能
+news-mark-all = 全部標為已看過
+news-marked-seen =
+    { $count ->
+       *[other] 已將 { $count } 項標為已看過
+    }
+news-themes-title = 十款淺色與十款深色主題
+news-themes-body = 淺色主題新增 Sky、Mint、Apricot 和 Lemon，深色主題新增 Midnight、Lagoon 和 Neon，新外觀會從你選取的圖塊向外展開。
+news-tiles-move-title = 讓圖塊一直動起來
+news-tiles-move-body = 素材庫圖塊上的動畫和動態圖片可以一律播放，不只在指標停留時。
+news-motion-trails-title = 動畫運動軌跡
+news-motion-trails-body = 動畫的縮圖會描出角色走過的路徑，並用一個圓點標出它目前的位置。
+news-text-size-title = 文字大小與間距
+news-text-size-body = 把文字調大或調小、頁面調得寬鬆或緊湊，並選擇圖塊和頂端列顯示的內容。
+news-tag-tree-title = 標籤中的標籤
+news-tag-tree-body = 把標籤放到更廣泛的標籤下，搜尋「交通工具」時也能找到「汽車」和「轎車」。「設定 → 標籤」會以樹狀圖顯示它們。
+news-bulk-edit-title = 批次編輯
+news-bulk-edit-body = 選取一些素材後按 E，就能一起變更它們的標籤、授權、評分等，而且可以復原。
+news-backups-title = 排程備份
+news-backups-body = 每天或每週備份一次資料庫，保留最新的幾份，並把每份複製到另一個資料夾。
 ui-undo = 復原
 ui-today = 今天
 ui-yesterday = 昨天

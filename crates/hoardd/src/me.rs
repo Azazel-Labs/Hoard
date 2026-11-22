@@ -1,5 +1,5 @@
-//! What's each person's own in the library: the assets they've starred (favorites), the searches they've saved, and
-//! their dragon hoard (how much of the library they've collected). Looking is enough for all of them, since none
+//! What's each person's own in the library: the assets they've starred (favorites), the searches they've saved,
+//! their dragon hoard (how much of the library they've collected), and which of what's new in Hoard they've seen. Looking is enough for all of them, since none
 //! changes the library. An access token or connected app acts for the account that made it.
 
 use crate::i18n::tr;
@@ -8,7 +8,7 @@ use axum::http::StatusCode;
 use axum::routing::get;
 use axum::{Extension, Json, Router};
 use rusqlite::{Connection, OptionalExtension, params};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
@@ -24,6 +24,7 @@ pub(crate) fn router() -> Router<AppState> {
         .route("/api/me/searches", get(list_searches).post(save_search))
         .route("/api/me/searches/{id}", axum::routing::put(change_search).delete(delete_search))
         .route("/api/me/hoard", get(get_hoard).put(set_hoard))
+        .route("/api/me/news", get(get_news).put(set_news))
 }
 
 /// The person `who` is, or acts for.
@@ -270,6 +271,64 @@ async fn set_hoard(
     Ok(Json(json!({ "seen": change.seen })))
 }
 
+/// What's new in Hoard that a person has seen: each new thing's id (the portal's list names them) with when they saw
+/// it, and whether they've asked not to have new things pointed out. Kept with the account so that signing in on
+/// another browser doesn't point everything out again.
+#[derive(Debug, Default, Deserialize, Serialize)]
+struct News {
+    #[serde(default)]
+    seen: BTreeMap<String, String>,
+    #[serde(default)]
+    off: bool,
+}
+
+/// The most new things a record keeps, and the longest id or time one may have: far more than are ever new at once.
+const NEWS_SEEN: usize = 256;
+const NEWS_ID_LEN: usize = 48;
+const NEWS_WHEN_LEN: usize = 40;
+
+fn valid_news(n: &News) -> bool {
+    n.seen.len() <= NEWS_SEEN
+        && n.seen.iter().all(|(id, when)| {
+            !id.is_empty()
+                && id.len() <= NEWS_ID_LEN
+                && id.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+                && when.len() <= NEWS_WHEN_LEN
+        })
+}
+
+/// What a person has seen of what's new, or `null` before anything's been recorded.
+async fn get_news(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
+    let user = owner(&who)?;
+    let news = db::call(&state.pool, move |c| {
+        let raw: Option<String> =
+            c.query_row("SELECT news_seen FROM users WHERE id = ?1", [user], |r| r.get(0)).optional()?.flatten();
+        // A record that no longer reads is as good as none.
+        Ok(raw.and_then(|r| serde_json::from_str::<News>(&r).ok()))
+    })
+    .await?;
+    Ok(Json(json!({ "news": news })))
+}
+
+/// Record what a person has seen of what's new, replacing what was recorded. Answers with it.
+async fn set_news(
+    State(state): State<AppState>,
+    Extension(who): Extension<Who>,
+    Json(news): Json<News>,
+) -> ApiResult<Json<Value>> {
+    let user = owner(&who)?;
+    if !valid_news(&news) {
+        return Err(AppError::bad_request(tr!("error-news-seen")));
+    }
+    let text = serde_json::to_string(&news).map_err(anyhow::Error::from)?;
+    db::call(&state.pool, move |c| {
+        c.execute("UPDATE users SET news_seen = ?2 WHERE id = ?1", params![user, text])?;
+        Ok(())
+    })
+    .await?;
+    Ok(Json(json!({ "news": news })))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -317,5 +376,25 @@ mod tests {
         }
         let many: Hoard = (0..=HOARD_KINDS).map(|i| ("k".repeat(i % 8 + 1) + &"x".repeat(i / 8), 1)).collect();
         assert!(!valid_hoard(&many));
+    }
+
+    #[test]
+    fn what_s_new_is_recorded_by_short_ids() {
+        let news = |ids: &[&str]| News {
+            seen: ids.iter().map(|id| ((*id).to_owned(), "2026-11-22T10:00:00Z".to_owned())).collect(),
+            off: false,
+        };
+        assert!(valid_news(&news(&["themes-20", "tiles-move"])));
+        assert!(valid_news(&News::default()));
+        for bad in ["", "Themes", "two words", "a/b", &"x".repeat(NEWS_ID_LEN + 1)] {
+            assert!(!valid_news(&news(&[bad])), "{bad:?}");
+        }
+        let long = News { seen: [("a".to_owned(), "x".repeat(NEWS_WHEN_LEN + 1))].into(), off: true };
+        assert!(!valid_news(&long));
+        let many: Vec<String> = (0..=NEWS_SEEN).map(|i| format!("n{i}")).collect();
+        assert!(!valid_news(&news(&many.iter().map(String::as_str).collect::<Vec<_>>())));
+        // A record from before `off` reads as pointing things out.
+        let old: News = serde_json::from_str(r#"{"seen":{"a":"2026-11-01"}}"#).unwrap();
+        assert!(!old.off && old.seen.len() == 1);
     }
 }

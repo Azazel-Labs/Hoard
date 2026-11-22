@@ -197,6 +197,7 @@ error-favorites-too-many = no máximo 10 000 de cada vez
 error-saved-search-name = uma pesquisa guardada precisa de um nome com no máximo 80 caracteres
 error-saved-search-too-long = essa pesquisa é demasiado longa para ser guardada
 error-hoard-seen = o tesouro pode registar no máximo 32 tipos de recurso, cada um com nome em letras minúsculas
+error-news-seen = as novidades podem registar no máximo 256 itens vistos, cada um com nome em letras minúsculas, algarismos e hífenes
 error-texture-pattern-map = O padrão de nome das texturas precisa de { "{" }map{ "}" }, senão todos os mapas de um material ficariam com o mesmo nome
 error-texture-pattern-fields = O padrão de nome das texturas pode usar { "{" }name{ "}" }, { "{" }map{ "}" } e { "{" }size{ "}" }
 error-texture-name-chars = Os nomes das texturas não podem ter < > : " / \ | ? nem *
@@ -460,6 +461,9 @@ appearance-top-theme = Comutador entre claro e escuro
 appearance-top-mic = Microfone na caixa de pesquisa, para encontrar sons fazendo um
 appearance-top-slash = A sugestão / na caixa de pesquisa
 appearance-top-palette = Botão da paleta de comandos ({ $keys })
+appearance-news = Novidades
+appearance-news-what = As novidades do Hoard ganham um ponto dourado cintilante até as ver, e a barra superior reúne-as num só lugar. O que já viu fica guardado na sua conta.
+appearance-news-point-out = Destacar novidades
 
 ## Raiz
 
@@ -866,6 +870,10 @@ app-drop-hint = Cada ficheiro ou pasta de nível superior torna-se um pacote pr�
 palette-group-go-to = Ir para
 palette-group-actions = Ações
 palette-group-theme = Tema
+palette-group-news = Novidades
+palette-news-show = Mostrar novidades
+palette-news-mark-all = Marcar todas as novidades como vistas
+palette-news-keywords = novidades novo novos alterações funcionalidades versão vistos new news changes features release seen
 palette-group-kinds = Tipos
 palette-group-packs = Pacotes
 palette-group-collections = Coleções
@@ -3256,6 +3264,54 @@ api-kind-other-name = outros
 
 ## Notificações, diálogos e carregamento (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } novidade
+       *[other] { $count } novidades
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } novidade no Hoard
+       *[other] { $count } novidades no Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Novidade no Hoard
+       *[other] { $count } novidades aqui
+    }
+news-title = Novidades no Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } por descobrir
+       *[other] { $count } por descobrir
+    }
+news-close = Fechar
+news-take-me = Ir para lá
+news-look-again = Ver outra vez
+news-none = Não há novidades por descobrir de momento.
+news-seen-lately = Vistas recentemente
+news-stop-pointing = Deixar de destacar novidades
+news-point-out = Voltar a destacar novidades
+news-mark-all = Marcar todas como vistas
+news-marked-seen =
+    { $count ->
+        [one] { $count } novidade marcada como vista
+       *[other] { $count } novidades marcadas como vistas
+    }
+news-themes-title = Dez temas claros e dez escuros
+news-themes-body = Céu, Menta, Alperce e Limão juntam-se aos temas claros e Meia-noite, Lagoa e Néon aos escuros, e o novo aspeto espalha-se a partir do mosaico que escolher.
+news-tiles-move-title = Mosaicos sempre em movimento
+news-tiles-move-body = As animações e imagens animadas nos mosaicos da biblioteca podem ser reproduzidas sempre, não só por baixo do ponteiro.
+news-motion-trails-title = Rastos de movimento nas animações
+news-motion-trails-body = A miniatura de uma animação traça o caminho que a personagem percorre, com um ponto onde ela está agora.
+news-text-size-title = Tamanho do texto e espaçamento
+news-text-size-body = Torne o texto maior ou mais pequeno e a página mais espaçosa ou mais compacta, e escolha o que os mosaicos e a barra superior mostram.
+news-tag-tree-title = Etiquetas dentro de etiquetas
+news-tag-tree-body = Coloque uma etiqueta dentro de outra mais ampla, para que pesquisar veículo encontre também automóvel e berlina. Definições → Etiquetas mostra-as como uma árvore.
+news-bulk-edit-title = Editar vários de uma vez
+news-bulk-edit-body = Selecione alguns recursos e prima E para alterar de uma vez as etiquetas, a licença, a classificação e mais, com Anular.
+news-backups-title = Cópias de segurança agendadas
+news-backups-body = Faça uma cópia de segurança da base de dados todos os dias ou todas as semanas, guarde as mais recentes e copie cada uma para outra pasta.
 ui-undo = Anular
 ui-today = hoje
 ui-yesterday = ontem

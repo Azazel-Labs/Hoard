@@ -197,6 +197,7 @@ error-favorites-too-many = egyszerre legfeljebb 10 000
 error-saved-search-name = a mentett keresésnek legfeljebb 80 karakteres név kell
 error-saved-search-too-long = ez a keresés túl hosszú a mentéshez
 error-hoard-seen = a kincs legfeljebb 32 assetfajtát tarthat nyilván, mindegyiket kisbetűs névvel
+error-news-seen = az újdonságok legfeljebb 256 látott elemet tarthatnak nyilván, mindegyiket kisbetűkből, számjegyekből és kötőjelekből álló névvel
 error-texture-pattern-map = A textúranév-mintában szerepelnie kell ennek: { "{" }map{ "}" }, különben egy anyag minden térképe ugyanazt a nevet kapná
 error-texture-pattern-fields = A textúranév-minta ezeket használhatja: { "{" }name{ "}" }, { "{" }map{ "}" } és { "{" }size{ "}" }
 error-texture-name-chars = A textúranevek nem tartalmazhatják ezeket: < > : " / \ | ? vagy *
@@ -460,6 +461,9 @@ appearance-top-theme = Világos–sötét kapcsoló
 appearance-top-mic = Mikrofon a keresőmezőben, hangok kereséséhez egy hang kiadásával
 appearance-top-slash = A / tipp a keresőmezőben
 appearance-top-palette = Parancspaletta gomb ({ $keys })
+appearance-news = Újdonságok
+appearance-news-what = A Hoard újdonságait csillogó arany pötty jelzi, amíg meg nem nézi őket, a felső sáv pedig egy helyre gyűjti őket. Hogy mit látott már, azt a fiókja őrzi.
+appearance-news-point-out = Újdonságok jelzése
 
 ## Gyökér
 
@@ -842,6 +846,10 @@ app-drop-hint = Minden legfelső szintű fájl vagy mappa külön csomag lesz. T
 palette-group-go-to = Ugrás
 palette-group-actions = Műveletek
 palette-group-theme = Téma
+palette-group-news = Újdonságok
+palette-news-show = Újdonságok megjelenítése
+palette-news-mark-all = Minden újdonság megjelölése látottként
+palette-news-keywords = új újdonság újdonságok változások funkciók kiadás látott new news changes features release seen
 palette-group-kinds = Típusok
 palette-group-packs = Csomagok
 palette-group-collections = Gyűjtemények
@@ -3078,6 +3086,50 @@ api-kind-other-name = egyebek
 
 ## Értesítések, párbeszédablakok és betöltés (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } új
+news-button-title =
+    { $count ->
+        [one] { $count } újdonság a Hoardban
+       *[other] { $count } újdonság a Hoardban
+    }
+news-pip =
+    { $count ->
+        [one] Újdonság a Hoardban
+       *[other] { $count } újdonság itt
+    }
+news-title = Újdonságok a Hoardban
+news-to-find =
+    { $count ->
+        [one] { $count } felfedezésre vár
+       *[other] { $count } felfedezésre vár
+    }
+news-close = Bezárás
+news-take-me = Ugrás oda
+news-look-again = Megnézem újra
+news-none = Most nincs felfedeznivaló újdonság.
+news-seen-lately = Nemrég látott
+news-stop-pointing = Újdonságok jelzésének kikapcsolása
+news-point-out = Újdonságok jelzésének visszakapcsolása
+news-mark-all = Összes megjelölése látottként
+news-marked-seen =
+    { $count ->
+        [one] { $count } elem megjelölve látottként
+       *[other] { $count } elem megjelölve látottként
+    }
+news-themes-title = Tíz világos és tíz sötét téma
+news-themes-body = Az Égbolt, a Menta, a Sárgabarack és a Citrom a világos, az Éjfél, a Lagúna és a Neon a sötét témák közé került, az új megjelenés pedig a kiválasztott csempétől terül szét.
+news-tiles-move-title = Mozgásban maradó csempék
+news-tiles-move-body = A könyvtár csempéin az animációk és az animált képek folyamatosan is lejátszódhatnak, nem csak a mutató alatt.
+news-motion-trails-title = Mozgásnyomok az animációkon
+news-motion-trails-body = Az animációk bélyegképe kirajzolja a karakter útját, egy ponttal ott, ahol éppen jár.
+news-text-size-title = Szövegméret és térköz
+news-text-size-body = Legyen nagyobb vagy kisebb a szöveg, tágasabb vagy tömörebb az oldal, és válassza ki, mit mutassanak a csempék és a felső sáv.
+news-tag-tree-title = Címkék a címkéken belül
+news-tag-tree-body = Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldal faként rajzolja ki őket.
+news-bulk-edit-title = Sok asset szerkesztése egyszerre
+news-bulk-edit-body = Jelöljön ki néhány assetet, és nyomja meg az E billentyűt, hogy egyszerre módosítsa a címkéiket, licencüket, értékelésüket és még sok mást – mindez visszavonható.
+news-backups-title = Ütemezett biztonsági mentések
+news-backups-body = Mentse az adatbázist minden nap vagy minden héten, tartsa meg a legújabbakat, és másolja mindegyiket egy másik mappába is.
 ui-undo = Visszavonás
 ui-today = ma
 ui-yesterday = tegnap

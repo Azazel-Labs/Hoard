@@ -197,6 +197,7 @@ error-favorites-too-many = 一度に 10,000 件までです
 error-saved-search-name = 保存する検索には 80 文字以内の名前が必要です
 error-saved-search-too-long = その検索は長すぎて保存できません
 error-hoard-seen = 宝の山に記録できるアセットの種類は 32 種類までで、それぞれ小文字の名前が必要です
+error-news-seen = 新着情報に記録できる確認済みの項目は 256 件までで、それぞれ小文字、数字、ハイフンの名前が必要です
 error-texture-pattern-map = テクスチャ名のパターンには { "{" }map{ "}" } が必要です。ないと、マテリアルのすべてのマップが同じ名前になります
 error-texture-pattern-fields = テクスチャ名のパターンには { "{" }name{ "}" }、{ "{" }map{ "}" }、{ "{" }size{ "}" } を使えます
 error-texture-name-chars = テクスチャ名に < > : " / \ | ? * は使えません
@@ -460,6 +461,9 @@ appearance-top-theme = ライト／ダークの切り替え
 appearance-top-mic = 検索ボックスのマイク（音を出して似た音を探す）
 appearance-top-slash = 検索ボックスの / のヒント
 appearance-top-palette = コマンドパレットのボタン（{ $keys }）
+appearance-news = 新着情報
+appearance-news-what = Hoard の新しいものには、確認するまできらめく金色の点が付き、上部バーにまとめて表示されます。確認済みの項目はアカウントに記録されます。
+appearance-news-point-out = 新しいものを知らせる
 
 ## ルート
 
@@ -799,6 +803,10 @@ app-drop-hint = 最上位のファイルやフォルダーは、それぞれ個�
 palette-group-go-to = 移動
 palette-group-actions = 操作
 palette-group-theme = テーマ
+palette-group-news = 新着情報
+palette-news-show = 新着情報を表示
+palette-news-mark-all = 新着をすべて確認済みにする
+palette-news-keywords = 新着 新機能 お知らせ 変更 リリース 確認済み new news changes features release seen
 palette-group-kinds = 種類
 palette-group-packs = パック
 palette-group-collections = コレクション
@@ -2987,6 +2995,47 @@ api-kind-other-name = その他
 
 ## トースト、ダイアログ、読み込み（ui.ts、UiLayer.vue、lazy.ts）
 
+news-button = 新着 { $count } 件
+news-button-title =
+    { $count ->
+       *[other] Hoard の新着 { $count } 件
+    }
+news-pip =
+    { $count ->
+        [1] Hoard の新着
+       *[other] ここに新着 { $count } 件
+    }
+news-title = Hoard の新着情報
+news-to-find =
+    { $count ->
+       *[other] 未確認 { $count } 件
+    }
+news-close = 閉じる
+news-take-me = 見に行く
+news-look-again = もう一度見る
+news-none = 今のところ新着はありません。
+news-seen-lately = 最近確認したもの
+news-stop-pointing = 新着を知らせない
+news-point-out = 新着をまた知らせる
+news-mark-all = すべて確認済みにする
+news-marked-seen =
+    { $count ->
+       *[other] { $count } 件を確認済みにしました
+    }
+news-themes-title = ライトテーマとダークテーマが 10 種類ずつ
+news-themes-body = ライトテーマに Sky、Mint、Apricot、Lemon、ダークテーマに Midnight、Lagoon、Neon が加わりました。新しい見た目は選んだタイルから広がります。
+news-tiles-move-title = タイルを動かし続ける
+news-tiles-move-body = ライブラリのタイルのアニメーションやアニメーション画像を、ポインターを重ねていなくても常に再生できます。
+news-motion-trails-title = アニメーションの軌跡
+news-motion-trails-body = アニメーションのサムネイルにキャラクターの動いた道筋が描かれ、今いる位置に点が表示されます。
+news-text-size-title = 文字の大きさと余白
+news-text-size-body = 文字を大きくも小さくも、ページをゆったりともコンパクトにもできます。タイルと上部バーに表示するものも選べます。
+news-tag-tree-title = タグの中のタグ
+news-tag-tree-body = タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ ではツリーとして表示されます。
+news-bulk-edit-title = まとめて編集
+news-bulk-edit-body = アセットをいくつか選んで E を押すと、タグ、ライセンス、評価などをまとめて変更できます。元に戻すこともできます。
+news-backups-title = 定期バックアップ
+news-backups-body = データベースを毎日または毎週バックアップし、最新のものをいくつか残して、それぞれを別のフォルダーにもコピーできます。
 ui-undo = 元に戻す
 ui-today = 今日
 ui-yesterday = 昨日

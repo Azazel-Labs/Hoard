@@ -1785,6 +1785,18 @@ translation = "言語"
 source = "Browser's ({ $name })"
 translation = "ブラウザーの言語（{ $name }）"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "新着情報"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "新しいものを知らせる"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Hoard の新しいものには、確認するまできらめく金色の点が付き、上部バーにまとめて表示されます。確認済みの項目はアカウントに記録されます。"
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "ライトかダークか"
@@ -4577,6 +4589,10 @@ translation = "{ $model } をダウンロードできませんでした: { $reas
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "モデルサーバー: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "新着情報に記録できる確認済みの項目は 256 件までで、それぞれ小文字、数字、ハイフンの名前が必要です"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7651,6 +7667,147 @@ translation = "{ $note } 長調"
 source = "{ $note } minor"
 translation = "{ $note } 短調"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "データベースを毎日または毎週バックアップし、最新のものをいくつか残して、それぞれを別のフォルダーにもコピーできます。"
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "定期バックアップ"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "アセットをいくつか選んで E を押すと、タグ、ライセンス、評価などをまとめて変更できます。元に戻すこともできます。"
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "まとめて編集"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "新着 { $count } 件"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+       *[other] Hoard の新着 { $count } 件
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "閉じる"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "もう一度見る"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "すべて確認済みにする"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件を確認済みにしました
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "アニメーションのサムネイルにキャラクターの動いた道筋が描かれ、今いる位置に点が表示されます。"
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "アニメーションの軌跡"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "今のところ新着はありません。"
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Hoard の新着
+       *[other] ここに新着 { $count } 件
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "新着をまた知らせる"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "最近確認したもの"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "新着を知らせない"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ ではツリーとして表示されます。"
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "タグの中のタグ"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "見に行く"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "文字を大きくも小さくも、ページをゆったりともコンパクトにもできます。タイルと上部バーに表示するものも選べます。"
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "文字の大きさと余白"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "ライトテーマに Sky、Mint、Apricot、Lemon、ダークテーマに Midnight、Lagoon、Neon が加わりました。新しい見た目は選んだタイルから広がります。"
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "ライトテーマとダークテーマが 10 種類ずつ"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "ライブラリのタイルのアニメーションやアニメーション画像を、ポインターを重ねていなくても常に再生できます。"
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "タイルを動かし続ける"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Hoard の新着情報"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+       *[other] 未確認 { $count } 件
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "すべてのパック"
@@ -8445,6 +8602,10 @@ translation = "移動"
 source = "Kinds"
 translation = "種類"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "新着情報"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "パック"
@@ -8496,6 +8657,18 @@ translation = "アセット グリッド ホーム assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "ライトテーマ: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "新着 新機能 お知らせ 変更 リリース 確認済み new news changes features release seen"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "新着をすべて確認済みにする"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "新着情報を表示"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

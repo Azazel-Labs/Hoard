@@ -197,6 +197,7 @@ error-favorites-too-many = maximaal 10.000 tegelijk
 error-saved-search-name = een opgeslagen zoekopdracht heeft een naam nodig van maximaal 80 tekens
 error-saved-search-too-long = die zoekopdracht is te lang om op te slaan
 error-hoard-seen = de schat kan hoogstens 32 soorten assets bijhouden, elk met een naam in kleine letters
+error-news-seen = wat is er nieuw kan hoogstens 256 geziene dingen bijhouden, elk met een naam in kleine letters, cijfers en koppeltekens
 error-texture-pattern-map = Het patroon voor textuurnamen heeft { "{" }map{ "}" } nodig, anders krijgt elke map van een materiaal dezelfde naam
 error-texture-pattern-fields = Het patroon voor textuurnamen kan { "{" }name{ "}" }, { "{" }map{ "}" } en { "{" }size{ "}" } gebruiken
 error-texture-name-chars = Textuurnamen mogen geen < > : " / \ | ? of * bevatten
@@ -460,6 +461,9 @@ appearance-top-theme = Schakelaar voor licht en donker
 appearance-top-mic = Microfoon in het zoekvak, om geluiden te vinden door er een te maken
 appearance-top-slash = De /-hint in het zoekvak
 appearance-top-palette = Knop voor het opdrachtpalet ({ $keys })
+appearance-news = Wat is er nieuw
+appearance-news-what = Nieuwe dingen in Hoard krijgen een glinsterende gouden stip tot je ze hebt gezien, en de bovenbalk verzamelt ze op één plek. Wat je hebt gezien, gaat mee met je account.
+appearance-news-point-out = Nieuwe dingen aanwijzen
 
 ## Root
 
@@ -866,6 +870,10 @@ app-drop-hint = Elk bestand of elke map op het hoogste niveau wordt een eigen pa
 palette-group-go-to = Ga naar
 palette-group-actions = Acties
 palette-group-theme = Thema
+palette-group-news = Wat is er nieuw
+palette-news-show = Tonen wat er nieuw is
+palette-news-mark-all = Alles wat nieuw is als gezien markeren
+palette-news-keywords = nieuw nieuws wijzigingen functies versie gezien new news changes features release seen
 palette-group-kinds = Soorten
 palette-group-packs = Pakketten
 palette-group-collections = Collecties
@@ -3249,6 +3257,50 @@ api-kind-other-name = overige
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } nieuw
+news-button-title =
+    { $count ->
+        [one] { $count } nieuw ding in Hoard
+       *[other] { $count } nieuwe dingen in Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nieuw in Hoard
+       *[other] { $count } nieuwe dingen hier
+    }
+news-title = Nieuw in Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } te ontdekken
+       *[other] { $count } te ontdekken
+    }
+news-close = Sluiten
+news-take-me = Breng me erheen
+news-look-again = Nog eens bekijken
+news-none = Op dit moment niets nieuws te ontdekken.
+news-seen-lately = Onlangs gezien
+news-stop-pointing = Nieuwe dingen niet meer aanwijzen
+news-point-out = Nieuwe dingen weer aanwijzen
+news-mark-all = Alles als gezien markeren
+news-marked-seen =
+    { $count ->
+        [one] { $count } ding als gezien gemarkeerd
+       *[other] { $count } dingen als gezien gemarkeerd
+    }
+news-themes-title = Tien lichte en tien donkere thema’s
+news-themes-body = Hemel, Munt, Abrikoos en Citroen komen bij de lichte thema’s en Middernacht, Lagune en Neon bij de donkere, en de nieuwe look verspreidt zich vanaf de tegel die je kiest.
+news-tiles-move-title = Tegels blijven bewegen
+news-tiles-move-body = Animaties en bewegende afbeeldingen op de tegels in de bibliotheek kunnen altijd afspelen, niet alleen onder de aanwijzer.
+news-motion-trails-title = Bewegingssporen op animaties
+news-motion-trails-body = De miniatuur van een animatie tekent het pad dat het personage aflegt, met een stip waar het nu is.
+news-text-size-title = Tekstgrootte en ruimte
+news-text-size-body = Maak de tekst groter of kleiner en de pagina ruimer of compacter, en kies wat de tegels en de bovenbalk laten zien.
+news-tag-tree-title = Tags in tags
+news-tag-tree-body = Zet een tag onder een bredere, zodat zoeken op voertuig ook auto en sedan vindt. Instellingen → Tags tekent ze als een boom.
+news-bulk-edit-title = Veel tegelijk bewerken
+news-bulk-edit-body = Selecteer een paar assets en druk op E om hun tags, licentie, beoordeling en meer tegelijk te wijzigen, met Ongedaan maken.
+news-backups-title = Geplande back-ups
+news-backups-body = Maak elke dag of elke week een back-up van de database, bewaar de nieuwste paar en kopieer elke back-up naar een andere map.
 ui-undo = Ongedaan maken
 ui-today = vandaag
 ui-yesterday = gisteren

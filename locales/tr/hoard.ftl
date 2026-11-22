@@ -197,6 +197,7 @@ error-favorites-too-many = bir seferde en fazla 10.000
 error-saved-search-name = kayıtlı aramanın en fazla 80 karakterlik bir adı olmalı
 error-saved-search-too-long = bu arama kaydedilemeyecek kadar uzun
 error-hoard-seen = hazine en fazla 32 varlık türü kaydedebilir, her biri küçük harflerle adlandırılmış olmalıdır
+error-news-seen = yenilikler en fazla 256 görülen şey kaydedebilir, her biri küçük harfler, rakamlar ve kısa çizgilerle adlandırılmış olmalıdır
 error-texture-pattern-map = Doku adı kalıbında { "{" }map{ "}" } olmalı, yoksa bir malzemenin tüm haritaları aynı adı alır
 error-texture-pattern-fields = Doku adı kalıbı { "{" }name{ "}" }, { "{" }map{ "}" } ve { "{" }size{ "}" } kullanabilir
 error-texture-name-chars = Doku adlarında < > : " / \ | ? ya da * olamaz
@@ -460,6 +461,9 @@ appearance-top-theme = Açık ve koyu düğmesi
 appearance-top-mic = Arama kutusunda mikrofon, bir ses çıkararak sesleri bulmak için
 appearance-top-slash = Arama kutusundaki / ipucu
 appearance-top-palette = Komut paleti düğmesi ({ $keys })
+appearance-news = Yenilikler
+appearance-news-what = Hoard’daki yeni şeyler, siz görene kadar parıldayan altın bir noktayla işaretlenir; üst çubuk da hepsini tek bir yerde toplar. Neleri gördüğünüz hesabınıza kaydedilir.
+appearance-news-point-out = Yeni şeyleri işaretle
 
 ## Kök
 
@@ -830,6 +834,10 @@ app-drop-hint = Her üst düzey dosya ya da klasör kendi paketi olur. Gigabaytl
 palette-group-go-to = Git
 palette-group-actions = Eylemler
 palette-group-theme = Tema
+palette-group-news = Yenilikler
+palette-news-show = Yenilikleri göster
+palette-news-mark-all = Tüm yenilikleri görüldü olarak işaretle
+palette-news-keywords = yeni yenilikler değişiklikler özellikler sürüm görüldü new news
 palette-group-kinds = Türler
 palette-group-packs = Paketler
 palette-group-collections = Koleksiyonlar
@@ -3050,6 +3058,50 @@ api-kind-other-name = diğer
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button = { $count } yeni
+news-button-title =
+    { $count ->
+        [one] Hoard’da { $count } yenilik
+       *[other] Hoard’da { $count } yenilik
+    }
+news-pip =
+    { $count ->
+        [one] Hoard’da yeni
+       *[other] Burada { $count } yenilik var
+    }
+news-title = Hoard’daki yenilikler
+news-to-find =
+    { $count ->
+        [one] Keşfedilecek { $count } şey
+       *[other] Keşfedilecek { $count } şey
+    }
+news-close = Kapat
+news-take-me = Beni oraya götür
+news-look-again = Yeniden bak
+news-none = Şu an keşfedilecek yeni bir şey yok.
+news-seen-lately = Son görülenler
+news-stop-pointing = Yeni şeyleri işaretlemeyi bırak
+news-point-out = Yeni şeyleri yeniden işaretle
+news-mark-all = Tümünü görüldü olarak işaretle
+news-marked-seen =
+    { $count ->
+        [one] { $count } şey görüldü olarak işaretlendi
+       *[other] { $count } şey görüldü olarak işaretlendi
+    }
+news-themes-title = On açık ve on koyu tema
+news-themes-body = Açık temalara Sky, Mint, Apricot ve Lemon, koyu temalara Midnight, Lagoon ve Neon katıldı; yeni görünüm de seçtiğiniz kutucuktan yayılıyor.
+news-tiles-move-title = Kutucuklar hep hareketli
+news-tiles-move-body = Kütüphane kutucuklarındaki animasyonlar ve hareketli resimler yalnızca işaretçinin altındayken değil, her zaman oynayabilir.
+news-motion-trails-title = Animasyonlarda hareket izleri
+news-motion-trails-body = Bir animasyonun küçük resmi, karakterin izlediği yolu çizer ve şu an nerede olduğunu bir noktayla gösterir.
+news-text-size-title = Metin boyutu ve aralıklar
+news-text-size-body = Yazıyı büyütün ya da küçültün, sayfayı daha ferah ya da daha sıkı yapın ve kutucuklarla üst çubuğun ne göstereceğini seçin.
+news-tag-tree-title = Etiket içinde etiket
+news-tag-tree-body = Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Ayarlar → Etiketler bunları bir ağaç olarak gösterir.
+news-bulk-edit-title = Birçoğunu birden düzenleyin
+news-bulk-edit-body = Birkaç varlık seçin ve E’ye basarak etiketlerini, lisanslarını, puanlarını ve daha fazlasını birlikte değiştirin; hepsi geri alınabilir.
+news-backups-title = Zamanlanmış yedekler
+news-backups-body = Veritabanını her gün ya da her hafta yedekleyin, en yeni birkaç yedeği saklayın ve her birini başka bir klasöre kopyalayın.
 ui-undo = Geri al
 ui-today = bugün
 ui-yesterday = dün

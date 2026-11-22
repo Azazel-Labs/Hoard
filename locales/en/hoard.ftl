@@ -226,6 +226,7 @@ error-favorites-too-many = at most 10,000 at a time
 error-saved-search-name = a saved search needs a name of at most 80 characters
 error-saved-search-too-long = that search is too long to save
 error-hoard-seen = the hoard can record at most 32 kinds of asset, each named in lowercase letters
+error-news-seen = what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens
 # Settings → Textures. {"{"}name{"}"}, {"{"}map{"}"} and {"{"}size{"}"} are placeholders people type in the pattern: keep them as they are.
 error-texture-pattern-map = The texture name pattern needs { "{" }map{ "}" }, or every map of a material would get the same name
 error-texture-pattern-fields = The texture name pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }
@@ -521,6 +522,9 @@ appearance-top-mic = Microphone in the search box, for finding sounds by making 
 appearance-top-slash = The / hint in the search box
 # $keys is the command palette's shortcut, like Ctrl+K.
 appearance-top-palette = Command palette button ({ $keys })
+appearance-news = What’s new
+appearance-news-what = New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account.
+appearance-news-point-out = Point out new things
 
 ## Root
 
@@ -971,6 +975,11 @@ app-drop-hint = Each top-level file or folder becomes its own pack. Gigabytes ar
 palette-group-go-to = Go to
 palette-group-actions = Actions
 palette-group-theme = Theme
+palette-group-news = What’s new
+palette-news-show = Show what’s new
+palette-news-mark-all = Mark everything new as seen
+# Extra words the What's new commands are found by; not shown.
+palette-news-keywords = new news changes features release seen
 palette-group-kinds = Kinds
 palette-group-packs = Packs
 palette-group-collections = Collections
@@ -3628,6 +3637,56 @@ api-kind-video-name = video
 api-kind-document-name = documents
 api-kind-data-name = data
 api-kind-other-name = other
+
+## What's new in Hoard (news.ts, NewsTray.vue, NewPip.vue)
+
+# The top bar's button, e.g. "4 new".
+news-button = { $count } new
+news-button-title =
+    { $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }
+# The gold dot by something new, read out by screen readers; with a count on a Settings page's name.
+news-pip =
+    { $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }
+news-title = New in Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }
+news-close = Close
+news-take-me = Take me there
+news-look-again = Look again
+news-none = Nothing new to find right now.
+news-seen-lately = Seen lately
+news-stop-pointing = Stop pointing out new things
+news-point-out = Point out new things again
+news-mark-all = Mark all seen
+news-marked-seen =
+    { $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }
+# The new things themselves: a short title and a sentence or two on what it is.
+news-themes-title = Ten light and ten dark themes
+news-themes-body = Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick.
+news-tiles-move-title = Keep tiles moving
+news-tiles-move-body = Animations and animated pictures on the library tiles can play all the time, not only under the pointer.
+news-motion-trails-title = Motion trails on animations
+news-motion-trails-body = An animation’s thumbnail traces the path its character takes, with a dot where it is right now.
+news-text-size-title = Text size and spacing
+news-text-size-body = Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show.
+news-tag-tree-title = Tags inside tags
+news-tag-tree-body = Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree.
+news-bulk-edit-title = Edit many at once
+news-bulk-edit-body = Select some assets and press E to change their tags, license, rating and more together, with Undo.
+news-backups-title = Scheduled backups
+news-backups-body = Back the database up every day or every week, keep the newest few, and copy each one to another folder.
 
 ## Toasts, dialogs and loading (ui.ts, UiLayer.vue, lazy.ts)
 

@@ -1785,6 +1785,18 @@ translation = "언어"
 source = "Browser's ({ $name })"
 translation = "브라우저 언어({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "새로운 기능"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "새로운 것 알려 주기"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Hoard의 새로운 것에는 확인하기 전까지 반짝이는 금색 점이 표시되고, 상단 막대가 한곳에 모아 보여 줍니다. 확인한 항목은 계정에 기록됩니다."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "밝게 또는 어둡게"
@@ -4568,6 +4580,10 @@ translation = "{ $model }을(를) 다운로드할 수 없습니다: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "모델 서버: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "새로운 기능에는 확인한 항목을 최대 256개까지 기록할 수 있으며, 각각 소문자, 숫자, 하이픈으로 된 이름이어야 합니다"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7631,6 +7647,147 @@ translation = "{ $note } 장조"
 source = "{ $note } minor"
 translation = "{ $note } 단조"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "데이터베이스를 매일 또는 매주 백업하고, 최신 백업 몇 개를 보관하며, 각각을 다른 폴더에도 복사합니다."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "예약 백업"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "에셋 몇 개를 선택하고 E를 누르면 태그, 라이선스, 평점 등을 한꺼번에 바꿀 수 있고, 실행 취소도 됩니다."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "여러 개를 한 번에 편집"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = "새 항목 { $count }개"
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+       *[other] Hoard의 새 항목 { $count }개
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "닫기"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "다시 보기"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "모두 확인함으로 표시"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+       *[other] 항목 { $count }개를 확인함으로 표시했습니다
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "애니메이션 썸네일에 캐릭터가 지나가는 경로가 그려지고, 지금 있는 위치에 점이 표시됩니다."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "애니메이션의 움직임 궤적"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "지금은 새로운 항목이 없습니다."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [1] Hoard의 새 항목
+       *[other] 이곳의 새 항목 { $count }개
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "새로운 것 다시 알려 주기"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "최근에 확인함"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "새로운 것 알려 주지 않기"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그에서 트리로 보여 줍니다."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "태그 안의 태그"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "바로 가기"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "글자를 크거나 작게, 페이지를 여유 있거나 촘촘하게 만들고, 타일과 상단 막대에 보여 줄 것을 고를 수 있습니다."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "글자 크기와 간격"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "밝은 테마에 스카이, 민트, 애프리콧, 레몬이, 어두운 테마에 미드나이트, 라군, 네온이 추가되었고, 새 모습은 고른 타일에서부터 퍼져 나갑니다."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "밝은 테마 10개와 어두운 테마 10개"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "라이브러리 타일의 애니메이션과 움직이는 그림을 포인터를 올리지 않아도 항상 재생할 수 있습니다."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "타일 계속 움직이기"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Hoard의 새로운 기능"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+       *[other] 확인할 항목 { $count }개
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "모든 팩"
@@ -8407,6 +8564,10 @@ translation = "이동"
 source = "Kinds"
 translation = "종류"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "새로운 기능"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "팩"
@@ -8458,6 +8619,18 @@ translation = "에셋 그리드 홈 assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "밝은 테마: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "새로운 새 소식 변경 기능 릴리스 확인 new news changes features release seen"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "새 항목을 모두 확인함으로 표시"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "새로운 기능 보기"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

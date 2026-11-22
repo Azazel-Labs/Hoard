@@ -197,6 +197,7 @@ error-favorites-too-many = högst 10 000 åt gången
 error-saved-search-name = en sparad sökning behöver ett namn på högst 80 tecken
 error-saved-search-too-long = sökningen är för lång för att sparas
 error-hoard-seen = skatten kan registrera högst 32 typer av tillgångar, var och en namngiven med små bokstäver
+error-news-seen = nyheter kan registrera högst 256 sedda saker, var och en namngiven med små bokstäver, siffror och bindestreck
 error-texture-pattern-map = Mönstret för texturnamn behöver { "{" }map{ "}" }, annars skulle alla kartor i ett material få samma namn
 error-texture-pattern-fields = Mönstret för texturnamn kan använda { "{" }name{ "}" }, { "{" }map{ "}" } och { "{" }size{ "}" }
 error-texture-name-chars = Texturnamn får inte innehålla < > : " / \ | ? eller *
@@ -460,6 +461,9 @@ appearance-top-theme = Växlare för ljust och mörkt
 appearance-top-mic = Mikrofon i sökrutan, för att hitta ljud genom att göra ett
 appearance-top-slash = /-tipset i sökrutan
 appearance-top-palette = Knapp för kommandopaletten ({ $keys })
+appearance-news = Nyheter
+appearance-news-what = Nya saker i Hoard får en glittrande guldprick tills du har sett dem, och toppfältet samlar dem på ett ställe. Vad du har sett följer ditt konto.
+appearance-news-point-out = Markera nya saker
 
 ## Rot
 
@@ -866,6 +870,10 @@ app-drop-hint = Varje fil eller mapp på översta nivån blir ett eget paket. Gi
 palette-group-go-to = Gå till
 palette-group-actions = Åtgärder
 palette-group-theme = Tema
+palette-group-news = Nyheter
+palette-news-show = Visa nyheter
+palette-news-mark-all = Markera alla nyheter som sedda
+palette-news-keywords = nytt nyheter ändringar funktioner version sett new news
 palette-group-kinds = Typer
 palette-group-packs = Paket
 palette-group-collections = Samlingar
@@ -3253,6 +3261,54 @@ api-kind-other-name = övrigt
 
 ## Aviseringar, dialogrutor och inläsning (ui.ts, UiLayer.vue, lazy.ts)
 
+news-button =
+    { $count ->
+        [one] { $count } ny
+       *[other] { $count } nya
+    }
+news-button-title =
+    { $count ->
+        [one] { $count } nyhet i Hoard
+       *[other] { $count } nyheter i Hoard
+    }
+news-pip =
+    { $count ->
+        [one] Nytt i Hoard
+       *[other] { $count } nyheter här
+    }
+news-title = Nytt i Hoard
+news-to-find =
+    { $count ->
+        [one] { $count } att upptäcka
+       *[other] { $count } att upptäcka
+    }
+news-close = Stäng
+news-take-me = Ta mig dit
+news-look-again = Titta igen
+news-none = Inget nytt att upptäcka just nu.
+news-seen-lately = Nyligen sett
+news-stop-pointing = Sluta markera nya saker
+news-point-out = Markera nya saker igen
+news-mark-all = Markera alla som sedda
+news-marked-seen =
+    { $count ->
+        [one] { $count } sak markerad som sedd
+       *[other] { $count } saker markerade som sedda
+    }
+news-themes-title = Tio ljusa och tio mörka teman
+news-themes-body = Sky, Mint, Apricot och Lemon ansluter till de ljusa temana och Midnight, Lagoon och Neon till de mörka, och det nya utseendet sprider sig från rutan du väljer.
+news-tiles-move-title = Rutor i rörelse
+news-tiles-move-body = Animationer och animerade bilder på bibliotekets rutor kan spelas hela tiden, inte bara under pekaren.
+news-motion-trails-title = Rörelsespår på animationer
+news-motion-trails-body = En animations miniatyrbild ritar upp vägen figuren tar, med en prick där den är just nu.
+news-text-size-title = Textstorlek och avstånd
+news-text-size-body = Gör texten större eller mindre och sidan luftigare eller mer kompakt, och välj vad rutorna och toppfältet visar.
+news-tag-tree-title = Taggar i taggar
+news-tag-tree-body = Lägg en tagg under en bredare, så att en sökning på fordon även hittar bil och sedan. Inställningar → Taggar visar dem som ett träd.
+news-bulk-edit-title = Redigera många på en gång
+news-bulk-edit-body = Välj några resurser och tryck på E för att ändra deras taggar, licens, betyg med mera på en gång, med Ångra.
+news-backups-title = Schemalagda säkerhetskopior
+news-backups-body = Säkerhetskopiera databasen varje dag eller varje vecka, behåll de senaste och kopiera var och en till en annan mapp.
 ui-undo = Ångra
 ui-today = i dag
 ui-yesterday = i går

@@ -1848,6 +1848,18 @@ translation = "Llengua"
 source = "Browser's ({ $name })"
 translation = "La del navegador ({ $name })"
 
+[messages.appearance-news]
+source = "What’s new"
+translation = "Novetats"
+
+[messages.appearance-news-point-out]
+source = "Point out new things"
+translation = "Assenyala les novetats"
+
+[messages.appearance-news-what]
+source = "New things in Hoard get a glinting gold pip until you’ve seen them, and the top bar gathers them in one place. What you’ve seen follows your account."
+translation = "Les novetats del Hoard porten un punt daurat que brilla fins que les veus, i la barra superior les aplega en un sol lloc. El que has vist va lligat al teu compte."
+
 [messages.appearance-scheme]
 source = "Light or dark"
 translation = "Clar o fosc"
@@ -4715,6 +4727,10 @@ translation = "no s'ha pogut baixar { $model }: { $reason }"
 [messages.error-model-server-refused]
 source = "the model server: { $reason }"
 translation = "el servidor de models: { $reason }"
+
+[messages.error-news-seen]
+source = "what’s new can record at most 256 things seen, each named in lowercase letters, digits and hyphens"
+translation = "les novetats poden registrar com a màxim 256 elements vistos, cadascun amb un nom en minúscules, xifres i guions"
 
 [messages.error-no-frame-sheet]
 source = "no frame sheet: { $reason }"
@@ -7836,6 +7852,154 @@ translation = "{ $note } major"
 source = "{ $note } minor"
 translation = "{ $note } menor"
 
+[messages.news-backups-body]
+source = "Back the database up every day or every week, keep the newest few, and copy each one to another folder."
+translation = "Fes una còpia de seguretat de la base de dades cada dia o cada setmana, conserva les més recents i copia cadascuna a una altra carpeta."
+
+[messages.news-backups-title]
+source = "Scheduled backups"
+translation = "Còpies de seguretat programades"
+
+[messages.news-bulk-edit-body]
+source = "Select some assets and press E to change their tags, license, rating and more together, with Undo."
+translation = "Selecciona uns quants recursos i prem E per canviar-ne alhora les etiquetes, la llicència, la valoració i més, amb Desfés."
+
+[messages.news-bulk-edit-title]
+source = "Edit many at once"
+translation = "Edita’n molts alhora"
+
+[messages.news-button]
+source = "{ $count } new"
+translation = """
+{ $count ->
+        [one] { $count } novetat
+       *[other] { $count } novetats
+    }"""
+
+[messages.news-button-title]
+source = """
+{ $count ->
+        [one] { $count } new thing in Hoard
+       *[other] { $count } new things in Hoard
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } novetat al Hoard
+       *[other] { $count } novetats al Hoard
+    }"""
+
+[messages.news-close]
+source = "Close"
+translation = "Tanca"
+
+[messages.news-look-again]
+source = "Look again"
+translation = "Torna-ho a veure"
+
+[messages.news-mark-all]
+source = "Mark all seen"
+translation = "Marca-ho tot com a vist"
+
+[messages.news-marked-seen]
+source = """
+{ $count ->
+        [one] { $count } thing marked seen
+       *[other] { $count } things marked seen
+    }"""
+translation = """
+{ $count ->
+        [one] S’ha marcat { $count } novetat com a vista
+       *[other] S’han marcat { $count } novetats com a vistes
+    }"""
+
+[messages.news-motion-trails-body]
+source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
+translation = "La miniatura d’una animació traça el camí que fa el seu personatge, amb un punt on és ara mateix."
+
+[messages.news-motion-trails-title]
+source = "Motion trails on animations"
+translation = "Trajectòries a les animacions"
+
+[messages.news-none]
+source = "Nothing new to find right now."
+translation = "Ara mateix no hi ha res de nou per descobrir."
+
+[messages.news-pip]
+source = """
+{ $count ->
+        [one] New in Hoard
+       *[other] { $count } new things here
+    }"""
+translation = """
+{ $count ->
+        [one] Nou al Hoard
+       *[other] { $count } novetats aquí
+    }"""
+
+[messages.news-point-out]
+source = "Point out new things again"
+translation = "Torna a assenyalar les novetats"
+
+[messages.news-seen-lately]
+source = "Seen lately"
+translation = "Vist fa poc"
+
+[messages.news-stop-pointing]
+source = "Stop pointing out new things"
+translation = "Deixa d’assenyalar les novetats"
+
+[messages.news-tag-tree-body]
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
+translation = "Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Configuració → Etiquetes les mostra com un arbre."
+
+[messages.news-tag-tree-title]
+source = "Tags inside tags"
+translation = "Etiquetes dins d’etiquetes"
+
+[messages.news-take-me]
+source = "Take me there"
+translation = "Porta-m’hi"
+
+[messages.news-text-size-body]
+source = "Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show."
+translation = "Fes la lletra més gran o més petita i la pàgina més espaiosa o més compacta, i tria què mostren les miniatures i la barra superior."
+
+[messages.news-text-size-title]
+source = "Text size and spacing"
+translation = "Mida del text i espaiat"
+
+[messages.news-themes-body]
+source = "Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick."
+translation = "Cel, Menta, Albercoc i Llimona s’afegeixen als temes clars, i Mitjanit, Llacuna i Neó als foscos; el nou aspecte s’escampa des de la miniatura que triïs."
+
+[messages.news-themes-title]
+source = "Ten light and ten dark themes"
+translation = "Deu temes clars i deu de foscos"
+
+[messages.news-tiles-move-body]
+source = "Animations and animated pictures on the library tiles can play all the time, not only under the pointer."
+translation = "Les animacions i les imatges animades de les miniatures de la biblioteca es poden reproduir tota l’estona, no només sota el punter."
+
+[messages.news-tiles-move-title]
+source = "Keep tiles moving"
+translation = "Miniatures sempre en moviment"
+
+[messages.news-title]
+source = "New in Hoard"
+translation = "Novetats al Hoard"
+
+[messages.news-to-find]
+source = """
+{ $count ->
+        [one] { $count } to find
+       *[other] { $count } to find
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } per descobrir
+       *[other] { $count } per descobrir
+    }"""
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tots els paquets"
@@ -8658,6 +8822,10 @@ translation = "Ves a"
 source = "Kinds"
 translation = "Tipus"
 
+[messages.palette-group-news]
+source = "What’s new"
+translation = "Novetats"
+
 [messages.palette-group-packs]
 source = "Packs"
 translation = "Paquets"
@@ -8709,6 +8877,18 @@ translation = "recursos graella inici assets grid home"
 [messages.palette-light-theme]
 source = "Light theme: { $name }"
 translation = "Tema clar: { $name }"
+
+[messages.palette-news-keywords]
+source = "new news changes features release seen"
+translation = "nou novetats canvis funcions versió vist new news"
+
+[messages.palette-news-mark-all]
+source = "Mark everything new as seen"
+translation = "Marca totes les novetats com a vistes"
+
+[messages.palette-news-show]
+source = "Show what’s new"
+translation = "Mostra les novetats"
 
 [messages.palette-no-match]
 source = "Nothing matches “{ $query }”"

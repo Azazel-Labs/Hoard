@@ -48,7 +48,8 @@ onBeforeUnmount(stop)
       role="img"
       :aria-label="t('news-pip', { count })"
       :title="t('news-pip', { count })"
-    >{{ count > 1 ? formatNumber(count) : '' }}</span>
+      :data-count="count > 1 ? formatNumber(count) : undefined"
+    />
   </Transition>
 </template>
 
@@ -67,6 +68,10 @@ onBeforeUnmount(stop)
   outline: 1px solid rgb(150 105 10 / 0.35);
   vertical-align: middle;
   animation: glint 2.2s ease-in-out infinite;
+}
+/* Drawn rather than written, so the count isn't part of the text of what it marks (a button's name stays its own). */
+.newpip.many::after {
+  content: attr(data-count);
 }
 .newpip.many {
   width: auto;

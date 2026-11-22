@@ -425,7 +425,7 @@ fn made_for<'a>(conn: &Connection, all: &'a [Skeleton], id: &str) -> Result<Opti
 }
 
 /// The character skeleton `key`'s animations play on: the one chosen for it, while it's still a character with that
-/// skeleton and isn't archived; or else the best dressed (wearing a texture or material), then the one its pack ships the most clips
+/// skeleton and isn't archived; or else the best dressed (wearing a texture or material), then the one its pack ships the most clips (or takes)
 /// for (its main character), then by pack and path. Archived ones and another format's copy of one are left out.
 fn skeleton_body(conn: &Connection, all: &[Skeleton], key: &str) -> Result<Option<String>> {
     type Score<'a> = (bool, i64, Reverse<&'a str>, Reverse<String>);
@@ -451,6 +451,9 @@ fn skeleton_body(conn: &Connection, all: &[Skeleton], key: &str) -> Result<Optio
         if chosen.as_deref() == Some(m.id.as_str()) {
             return Ok(chosen);
         }
+        // Its takes are clips it ships too.
+        let takes = all.iter().filter(|s| s.animation && s.take_of.as_deref() == Some(m.id.as_str())).count();
+        let clips = clips + i64::try_from(takes).unwrap_or(i64::MAX);
         let score = (dressed, clips, Reverse(m.pack_id.as_str()), Reverse(path));
         if best.as_ref().is_none_or(|(b, _)| score > *b) {
             best = Some((score, m.id.as_str()));

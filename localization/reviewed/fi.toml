@@ -1892,6 +1892,10 @@ translation = "Laji ja koko (pikselit, kesto, kolmiot)"
 source = "Play animations while the pointer is over them"
 translation = "Toista animaatiot, kun osoitin on niiden päällä"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Toista animaatioita koko ajan, ei vain osoittimen alla"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Nimet"

@@ -462,6 +462,7 @@ appearance-tile-names = Názvy
 appearance-tile-details = Druh a velikost (pixely, délka, trojúhelníky)
 appearance-tile-badges = Typ souboru na obrázku
 appearance-tile-motion = Přehrávat animace, když je nad nimi ukazatel
+appearance-tile-motion-always = Přehrávat animace pořád, nejen pod ukazatelem
 appearance-top-bar = Horní lišta
 appearance-top-bar-what = Vynechte, co nepoužíváte. / dál přejde do vyhledávacího pole a { $keys } dál otevře paletu příkazů.
 appearance-top-activity = Práce na pozadí

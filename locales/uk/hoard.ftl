@@ -464,6 +464,7 @@ appearance-tile-names = Назви
 appearance-tile-details = Тип і розмір (пікселі, тривалість, трикутники)
 appearance-tile-badges = Тип файлу на зображенні
 appearance-tile-motion = Відтворювати анімації, поки над ними вказівник
+appearance-tile-motion-always = Відтворювати анімації весь час, а не лише під вказівником
 appearance-top-bar = Верхня панель
 appearance-top-bar-what = Приберіть те, чим не користуєтеся. / і далі переводить у поле пошуку, а { $keys } і далі відкриває палітру команд.
 appearance-top-activity = Фонова робота

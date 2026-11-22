@@ -1888,6 +1888,10 @@ translation = "Tipo e dimensioni (pixel, durata, triangoli)"
 source = "Play animations while the pointer is over them"
 translation = "Riproduci le animazioni quando il puntatore è sopra"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Riproduci sempre le animazioni, non solo sotto il puntatore"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Nomi"

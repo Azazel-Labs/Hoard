@@ -1908,6 +1908,10 @@ translation = "Врста и величина (пиксели, трајање, �
 source = "Play animations while the pointer is over them"
 translation = "Пуштај анимације док је показивач изнад њих"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Пуштај анимације све време, не само испод показивача"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Називи"

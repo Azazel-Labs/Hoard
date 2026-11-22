@@ -129,6 +129,10 @@ const flip = (id: string) => (prefs.hidden = toggleIn(prefs.hidden, id))
           <input type="checkbox" :checked="shows(o.id)" @change="flip(o.id)" />
           {{ o.label }}
         </label>
+        <label v-if="group === 'tiles'" class="check">
+          <input v-model="prefs.tilesAlwaysMove" type="checkbox" />
+          {{ t('appearance-tile-motion-always') }}
+        </label>
       </div>
     </section>
   </div>

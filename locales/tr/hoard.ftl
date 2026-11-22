@@ -452,6 +452,7 @@ appearance-tile-names = Adlar
 appearance-tile-details = Tür ve boyut (piksel, süre, üçgen)
 appearance-tile-badges = Resmin üzerinde dosya türü
 appearance-tile-motion = İşaretçi üzerindeyken animasyonları oynat
+appearance-tile-motion-always = Animasyonları yalnızca işaretçinin altındayken değil, her zaman oynat
 appearance-top-bar = Üst çubuk
 appearance-top-bar-what = Kullanmadıklarını gizle. / yine arama kutusuna götürür, { $keys } yine komut paletini açar.
 appearance-top-activity = Arka plan işleri

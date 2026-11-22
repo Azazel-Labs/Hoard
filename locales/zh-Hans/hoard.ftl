@@ -452,6 +452,7 @@ appearance-tile-names = 名称
 appearance-tile-details = 类型和尺寸（像素、时长、三角形）
 appearance-tile-badges = 图片上的文件类型
 appearance-tile-motion = 指针悬停时播放动画
+appearance-tile-motion-always = 始终播放动画，而不仅在指针悬停时
 appearance-top-bar = 顶栏
 appearance-top-bar-what = 隐藏你不用的项目。按 / 仍可进入搜索框，按 { $keys } 仍可打开命令面板。
 appearance-top-activity = 后台任务

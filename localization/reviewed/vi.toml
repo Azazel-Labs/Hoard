@@ -1828,6 +1828,10 @@ translation = "Loại và kích thước (điểm ảnh, độ dài, tam giác)"
 source = "Play animations while the pointer is over them"
 translation = "Phát hoạt ảnh khi con trỏ ở trên"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Luôn phát hoạt ảnh, không chỉ khi con trỏ ở trên"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Tên"

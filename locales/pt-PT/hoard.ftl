@@ -452,6 +452,7 @@ appearance-tile-names = Nomes
 appearance-tile-details = Tipo e tamanho (píxeis, duração, triângulos)
 appearance-tile-badges = Tipo de ficheiro sobre a imagem
 appearance-tile-motion = Reproduzir animações enquanto o ponteiro está por cima
+appearance-tile-motion-always = Reproduzir animações sempre, não só por baixo do ponteiro
 appearance-top-bar = Barra superior
 appearance-top-bar-what = Oculte o que não usa. / continua a levar à caixa de pesquisa e { $keys } continua a abrir a paleta de comandos.
 appearance-top-activity = Trabalho em segundo plano

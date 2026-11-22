@@ -1888,6 +1888,10 @@ translation = "Soort en grootte (pieksels, lengte, driehoeke)"
 source = "Play animations while the pointer is over them"
 translation = "Speel animasies terwyl die wyser daaroor is"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Hou animasies heeltyd aan die speel, nie net onder die wyser nie"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Name"

@@ -1837,6 +1837,10 @@ translation = "Jenis dan ukuran (piksel, durasi, segitiga)"
 source = "Play animations while the pointer is over them"
 translation = "Putar animasi saat penunjuk berada di atasnya"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Putar animasi terus-menerus, tidak hanya di bawah penunjuk"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Nama"

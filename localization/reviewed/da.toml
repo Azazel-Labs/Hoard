@@ -1888,6 +1888,10 @@ translation = "Type og størrelse (pixels, længde, trekanter)"
 source = "Play animations while the pointer is over them"
 translation = "Afspil animationer, mens markøren er over dem"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Afspil animationer hele tiden, ikke kun under markøren"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Navne"

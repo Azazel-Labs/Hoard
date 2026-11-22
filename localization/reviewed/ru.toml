@@ -1938,6 +1938,10 @@ translation = "Тип и размер (пиксели, длительность,
 source = "Play animations while the pointer is over them"
 translation = "Проигрывать анимации, пока над ними указатель"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Проигрывать анимации всё время, а не только под указателем"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Названия"

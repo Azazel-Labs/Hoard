@@ -1864,6 +1864,10 @@ translation = "Fajta és méret (képpont, hossz, háromszögek)"
 source = "Play animations while the pointer is over them"
 translation = "Animációk lejátszása, amíg a mutató rajtuk van"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Animációk folyamatos lejátszása, nem csak a mutató alatt"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Nevek"

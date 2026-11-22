@@ -1852,6 +1852,10 @@ translation = "Tür ve boyut (piksel, süre, üçgen)"
 source = "Play animations while the pointer is over them"
 translation = "İşaretçi üzerindeyken animasyonları oynat"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Animasyonları yalnızca işaretçinin altındayken değil, her zaman oynat"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Adlar"

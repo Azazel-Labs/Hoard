@@ -460,6 +460,7 @@ appearance-tile-names = Nimet
 appearance-tile-details = Laji ja koko (pikselit, kesto, kolmiot)
 appearance-tile-badges = Tiedostotyyppi kuvan päällä
 appearance-tile-motion = Toista animaatiot, kun osoitin on niiden päällä
+appearance-tile-motion-always = Toista animaatioita koko ajan, ei vain osoittimen alla
 appearance-top-bar = Yläpalkki
 appearance-top-bar-what = Jätä pois, mitä et käytä. / vie edelleen hakukenttään, ja { $keys } avaa edelleen komentopaletin.
 appearance-top-activity = Taustatyöt

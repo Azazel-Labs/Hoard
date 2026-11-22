@@ -452,6 +452,7 @@ appearance-tile-names = 名稱
 appearance-tile-details = 類型和尺寸（像素、長度、三角形）
 appearance-tile-badges = 圖片上的檔案類型
 appearance-tile-motion = 指標停留時播放動畫
+appearance-tile-motion-always = 一律播放動畫，不只在指標停留時
 appearance-top-bar = 頂端列
 appearance-top-bar-what = 隱藏你不用的項目。按 / 仍可進入搜尋框，按 { $keys } 仍可開啟命令面板。
 appearance-top-activity = 背景工作

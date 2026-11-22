@@ -456,6 +456,7 @@ appearance-tile-names = Namen
 appearance-tile-details = Art und Größe (Pixel, Länge, Dreiecke)
 appearance-tile-badges = Dateityp auf dem Bild
 appearance-tile-motion = Animationen abspielen, solange der Zeiger darüber ist
+appearance-tile-motion-always = Animationen immer abspielen, nicht nur unter dem Zeiger
 appearance-top-bar = Obere Leiste
 appearance-top-bar-what = Lass weg, was du nicht brauchst. / springt weiter ins Suchfeld, und { $keys } öffnet weiter die Befehlspalette.
 appearance-top-activity = Hintergrundarbeit

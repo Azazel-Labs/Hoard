@@ -452,6 +452,7 @@ appearance-tile-names = Nama
 appearance-tile-details = Jenis dan ukuran (piksel, durasi, segitiga)
 appearance-tile-badges = Jenis file di atas gambar
 appearance-tile-motion = Putar animasi saat penunjuk berada di atasnya
+appearance-tile-motion-always = Putar animasi terus-menerus, tidak hanya di bawah penunjuk
 appearance-top-bar = Bilah atas
 appearance-top-bar-what = Sembunyikan yang tidak Anda pakai. / tetap membuka kotak pencarian, dan { $keys } tetap membuka palet perintah.
 appearance-top-activity = Pekerjaan latar belakang

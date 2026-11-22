@@ -452,6 +452,7 @@ appearance-tile-names = Navn
 appearance-tile-details = Type og størrelse (piksler, lengde, trekanter)
 appearance-tile-badges = Filtype på bildet
 appearance-tile-motion = Spill av animasjoner mens pekeren er over dem
+appearance-tile-motion-always = Spill av animasjoner hele tiden, ikke bare under pekeren
 appearance-top-bar = Topplinje
 appearance-top-bar-what = Utelat det du ikke bruker. / går fortsatt til søkefeltet, og { $keys } åpner fortsatt kommandopaletten.
 appearance-top-activity = Bakgrunnsarbeid

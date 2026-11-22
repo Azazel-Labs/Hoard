@@ -1828,6 +1828,10 @@ translation = "类型和尺寸（像素、时长、三角形）"
 source = "Play animations while the pointer is over them"
 translation = "指针悬停时播放动画"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "始终播放动画，而不仅在指针悬停时"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "名称"

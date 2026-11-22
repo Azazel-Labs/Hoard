@@ -511,6 +511,7 @@ appearance-tile-names = Names
 appearance-tile-details = Kind and size (pixels, length, triangles)
 appearance-tile-badges = File type on the picture
 appearance-tile-motion = Play animations while the pointer is over them
+appearance-tile-motion-always = Keep animations playing all the time, not only under the pointer
 appearance-top-bar = Top bar
 # $keys is the command palette's shortcut, like Ctrl+K.
 appearance-top-bar-what = Leave out what you don’t use. / still goes to the search box, and { $keys } still opens the command palette.

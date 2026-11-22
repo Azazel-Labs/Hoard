@@ -452,6 +452,7 @@ appearance-tile-names = Namn
 appearance-tile-details = Typ och storlek (pixlar, längd, trianglar)
 appearance-tile-badges = Filtyp på bilden
 appearance-tile-motion = Spela animationer medan pekaren är över dem
+appearance-tile-motion-always = Spela animationer hela tiden, inte bara under pekaren
 appearance-top-bar = Toppfält
 appearance-top-bar-what = Ta bort det du inte använder. / går fortfarande till sökrutan och { $keys } öppnar fortfarande kommandopaletten.
 appearance-top-activity = Bakgrundsarbete

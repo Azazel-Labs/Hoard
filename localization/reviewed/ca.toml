@@ -1888,6 +1888,10 @@ translation = "Tipus i mida (píxels, durada, triangles)"
 source = "Play animations while the pointer is over them"
 translation = "Reprodueix les animacions mentre el punter hi és a sobre"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Mantén les animacions en marxa tota l’estona, no només sota el punter"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Noms"

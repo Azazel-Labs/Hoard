@@ -456,6 +456,7 @@ appearance-tile-names = Ονόματα
 appearance-tile-details = Είδος και μέγεθος (pixel, διάρκεια, τρίγωνα)
 appearance-tile-badges = Τύπος αρχείου πάνω στην εικόνα
 appearance-tile-motion = Αναπαραγωγή κινούμενων εικόνων όσο ο δείκτης είναι πάνω τους
+appearance-tile-motion-always = Αναπαραγωγή κινούμενων εικόνων συνέχεια, όχι μόνο κάτω από τον δείκτη
 appearance-top-bar = Επάνω γραμμή
 appearance-top-bar-what = Παραλείψτε ό,τι δεν χρησιμοποιείτε. Το / εξακολουθεί να πηγαίνει στο πεδίο αναζήτησης και το { $keys } εξακολουθεί να ανοίγει την παλέτα εντολών.
 appearance-top-activity = Εργασίες παρασκηνίου

@@ -462,6 +462,7 @@ appearance-tile-names = Називи
 appearance-tile-details = Врста и величина (пиксели, трајање, троуглови)
 appearance-tile-badges = Тип датотеке на слици
 appearance-tile-motion = Пуштај анимације док је показивач изнад њих
+appearance-tile-motion-always = Пуштај анимације све време, не само испод показивача
 appearance-top-bar = Горња трака
 appearance-top-bar-what = Изоставите оно што не користите. / и даље води у поље за претрагу, а { $keys } и даље отвара палету команди.
 appearance-top-activity = Рад у позадини

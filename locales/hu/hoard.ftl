@@ -452,6 +452,7 @@ appearance-tile-names = Nevek
 appearance-tile-details = Fajta és méret (képpont, hossz, háromszögek)
 appearance-tile-badges = Fájltípus a képen
 appearance-tile-motion = Animációk lejátszása, amíg a mutató rajtuk van
+appearance-tile-motion-always = Animációk folyamatos lejátszása, nem csak a mutató alatt
 appearance-top-bar = Felső sáv
 appearance-top-bar-what = Hagyd el, amit nem használsz. A / továbbra is a keresőmezőbe visz, a { $keys } pedig továbbra is megnyitja a parancspalettát.
 appearance-top-activity = Háttérmunka

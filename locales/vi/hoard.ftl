@@ -452,6 +452,7 @@ appearance-tile-names = Tên
 appearance-tile-details = Loại và kích thước (điểm ảnh, độ dài, tam giác)
 appearance-tile-badges = Loại tệp trên hình
 appearance-tile-motion = Phát hoạt ảnh khi con trỏ ở trên
+appearance-tile-motion-always = Luôn phát hoạt ảnh, không chỉ khi con trỏ ở trên
 appearance-top-bar = Thanh trên cùng
 appearance-top-bar-what = Ẩn những gì bạn không dùng. / vẫn đưa bạn đến ô tìm kiếm và { $keys } vẫn mở bảng lệnh.
 appearance-top-activity = Công việc nền

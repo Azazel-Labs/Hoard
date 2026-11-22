@@ -10,7 +10,7 @@ import { noteTileClick } from '../viewers'
 import { materialSummary } from '../materials'
 import { animatedSrc, PLAY_ON_TILE } from '../sprites'
 import { t } from '../i18n'
-import { shows } from '../prefs'
+import { prefs, shows } from '../prefs'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent]; similar: [] }>()
@@ -33,12 +33,15 @@ const loaded = ref(false)
 watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
 const starred = computed(() => mine.favorites.has(props.asset.id))
-// Animated pictures, and animations with a movie of them playing, move while the pointer is over them (unless
-// motion is unwelcome, or turned off in Settings → Appearance).
+// Animated pictures, and animations with a movie of them playing, move while the pointer is over them, or all the
+// time when Settings → Appearance says so (unless motion is unwelcome, or turned off there).
 const hovering = ref(false)
-const moving = computed(() => (hovering.value ? (animatedSrc(props.asset, PLAY_ON_TILE) ?? motionUrl(props.asset)) : null))
+const stillPlease = matchMedia('(prefers-reduced-motion: reduce)').matches
+const moving = computed(() =>
+  hovering.value || (prefs.tilesAlwaysMove && !stillPlease) ? (animatedSrc(props.asset, PLAY_ON_TILE) ?? motionUrl(props.asset)) : null,
+)
 function hoverPlay(on: boolean, e: PointerEvent) {
-  if (on && (e.pointerType !== 'mouse' || !shows('tile-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches)) return
+  if (on && (e.pointerType !== 'mouse' || !shows('tile-motion') || stillPlease)) return
   hovering.value = on
 }
 

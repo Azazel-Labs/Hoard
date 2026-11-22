@@ -1825,6 +1825,10 @@ translation = "ชนิดและขนาด (พิกเซล ควา�
 source = "Play animations while the pointer is over them"
 translation = "เล่นแอนิเมชันขณะที่ตัวชี้อยู่เหนือภาพ"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "เล่นแอนิเมชันตลอดเวลา ไม่ใช่แค่ตอนที่ตัวชี้อยู่เหนือภาพ"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "ชื่อ"

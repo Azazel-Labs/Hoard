@@ -452,6 +452,7 @@ appearance-tile-names = Name
 appearance-tile-details = Soort en grootte (pieksels, lengte, driehoeke)
 appearance-tile-badges = Lêertipe op die prent
 appearance-tile-motion = Speel animasies terwyl die wyser daaroor is
+appearance-tile-motion-always = Hou animasies heeltyd aan die speel, nie net onder die wyser nie
 appearance-top-bar = Boonste balk
 appearance-top-bar-what = Laat weg wat jy nie gebruik nie. / gaan steeds na die soekkassie, en { $keys } maak steeds die opdragpalet oop.
 appearance-top-activity = Agtergrondwerk

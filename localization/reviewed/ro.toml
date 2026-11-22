@@ -1924,6 +1924,10 @@ translation = "Tip și mărime (pixeli, durată, triunghiuri)"
 source = "Play animations while the pointer is over them"
 translation = "Redă animațiile cât timp cursorul e deasupra lor"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Redă animațiile tot timpul, nu doar sub cursor"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Nume"

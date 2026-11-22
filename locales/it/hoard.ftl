@@ -460,6 +460,7 @@ appearance-tile-names = Nomi
 appearance-tile-details = Tipo e dimensioni (pixel, durata, triangoli)
 appearance-tile-badges = Tipo di file sull’immagine
 appearance-tile-motion = Riproduci le animazioni quando il puntatore è sopra
+appearance-tile-motion-always = Riproduci sempre le animazioni, non solo sotto il puntatore
 appearance-top-bar = Barra superiore
 appearance-top-bar-what = Togli ciò che non usi. / porta comunque alla casella di ricerca e { $keys } apre comunque la tavolozza dei comandi.
 appearance-top-activity = Attività in background

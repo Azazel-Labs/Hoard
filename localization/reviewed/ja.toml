@@ -1825,6 +1825,10 @@ translation = "種類とサイズ（ピクセル、長さ、三角形）"
 source = "Play animations while the pointer is over them"
 translation = "ポインターを重ねている間はアニメーションを再生"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "ポインターを重ねていなくても常にアニメーションを再生"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "名前"

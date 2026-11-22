@@ -1900,6 +1900,10 @@ translation = "Είδος και μέγεθος (pixel, διάρκεια, τρί
 source = "Play animations while the pointer is over them"
 translation = "Αναπαραγωγή κινούμενων εικόνων όσο ο δείκτης είναι πάνω τους"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Αναπαραγωγή κινούμενων εικόνων συνέχεια, όχι μόνο κάτω από τον δείκτη"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Ονόματα"

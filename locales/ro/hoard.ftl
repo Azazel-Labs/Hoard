@@ -462,6 +462,7 @@ appearance-tile-names = Nume
 appearance-tile-details = Tip și mărime (pixeli, durată, triunghiuri)
 appearance-tile-badges = Tipul fișierului pe imagine
 appearance-tile-motion = Redă animațiile cât timp cursorul e deasupra lor
+appearance-tile-motion-always = Redă animațiile tot timpul, nu doar sub cursor
 appearance-top-bar = Bara de sus
 appearance-top-bar-what = Ascunde ce nu folosești. / duce în continuare la caseta de căutare, iar { $keys } deschide în continuare paleta de comenzi.
 appearance-top-activity = Lucru în fundal

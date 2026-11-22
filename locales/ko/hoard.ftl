@@ -452,6 +452,7 @@ appearance-tile-names = 이름
 appearance-tile-details = 종류와 크기(픽셀, 길이, 삼각형)
 appearance-tile-badges = 그림 위의 파일 형식
 appearance-tile-motion = 포인터를 올려 두는 동안 애니메이션 재생
+appearance-tile-motion-always = 포인터를 올리지 않아도 항상 애니메이션 재생
 appearance-top-bar = 상단 막대
 appearance-top-bar-what = 쓰지 않는 것은 숨기세요. /는 계속 검색 상자로 이동하고 { $keys }는 계속 명령 팔레트를 엽니다.
 appearance-top-activity = 백그라운드 작업

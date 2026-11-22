@@ -452,6 +452,7 @@ appearance-tile-names = ชื่อ
 appearance-tile-details = ชนิดและขนาด (พิกเซล ความยาว สามเหลี่ยม)
 appearance-tile-badges = ชนิดไฟล์บนภาพ
 appearance-tile-motion = เล่นแอนิเมชันขณะที่ตัวชี้อยู่เหนือภาพ
+appearance-tile-motion-always = เล่นแอนิเมชันตลอดเวลา ไม่ใช่แค่ตอนที่ตัวชี้อยู่เหนือภาพ
 appearance-top-bar = แถบด้านบน
 appearance-top-bar-what = ซ่อนสิ่งที่คุณไม่ได้ใช้ / ยังคงไปที่ช่องค้นหา และ { $keys } ยังคงเปิดแผงคำสั่ง
 appearance-top-activity = งานเบื้องหลัง

@@ -1825,6 +1825,10 @@ translation = "종류와 크기(픽셀, 길이, 삼각형)"
 source = "Play animations while the pointer is over them"
 translation = "포인터를 올려 두는 동안 애니메이션 재생"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "포인터를 올리지 않아도 항상 애니메이션 재생"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "이름"

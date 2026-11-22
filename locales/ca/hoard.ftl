@@ -452,6 +452,7 @@ appearance-tile-names = Noms
 appearance-tile-details = Tipus i mida (píxels, durada, triangles)
 appearance-tile-badges = Tipus de fitxer sobre la imatge
 appearance-tile-motion = Reprodueix les animacions mentre el punter hi és a sobre
+appearance-tile-motion-always = Mantén les animacions en marxa tota l’estona, no només sota el punter
 appearance-top-bar = Barra superior
 appearance-top-bar-what = Amaga el que no facis servir. / continua anant al quadre de cerca i { $keys } continua obrint la paleta d'ordres.
 appearance-top-activity = Feina en segon pla

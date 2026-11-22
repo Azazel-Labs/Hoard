@@ -452,6 +452,7 @@ appearance-tile-names = Namen
 appearance-tile-details = Soort en grootte (pixels, duur, driehoeken)
 appearance-tile-badges = Bestandstype op de afbeelding
 appearance-tile-motion = Animaties afspelen terwijl de aanwijzer erboven is
+appearance-tile-motion-always = Animaties altijd afspelen, niet alleen onder de aanwijzer
 appearance-top-bar = Bovenbalk
 appearance-top-bar-what = Laat weg wat je niet gebruikt. / gaat nog steeds naar het zoekvak en { $keys } opent nog steeds het opdrachtpalet.
 appearance-top-activity = Achtergrondwerk

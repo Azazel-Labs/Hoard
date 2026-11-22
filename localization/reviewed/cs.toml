@@ -1922,6 +1922,10 @@ translation = "Druh a velikost (pixely, délka, trojúhelníky)"
 source = "Play animations while the pointer is over them"
 translation = "Přehrávat animace, když je nad nimi ukazatel"
 
+[messages.appearance-tile-motion-always]
+source = "Keep animations playing all the time, not only under the pointer"
+translation = "Přehrávat animace pořád, nejen pod ukazatelem"
+
 [messages.appearance-tile-names]
 source = "Names"
 translation = "Názvy"

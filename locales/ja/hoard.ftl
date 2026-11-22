@@ -452,6 +452,7 @@ appearance-tile-names = 名前
 appearance-tile-details = 種類とサイズ（ピクセル、長さ、三角形）
 appearance-tile-badges = 画像上のファイル形式
 appearance-tile-motion = ポインターを重ねている間はアニメーションを再生
+appearance-tile-motion-always = ポインターを重ねていなくても常にアニメーションを再生
 appearance-top-bar = 上部バー
 appearance-top-bar-what = 使わないものは非表示にできます。非表示にしても / で検索ボックスに移動でき、{ $keys } でコマンドパレットを開けます。
 appearance-top-activity = バックグラウンド処理

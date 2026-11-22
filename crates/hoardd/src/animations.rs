@@ -354,14 +354,59 @@ pub(crate) async fn choose_body(state: &AppState, id: String) -> Result<Option<V
     .await
 }
 
+/// The animations whose thumbnails were drawn on a character other than the one they now play on: since then a better
+/// dressed character with their skeleton came in, the one they were drawn on was archived, or their skeleton changed.
+pub(crate) async fn drawn_on_another(state: &AppState) -> Result<Vec<String>> {
+    with_skeletons(state, drawn_elsewhere).await
+}
+
+/// See [`drawn_on_another`].
+fn drawn_elsewhere(c: &Connection, all: &[Skeleton]) -> Result<Vec<String>> {
+    let drawn: Vec<(String, String)> = c
+        .prepare("SELECT asset_id, body_id FROM drawn_on ORDER BY asset_id")?
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    // Many animations share a skeleton: work its character out once.
+    let mut bodies: HashMap<String, Option<String>> = HashMap::new();
+    let mut out = Vec::new();
+    for (id, was) in drawn {
+        let Some(made_for) = made_for(c, all, &id)? else { continue };
+        let key = skeleton_key(made_for);
+        let body = if let Some(b) = bodies.get(&key) {
+            b.clone()
+        } else {
+            let b = skeleton_body(c, all, &key)?;
+            bodies.insert(key, b.clone());
+            b
+        };
+        // As `body_of` has it.
+        let now = body.unwrap_or_else(|| made_for.id.clone());
+        if now != was {
+            out.push(id);
+        }
+    }
+    Ok(out)
+}
+
+/// A number that changes whenever a rig or a model's kind does, and with it which character an animation plays on.
+pub(crate) fn revision() -> u64 {
+    REVISION.load(Ordering::Acquire)
+}
+
 /// The character animation `id` plays on (see [`plays_on`]).
 fn body_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<Option<String>> {
+    let Some(made_for) = made_for(conn, all, id)? else { return Ok(None) };
+    Ok(skeleton_body(conn, all, &skeleton_key(made_for))?.or_else(|| Some(made_for.id.clone())))
+}
+
+/// The character animation `id` was made for, whose skeleton it plays: the file of takes it's one of, when that's a
+/// character; then the first its pack ships it for; then the first that fits it.
+fn made_for<'a>(conn: &Connection, all: &'a [Skeleton], id: &str) -> Result<Option<&'a Skeleton>> {
     if !all.iter().any(|s| s.id == id && s.animation) {
         return Ok(None);
     }
     let character = |id: &str| all.iter().find(|s| s.id == id && !s.animation);
     let me = all.iter().find(|s| s.id == id).map(|s| s.take_of.as_deref());
-    // The file of takes it's one of, when that's a character; then those its pack ships it for; then any that fits.
     let mut made_for = me.flatten().and_then(character);
     if made_for.is_none() {
         let linked: Vec<String> = conn
@@ -376,8 +421,7 @@ fn body_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<Option<Strin
     if made_for.is_none() {
         made_for = fits_of(conn, all, id)?.0.first().and_then(|f| character(&f.id));
     }
-    let Some(made_for) = made_for else { return Ok(None) };
-    Ok(skeleton_body(conn, all, &skeleton_key(made_for))?.or_else(|| Some(made_for.id.clone())))
+    Ok(made_for)
 }
 
 /// The character skeleton `key`'s animations play on: the one chosen for it, while it's still a character with that
@@ -914,8 +958,14 @@ mod tests {
         }
         assert_eq!(body("beep"), None, "it fits no character");
         assert_eq!(body("hero"), None, "a character plays its own clips");
+        for id in ["wave", "run"] {
+            c.execute("INSERT INTO drawn_on (asset_id, body_id) VALUES (?1, 'hero')", [id]).unwrap();
+        }
+        let moved = || drawn_elsewhere(&c, &all).unwrap();
+        assert_eq!(moved(), Vec::<String>::new(), "drawn on the character they play on");
         c.execute("INSERT INTO asset_links (from_id, to_id, rel) VALUES ('knight', 'robot', 'texture')", []).unwrap();
         assert_eq!(body("wave").as_deref(), Some("knight"), "wearing a texture beats shipping more clips");
+        assert_eq!(moved(), ["run", "wave"], "a better dressed character came in: drawn again on it");
         c.execute("INSERT INTO skeleton_bodies (skeleton, asset_id, chosen_at) VALUES (?1, 'hero', 'x')", [&key])
             .unwrap();
         assert_eq!(body("run").as_deref(), Some("hero"), "the one chosen");

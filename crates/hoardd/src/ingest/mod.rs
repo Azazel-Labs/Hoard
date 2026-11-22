@@ -355,8 +355,9 @@ pub(crate) fn ingest_pack(
         tracing::info!(pack = pack_id, files = replaced.len(), "files uploaded again with changes read again");
         retag_pack(state, rt, pack_id, Some(&replaced))?;
     }
-    animations_in(state, rt, pack_id);
+    // Materials first: they say which characters are dressed, and so which its animations are drawn on.
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
+    animations_in(state, rt, pack_id);
     read_pack_files(state, rt, pack_id, auto_name, wrapper_name);
 
     if watched.is_none() {
@@ -662,8 +663,9 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
     fs::remove_dir_all(&work).ok();
     convert::thumbs_from_conversions(state, rt, pack_id)?;
     crate::animations::rigs_from_conversions(state, rt, pack_id)?;
-    animations_in(state, rt, pack_id);
+    // Materials first: they say which characters are dressed, and so which its animations are drawn on.
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
+    animations_in(state, rt, pack_id);
     read_pack_files(state, rt, pack_id, false, None);
     Ok(())
 }

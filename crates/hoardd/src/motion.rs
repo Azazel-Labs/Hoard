@@ -39,6 +39,9 @@ static FAILED: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
 static WAITING: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
 /// How many packs have come in, so a clip found to fit nothing while one came in is tried again rather than put aside.
 static PACKS_IN: AtomicU64 = AtomicU64::new(0);
+/// The packs come in and the skeletons' revision when animations were last checked for being drawn on the character
+/// they play on, so they're checked again only when either may have changed it.
+static CHECKED: Mutex<Option<(u64, u64)>> = Mutex::new(None);
 
 /// Why a clip with no mesh of its own can't be drawn: it fits no character.
 #[derive(Debug)]
@@ -111,6 +114,13 @@ pub(crate) async fn redraw(state: &AppState, ids: Vec<String>) -> Result<()> {
     if ids.is_empty() {
         return Ok(());
     }
+    forget(state, ids).await?;
+    kick(state);
+    Ok(())
+}
+
+/// Forget these animations' thumbnails, deleting their files, so the next round draws them.
+async fn forget(state: &AppState, ids: Vec<String>) -> Result<()> {
     let blobs = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         let mut blobs = Vec::new();
@@ -132,7 +142,23 @@ pub(crate) async fn redraw(state: &AppState, ids: Vec<String>) -> Result<()> {
     .await?;
     crate::jobs::delete_unused(state, blobs).await?;
     FAILED.lock().unwrap_or_else(PoisonError::into_inner).clear();
-    kick(state);
+    Ok(())
+}
+
+/// Draw again the animations drawn on a character they no longer play on: a pack came in with a better dressed
+/// character of their skeleton, or the one they were drawn on went. Checked once after the server starts, and again
+/// after a pack comes in or a rig changes.
+async fn redraw_moved(state: &AppState) -> Result<()> {
+    let now = (PACKS_IN.load(Ordering::SeqCst), crate::animations::revision());
+    if *CHECKED.lock().unwrap_or_else(PoisonError::into_inner) == Some(now) {
+        return Ok(());
+    }
+    let moved = crate::animations::drawn_on_another(state).await?;
+    if !moved.is_empty() {
+        tracing::info!(count = moved.len(), "drawing animations again on their skeleton's character");
+        forget(state, moved).await?;
+    }
+    *CHECKED.lock().unwrap_or_else(PoisonError::into_inner) = Some(now);
     Ok(())
 }
 
@@ -146,6 +172,7 @@ struct Todo {
 }
 
 async fn fill(state: &AppState) -> Result<()> {
+    redraw_moved(state).await?;
     let motion_on = state.settings.get().motion_thumbs;
     // A thumbnail a browser drew is kept: it drew the clip mid-way too, with every texture.
     let todo: Vec<Todo> = db::call(&state.pool, move |c| {

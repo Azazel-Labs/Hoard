@@ -76,7 +76,7 @@ onBeforeUnmount(endPreview)
 .sw small { font-size: 0.68rem; color: var(--faint); font-weight: 400; line-height: 1.3; }
 .sw.light { --s-bg: var(--l-bg); --s-panel: var(--l-panel); --s-line: var(--l-line); --s-text: var(--l-text); --s-muted: var(--l-muted); --s-accent: var(--l-accent); }
 .sw.dark { --s-bg: var(--d-bg); --s-panel: var(--d-panel); --s-line: var(--d-line); --s-text: var(--d-text); --s-muted: var(--d-muted); --s-accent: var(--d-accent); }
-.sw { display: grid; gap: 0.25rem; cursor: pointer; font-size: 0.75rem; color: var(--muted); }
+.sw { position: relative; display: grid; gap: 0.25rem; cursor: pointer; font-size: 0.75rem; color: var(--muted); }
 .sw input { position: absolute; opacity: 0; pointer-events: none; }
 .mini {
   position: relative; display: block; height: 3.6rem; border-radius: 6px; overflow: hidden;

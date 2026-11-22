@@ -22,7 +22,10 @@ section > .what { margin-bottom: 0.9rem; max-width: 40rem; }
 .modes label:has(:checked) { background: var(--raised); color: var(--text); font-weight: 600; box-shadow: var(--elev-1), 0 0 0 1px var(--line); }
 .modes label:has(:disabled) { cursor: default; }
 .modes label:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
-.modes input { position: absolute; opacity: 0; pointer-events: none; }
+/* The radio stays inside its label: placed against the page instead, it stretched the window to where the radio sat
+   down the page, and choosing one scrolled the whole window away. */
+.modes label { position: relative; }
+.modes input { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
 
 .status {
   --st: var(--faint);

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "9b801db8ec5d00873c2610fa28f932ac92cd57be6eebeffaf440d525cedbcb00"
+source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
 translation = "19af1556db5b772a542174850d260c29dc1e0f9f92eb519c88ebd9c71e8bbcca"
 
 [messages.about-blender]

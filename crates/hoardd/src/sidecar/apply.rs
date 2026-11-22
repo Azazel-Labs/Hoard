@@ -130,7 +130,9 @@ fn write(
             }
             touched.insert(asset.clone());
         }
-        name_and_link(&tx, s, &mine)?;
+        if !s.whole_pack {
+            name_and_link(&tx, s, &mine)?;
+        }
         // A model whose file couldn't be read for its triangles takes the count the store gives.
         for (asset, path, kind) in &mine {
             if kind == AssetKind::Model.as_str()
@@ -181,15 +183,25 @@ fn write(
         let names: Vec<&str> = titles.iter().copied().collect();
         let shown = names.iter().take(4).copied().collect::<Vec<_>>().join(", ");
         let more = names.len().saturating_sub(4);
+        // Only so many files are read: a bundle of hundreds of kits has more than were counted.
+        let capped = i64::try_from(sidecars.len()).is_ok_and(|n| n >= MAX_SIDECARS);
         let formats: BTreeSet<&str> = sidecars.iter().map(|s| s.format.as_str()).collect();
         let whose = match formats.into_iter().collect::<Vec<_>>().as_slice() {
             [one] => format!("{one} "),
             _ => String::new(),
         };
+        let things = if sidecars.iter().all(|s| s.whole_pack) { "packs" } else { "assets" };
         format!(
-            "{} {whose}assets: {shown}{}.",
+            "{}{} {whose}{things}: {shown}{}.",
             sidecars.len(),
-            if more > 0 { format!(" and {more} more") } else { String::new() }
+            if capped { "+" } else { "" },
+            if capped {
+                " and more".to_owned()
+            } else if more > 0 {
+                format!(" and {more} more")
+            } else {
+                String::new()
+            }
         )
     };
     applied.described = description.is_none();
@@ -204,6 +216,14 @@ fn write(
             serde_json::to_string(&file_tags)?
         ],
     )?;
+    credit(&tx, pack_id, sidecars)?;
+    tx.commit()?;
+    Ok(applied)
+}
+
+/// Who made the pack, and the license the credits give it when every file that names one names the same one, and it's
+/// one they know. Neither replaces what's there.
+fn credit(tx: &rusqlite::Connection, pack_id: &str, sidecars: &[Sidecar]) -> Result<()> {
     if let Some(seller) = sidecars.iter().find_map(|s| s.seller.as_deref()) {
         tx.execute(
             "INSERT INTO pack_context (pack_id, seller) VALUES (?1, ?2)
@@ -211,8 +231,17 @@ fn write(
             params![pack_id, seller],
         )?;
     }
-    tx.commit()?;
-    Ok(applied)
+    let licenses: BTreeSet<&str> = sidecars.iter().filter_map(|s| s.license.as_deref()).collect();
+    if let [license] = licenses.into_iter().collect::<Vec<_>>().as_slice()
+        && crate::credits::license_name(license).is_some()
+    {
+        tx.execute(
+            "INSERT INTO pack_context (pack_id, store_license) VALUES (?1, ?2)
+             ON CONFLICT (pack_id) DO UPDATE SET store_license = COALESCE(store_license, excluded.store_license)",
+            params![pack_id, license],
+        )?;
+    }
+    Ok(())
 }
 
 /// The model a store's file describes takes the listing's title (each LOD with its number), unless someone renamed
@@ -240,4 +269,54 @@ fn name_and_link(tx: &rusqlite::Connection, s: &Sidecar, mine: &[&(String, Strin
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_bundle_of_kits_is_credited_to_their_maker_and_its_models_keep_their_names() {
+        let mut conn = db::test_library();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p', 'Kenney All-in-1', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('ship', 'p', 'h', 'Pirate Kit/Models/ship.glb', 'Ship', 'glb', 'model', 'x', 'x'),
+               ('lic1', 'p', 'h', 'Pirate Kit/License.txt', 'License', 'txt', 'document', 'x', 'x'),
+               ('car', 'p', 'h', 'Car Kit/Models/car.glb', 'Car', 'glb', 'model', 'x', 'x'),
+               ('lic2', 'p', 'h', 'Car Kit/License.txt', 'License', 'txt', 'document', 'x', 'x');",
+        )
+        .unwrap();
+        let license = |kit: &str| {
+            format!(
+                "\t\n\n\t{kit} (1.2)\n\n\tCreated/distributed by Kenney (www.kenney.nl)\n\n\t\t\t----------\n\n\
+                 \tLicense: (Creative Commons Zero, CC0)\n\thttp://creativecommons.org/publicdomain/zero/1.0/\n"
+            )
+        };
+        let sidecars: Vec<Sidecar> = [("Pirate Kit", "Pirate Kit/License.txt"), ("Car Kit", "Car Kit/License.txt")]
+            .into_iter()
+            .map(|(kit, path)| read(path, &license(kit)).expect("read as Kenney's"))
+            .collect();
+        let applied = write(&mut conn, "p", &sidecars, false, None).unwrap();
+        assert_eq!(applied.renamed, None);
+
+        let names: Vec<String> = conn
+            .prepare("SELECT name FROM assets WHERE kind = 'model' ORDER BY id")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert_eq!(names, ["Car", "Ship"]);
+        let (description, seller, license): (String, String, String) = conn
+            .query_row(
+                "SELECT p.description, c.seller, c.store_license FROM packs p JOIN pack_context c ON c.pack_id = p.id",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!(description, "2 Kenney packs: Car Kit, Pirate Kit.");
+        assert_eq!((seller.as_str(), license.as_str()), ("Kenney", "CC0"));
+    }
 }

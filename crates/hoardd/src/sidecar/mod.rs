@@ -40,6 +40,8 @@ pub(crate) struct Sidecar {
     pub(crate) format: String,
     /// The kind of file, in words ("Megascans file").
     pub(crate) source: String,
+    /// It speaks for the whole pack, not one asset: no model takes its title.
+    pub(crate) whole_pack: bool,
     /// Who sells it, or made it.
     pub(crate) seller: Option<String>,
     /// The license it's sold under, as the file writes it ("CC-BY-4.0").
@@ -252,6 +254,7 @@ pub(crate) fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
         title,
         format: f.name.clone(),
         source: f.called.clone(),
+        whole_pack: f.whole_pack,
         seller: x.seller.first(at).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 80).or(f.seller.clone()),
         license: x.license.first(at).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 120),
         url: x.url.first(at).filter(|u| u.starts_with("https://") || u.starts_with("http://")),
@@ -336,7 +339,7 @@ impl Sidecar {
 
     /// A short description from the facts: what it is, where it's from, its size and maps.
     pub(crate) fn describe(&self, maps: &[&str]) -> String {
-        let kind = self.asset_type.as_deref().unwrap_or("asset");
+        let kind = self.asset_type.as_deref().unwrap_or(if self.whole_pack { "pack" } else { "asset" });
         let lead = if kind.starts_with(['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u']) { "An" } else { "A" };
         let mut out = format!("{lead} {kind}");
         if let Some(s) = &self.seller {

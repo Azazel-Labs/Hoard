@@ -21,6 +21,7 @@ use selector::{Sel, Sels, glob};
 
 /// The formats Hoard ships with, by file name (a test checks every file in `formats/` is here).
 const BUILT_IN: &[(&str, &str)] = &[
+    ("kenney.toml", include_str!("../../formats/kenney.toml")),
     ("megascans.toml", include_str!("../../formats/megascans.toml")),
     ("sketchfab.toml", include_str!("../../formats/sketchfab.toml")),
 ];
@@ -121,6 +122,8 @@ pub(crate) struct Format {
     pub(crate) origin_words: String,
     /// The file's name is the asset's id (`xeokah0.json`) when the file doesn't give one.
     pub(crate) id_from_file_name: bool,
+    /// The file speaks for its whole pack (a kit of many models), not one asset.
+    pub(crate) whole_pack: bool,
     pub(crate) fields: Fields,
     /// Its file's name (`megascans.toml`).
     pub(crate) file: String,
@@ -328,6 +331,7 @@ impl Format {
             tags: spec.tags,
             origin_words: spec.origin_words.unwrap_or_else(|| "from".to_owned()),
             id_from_file_name: spec.id_from_file_name,
+            whole_pack: spec.describes == Describes::Pack,
             fields,
             file: String::new(),
             custom: false,
@@ -357,7 +361,18 @@ struct Spec {
     #[serde(default)]
     id_from_file_name: bool,
     #[serde(default)]
+    describes: Describes,
+    #[serde(default)]
     fields: FieldSpec,
+}
+
+/// What a file speaks for: the asset beside it (whose model takes its title), or the whole pack.
+#[derive(Deserialize, Default, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+enum Describes {
+    #[default]
+    Asset,
+    Pack,
 }
 
 #[derive(Deserialize, Default)]

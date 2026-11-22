@@ -1,7 +1,7 @@
 # Store file formats
 
 Some stores ship a small file beside the art that says what it is: Megascans' `<id>.json`, Sketchfab's
-`license.txt`. Hoard reads these to name the pack, tag it, describe it, and find its store page. Each store's file is
+`license.txt`, Kenney's `License.txt`. Hoard reads these to name the pack, tag it, describe it, and find its store page. Each store's file is
 described by a TOML file in [`crates/hoardd/formats/`](../crates/hoardd/formats/). No Rust is needed. Adding a store
 means adding a TOML file and a sample, which makes a small PR.
 
@@ -58,6 +58,7 @@ require = ["semanticTags", ["id", "meta"]]  # how to tell the file is the store'
 tags = ["megascans"]        # optional; added to everything it describes
 origin_words = "scanned in" # optional; "… from Quixel Megascans, scanned in Norway."
 id_from_file_name = true    # optional; the file's name (`xeokah0.json`) is the asset's id when the file gives none
+describes = "asset"         # optional; "pack" when the file speaks for a whole kit of many models (Kenney's)
 
 [fields]
 title = "semanticTags.name"
@@ -66,6 +67,10 @@ title = "semanticTags.name"
 
 A file is read as the first format whose `files` match its name, whose `require` holds, and in which `title` finds
 something. Other files are skipped. Keep `require` specific: `*.json` matches every JSON file in every pack.
+
+A file speaks for everything in its folder and below. By default it describes one asset: a lone model there takes its
+title, and the file is shown behind the model. With `describes = "pack"` the title only names the pack, and the
+models keep their own names.
 
 `require` lists the ways to recognize the file. Each way is one selector, or a list of selectors that must all find
 something. `["semanticTags", ["id", "meta"]]` means: it has `semanticTags`, or it has both `id` and `meta`.
@@ -84,7 +89,7 @@ the first that finds something, so put the best place first. A field with many v
 | `colors` | many | `color:` tags |
 | `origin` | many | where it was made or scanned, for the description |
 | `seller` | one | who made or sells it; beats the format's `seller` |
-| `license` | one | the license as the file writes it ("CC-BY-4.0") |
+| `license` | one | the license as the file writes it ("CC-BY-4.0"); one the credits know becomes the pack's |
 | `url` | one | the store page; it must start with `http://` or `https://` |
 | `size_min`, `size_max`, `size` | one | its size in words ("1 m to 2 m"), from a range or else `size` |
 | `texel_density` | one | for the description |

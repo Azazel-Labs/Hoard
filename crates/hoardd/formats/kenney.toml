@@ -1,0 +1,24 @@
+# Every Kenney download comes with License.txt, which names the pack (with its version), says Kenney made it, and
+# gives its license:
+#
+#   	1-Bit Pack (1.2)
+#
+#   	Created/distributed by Kenney (www.kenney.nl)
+#   	Creation date: 09-11-2021
+#
+#   			------------------------------
+#
+#   	License: (Creative Commons Zero, CC0)
+#   	http://creativecommons.org/publicdomain/zero/1.0/
+#
+# Older ones say "by Kenney Vleugels (Kenney.nl)" and "License (…)". The title is the kit's, not one model's.
+name = "Kenney"
+seller = "Kenney"
+files = ["license.txt"]
+syntax = "text"
+describes = "pack"
+require = ['^[ \t]*(?:Created/distributed by|by) +Kenney']
+
+[fields]
+title = '\A\s*(.+?)(?:[ \t]*\((?:version[ \t]*)?[\d.]+[A-Za-z]?\))?[ \t]*$'
+license = '^[ \t]*License:?[ \t]*\((?:[^),]*,[ \t]*)?([^)]+)\)'

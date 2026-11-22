@@ -10,7 +10,8 @@
 //! Updates need nothing from the person using it: the app looks for one when it starts and every few hours, downloads
 //! it in the background, and installs it with no window when the app quits, so the next start is the new version. On
 //! Windows the app is installed for the one user, in their own folders, so installing an update doesn't ask for an
-//! administrator. A copy installed from the .deb is left to the package manager.
+//! administrator. A copy installed from the .deb is left to the package manager, and one Steam installed or started to
+//! Steam.
 //!
 //! Built without the default `updater` feature, it leaves updating to whatever installed it.
 
@@ -144,6 +145,11 @@ fn start(app: &AppHandle) -> Result<()> {
     tauri::async_runtime::spawn(async move {
         // A .deb is updated by the package manager, with the next .deb.
         if tauri::utils::platform::bundle_type() == Some(tauri::utils::config::BundleType::Deb) {
+            return;
+        }
+        // Nor does a copy Steam installed or started: Steam updates it, and two updaters would fight.
+        if steam_owns_it() {
+            tracing::info!("Steam updates this copy");
             return;
         }
         loop {
@@ -357,6 +363,19 @@ async fn fetch_update(app: &AppHandle) -> Result<bool> {
     Ok(true)
 }
 
+/// Whether Steam started this copy (it says which app it started, unlike a non-Steam shortcut's `0`) or installed
+/// it, in a library's `steamapps` folder.
+#[cfg(feature = "updater")]
+fn steam_owns_it() -> bool {
+    let started = std::env::var("SteamAppId").is_ok_and(|id| !id.trim().is_empty() && id.trim() != "0");
+    started || std::env::current_exe().is_ok_and(|exe| in_steam_library(&exe))
+}
+
+#[cfg(any(feature = "updater", test))]
+fn in_steam_library(exe: &Path) -> bool {
+    exe.components().any(|c| c.as_os_str().eq_ignore_ascii_case("steamapps"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -366,5 +385,13 @@ mod tests {
         assert!(is_loopback("127.0.0.1") && is_loopback("[::1]") && is_loopback("LocalHost"));
         assert!(is_loopback("tauri.localhost"));
         assert!(!is_loopback("example.com") && !is_loopback("192.168.0.1") && !is_loopback("localhost.example.com"));
+    }
+
+    #[test]
+    fn a_copy_in_a_steam_library_is_steams() {
+        assert!(in_steam_library(Path::new(r"C:\Program Files (x86)\Steam\steamapps\common\Hoard\Hoard.exe")));
+        assert!(in_steam_library(Path::new("/home/me/.local/share/Steam/SteamApps/common/Hoard/usr/bin/hoard")));
+        assert!(!in_steam_library(Path::new(r"C:\Users\me\AppData\Local\Hoard\Hoard.exe")));
+        assert!(!in_steam_library(Path::new("/Applications/Hoard.app/Contents/MacOS/Hoard")));
     }
 }

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "9b9cdb0c0c213f51025310f204d8fd86748602acc18d04be07e8b2b164492a1d"
 
 [messages.about-blender]
@@ -8984,6 +8984,14 @@ translation = "กำลังค้นหาหน้าร้านค้า"
 source = "Converting Unreal packages in { $pack }"
 translation = "กำลังแปลงแพ็กเกจ Unreal ใน { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "แปลงภาพย่อเป็น AVIF"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "แปลงภาพย่อทั้งหมดตอนนี้ แทนที่จะแปลงทีละภาพเมื่อแสดงครั้งแรก เมื่อตั้งให้ส่งภาพย่อเป็น AVIF"
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "สำรองฐานข้อมูล"
@@ -10380,9 +10388,17 @@ translation = "ธีม"
 source = "Thumbnails"
 translation = "ภาพย่อ"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "กำลังแปลง…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "แปลงทั้งหมดตอนนี้"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "เบราว์เซอร์ที่แสดง AVIF ได้จะได้รับภาพย่อที่คมชัดเท่าตัวเลือกด้านบน แต่มักเล็กลงเหลือไม่ถึงครึ่ง ภาพย่อแต่ละภาพจะสร้างจากภาพย่อที่เก็บไว้เมื่อแสดงครั้งแรก และเก็บไว้กับไฟล์ที่แปลงแล้ว ระหว่างนั้นจะส่งภาพที่เก็บไว้แทน การสร้างจะใช้ได้ถึงสองคอร์ขณะที่เปิดดูคลังขนาดใหญ่เป็นครั้งแรก ภาพย่อแบบไม่สูญเสียคุณภาพและพิกเซลอาร์ตจะส่งไปตามเดิม"
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF มักมีขนาดเพียงครึ่งเดียว ภาพย่อแต่ละภาพจะถูกแปลงเมื่อแสดงครั้งแรก"
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

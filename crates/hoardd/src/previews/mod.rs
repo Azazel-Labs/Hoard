@@ -13,7 +13,7 @@
 //! - **AVIF thumbnails** for browsers that read them, when Settings asks: see [`avif`].
 
 mod avif;
-pub(crate) use avif::{AvifThumb, avif_thumb, vary};
+pub(crate) use avif::{AvifThumb, avif_thumb, convert_all as avif_thumbs, vary};
 
 use crate::i18n::tr;
 use axum::Json;

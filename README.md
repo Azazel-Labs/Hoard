@@ -1260,7 +1260,7 @@ Set before starting (these need a restart):
 
 **Settings → Maintenance** has a button for each job that looks after the library, with progress while it runs and a history of past runs:
 back up the database, check files for damage, re-analyze every pack (thumbnails, previews and rule tags made afresh;
-your edits stay, the AI isn't asked again), shrink thumbnails, clear cached "Download as" conversions and leftovers,
+your edits stay, the AI isn't asked again), shrink thumbnails, convert thumbnails to AVIF, clear cached "Download as" conversions and leftovers,
 and delete unused files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
 history the same way.
 
@@ -1292,7 +1292,9 @@ It's kept in memory only and starts over when Hoard restarts. `GET /api/admin/pr
 (the default) or Sharper JPEG, or Lossless PNG. Anything with transparency (model renders, waveforms, font
 specimens, cut-out sprites) and pixel art always stays PNG, and so does a picture whose PNG is about as small as the
 JPEG would be. For photo-like textures Balanced is roughly an eighth of the PNG. Changing it affects new thumbnails;
-Maintenance → Shrink thumbnails re-stores the existing PNG ones.
+Maintenance → Shrink thumbnails re-stores the existing PNG ones. Its Format switch sends them to browsers as JPEG or
+AVIF, often half the size at the same sharpness: each AVIF is made from the stored thumbnail the first time it's
+shown, or all at once with Convert all now (Maintenance → Convert thumbnails to AVIF).
 
 - Content addressing: every byte is verifiable. `POST /api/admin/scrub` re-hashes all blobs (local or S3) and flags
   corrupt or missing ones; the portal shows the count. It answers 202 and runs in the background.
@@ -1529,7 +1531,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
 | GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
-| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `clear_cache` or `gc` |
+| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `avif_thumbs`, `clear_cache` or `gc` |
 | POST | `/mcp` | MCP over streamable HTTP (needs a sign-in: OAuth or an access token) |
 | GET | `/.well-known/oauth-protected-resource/mcp`, `/.well-known/oauth-authorization-server` | OAuth discovery for MCP apps |
 | POST | `/oauth/register`, `/oauth/token` | OAuth dynamic client registration; codes and refresh tokens for access tokens |

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Performance: the profiler, rendering model thumbnails, their quality, and the limits on work, uploads and
 // the conversion cache.
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { api, type Stats, type ThumbQuality } from '../api'
 import { humanBytes } from '../format'
 import { formatNumber, t } from '../i18n'
@@ -9,6 +9,7 @@ import { formatMiB } from '../sizes'
 import ProfilerPanel from './ProfilerPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
+import { showError } from '../ui'
 import { onOff, useSettings } from './settingsContext'
 
 const props = defineProps<{ stats: Stats | null }>()
@@ -36,6 +37,28 @@ function qualityOf(q: (typeof THUMBS)[number]): string {
   const quality = s.value?.options.thumb_avif.value ? q.avif : q.jpeg
   return quality === undefined ? '' : t('settings-thumbs-quality', { quality })
 }
+// Converting every thumbnail to AVIF now rather than as each is shown: a Maintenance task, followed while it runs.
+const converting = ref(false)
+let convertTimer: ReturnType<typeof setTimeout> | undefined
+async function followConvert() {
+  clearTimeout(convertTimer)
+  try {
+    converting.value = !!(await api.maintenance()).tasks.find((t) => t.id === 'avif_thumbs')?.running
+  } catch {
+    converting.value = false
+  }
+  if (converting.value) convertTimer = setTimeout(followConvert, 3000)
+}
+async function convertAll() {
+  try {
+    await api.runMaintenance('avif_thumbs')
+  } catch (e) {
+    showError((e as Error).message)
+  }
+  await followConvert()
+}
+onMounted(followConvert)
+onUnmounted(() => clearTimeout(convertTimer))
 // How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
 const usage = ref<Stats | null>(null)
 async function loadUsage() {
@@ -114,7 +137,12 @@ watch(
         <span><strong>{{ q.label }}</strong><small>{{ qualityOf(q) }} {{ q.hint }}</small></span>
       </label>
     </div>
-    <p class="what avif">{{ t('settings-thumbs-avif-what') }}</p>
+    <div class="avif">
+      <p class="what">{{ t('settings-thumbs-avif-what') }}</p>
+      <button v-if="s.options.thumb_avif.value" class="btn" :disabled="busy || converting" @click="convertAll">
+        {{ converting ? t('settings-thumbs-avif-converting') : t('settings-thumbs-avif-now') }}
+      </button>
+    </div>
     <div class="switches motion">
       <div class="opt-row">
         <label class="check">
@@ -181,5 +209,7 @@ watch(
 <style scoped>
 .switches.motion { margin: 0.9rem 0 0.2rem; }
 .format { margin-bottom: 0.5rem; font-size: var(--step--1); color: var(--muted); }
-.what.avif { margin-top: 0.6rem; }
+.avif { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.6rem; }
+.avif .what { margin: 0; }
+.avif .btn { flex: none; }
 </style>

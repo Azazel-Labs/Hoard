@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "d0e6acc5bd4349cf2e38516e2111f5e558cb5c06ac0604e881c65c5a1160098e"
 
 [messages.about-blender]
@@ -9406,6 +9406,14 @@ translation = "Wyszukiwanie strony w sklepie"
 source = "Converting Unreal packages in { $pack }"
 translation = "Konwersja pakietów Unreal: { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "Konwertuj miniatury do AVIF"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "Konwertuje teraz wszystkie miniatury, zamiast każdej przy pierwszym wyświetleniu, gdy miniatury są wysyłane jako AVIF."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Kopia zapasowa bazy danych"
@@ -10855,9 +10863,17 @@ translation = "Motywy"
 source = "Thumbnails"
 translation = "Miniatury"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "Konwertowanie…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "Konwertuj wszystkie teraz"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Przeglądarki, które wyświetlają AVIF, dostają miniatury tak ostre jak w wyborze powyżej, często mniejsze niż połowa rozmiaru. Każda powstaje z zapisanej miniatury przy pierwszym wyświetleniu i jest przechowywana razem z konwersjami; do tego czasu wysyłana jest zapisana. Ich tworzenie zajmuje do dwóch rdzeni, gdy duża biblioteka jest przeglądana po raz pierwszy. Bezstratne miniatury i pixel art są wysyłane bez zmian."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF często zajmuje o połowę mniej. Każda miniatura jest konwertowana przy pierwszym wyświetleniu."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "bd7cd34aed4768345a5f9fea614ee34f51ffb924aa266c18a1b392a66b52d3b0"
 
 [messages.about-blender]
@@ -9218,6 +9218,14 @@ translation = "Consultant una pàgina de botiga"
 source = "Converting Unreal packages in { $pack }"
 translation = "Convertint els paquets d'Unreal de { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "Converteix les miniatures a AVIF"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "Converteix ara totes les miniatures, en lloc de fer-ho a mesura que es mostren per primera vegada, quan les miniatures s’envien en AVIF."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Fes una còpia de seguretat de la base de dades"
@@ -10630,9 +10638,17 @@ translation = "Temes"
 source = "Thumbnails"
 translation = "Miniatures"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "S’estan convertint…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "Converteix-les totes ara"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Els navegadors que mostren AVIF reben miniatures tan nítides com l’opció de dalt, sovint de menys de la meitat de la mida. Cadascuna es fa a partir de la miniatura desada la primera vegada que es mostra i es guarda amb les conversions; fins aleshores s’envia la desada. Fer-les manté ocupats fins a dos nuclis mentre es navega per primera vegada per una biblioteca gran. Les miniatures sense pèrdua i el pixel art s’envien tal com són."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "L’AVIF sovint fa la meitat de mida. Cada miniatura es converteix la primera vegada que es mostra."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

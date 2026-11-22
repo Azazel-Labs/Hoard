@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -9029,6 +9029,14 @@ translation = "Bir mağaza sayfası aranıyor"
 source = "Converting Unreal packages in { $pack }"
 translation = "Unreal paketleri dönüştürülüyor: { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "Küçük resimleri AVIF’e dönüştür"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "Küçük resimler AVIF olarak gönderilirken, her birini ilk gösterildiğinde dönüştürmek yerine hepsini şimdi dönüştürür."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Veritabanını yedekle"
@@ -10437,9 +10445,17 @@ translation = "Temalar"
 source = "Thumbnails"
 translation = "Küçük resimler"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "Dönüştürülüyor…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "Hepsini şimdi dönüştür"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF gösterebilen tarayıcılar, yukarıdaki seçim kadar net küçük resimler alır, çoğu zaman boyutun yarısından da az. Her biri ilk gösterildiğinde saklanan küçük resimden yapılır ve dönüştürmelerle birlikte tutulur; o zamana kadar saklanan gönderilir. Bunları yapmak, büyük bir kitaplığa ilk kez göz atılırken en fazla iki çekirdeği meşgul eder. Kayıpsız küçük resimler ve piksel sanatı olduğu gibi gönderilir."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF çoğu zaman yarı boyuttadır. Her küçük resim ilk gösterildiğinde dönüştürülür."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

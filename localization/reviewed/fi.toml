@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "19af1556db5b772a542174850d260c29dc1e0f9f92eb519c88ebd9c71e8bbcca"
 
 [messages.about-blender]
@@ -9261,6 +9261,14 @@ translation = "Haetaan kauppasivua"
 source = "Converting Unreal packages in { $pack }"
 translation = "Muunnetaan Unreal-paketteja: { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "Muunna pikkukuvat AVIF-muotoon"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "Muuntaa kaikki pikkukuvat nyt sen sijaan, että kukin muunnettaisiin ensimmäisellä näyttökerralla, kun pikkukuvat lähetetään AVIF-muodossa."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Varmuuskopioi tietokanta"
@@ -10675,9 +10683,17 @@ translation = "Teemat"
 source = "Thumbnails"
 translation = "Pikkukuvat"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "Muunnetaan…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "Muunna kaikki nyt"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF-kuvia näyttävät selaimet saavat yllä valitun tarkkuisia pikkukuvia, usein alle puolet koosta. Kukin tehdään tallennetusta pikkukuvasta, kun se näytetään ensimmäisen kerran, ja säilytetään muunnosten kanssa; siihen asti lähetetään tallennettu. Niiden tekeminen pitää enintään kaksi ydintä kiireisenä, kun suurta kirjastoa selataan ensimmäistä kertaa. Häviöttömät pikkukuvat ja pikselitaide lähetetään sellaisinaan."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF on usein puolet pienempi. Kukin pikkukuva muunnetaan, kun se näytetään ensimmäisen kerran."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

@@ -231,18 +231,28 @@ test('Procreate, Affinity, EPS and camera raw files show the picture inside', as
   }
 })
 
-test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once the stored one has been sent', async ({ page, api }) => {
-  test.setTimeout(120_000)
+test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once the stored one has been sent or all at once', async ({ page, api }) => {
+  test.setTimeout(180_000)
   // Smooth color with detail, like a render: its thumbnail is a JPEG that AVIF shrinks.
   const photo = png(256, 256, (x, y) => {
     const ripple = Math.sin(x / 11) * Math.cos(y / 15) * 40
     const c = (v: number) => Math.max(0, Math.min(255, Math.round(v * 200 + ripple)))
     return [c(x / 256), c(y / 256), c(1 - (x * y) / 65_536), 255]
   })
-  const pack = await uploadPack(api, `E2E AVIF ${unique()}`, [{ relpath: 'render.png', data: photo }])
+  // A second one, mirrored so its thumbnail differs, isn't asked for until Convert all now has made its AVIF.
+  const mirrored = png(256, 256, (x, y) => {
+    const ripple = Math.sin(y / 11) * Math.cos(x / 15) * 40
+    const c = (v: number) => Math.max(0, Math.min(255, Math.round(v * 200 + ripple)))
+    return [c(y / 256), c(x / 256), c(1 - (x * y) / 65_536), 255]
+  })
+  const pack = await uploadPack(api, `E2E AVIF ${unique()}`, [
+    { relpath: 'render.png', data: photo },
+    { relpath: 'later.png', data: mirrored },
+  ])
   await waitReady(api, [pack.id])
-  const [render] = await assetsOf(api, pack.id)
-  const thumb = (accept: string) => api.get(`/api/assets/${render.id}/thumb`, { headers: { Accept: accept } })
+  const assets = await assetsOf(api, pack.id)
+  const idOf = (name: string) => assets.find((a: { path: string }) => a.path === name)!.id
+  const thumb = (accept: string, name = 'render.png') => api.get(`/api/assets/${idOf(name)}/thumb`, { headers: { Accept: accept } })
 
   await page.goto('/#settings/performance')
   // The format is picked above the choices, which each say the quality browsers get in it.
@@ -257,6 +267,9 @@ test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once t
   await expect(choice('Balanced')).toContainText('Quality 68. Hard to tell')
   await expect(choice('Sharper')).toContainText('Quality 80.')
   await expect(choice('Lossless')).toHaveText(/^Lossless\s*PNG, exactly as made\. Several times larger, and never sent as AVIF\.$/)
+  // Only with AVIF on is there anything to convert.
+  const convert = page.getByRole('button', { name: 'Convert all now' })
+  await expect(convert).toBeVisible()
   try {
     // The stored picture goes out while the AVIF is made, not to be kept by the browser.
     const first = await thumb('image/avif,image/webp,*/*')
@@ -274,6 +287,16 @@ test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once t
 
     // One that doesn't read AVIF still gets the JPEG.
     expect((await thumb('image/webp,*/*')).headers()['content-type']).toBe('image/jpeg')
+
+    // Convert all now makes the rest up front, so the first request for one is already AVIF.
+    await convert.click()
+    await expect(convert).toBeEnabled({ timeout: 120_000 })
+    const task = async () => (await (await api.get('/api/admin/maintenance')).json()).tasks.find((t: { id: string }) => t.id === 'avif_thumbs')
+    await expect.poll(async () => (await task()).running, { timeout: 120_000 }).toBeNull()
+    const { last } = await task()
+    expect(last.ok).toBe(true)
+    expect(last.summary).toMatch(/^(Converted \d+ of \d+ thumbnails|Every thumbnail was already AVIF)/)
+    expect((await thumb('image/avif,image/webp,*/*', 'later.png')).headers()['content-type']).toBe('image/avif')
   } finally {
     await api.put('/api/admin/settings', { headers: HOARD_HEADERS, data: { thumb_avif: null } })
   }

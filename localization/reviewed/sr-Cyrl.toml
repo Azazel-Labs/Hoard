@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "c57db96716344aa847d7559e1fe2d5e482ceb243539e41e9ff1ff7eff455c08a"
 
 [messages.about-blender]
@@ -9310,6 +9310,14 @@ translation = "Тражење странице у продавници"
 source = "Converting Unreal packages in { $pack }"
 translation = "Претварање Unreal пакета: { $pack }"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "Претвори сличице у AVIF"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "Претвара све сличице сада, уместо сваку када се први пут прикаже, када се сличице шаљу као AVIF."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Направи резервну копију базе"
@@ -10743,9 +10751,17 @@ translation = "Теме"
 source = "Thumbnails"
 translation = "Сличице"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "Претвара се…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "Претвори све сада"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "Прегледачи који приказују AVIF добијају сличице оштре као избор изнад, често мање од половине величине. Свака се прави од сачуване сличице први пут када се прикаже и чува се уз конверзије; дотле се шаље сачувана. Њихово прављење заузима до два језгра док се велика библиотека први пут прегледа. Сличице без губитака и пиксел арт шаљу се какви јесу."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF је често упола мањи. Свака сличица се претвара први пут када се прикаже."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

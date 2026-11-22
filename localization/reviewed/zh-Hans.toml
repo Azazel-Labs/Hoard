@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "dfa154e4e2c244ac9b5bd0c069e7aef203d0da135fdc9b3c5f3448615a30c08f"
 
 [messages.about-blender]
@@ -8995,6 +8995,14 @@ translation = "正在查找商店页面"
 source = "Converting Unreal packages in { $pack }"
 translation = "正在转换 { $pack } 中的 Unreal 包"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "将缩略图转换为 AVIF"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "缩略图以 AVIF 发送时，立即转换所有缩略图，而不是在每张第一次显示时才转换。"
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "备份数据库"
@@ -10391,9 +10399,17 @@ translation = "主题"
 source = "Thumbnails"
 translation = "缩略图"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "正在转换…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "立即全部转换"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "能显示 AVIF 的浏览器会收到与上面所选清晰度相同的缩略图，常常不到一半大小。每张缩略图在第一次显示时由已存的缩略图生成，并与转换结果一起保存；在此之前发送已存的那张。首次浏览大型资源库时，生成它们最多会占用两个核心。无损缩略图和像素画按原样发送。"
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF 通常只有一半大小。每张缩略图在第一次显示时转换。"
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

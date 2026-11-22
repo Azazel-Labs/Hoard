@@ -31,6 +31,7 @@ pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const REANALYZE: &str = "reanalyze";
 pub(crate) const CLEAR_CACHE: &str = "clear_cache";
 pub(crate) const SHRINK_THUMBS: &str = "shrink_thumbs";
+pub(crate) const AVIF_THUMBS: &str = "avif_thumbs";
 pub(crate) const GC: &str = "gc";
 
 pub(crate) const TASKS: &[Task] = &[
@@ -50,6 +51,11 @@ pub(crate) const TASKS: &[Task] = &[
         id: SHRINK_THUMBS,
         label: || tr!("server-maintenance-shrink-thumbs"),
         blurb: || tr!("server-maintenance-shrink-thumbs-blurb"),
+    },
+    Task {
+        id: AVIF_THUMBS,
+        label: || tr!("server-maintenance-avif-thumbs"),
+        blurb: || tr!("server-maintenance-avif-thumbs-blurb"),
     },
     Task { id: GC, label: || tr!("server-maintenance-gc"), blurb: || tr!("server-maintenance-gc-blurb") },
 ];
@@ -155,6 +161,10 @@ async fn execute(state: &AppState, t: &'static Task, run: i64, scheduled: bool) 
         REANALYZE => reanalyze(state, &report).await,
         CLEAR_CACHE => clear_cache(state).await,
         SHRINK_THUMBS => shrink_thumbs(state, &report).await,
+        AVIF_THUMBS => {
+            crate::previews::avif_thumbs(state, |done, total| report.progress(done, total, ("thumbnail", "thumbnails")))
+                .await
+        }
         GC => gc(state).await,
         other => Err(anyhow::anyhow!("no maintenance task {other}")),
     };

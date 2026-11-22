@@ -6,6 +6,7 @@
 //! AVIF hardly shrinks (flat colors, line art) stay as they are.
 
 use std::collections::HashSet;
+use std::fmt::Write as _;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{LazyLock, Mutex};
 
@@ -127,6 +128,92 @@ fn start(state: &AppState, id: &str, thumb: &str, kind: String, quality: u8) {
             Err(e) => tracing::debug!(asset = %id, error = %format!("{e:#}"), "couldn't make an AVIF thumbnail"),
         }
     });
+}
+
+/// Make the AVIF of every thumbnail that hasn't one yet, instead of as each is first shown (Settings → Maintenance,
+/// and the button under the thumbnail choices). It takes the same two slots as those made while browsing, so pages
+/// aren't kept waiting, and stops if thumbnails stop being sent as AVIF.
+pub(crate) async fn convert_all(state: &AppState, progress: impl Fn(usize, usize)) -> anyhow::Result<String> {
+    let quality = || {
+        let s = state.settings.get();
+        s.thumb_quality.avif_quality().filter(|_| s.thumb_avif)
+    };
+    let Some(mut q) = quality() else { return Ok("Thumbnails aren't sent as AVIF".to_owned()) };
+    let todo: Vec<(String, String)> = db::call(&state.pool, |c| {
+        let rows = c
+            .prepare(
+                "SELECT a.id, a.thumb_hash FROM assets a
+                  WHERE a.thumb_hash IS NOT NULL
+                    AND COALESCE(json_extract(a.meta, '$.\"pixel-art-likely\"'), 0) = 0
+                    AND NOT EXISTS (SELECT 1 FROM derivatives d
+                                     WHERE d.asset_id = a.id AND d.kind = 'as:thumb.avif:' || substr(a.thumb_hash, 1, 16))",
+            )?
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    })
+    .await?;
+    let total = todo.len();
+    let (mut made, mut as_is, mut failed) = (0usize, 0usize, 0usize);
+    let mut tally = |done: Result<(String, anyhow::Result<bool>), tokio::task::JoinError>| match done {
+        Ok((_, Ok(true))) => made += 1,
+        Ok((thumb, Ok(false))) => {
+            as_is += 1;
+            lock(&NOT_WORTH_IT).insert(thumb);
+        }
+        Ok((_, Err(e))) => {
+            failed += 1;
+            tracing::debug!(error = %format!("{e:#}"), "couldn't make an AVIF thumbnail");
+        }
+        Err(_) => failed += 1,
+    };
+    let mut making = tokio::task::JoinSet::new();
+    let mut stopped = false;
+    for (i, (id, thumb)) in todo.into_iter().enumerate() {
+        if i % 50 == 0 {
+            progress(i, total);
+            let Some(now) = quality() else {
+                stopped = true;
+                break;
+            };
+            q = now;
+        }
+        if lock(&NOT_WORTH_IT).contains(&thumb) || !lock(&MAKING).insert(thumb.clone()) {
+            continue;
+        }
+        let slot = SLOTS.acquire().await?;
+        let state = std::sync::Arc::clone(state);
+        making.spawn(async move {
+            let _slot = slot;
+            let made = make(&state, &id, &thumb, kind(&thumb), q).await;
+            lock(&MAKING).remove(&thumb);
+            if matches!(made, Ok(true)) && MADE.fetch_add(1, Ordering::Relaxed) % TRIM_EVERY == TRIM_EVERY - 1 {
+                crate::formats::log_trim(&state).await;
+            }
+            (thumb, made)
+        });
+        while let Some(done) = making.try_join_next() {
+            tally(done);
+        }
+    }
+    while let Some(done) = making.join_next().await {
+        tally(done);
+    }
+    progress(total, total);
+    let mut summary = if stopped {
+        "Stopped: thumbnails aren't sent as AVIF any more".to_owned()
+    } else if made + as_is + failed == 0 {
+        "Every thumbnail was already AVIF".to_owned()
+    } else {
+        format!("Converted {made} of {total} thumbnails")
+    };
+    if as_is > 0 {
+        let _ = write!(summary, "; {as_is} left as they are, AVIF being no smaller");
+    }
+    if failed > 0 {
+        let _ = write!(summary, "; {failed} couldn't be converted");
+    }
+    Ok(summary)
 }
 
 /// Make and keep the AVIF; `false` when it isn't a fifth smaller than the stored picture.

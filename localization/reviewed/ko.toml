@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "518748d51ddc5472eafdc9505aa0e8fc653cae57d72dbf92356f5fae38d310a1"
+source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -8957,6 +8957,14 @@ translation = "스토어 페이지 찾는 중"
 source = "Converting Unreal packages in { $pack }"
 translation = "{ $pack }의 Unreal 패키지 변환하는 중"
 
+[messages.server-maintenance-avif-thumbs]
+source = "Convert thumbnails to AVIF"
+translation = "썸네일을 AVIF로 변환"
+
+[messages.server-maintenance-avif-thumbs-blurb]
+source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
+translation = "썸네일을 AVIF로 보낼 때, 처음 표시될 때마다 변환하는 대신 모든 썸네일을 지금 변환합니다."
+
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "데이터베이스 백업"
@@ -10347,9 +10355,17 @@ translation = "테마"
 source = "Thumbnails"
 translation = "썸네일"
 
+[messages.settings-thumbs-avif-converting]
+source = "Converting…"
+translation = "변환 중…"
+
+[messages.settings-thumbs-avif-now]
+source = "Convert all now"
+translation = "지금 모두 변환"
+
 [messages.settings-thumbs-avif-what]
-source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
-translation = "AVIF를 표시하는 브라우저는 위에서 고른 선명도 그대로 더 작은 썸네일을 받습니다. 절반 이하인 경우가 많습니다. 각 썸네일은 처음 표시될 때 저장된 썸네일로 만들어지고 변환 파일과 함께 보관되며, 그전까지는 저장된 썸네일이 전송됩니다. 큰 라이브러리를 처음 둘러보는 동안 만드는 데 최대 두 개의 코어를 사용합니다. 무손실 썸네일과 픽셀 아트는 그대로 전송됩니다."
+source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
+translation = "AVIF는 보통 크기가 절반입니다. 각 썸네일은 처음 표시될 때 변환됩니다."
 
 [messages.settings-thumbs-balanced]
 source = "Balanced"

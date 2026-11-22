@@ -476,6 +476,8 @@ server-maintenance-clear-cache = Clear cached conversions
 server-maintenance-clear-cache-blurb = Drops the files kept from “Download as” conversions (they're made again when next asked for) and what interrupted work left behind.
 server-maintenance-shrink-thumbs = Shrink thumbnails
 server-maintenance-shrink-thumbs-blurb = Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG.
+server-maintenance-avif-thumbs = Convert thumbnails to AVIF
+server-maintenance-avif-thumbs-blurb = Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF.
 server-maintenance-gc = Delete unused files
 server-maintenance-gc-blurb = Deletes stored files nothing points at any more, such as the files of packs deleted for good.
 # What came of calling the update address (Settings → Updates).
@@ -3457,7 +3459,10 @@ settings-thumbs-sharp = Sharper
 settings-thumbs-sharp-hint = About twice the size of Balanced.
 settings-thumbs-lossless = Lossless
 settings-thumbs-lossless-hint = PNG, exactly as made. Several times larger, and never sent as AVIF.
-settings-thumbs-avif-what = Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are.
+settings-thumbs-avif-what = AVIF is often half the size. Each thumbnail is converted the first time it’s shown.
+# The button under it, shown with AVIF picked; it says Converting… while it runs.
+settings-thumbs-avif-now = Convert all now
+settings-thumbs-avif-converting = Converting…
 settings-motion-thumbs = Moving thumbnails for animations
 settings-motion-thumbs-what = Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them.
 settings-limits = Work and limits

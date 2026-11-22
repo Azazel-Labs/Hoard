@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "3890c90fa88633a6ab70ef57bf24cb23df5f0ca93b1323895034945b5971b327"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "đang chờ"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } giây"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "Dừng “{ $what }”"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Dừng toàn bộ việc gắn thẻ AI ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4312,6 +4320,14 @@ translation = "Không thể dùng chứng chỉ hoặc khóa này"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "Không có gì trong bản ghi nổi bật hơn tiếng nền. Hãy thử lại gần micrô hơn."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "Không thể dừng “{ $job }” sau khi đã bắt đầu"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "việc đó không còn chờ hay đang chạy nữa"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "hãy đặt một vị trí khác làm vị trí chứa mọi loại"
@@ -4831,6 +4847,14 @@ translation = "không có gì để tìm; hãy nhập tên gói"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } đã nằm dưới { $tag }, nên { $tag } không thể đặt dưới nó"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "Không thể dừng “{ $task }” giữa chừng"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "“{ $task }” không chạy"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6741,6 +6765,18 @@ translation = "Đang bắt đầu…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Đang bắt đầu"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Dừng"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "Không thể dừng “{ $task }”"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Đang dừng…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

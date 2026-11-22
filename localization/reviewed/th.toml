@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "9b9cdb0c0c213f51025310f204d8fd86748602acc18d04be07e8b2b164492a1d"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "รอคิว"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } วินาที"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "หยุด “{ $what }”"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "หยุดการติดแท็กด้วย AI ทั้งหมด ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4315,6 +4323,14 @@ translation = "ใช้ใบรับรองหรือคีย์นี�
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "ไม่มีเสียงใดในการบันทึกที่เด่นกว่าเสียงพื้นหลัง ลองอีกครั้งโดยอยู่ใกล้ไมโครโฟนมากขึ้น"
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "“{ $job }” หยุดไม่ได้เมื่อเริ่มแล้ว"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "งานนั้นไม่ได้รอคิวหรือกำลังทำงานอยู่แล้ว"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "ให้ตั้งตำแหน่งอื่นเป็นที่รับทุกอย่างแทน"
@@ -4834,6 +4850,14 @@ translation = "ไม่มีอะไรให้ค้นหา ให้พ�
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } อยู่ใต้ { $tag } อยู่แล้ว จึงใส่ { $tag } ไว้ใต้แท็กนั้นไม่ได้"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "“{ $task }” หยุดกลางคันไม่ได้"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "“{ $task }” ไม่ได้กำลังทำงาน"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6741,6 +6765,18 @@ translation = "กำลังเริ่ม…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "กำลังเริ่ม"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "หยุด"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "หยุด “{ $task }” ไม่ได้"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "กำลังหยุด…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

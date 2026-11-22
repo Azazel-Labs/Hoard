@@ -229,11 +229,13 @@ fn library_report(c: &Connection) -> anyhow::Result<Value> {
 /// "since", "pack_id"?}]}`.
 pub(super) async fn activity(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     let mut items = crate::activity::snapshot();
-    let queued = db::call(&state.pool, |c| {
-        let mut stmt = c.prepare(
+    let (queued, ai_tagging) = db::call(&state.pool, |c| {
+        // In the order they'll run.
+        let mut stmt = c.prepare(&format!(
             "SELECT j.id, j.kind, j.pack_id, p.name, j.created_at FROM jobs j LEFT JOIN packs p ON p.id = j.pack_id
-             WHERE j.status = 'queued' ORDER BY j.id LIMIT 50",
-        )?;
+             WHERE j.status = 'queued' ORDER BY {}, j.id LIMIT 50",
+            db::rank_sql("j.kind")
+        ))?;
         let rows = stmt
             .query_map([], |r| {
                 Ok((
@@ -245,7 +247,13 @@ pub(super) async fn activity(State(state): State<AppState>) -> ApiResult<Json<Va
                 ))
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
-        Ok(rows)
+        // All of it, past the 50 listed, for "Stop all AI tagging".
+        let ai_tagging: i64 = c.query_row(
+            "SELECT COUNT(*) FROM jobs WHERE kind = ?1 AND status IN ('queued', 'running')",
+            [jobs::LLM_TAG],
+            |r| r.get(0),
+        )?;
+        Ok((rows, ai_tagging))
     })
     .await?;
     for (id, kind, pack_id, pack, created) in queued {
@@ -258,7 +266,8 @@ pub(super) async fn activity(State(state): State<AppState>) -> ApiResult<Json<Va
             state: "queued",
             since: created,
             pack_id,
+            stop: (kind != jobs::INGEST).then(|| jobs::stop_path(id)),
         });
     }
-    Ok(Json(json!({ "items": items })))
+    Ok(Json(json!({ "items": items, "ai_tagging": ai_tagging })))
 }

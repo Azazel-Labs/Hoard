@@ -74,7 +74,7 @@ fn an_import_with_searches_alongside_is_never_locked_out() {
                             )
                             .unwrap();
                         // A worker looking for a job.
-                        super::claim_job(&c).unwrap();
+                        super::claim_job(&c, usize::MAX).unwrap();
                         n += 1;
                     }
                     n

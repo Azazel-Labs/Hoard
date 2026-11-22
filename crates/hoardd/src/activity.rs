@@ -29,6 +29,9 @@ pub(crate) struct Entry {
     pub(crate) since: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) pack_id: Option<String>,
+    /// Where to `POST` to stop it, when it can be stopped (an admin's to do).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) stop: Option<String>,
 }
 
 static NEXT: AtomicU64 = AtomicU64::new(1);
@@ -54,6 +57,7 @@ pub(crate) fn start(kind: &'static str, label: impl Into<String>, pack_id: Optio
         state: "running",
         since: crate::db::now(),
         pack_id: pack_id.map(str::to_owned),
+        stop: None,
     };
     with(|m| m.insert(id, entry));
     Handle(id)
@@ -73,6 +77,15 @@ impl Handle {
         with(|m| {
             if let Some(e) = m.get_mut(&self.0) {
                 e.detail = Some(d);
+            }
+        });
+    }
+
+    /// Where to `POST` to stop it, or `None` while it can't be.
+    pub(crate) fn stop_at(&self, path: Option<String>) {
+        with(|m| {
+            if let Some(e) = m.get_mut(&self.0) {
+                e.stop = path;
             }
         });
     }

@@ -244,7 +244,12 @@ export const api = {
   tagTree: () => request<{ tag: string; parent: string }[]>('/api/tags/tree'),
   tagAliases: () => request<{ tag: string; into: string }[]>('/api/tags/aliases'),
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
-  activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
+  /** What's going on, and how many AI tagging jobs are waiting or running (past the ones listed). */
+  activity: () => request<{ items: ActivityItem[]; ai_tagging: number }>('/api/activity'),
+  /** Stop one thing in the activity list, by the address it gave. */
+  stopActivity: (path: string) => request<void>(path, { method: 'POST' }),
+  /** Stop every job of a kind, waiting or running. */
+  stopJobs: (kind: string) => post<{ stopped: number }>('/api/admin/jobs/stop', { kind }),
   settings: () => request<Settings>('/api/admin/settings'),
   profile: (after: number) => request<Profile>(`/api/admin/profile?after=${after}`),
   /** What an issue on GitHub needs for a problem to be looked into, with nothing private in it. */
@@ -390,6 +395,7 @@ export const api = {
   dismissIssues: (pick: IssuePick) => post<{ dismissed: number }>('/api/admin/issues/dismiss', pick),
   runMaintenance: (task: string) =>
     request<{ run: number }>(`/api/admin/maintenance/${task}`, { method: 'POST' }),
+  stopMaintenance: (task: string) => request<void>(`/api/admin/maintenance/${task}/stop`, { method: 'POST' }),
   locations: () => request<LocationList>('/api/admin/locations'),
   addLocation: (loc: NewLocation) =>
     request<LibraryLocation>('/api/admin/locations', {

@@ -1,7 +1,8 @@
 //! Durable background job queue in SQLite. Jobs survive restarts; anything left `running` after a crash
 //! is re-queued at startup.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::sync::{Arc, LazyLock, Mutex, PoisonError};
 use std::time::Duration;
 
 use anyhow::Result;
@@ -10,8 +11,10 @@ use hoard_core::PackStatus;
 use rusqlite::params;
 
 use crate::AppState;
+use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use crate::{db, ingest, llm};
+use axum::http::StatusCode;
 
 pub(crate) const INGEST: &str = "ingest";
 pub(crate) const RETAG: &str = "retag";
@@ -35,6 +38,20 @@ pub(crate) const READ_FILES: &str = "read_files";
 /// Look up the next pack's store page (see [`crate::store_lookup`]).
 pub(crate) const STORE_LOOKUP: &str = "store_lookup";
 
+/// Work someone is waiting on, run before anything else: a pack being read, a watched folder looked over, the library
+/// moved.
+pub(crate) const URGENT: &[&str] = &[INGEST, SCAN, RELOCATE];
+/// Work nobody is waiting on, run after everything else: the AI's tags, search, "more like this", store pages. It
+/// never has every worker at once, and stops partway when asked (see [`stop`]).
+pub(crate) const BACKGROUND: &[&str] = &[LLM_TAG, LOOKS, SOUNDS, EMBED, HEAR, STORE_LOOKUP];
+
+/// The running background jobs, by id, with what stops each.
+static STOPPERS: LazyLock<Mutex<HashMap<i64, Arc<tokio::sync::Notify>>>> = LazyLock::new(Default::default);
+
+fn stoppers<R>(f: impl FnOnce(&mut HashMap<i64, Arc<tokio::sync::Notify>>) -> R) -> R {
+    f(&mut STOPPERS.lock().unwrap_or_else(PoisonError::into_inner))
+}
+
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
 const MAX_LLM_ATTEMPTS: i64 = 5;
@@ -43,7 +60,7 @@ const MAX_LLM_ATTEMPTS: i64 = 5;
 /// of seconds, and never taking a wake-up meant for a working one) so the count can change without a restart.
 pub(crate) fn spawn_workers(state: &AppState) {
     for n in 0..crate::settings::MAX_WORKERS {
-        let state = std::sync::Arc::clone(state);
+        let state = Arc::clone(state);
         tokio::spawn(async move {
             tracing::debug!(worker = n, "job worker started");
             loop {
@@ -70,7 +87,9 @@ pub(crate) fn spawn_workers(state: &AppState) {
 }
 
 async fn next_job(state: &AppState) -> Result<Option<db::JobRow>> {
-    db::call(&state.pool, |c| db::claim_job(c)).await
+    // With more than one worker, one is kept from background work.
+    let slots = state.settings.get().workers.saturating_sub(1).max(1);
+    db::call(&state.pool, move |c| db::claim_job(c, slots)).await
 }
 
 /// How a job reads in the activity list.
@@ -108,25 +127,14 @@ async fn run(state: &AppState, job: db::JobRow) {
         }
         None => None,
     };
-    let kind: &'static str = match job.kind.as_str() {
-        INGEST => INGEST,
-        RETAG => RETAG,
-        LLM_TAG => LLM_TAG,
-        CONVERT => CONVERT,
-        UNREAL => UNREAL,
-        REFORMAT => REFORMAT,
-        SCAN => SCAN,
-        RELOCATE => RELOCATE,
-        LOOKS => LOOKS,
-        SOUNDS => SOUNDS,
-        EMBED => EMBED,
-        HEAR => HEAR,
-        MATERIALS => MATERIALS,
-        READ_FILES => READ_FILES,
-        STORE_LOOKUP => STORE_LOOKUP,
-        _ => "job",
-    };
+    let kind = static_kind(&job.kind);
     let activity = crate::activity::start(kind, job_label(&job.kind, pack_name.as_deref()), job.pack_id.as_deref());
+    let stopper = BACKGROUND.contains(&kind).then(|| {
+        let n = Arc::new(tokio::sync::Notify::new());
+        stoppers(|m| m.insert(job.id, Arc::clone(&n)));
+        n
+    });
+    activity.stop_at(stopper.is_some().then(|| stop_path(job.id)));
 
     // A job that panics is a job failed, not a worker gone with its job left running.
     let work = async {
@@ -190,10 +198,25 @@ async fn run(state: &AppState, job: db::JobRow) {
             other => Err(anyhow::anyhow!("unknown job kind {other}")),
         }
     };
-    let result: Result<()> = std::panic::AssertUnwindSafe(work)
-        .catch_unwind()
-        .await
-        .unwrap_or_else(|_| Err(anyhow::anyhow!("the {} job panicked", job.kind)));
+    let work = async {
+        std::panic::AssertUnwindSafe(work)
+            .catch_unwind()
+            .await
+            .unwrap_or_else(|_| Err(anyhow::anyhow!("the {} job panicked", job.kind)))
+    };
+    // A background job asked to stop is let go at its next wait: what it has written stays, the rest is left undone.
+    let result: Option<Result<()>> = match &stopper {
+        Some(n) => tokio::select! {
+            r = work => Some(r),
+            () = n.notified() => None,
+        },
+        None => Some(work.await),
+    };
+    stoppers(|m| m.remove(&job.id));
+    let Some(result) = result else {
+        forget_stopped(state, &job).await;
+        return;
+    };
 
     let (error, retry, pack_update) = match &result {
         Ok(()) => (None, None, None),
@@ -241,6 +264,142 @@ async fn run(state: &AppState, job: db::JobRow) {
     if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | REFORMAT | SCAN | MATERIALS) {
         crate::looks::schedule(state).await;
     }
+}
+
+/// A job's kind as one of the constants, for the activity list.
+fn static_kind(kind: &str) -> &'static str {
+    [
+        INGEST,
+        RETAG,
+        LLM_TAG,
+        CONVERT,
+        UNREAL,
+        REFORMAT,
+        SCAN,
+        RELOCATE,
+        LOOKS,
+        SOUNDS,
+        EMBED,
+        HEAR,
+        MATERIALS,
+        READ_FILES,
+        STORE_LOOKUP,
+    ]
+    .into_iter()
+    .find(|k| *k == kind)
+    .unwrap_or("job")
+}
+
+/// A job stopped partway is gone from the queue, and its pack is ready with what it got.
+async fn forget_stopped(state: &AppState, job: &db::JobRow) {
+    tracing::info!(id = job.id, kind = %job.kind, pack = ?job.pack_id, "job stopped");
+    let (id, pack) = (job.id, job.pack_id.clone());
+    let res = db::call(&state.pool, move |c| {
+        c.execute("DELETE FROM jobs WHERE id = ?1", [id])?;
+        if let Some(p) = pack {
+            db::settle_packs(c, Some(&p), None)?;
+        }
+        Ok(())
+    })
+    .await;
+    if let Err(e) = res {
+        tracing::error!(error = ?e, "could not record a stopped job");
+    }
+}
+
+/// Stopping background work: one job, every job of a kind, or a Maintenance task. An admin's to do.
+pub(crate) fn stop_router() -> axum::Router<AppState> {
+    use axum::routing::post;
+    axum::Router::new()
+        .route("/api/admin/jobs/stop", post(stop_kind_route))
+        .route("/api/admin/jobs/{id}/stop", post(stop_route))
+        .route("/api/admin/maintenance/{task}/stop", post(crate::maintenance::stop_route))
+}
+
+pub(crate) fn stop_path(id: i64) -> String {
+    format!("/api/admin/jobs/{id}/stop")
+}
+
+/// Stop a job: one waiting is taken off the queue, and a background one running is let go at its next wait. Reading a
+/// pack isn't stopped, waiting or not, since its files wait in staging: deleting the pack is what does that.
+pub(crate) async fn stop(state: &AppState, id: i64) -> ApiResult<StatusCode> {
+    if let Some(n) = stoppers(|m| m.get(&id).cloned()) {
+        n.notify_one();
+        return Ok(StatusCode::ACCEPTED);
+    }
+    let found: Option<(String, String)> = db::call(&state.pool, move |c| {
+        use rusqlite::OptionalExtension as _;
+        let found: Option<(String, String, Option<String>)> = c
+            .query_row("SELECT kind, status, pack_id FROM jobs WHERE id = ?1", [id], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+            })
+            .optional()?;
+        let Some((kind, status, pack)) = found else { return Ok(None) };
+        if status == "queued" && kind != INGEST {
+            c.execute("DELETE FROM jobs WHERE id = ?1 AND status = 'queued'", [id])?;
+            if let Some(p) = pack {
+                db::settle_packs(c, Some(&p), None)?;
+            }
+            return Ok(Some((kind, "stopped".to_owned())));
+        }
+        Ok(Some((kind, status)))
+    })
+    .await?;
+    match found {
+        Some((_, status)) if status == "stopped" => Ok(StatusCode::NO_CONTENT),
+        Some((kind, status)) if status == "queued" || status == "running" => {
+            Err(AppError::conflict(tr!("error-job-cant-stop", job = job_label(&kind, None))))
+        }
+        _ => Err(AppError::not_found(tr!("error-job-not-found"))),
+    }
+}
+
+/// Stop every job of one kind, waiting or running (as [`stop`] would each): for after a big import, to call off the
+/// AI tagging it queued. How many were stopped.
+pub(crate) async fn stop_kind(state: &AppState, kind: String) -> Result<usize> {
+    if kind == INGEST {
+        return Ok(0);
+    }
+    let (queued, running): (usize, Vec<i64>) = db::call(&state.pool, move |c| {
+        let packs: Vec<Option<String>> = c
+            .prepare("DELETE FROM jobs WHERE kind = ?1 AND status = 'queued' RETURNING pack_id")?
+            .query_map([&kind], |r| r.get(0))?
+            .collect::<rusqlite::Result<_>>()?;
+        for p in packs.iter().flatten() {
+            db::settle_packs(c, Some(p), None)?;
+        }
+        let running = c
+            .prepare("SELECT id FROM jobs WHERE kind = ?1 AND status = 'running'")?
+            .query_map([&kind], |r| r.get(0))?
+            .collect::<rusqlite::Result<Vec<i64>>>()?;
+        Ok((packs.len(), running))
+    })
+    .await?;
+    let stopped = running.into_iter().filter_map(|id| stoppers(|m| m.get(&id).cloned())).inspect(|n| n.notify_one());
+    Ok(queued + stopped.count())
+}
+
+/// `POST /api/admin/jobs/{id}/stop`: 204 when a waiting job is gone, 202 when a running one has been asked to stop.
+pub(crate) async fn stop_route(
+    axum::extract::State(state): axum::extract::State<AppState>,
+    axum::extract::Path(id): axum::extract::Path<i64>,
+) -> ApiResult<StatusCode> {
+    stop(&state, id).await
+}
+
+#[derive(serde::Deserialize)]
+pub(crate) struct StopKind {
+    kind: String,
+}
+
+/// `POST /api/admin/jobs/stop` with `{"kind": "llm_tag"}`: stop every job of that kind, `{"stopped": n}`.
+pub(crate) async fn stop_kind_route(
+    axum::extract::State(state): axum::extract::State<AppState>,
+    axum::Json(body): axum::Json<StopKind>,
+) -> ApiResult<axum::Json<serde_json::Value>> {
+    let stopped = stop_kind(&state, body.kind).await?;
+    state.wake.notify_waiters();
+    Ok(axum::Json(serde_json::json!({ "stopped": stopped })))
 }
 
 /// Read the store's files in a pack again. What they say may find its store page now, so a pack without one is
@@ -299,14 +458,16 @@ async fn blocking<F>(state: &AppState, f: F) -> Result<()>
 where
     F: FnOnce(&AppState, &tokio::runtime::Handle) -> Result<()> + Send + 'static,
 {
-    let state = std::sync::Arc::clone(state);
+    let state = Arc::clone(state);
     let rt = tokio::runtime::Handle::current();
     crate::heavy::run("job", move || f(&state, &rt)).await?
 }
 
 /// What a scrub found.
 pub(crate) struct Scrubbed {
+    /// Files checked, of how many there are (fewer when it was stopped).
     pub(crate) total: usize,
+    pub(crate) of: usize,
     pub(crate) corrupt: usize,
     pub(crate) missing: usize,
     pub(crate) unreachable: usize,
@@ -314,7 +475,11 @@ pub(crate) struct Scrubbed {
 
 /// Re-hash every blob in storage and record the result. Detects bit rot and missing files on the NAS.
 /// `progress` is told (checked, total) as it goes.
-pub(crate) async fn scrub(state: &AppState, progress: &(dyn Fn(usize, usize) + Sync)) -> Result<Scrubbed> {
+pub(crate) async fn scrub(
+    state: &AppState,
+    progress: &(dyn Fn(usize, usize) + Sync),
+    stopped: &(dyn Fn() -> bool + Sync),
+) -> Result<Scrubbed> {
     let hashes: Vec<String> = db::call(&state.pool, |c| {
         let mut stmt = c.prepare("SELECT hash FROM blobs ORDER BY verified_at IS NOT NULL, verified_at")?;
         let rows = stmt.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
@@ -326,6 +491,10 @@ pub(crate) async fn scrub(state: &AppState, progress: &(dyn Fn(usize, usize) + S
     let checked = &checked;
     let results: Vec<(String, &'static str)> = stream::iter(hashes)
         .map(|h| async move {
+            // Asked to stop: what's left isn't checked, or marked.
+            if stopped() {
+                return (h, "skipped");
+            }
             let n = checked.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
             progress(n, total);
             let status = match state.blobs.verify(&h).await {
@@ -343,13 +512,18 @@ pub(crate) async fn scrub(state: &AppState, progress: &(dyn Fn(usize, usize) + S
         .collect()
         .await;
     let count = |status: &str| results.iter().filter(|(_, s)| *s == status).count();
-    let found =
-        Scrubbed { total, corrupt: count("corrupt"), missing: count("missing"), unreachable: count("unreachable") };
+    let found = Scrubbed {
+        total: total - count("skipped"),
+        of: total,
+        corrupt: count("corrupt"),
+        missing: count("missing"),
+        unreachable: count("unreachable"),
+    };
     db::call(&state.pool, move |c| {
         let now = db::now();
         let tx = c.transaction()?;
         for (h, s) in &results {
-            if *s == "unreachable" {
+            if *s == "unreachable" || *s == "skipped" {
                 continue;
             }
             tx.execute("UPDATE blobs SET status = ?2, verified_at = ?3 WHERE hash = ?1", params![h, s, now])?;

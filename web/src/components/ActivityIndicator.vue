@@ -1,11 +1,19 @@
 <script setup lang="ts">
 // What the server is doing in the background (ingests, tagging, conversions, zips, the ffmpeg download): a header
-// button with a count, and a list on hover or click. Polls quickly while anything runs or the list is open.
+// button with a count, and a list on hover or click. Polls quickly while anything runs or the list is open. An admin
+// can stop what can be stopped: take a job off the queue, or let background work and Maintenance go partway through.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, type ActivityItem } from '../api'
+import { may } from '../auth'
 import { t } from '../i18n'
+import { showError } from '../ui'
 
 const items = ref<ActivityItem[]>([])
+/** AI tagging waiting or running, all of it, for stopping in one go after a big import. */
+const tagging = ref(0)
+const admin = computed(() => may('admin'))
+/** What's been asked to stop, until it's gone from the list. */
+const stopping = ref(new Set<string>())
 const open = ref(false)
 const pinned = ref(false)
 const failed = ref(false)
@@ -28,7 +36,11 @@ let timer: ReturnType<typeof setTimeout> | undefined
 async function refresh() {
   clearTimeout(timer)
   try {
-    items.value = (await api.activity()).items
+    const got = await api.activity()
+    items.value = got.items
+    tagging.value = got.ai_tagging ?? 0
+    const live = new Set(got.items.map((i) => i.stop))
+    stopping.value = new Set([...stopping.value].filter((s) => live.has(s)))
     failed.value = false
   } catch {
     failed.value = true
@@ -81,6 +93,29 @@ onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', onVisible)
 })
 
+async function stop(i: ActivityItem) {
+  if (!i.stop) return
+  stopping.value = new Set(stopping.value).add(i.stop)
+  try {
+    await api.stopActivity(i.stop)
+  } catch (e) {
+    showError((e as Error).message)
+  }
+  await refresh()
+}
+const stoppingAll = ref(false)
+async function stopTagging() {
+  stoppingAll.value = true
+  try {
+    await api.stopJobs('llm_tag')
+  } catch (e) {
+    showError((e as Error).message)
+  } finally {
+    stoppingAll.value = false
+  }
+  await refresh()
+}
+
 function since(iso: string) {
   const s = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 1000))
   if (s < 60) return t('activity-seconds', { s })
@@ -122,6 +157,17 @@ const pctText = (p: number) => t('activity-percent', { pct: Math.round(p * 100) 
           <div class="line">
             <span class="what">{{ i.label }}</span>
             <span class="when mono">{{ i.state === 'queued' ? t('activity-queued') : i.progress !== undefined ? pctText(i.progress) : since(i.since) }}</span>
+            <button
+              v-if="admin && i.stop"
+              type="button"
+              class="stop"
+              :aria-label="t('activity-stop', { what: i.label })"
+              :title="t('activity-stop', { what: i.label })"
+              :disabled="stopping.has(i.stop)"
+              @click.stop="stop(i)"
+            >
+              <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" /></svg>
+            </button>
           </div>
           <div v-if="i.state === 'running'" class="bar" :class="{ unknown: i.progress === undefined }">
             <span :style="i.progress !== undefined ? { width: pct(i.progress) } : undefined" />
@@ -129,6 +175,11 @@ const pctText = (p: number) => t('activity-percent', { pct: Math.round(p * 100) 
           <div v-if="i.detail" class="detail">{{ i.detail }}</div>
         </li>
       </ul>
+      <footer v-if="admin && tagging > 1">
+        <button type="button" class="btn" :disabled="stoppingAll" @click.stop="stopTagging">
+          {{ t('activity-stop-tagging', { count: tagging }) }}
+        </button>
+      </footer>
     </section>
     </Transition>
   </div>
@@ -176,6 +227,13 @@ li.queued .what { color: var(--muted); }
 .what { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .when { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .detail { margin-top: 0.2rem; color: var(--faint); }
+.stop {
+  flex: none; display: grid; place-items: center; width: 1.3rem; height: 1.3rem; margin: -0.2rem -0.35rem -0.2rem 0;
+  padding: 0; border: 0; border-radius: var(--r-chip); background: transparent; color: var(--faint); cursor: pointer;
+}
+.stop:hover:not(:disabled), .stop:focus-visible { color: var(--danger); background: var(--raised); }
+.stop:disabled { opacity: 0.4; cursor: default; }
+footer { padding: 0.55rem 0.9rem 0.7rem; border-top: 1px solid var(--line); }
 .bar { position: relative; height: 4px; margin-top: 0.4rem; border-radius: 2px; background: var(--raised); overflow: hidden; }
 .bar span { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--accent); transition: width 0.4s ease; }
 .bar.unknown span { width: 30%; animation: sweep 1.4s ease-in-out infinite; }

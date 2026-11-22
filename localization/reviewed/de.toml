@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "9a0139bda043fb41090f30a54f857812603e79d615f0ac1d488dc04e9ad73d79"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "in der Warteschlange"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } s"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "„{ $what }“ anhalten"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Gesamtes KI-Tagging anhalten ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4456,6 +4464,14 @@ translation = "Das Zertifikat oder der Schlüssel kann nicht verwendet werden"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "In der Aufnahme hebt sich nichts vom Hintergrund ab. Versuch es näher am Mikrofon noch einmal."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "„{ $job }“ lässt sich nach dem Start nicht mehr anhalten"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "dieser Auftrag wartet nicht mehr und läuft auch nicht"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "machen Sie stattdessen einen anderen Speicherort zum Auffangort"
@@ -4975,6 +4991,14 @@ translation = "nichts zu suchen; geben Sie den Namen des Pakets ein"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } steht schon unter { $tag }, deshalb kann { $tag } nicht darunter stehen"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "„{ $task }“ lässt sich nicht mittendrin anhalten"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "„{ $task }“ läuft nicht"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6921,6 +6945,18 @@ translation = "Wird gestartet…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Wird gestartet"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Anhalten"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "„{ $task }“ konnte nicht angehalten werden"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Wird angehalten…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

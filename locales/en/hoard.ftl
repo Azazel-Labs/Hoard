@@ -217,6 +217,10 @@ error-no-other-location = there's no other library location to move the files to
 error-full-path = give a full path
 error-pick-folder = pick a folder
 error-task-running = “{ $task }” is already running
+error-job-cant-stop = “{ $job }” can't be stopped once it's started
+error-job-not-found = that job isn't waiting or running any more
+error-task-cant-stop = “{ $task }” can't be stopped partway
+error-task-not-running = “{ $task }” isn't running
 error-token-account-gone = this token's account is gone, so it has no favorites or searches
 error-favorites-too-many = at most 10,000 at a time
 error-saved-search-name = a saved search needs a name of at most 80 characters
@@ -1084,6 +1088,8 @@ activity-unreachable = Can't reach the server
 activity-unreachable-desktop = Hoard isn't answering
 activity-empty = Nothing running. Imports, tagging, conversions and zip downloads show up here while they work.
 activity-queued = queued
+activity-stop = Stop “{ $what }”
+activity-stop-tagging = Stop all AI tagging ({ $count })
 # How long a job has been running.
 activity-seconds = { $s } s
 activity-minutes = { $min } min
@@ -2915,6 +2921,9 @@ maintenance-loading = Loading…
 maintenance-running = Running…
 maintenance-starting = Starting…
 maintenance-run = Run
+maintenance-stop = Stop
+maintenance-stopping = Stopping…
+maintenance-stop-failed = Couldn't stop “{ $task }”
 # Under a running task: $detail is what it's doing, $when when it started (like “just now” or “5 min ago”).
 maintenance-started = { $detail } · started { $when }
 # What a running task is doing before it says.

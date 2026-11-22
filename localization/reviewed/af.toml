@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "ac32481da99b685200b599a0b42111713ba8e1daf08ea7fad7d1e37e027f0a2c"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "in die tou"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } s"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "Stop “{ $what }”"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Stop alle KI-etikettering ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4456,6 +4464,14 @@ translation = "Die sertifikaat of sleutel kan nie gebruik word nie"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "Niks in die opname staan uit bo die agtergrond nie. Probeer weer nader aan die mikrofoon."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "“{ $job }” kan nie gestop word sodra dit begin het nie"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "daardie taak wag of loop nie meer nie"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "maak eerder 'n ander ligging die vang-alles"
@@ -4975,6 +4991,14 @@ translation = "niks om na te soek nie; tik die pak se naam"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } is reeds onder { $tag }, so { $tag } kan nie daaronder gaan nie"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "“{ $task }” kan nie halfpad gestop word nie"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "“{ $task }” loop nie"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6921,6 +6945,18 @@ translation = "Begin…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Begin"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Stop"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "Kon nie “{ $task }” stop nie"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Stop tans…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

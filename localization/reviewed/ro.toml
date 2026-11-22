@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "ba53414f761bfe22b8de76cd70f11c6ffe1e1dd97c499b1280e56b909a994a6c"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "în așteptare"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } s"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "Oprește „{ $what }”"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Oprește toată etichetarea AI ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4532,6 +4540,14 @@ translation = "Certificatul sau cheia nu pot fi folosite"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "Nimic din înregistrare nu iese în evidență față de fundal. Încearcă din nou mai aproape de microfon."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "„{ $job }” nu poate fi oprit după ce a început"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "acea lucrare nu mai așteaptă și nici nu mai rulează"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "faceți în schimb altă locație implicită"
@@ -5056,6 +5072,14 @@ translation = "nimic de căutat; tastați numele pachetului"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } este deja sub { $tag }, deci { $tag } nu poate fi plasată sub ea"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "„{ $task }” nu poate fi oprit la jumătate"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "„{ $task }” nu rulează"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -7022,6 +7046,18 @@ translation = "Se pornește…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Se pornește"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Oprește"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "„{ $task }” nu a putut fi oprit"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Se oprește…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

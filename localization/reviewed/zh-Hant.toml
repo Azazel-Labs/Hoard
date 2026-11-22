@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "929b1679e1e3d56c7bee2ef626c703af1e4424772a8b07378b4cce80a92ad981"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "排隊中"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } 秒"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "停止「{ $what }」"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "停止所有 AI 標記 ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4318,6 +4326,14 @@ translation = "無法使用這個憑證或金鑰"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "錄音中沒有比背景更突出的聲音。請靠近麥克風再試一次。"
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "「{ $job }」一旦開始就無法停止"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "這項工作已不在等待或執行中"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "請改將另一個位置設為全部接收的位置"
@@ -4837,6 +4853,14 @@ translation = "沒有要搜尋的內容；請輸入素材包的名稱"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "「{ $task }」無法中途停止"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "「{ $task }」沒有在執行"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6747,6 +6771,18 @@ translation = "正在開始…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "正在開始"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "停止"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "無法停止「{ $task }」"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "正在停止…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

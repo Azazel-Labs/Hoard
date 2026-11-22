@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "c57db96716344aa847d7559e1fe2d5e482ceb243539e41e9ff1ff7eff455c08a"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "на чекању"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } с"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "Заустави „{ $what }“"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Заустави сво означавање помоћу ВИ ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4497,6 +4505,14 @@ translation = "Сертификат или кључ не могу да се ко
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "Ништа на снимку се не издваја од позадине. Покушајте поново ближе микрофону."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "„{ $job }“ не може да се заустави када почне"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "тај посао више не чека нити се извршава"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "уместо тога одредите другу локацију за све остало"
@@ -5021,6 +5037,14 @@ translation = "нема шта да се тражи; унесите назив �
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } је већ испод { $tag }, па { $tag } не може испод ње"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "„{ $task }“ не може да се заустави на пола пута"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "„{ $task }“ није покренут"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6978,6 +7002,18 @@ translation = "Покретање…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Покретање"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Заустави"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "Није могуће зауставити „{ $task }“"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Зауставља се…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

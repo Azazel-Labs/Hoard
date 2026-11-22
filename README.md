@@ -729,6 +729,13 @@ limit. The packs page shows its state.
 the list (ingests with file counts, tagging, conversions, zips being streamed, the ffmpeg download), with progress
 and the queued jobs behind them. `GET /api/activity` returns the same.
 
+Imports, folder scans and moves between locations go first; AI tagging, similar-looks and sound fingerprints, search
+embeddings and store lookups wait behind everything else. With more than one background worker, one is always kept
+free of those, so a big pack's AI tagging never holds up the next import. An admin can stop work from the list: the ×
+takes a waiting job off the queue, or stops background work like AI tagging after what it's doing now (its pack keeps
+what it got). Imports can't be stopped there (delete the pack instead). "Stop all AI tagging" clears it all at once
+after a big import.
+
 The portal has light, dark and "match system" themes (the switch beside it), remembered per browser.
 
 **Responsiveness.** Analysis, conversion, rendering, zipping, ffmpeg and Blender run on their own threads at a
@@ -1261,7 +1268,9 @@ Set before starting (these need a restart):
 **Settings → Maintenance** has a button for each job that looks after the library, with progress while it runs and a history of past runs:
 back up the database, check files for damage, re-analyze every pack (thumbnails, previews and rule tags made afresh;
 your edits stay, the AI isn't asked again), shrink thumbnails, convert thumbnails to AVIF, clear cached "Download as" conversions and leftovers,
-and delete unused files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
+and delete unused files. One of each runs at a time. Checking files, re-analyzing, shrinking thumbnails and
+converting them to AVIF can be stopped partway: the button turns to Stop while they run, and they stop after the item
+they're on, saying how far they got. Backup, scrub and gc can also be run from cron (below) and show up in the
 history the same way.
 
 The database looks after itself, a little at a time so nothing waits on it for more than a few milliseconds. Deleting
@@ -1532,6 +1541,9 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
 | GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
 | POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `avif_thumbs`, `clear_cache` or `gc` |
+| POST 🔒 | `/api/admin/maintenance/{task}/stop` | stop `scrub`, `reanalyze`, `shrink_thumbs` or `avif_thumbs` after the item it's on |
+| POST 🔒 | `/api/admin/jobs/{id}/stop` | take a waiting job off the queue, or stop a running background one (not ingests) |
+| POST 🔒 | `/api/admin/jobs/stop` | `{"kind": "llm_tag"}`: stop every job of a kind, waiting or running; returns `{"stopped": n}` |
 | POST | `/mcp` | MCP over streamable HTTP (needs a sign-in: OAuth or an access token) |
 | GET | `/.well-known/oauth-protected-resource/mcp`, `/.well-known/oauth-authorization-server` | OAuth discovery for MCP apps |
 | POST | `/oauth/register`, `/oauth/token` | OAuth dynamic client registration; codes and refresh tokens for access tokens |

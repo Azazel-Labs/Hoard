@@ -60,6 +60,10 @@ pub(crate) const TASKS: &[Task] = &[
     Task { id: GC, label: || tr!("server-maintenance-gc"), blurb: || tr!("server-maintenance-gc-blurb") },
 ];
 
+/// The tasks that stop partway when asked, between one thing and the next. A backup, clearing the cache and deleting
+/// unused files are quick, and best finished once begun.
+const STOPPABLE: &[&str] = &[SCRUB, REANALYZE, SHRINK_THUMBS, AVIF_THUMBS];
+
 /// Runs kept in the history.
 const KEEP_RUNS: i64 = 200;
 /// Leftovers in the temporary folder older than this are from work that was interrupted.
@@ -73,6 +77,9 @@ struct Live {
     progress: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     detail: Option<String>,
+    /// Whether it can be stopped partway, and whether it's been asked to.
+    stoppable: bool,
+    stopping: bool,
 }
 
 static RUNNING: LazyLock<Mutex<HashMap<&'static str, Live>>> = LazyLock::new(Default::default);
@@ -88,6 +95,11 @@ struct Report {
 }
 
 impl Report {
+    /// Whether someone asked it to stop.
+    fn stopped(&self) -> bool {
+        running(|m| m.get(self.task).is_some_and(|l| l.stopping))
+    }
+
     fn progress(&self, done: usize, total: usize, (one, many): (&str, &str)) {
         #[expect(clippy::cast_precision_loss, reason = "a fraction for a progress bar")]
         let p = (total > 0).then(|| done as f32 / total as f32);
@@ -126,7 +138,11 @@ async fn begin(state: &AppState, t: &'static Task) -> ApiResult<i64> {
         if m.contains_key(t.id) {
             return false;
         }
-        m.insert(t.id, Live { run: 0, started_at: started_at.clone(), progress: None, detail: None });
+        let stoppable = STOPPABLE.contains(&t.id);
+        m.insert(
+            t.id,
+            Live { run: 0, started_at: started_at.clone(), progress: None, detail: None, stoppable, stopping: false },
+        );
         true
     });
     if !claimed {
@@ -155,6 +171,7 @@ async fn begin(state: &AppState, t: &'static Task) -> ApiResult<i64> {
 /// Do the task, record how it went and let it go.
 async fn execute(state: &AppState, t: &'static Task, run: i64, scheduled: bool) -> Result<String> {
     let report = Report { task: t.id, activity: activity::start("maintenance", (t.label)(), None) };
+    report.activity.stop_at(STOPPABLE.contains(&t.id).then(|| format!("/api/admin/maintenance/{}/stop", t.id)));
     let result = match t.id {
         BACKUP => backup(state, scheduled).await,
         SCRUB => scrub(state, &report).await,
@@ -162,8 +179,12 @@ async fn execute(state: &AppState, t: &'static Task, run: i64, scheduled: bool) 
         CLEAR_CACHE => clear_cache(state).await,
         SHRINK_THUMBS => shrink_thumbs(state, &report).await,
         AVIF_THUMBS => {
-            crate::previews::avif_thumbs(state, |done, total| report.progress(done, total, ("thumbnail", "thumbnails")))
-                .await
+            crate::previews::avif_thumbs(
+                state,
+                |done, total| report.progress(done, total, ("thumbnail", "thumbnails")),
+                || report.stopped(),
+            )
+            .await
         }
         GC => gc(state).await,
         other => Err(anyhow::anyhow!("no maintenance task {other}")),
@@ -255,6 +276,20 @@ pub(crate) async fn overview(State(state): State<AppState>) -> ApiResult<Json<Va
         })
         .collect();
     Ok(Json(json!({ "tasks": tasks, "history": history })))
+}
+
+/// `POST /api/admin/maintenance/{task}/stop`: ask a running task to stop after what it's doing now.
+pub(crate) async fn stop_route(Path(id): Path<String>) -> ApiResult<StatusCode> {
+    let t = task(&id).ok_or_else(|| AppError::not_found(tr!("error-maintenance-task-not-found", id = id)))?;
+    let asked = running(|m| match m.get_mut(t.id) {
+        Some(l) if l.stoppable => {
+            l.stopping = true;
+            Ok(())
+        }
+        Some(_) => Err(AppError::conflict(tr!("error-task-cant-stop", task = (t.label)()))),
+        None => Err(AppError::not_found(tr!("error-task-not-running", task = (t.label)()))),
+    });
+    asked.map(|()| StatusCode::ACCEPTED)
 }
 
 /// `POST /api/admin/maintenance/{task}`: start a task.
@@ -407,7 +442,9 @@ pub(crate) async fn schedule_backups(state: AppState) {
 }
 
 async fn scrub(state: &AppState, report: &Report) -> Result<String> {
-    let found = jobs::scrub(state, &|done, total| report.progress(done, total, ("file", "files"))).await?;
+    let found =
+        jobs::scrub(state, &|done, total| report.progress(done, total, ("file", "files")), &|| report.stopped())
+            .await?;
     let mut bad = Vec::new();
     if found.corrupt > 0 {
         bad.push(format!("{} damaged", found.corrupt));
@@ -418,11 +455,12 @@ async fn scrub(state: &AppState, report: &Report) -> Result<String> {
     if found.unreachable > 0 {
         bad.push(format!("{} couldn't be read (a disk or bucket offline?)", found.unreachable));
     }
-    Ok(if bad.is_empty() {
-        format!("Checked {}: no damage", plural(found.total, "file", "files"))
+    let checked = if found.total < found.of {
+        format!("Stopped after checking {} of {}", found.total, plural(found.of, "file", "files"))
     } else {
-        format!("Checked {}: {}", plural(found.total, "file", "files"), bad.join(", "))
-    })
+        format!("Checked {}", plural(found.total, "file", "files"))
+    };
+    Ok(if bad.is_empty() { format!("{checked}: no damage") } else { format!("{checked}: {}", bad.join(", ")) })
 }
 
 /// Queue every ready pack for re-analysis and wait for the queue to get through them.
@@ -463,6 +501,25 @@ async fn reanalyze(state: &AppState, report: &Report) -> Result<String> {
         })
         .await?;
         report.progress(total - left, total, ("pack", "packs"));
+        if left > 0 && report.stopped() {
+            // The packs still waiting are left as they were.
+            let l = list.clone();
+            db::call(&state.pool, move |c| {
+                let packs: Vec<String> = c
+                    .prepare(
+                        "DELETE FROM jobs WHERE status = 'queued' AND id IN (SELECT value FROM json_each(?1))
+                         RETURNING pack_id",
+                    )?
+                    .query_map([l], |r| r.get(0))?
+                    .collect::<rusqlite::Result<_>>()?;
+                for p in &packs {
+                    db::settle_packs(c, Some(p), None)?;
+                }
+                Ok(())
+            })
+            .await?;
+            return Ok(format!("Stopped after re-analyzing {} of {}", total - left, plural(total, "pack", "packs")));
+        }
         if left == 0 {
             return Ok(match failed {
                 0 => format!("Re-analyzed {}", plural(total, "pack", "packs")),
@@ -525,8 +582,13 @@ async fn shrink_thumbs(state: &AppState, report: &Report) -> Result<String> {
     .await?;
     let total = rows.len();
     let (mut shrunk, mut saved) = (0usize, 0u64);
+    let mut stopped = None;
     for (i, (old, size, pixel_art)) in rows.into_iter().enumerate() {
         report.progress(i, total, ("thumbnail", "thumbnails"));
+        if report.stopped() {
+            stopped = Some(i);
+            break;
+        }
         if pixel_art {
             continue;
         }
@@ -562,9 +624,18 @@ async fn shrink_thumbs(state: &AppState, report: &Report) -> Result<String> {
         saved += u64::try_from(size - new_size).unwrap_or(0);
     }
     report.progress(total, total, ("thumbnail", "thumbnails"));
-    Ok(match shrunk {
-        0 => "Nothing to shrink".to_owned(),
-        n => format!("Shrank {}, saving {}", plural(n, "thumbnail", "thumbnails"), human_bytes(saved)),
+    let saving = |n| format!("{}, saving {}", plural(n, "thumbnail", "thumbnails"), human_bytes(saved));
+    Ok(match (stopped, shrunk) {
+        (Some(i), 0) => {
+            format!("Stopped after looking at {i} of {}: none shrunk", plural(total, "thumbnail", "thumbnails"))
+        }
+        (Some(i), n) => format!(
+            "Stopped after looking at {i} of {}: shrank {}",
+            plural(total, "thumbnail", "thumbnails"),
+            saving(n)
+        ),
+        (None, 0) => "Nothing to shrink".to_owned(),
+        (None, n) => format!("Shrank {}", saving(n)),
     })
 }
 

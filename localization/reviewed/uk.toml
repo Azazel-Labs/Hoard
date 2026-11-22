@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "dbfdb160954897a3050083ea51198e41df631fe78dd356d68112fc6eb1484d1a"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "у черзі"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } с"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "Зупинити «{ $what }»"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Зупинити все тегування ШІ ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4569,6 +4577,14 @@ translation = "Сертифікат або ключ не можна викори
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "У записі ніщо не виділяється на тлі. Спробуйте ще раз ближче до мікрофона."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "Завдання «{ $job }» не можна зупинити після запуску"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "це завдання вже не чекає в черзі й не виконується"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "натомість зробіть резервним інше розташування"
@@ -5094,6 +5110,14 @@ translation = "немає чого шукати; введіть назву па�
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } уже під { $tag }, тому { $tag } не можна помістити під нього"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "Завдання «{ $task }» не можна зупинити на півдорозі"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "Завдання «{ $task }» не виконується"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -7068,6 +7092,18 @@ translation = "Запуск…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Запуск"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Зупинити"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "Не вдалося зупинити «{ $task }»"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Зупиняється…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

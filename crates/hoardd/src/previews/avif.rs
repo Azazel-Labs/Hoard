@@ -133,7 +133,11 @@ fn start(state: &AppState, id: &str, thumb: &str, kind: String, quality: u8) {
 /// Make the AVIF of every thumbnail that hasn't one yet, instead of as each is first shown (Settings → Maintenance,
 /// and the button under the thumbnail choices). It takes the same two slots as those made while browsing, so pages
 /// aren't kept waiting, and stops if thumbnails stop being sent as AVIF.
-pub(crate) async fn convert_all(state: &AppState, progress: impl Fn(usize, usize)) -> anyhow::Result<String> {
+pub(crate) async fn convert_all(
+    state: &AppState,
+    progress: impl Fn(usize, usize),
+    stopped: impl Fn() -> bool,
+) -> anyhow::Result<String> {
     let quality = || {
         let s = state.settings.get();
         s.thumb_quality.avif_quality().filter(|_| s.thumb_avif)
@@ -168,12 +172,17 @@ pub(crate) async fn convert_all(state: &AppState, progress: impl Fn(usize, usize
         Err(_) => failed += 1,
     };
     let mut making = tokio::task::JoinSet::new();
-    let mut stopped = false;
+    // Whether it stopped short because someone asked (true) or AVIF was turned off (false).
+    let mut gave_up = None;
     for (i, (id, thumb)) in todo.into_iter().enumerate() {
+        if stopped() {
+            gave_up = Some(true);
+            break;
+        }
         if i % 50 == 0 {
             progress(i, total);
             let Some(now) = quality() else {
-                stopped = true;
+                gave_up = Some(false);
                 break;
             };
             q = now;
@@ -200,7 +209,9 @@ pub(crate) async fn convert_all(state: &AppState, progress: impl Fn(usize, usize
         tally(done);
     }
     progress(total, total);
-    let mut summary = if stopped {
+    let mut summary = if gave_up == Some(true) {
+        format!("Stopped after converting {made} of {total} thumbnails")
+    } else if gave_up == Some(false) {
         "Stopped: thumbnails aren't sent as AVIF any more".to_owned()
     } else if made + as_is + failed == 0 {
         "Every thumbnail was already AVIF".to_owned()

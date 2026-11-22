@@ -82,6 +82,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/backup", post(admin::admin_backup))
         .route("/api/admin/maintenance", get(crate::maintenance::overview))
         .route("/api/admin/maintenance/{task}", post(crate::maintenance::start_route))
+        .merge(crate::jobs::stop_router())
         .route("/api/admin/issues", get(crate::issues::list))
         .route("/api/admin/issues/retry", post(crate::issues::retry))
         .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))

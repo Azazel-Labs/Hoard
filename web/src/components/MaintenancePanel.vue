@@ -66,6 +66,16 @@ async function run(task: MaintenanceTask) {
   await load()
 }
 
+/** Ask a running task to stop after what it's doing now. */
+async function stop(task: MaintenanceTask) {
+  try {
+    await api.stopMaintenance(task.id)
+  } catch (e) {
+    failed(e, t('maintenance-stop-failed', { task: task.label }))
+  }
+  await load()
+}
+
 function when(at: string): string {
   const secs = (Date.now() - Date.parse(at)) / 1000
   if (secs < 60) return t('maintenance-just-now')
@@ -95,7 +105,11 @@ function took(from: string, to: string | null): string {
               <strong>{{ task.label }}</strong>
               <small>{{ task.blurb }}</small>
             </div>
+            <button v-if="task.running?.stoppable" type="button" class="btn" :disabled="task.running.stopping" @click="stop(task)">
+              {{ task.running.stopping ? t('maintenance-stopping') : t('maintenance-stop') }}
+            </button>
             <button
+              v-else
               type="button"
               class="btn"
               :class="{ danger: ask(task.id)?.danger }"

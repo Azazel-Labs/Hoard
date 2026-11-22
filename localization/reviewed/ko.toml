@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "대기 중"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s }초"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "“{ $what }” 중지"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "AI 태깅 모두 중지 ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4309,6 +4317,14 @@ translation = "인증서나 키를 사용할 수 없습니다"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "녹음에서 배경 소음보다 두드러지는 소리가 없습니다. 마이크에 더 가까이 대고 다시 해 보세요."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "“{ $job }” 작업은 시작된 후에는 중지할 수 없습니다"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "이 작업은 더 이상 대기 중이거나 실행 중이 아닙니다"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "대신 다른 위치를 기본 위치로 지정하세요"
@@ -4828,6 +4844,14 @@ translation = "검색할 내용이 없습니다. 팩 이름을 입력하세요"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent }이(가) 이미 { $tag } 아래에 있어서 { $tag }을(를) 그 아래에 넣을 수 없습니다"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "“{ $task }” 작업은 도중에 중지할 수 없습니다"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "“{ $task }” 작업이 실행 중이 아닙니다"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6735,6 +6759,18 @@ translation = "시작 중…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "시작 중"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "중지"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "“{ $task }” 작업을 중지하지 못했습니다"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "중지하는 중…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "77fd4beb8f78680f53a33eb6a672664269f0ac3b578dc0b66b506928524d453f"
+source = "4e7206b8d36344e7ffec471bd3f38be2eadbaeaa58371f5201539204dca74597"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -559,6 +559,14 @@ translation = "sırada"
 [messages.activity-seconds]
 source = "{ $s } s"
 translation = "{ $s } sn"
+
+[messages.activity-stop]
+source = "Stop “{ $what }”"
+translation = "“{ $what }” işini durdur"
+
+[messages.activity-stop-tagging]
+source = "Stop all AI tagging ({ $count })"
+translation = "Tüm yapay zekâ etiketlemeyi durdur ({ $count })"
 
 [messages.activity-title]
 source = "Background activity"
@@ -4353,6 +4361,14 @@ translation = "Sertifika ya da anahtar kullanılamıyor"
 source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
 translation = "Kayıtta arka plandan ayrılan bir şey yok. Mikrofona daha yakın durup yeniden dene."
 
+[messages.error-job-cant-stop]
+source = "“{ $job }” can't be stopped once it's started"
+translation = "“{ $job }” başladıktan sonra durdurulamaz"
+
+[messages.error-job-not-found]
+source = "that job isn't waiting or running any more"
+translation = "bu iş artık beklemiyor ve çalışmıyor"
+
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"
 translation = "bunun yerine başka bir konumu genel konum yapın"
@@ -4872,6 +4888,14 @@ translation = "aranacak bir şey yok; paketin adını yazın"
 [messages.error-tag-parent-loop]
 source = "{ $parent } is already under { $tag }, so { $tag } can't go under it"
 translation = "{ $parent } zaten { $tag } altında, bu yüzden { $tag } onun altına konamaz"
+
+[messages.error-task-cant-stop]
+source = "“{ $task }” can't be stopped partway"
+translation = "“{ $task }” yarıda durdurulamaz"
+
+[messages.error-task-not-running]
+source = "“{ $task }” isn't running"
+translation = "“{ $task }” çalışmıyor"
 
 [messages.error-task-running]
 source = "“{ $task }” is already running"
@@ -6783,6 +6807,18 @@ translation = "Başlatılıyor…"
 [messages.maintenance-starting-detail]
 source = "Starting"
 translation = "Başlatılıyor"
+
+[messages.maintenance-stop]
+source = "Stop"
+translation = "Durdur"
+
+[messages.maintenance-stop-failed]
+source = "Couldn't stop “{ $task }”"
+translation = "“{ $task }” durdurulamadı"
+
+[messages.maintenance-stopping]
+source = "Stopping…"
+translation = "Durduruluyor…"
 
 [messages.maintenance-took-hours]
 source = "{ $hours } h"

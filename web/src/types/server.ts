@@ -218,7 +218,7 @@ export interface MaintenanceTask {
   id: string
   label: string
   blurb: string
-  running: { run: number; started_at: string; progress?: number; detail?: string } | null
+  running: { run: number; started_at: string; progress?: number; detail?: string; stoppable: boolean; stopping: boolean } | null
   last: MaintenanceRun | null
 }
 
@@ -629,4 +629,6 @@ export interface ActivityItem {
   state: 'running' | 'queued'
   since: string
   pack_id?: string
+  /** Where to POST to stop it, when it can be stopped (an admin's to do). */
+  stop?: string
 }

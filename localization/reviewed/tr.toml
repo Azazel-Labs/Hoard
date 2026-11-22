@@ -10437,10 +10437,6 @@ translation = "Temalar"
 source = "Thumbnails"
 translation = "Küçük resimler"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Küçük resimleri AVIF olarak gönder"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "AVIF gösterebilen tarayıcılar, yukarıdaki seçim kadar net küçük resimler alır, çoğu zaman boyutun yarısından da az. Her biri ilk gösterildiğinde saklanan küçük resimden yapılır ve dönüştürmelerle birlikte tutulur; o zamana kadar saklanan gönderilir. Bunları yapmak, büyük bir kitaplığa ilk kez göz atılırken en fazla iki çekirdeği meşgul eder. Kayıpsız küçük resimler ve piksel sanatı olduğu gibi gönderilir."
@@ -10453,6 +10449,10 @@ translation = "Dengeli"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Küçük resim boyutunda özgününden ayırt etmek zor."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Biçim"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Kayıpsız"
@@ -10461,13 +10461,13 @@ translation = "Kayıpsız"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, tam oluşturulduğu gibi. Birkaç kat daha büyük. Hiçbir zaman AVIF olarak gönderilmez."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kalite { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Küçük resimler: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kalite { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

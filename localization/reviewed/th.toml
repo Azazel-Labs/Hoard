@@ -10380,10 +10380,6 @@ translation = "ธีม"
 source = "Thumbnails"
 translation = "ภาพย่อ"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "ส่งภาพย่อเป็น AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "เบราว์เซอร์ที่แสดง AVIF ได้จะได้รับภาพย่อที่คมชัดเท่าตัวเลือกด้านบน แต่มักเล็กลงเหลือไม่ถึงครึ่ง ภาพย่อแต่ละภาพจะสร้างจากภาพย่อที่เก็บไว้เมื่อแสดงครั้งแรก และเก็บไว้กับไฟล์ที่แปลงแล้ว ระหว่างนั้นจะส่งภาพที่เก็บไว้แทน การสร้างจะใช้ได้ถึงสองคอร์ขณะที่เปิดดูคลังขนาดใหญ่เป็นครั้งแรก ภาพย่อแบบไม่สูญเสียคุณภาพและพิกเซลอาร์ตจะส่งไปตามเดิม"
@@ -10396,6 +10392,10 @@ translation = "สมดุล"
 source = "Hard to tell from the original at thumbnail size."
 translation = "แยกจากต้นฉบับได้ยากที่ขนาดภาพย่อ"
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "รูปแบบ"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "ไม่สูญเสียคุณภาพ"
@@ -10404,13 +10404,13 @@ translation = "ไม่สูญเสียคุณภาพ"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG ตรงตามที่สร้างทุกประการ ใหญ่กว่าหลายเท่า ไม่ส่งเป็น AVIF"
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "คุณภาพ { $quality }"
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "ภาพย่อ: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format } คุณภาพ { $quality }"
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

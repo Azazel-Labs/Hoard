@@ -10391,10 +10391,6 @@ translation = "テーマ"
 source = "Thumbnails"
 translation = "サムネイル"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "サムネイルを AVIF で送る"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "AVIF を表示できるブラウザには、上で選んだ鮮明さのまま、より小さい（多くは半分以下の）サムネイルが送られます。各サムネイルは初めて表示されたときに保存済みのサムネイルから作られ、変換と一緒に保管されます。それまでは保存済みのものが送られます。大きなライブラリを初めて閲覧する間、作成のために最大 2 コアが使われます。ロスレスのサムネイルとピクセルアートはそのまま送られます。"
@@ -10407,6 +10403,10 @@ translation = "バランス"
 source = "Hard to tell from the original at thumbnail size."
 translation = "サムネイルのサイズでは元の画像と見分けにくい品質です。"
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "形式"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "ロスレス"
@@ -10415,13 +10415,13 @@ translation = "ロスレス"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG、作成したそのまま。数倍大きくなります。AVIF では送られません。"
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "品質 { $quality }。"
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "サムネイル: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }、品質 { $quality }。"
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

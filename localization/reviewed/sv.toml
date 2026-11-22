@@ -10629,10 +10629,6 @@ translation = "Teman"
 source = "Thumbnails"
 translation = "Miniatyrbilder"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Skicka miniatyrbilder som AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Webbläsare som visar AVIF får miniatyrbilder lika skarpa som valet ovan, ofta under halva storleken. Varje miniatyrbild görs från den sparade första gången den visas och sparas med konverteringarna; tills dess skickas den sparade. Att göra dem håller upp till två kärnor sysselsatta medan ett stort bibliotek bläddras igenom för första gången. Förlustfria miniatyrbilder och pixelkonst skickas som de är."
@@ -10645,6 +10641,10 @@ translation = "Balanserad"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Svår att skilja från originalet i miniatyrstorlek."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Förlustfri"
@@ -10653,13 +10653,13 @@ translation = "Förlustfri"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, exakt som den skapades. Flera gånger större. Skickas aldrig som AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kvalitet { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatyrbilder: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kvalitet { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

@@ -10821,10 +10821,6 @@ translation = "Motivy"
 source = "Thumbnails"
 translation = "Miniatury"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Posílat miniatury jako AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Prohlížeče, které umí zobrazit AVIF, dostanou miniatury stejně ostré jako u volby výše, často méně než poloviční. Každá se vytvoří z uložené miniatury při prvním zobrazení a uchová se s převody; do té doby se posílá uložená. Jejich vytváření zaměstná až dvě jádra, když se velkou knihovnou prochází poprvé. Bezeztrátové miniatury a pixel art se posílají tak, jak jsou."
@@ -10837,6 +10833,10 @@ translation = "Vyvážené"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Ve velikosti miniatury těžko rozeznatelné od originálu."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Formát"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Bezeztrátové"
@@ -10845,13 +10845,13 @@ translation = "Bezeztrátové"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, přesně tak, jak vzniklo. Několikanásobně větší. Nikdy se neposílají jako AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kvalita { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatury: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kvalita { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

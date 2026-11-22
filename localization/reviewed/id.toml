@@ -10409,10 +10409,6 @@ translation = "Tema"
 source = "Thumbnails"
 translation = "Gambar mini"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Kirim gambar mini sebagai AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Browser yang bisa menampilkan AVIF mendapat gambar mini setajam pilihan di atas, sering kali kurang dari separuh ukurannya. Masing-masing dibuat dari gambar mini tersimpan saat pertama kali ditampilkan dan disimpan bersama hasil konversi; sampai saat itu yang tersimpan yang dikirim. Membuatnya menyibukkan hingga dua inti selagi pustaka besar dijelajahi pertama kali. Gambar mini lossless dan pixel art dikirim apa adanya."
@@ -10425,6 +10421,10 @@ translation = "Seimbang"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Sulit dibedakan dari aslinya pada ukuran gambar mini."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Lossless"
@@ -10433,13 +10433,13 @@ translation = "Lossless"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, persis seperti dibuat. Beberapa kali lebih besar. Tidak pernah dikirim sebagai AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kualitas { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Gambar mini: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kualitas { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

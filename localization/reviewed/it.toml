@@ -10643,10 +10643,6 @@ translation = "Temi"
 source = "Thumbnails"
 translation = "Miniature"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Invia le miniature come AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "I browser che mostrano AVIF ricevono miniature nitide quanto la scelta qui sopra, spesso meno della metà. Ognuna viene creata dalla miniatura salvata la prima volta che viene mostrata e conservata con le conversioni; fino ad allora viene inviata quella salvata. Crearle tiene occupati fino a due core mentre una grande libreria viene sfogliata per la prima volta. Le miniature senza perdita e la pixel art vengono inviate così come sono."
@@ -10659,6 +10655,10 @@ translation = "Bilanciate"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Difficili da distinguere dall'originale alle dimensioni di una miniatura."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Formato"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Senza perdita"
@@ -10667,13 +10667,13 @@ translation = "Senza perdita"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, esattamente come generate. Parecchie volte più grandi. Mai inviate come AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Qualità { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniature: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, qualità { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

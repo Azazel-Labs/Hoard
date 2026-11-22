@@ -31,11 +31,10 @@ const THUMBS: { value: ThumbQuality; jpeg?: number; avif?: number; readonly labe
   { value: 'sharp', jpeg: 92, avif: 80, get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
   { value: 'lossless', get label() { return t('settings-thumbs-lossless') }, get hint() { return t('settings-thumbs-lossless-hint') } },
 ]
-/** What browsers get with a choice: AVIF when that's on, the stored JPEG when not. Nothing for Lossless, whose hint says. */
-function sentAs(q: (typeof THUMBS)[number]): string {
-  const avif = s.value?.options.thumb_avif.value
-  const quality = avif ? q.avif : q.jpeg
-  return quality === undefined ? '' : t('settings-thumbs-sent', { format: avif ? 'AVIF' : 'JPEG', quality })
+/** The quality browsers get with a choice, in the format picked above them. Nothing for Lossless, whose hint says. */
+function qualityOf(q: (typeof THUMBS)[number]): string {
+  const quality = s.value?.options.thumb_avif.value ? q.avif : q.jpeg
+  return quality === undefined ? '' : t('settings-thumbs-quality', { quality })
 }
 // How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
 const usage = ref<Stats | null>(null)
@@ -88,6 +87,21 @@ watch(
       {{ t('settings-thumbs-what') }}
       <template v-if="usage?.preview_bytes !== undefined">{{ t('settings-previews-size', { size: humanBytes(usage.preview_bytes) }) }}</template>
     </p>
+    <div class="opt-row format">
+      <span id="thumbs-format">{{ t('settings-thumbs-format') }}</span>
+      <div class="modes" role="radiogroup" aria-labelledby="thumbs-format">
+        <label v-for="f in ['JPEG', 'AVIF']" :key="f">
+          <input
+            type="radio"
+            name="thumbs-format"
+            :checked="s.options.thumb_avif.value === (f === 'AVIF')"
+            :disabled="busy"
+            @change="save({ thumb_avif: f === 'AVIF' })"
+          />{{ f }}
+        </label>
+      </div>
+      <ResetButton v-if="changed('thumb_avif')" :to="s.options.thumb_avif.default ? 'AVIF' : 'JPEG'" :disabled="busy" @reset="resetOpt('thumb_avif')" />
+    </div>
     <div class="choices" role="radiogroup" :aria-label="t('settings-thumbs')">
       <label v-for="q in THUMBS" :key="q.value" :class="{ on: s.options.thumb_quality.value === q.value }">
         <input
@@ -97,24 +111,10 @@ watch(
           :disabled="busy"
           @change="save({ thumb_quality: q.value }, t('settings-thumbs-saved', { quality: q.label }))"
         />
-        <span><strong>{{ q.label }}</strong><small>{{ sentAs(q) }} {{ q.hint }}</small></span>
+        <span><strong>{{ q.label }}</strong><small>{{ qualityOf(q) }} {{ q.hint }}</small></span>
       </label>
     </div>
-    <div class="switches motion">
-      <div class="opt-row">
-        <label class="check">
-          <input
-            type="checkbox"
-            :checked="s.options.thumb_avif.value"
-            :disabled="busy"
-            @change="save({ thumb_avif: ($event.target as HTMLInputElement).checked })"
-          />
-          {{ t('settings-thumbs-avif') }}
-        </label>
-        <ResetButton v-if="changed('thumb_avif')" :to="onOff(s.options.thumb_avif.default)" :disabled="busy" @reset="resetOpt('thumb_avif')" />
-      </div>
-    </div>
-    <p class="what">{{ t('settings-thumbs-avif-what') }}</p>
+    <p class="what avif">{{ t('settings-thumbs-avif-what') }}</p>
     <div class="switches motion">
       <div class="opt-row">
         <label class="check">
@@ -180,4 +180,6 @@ watch(
 
 <style scoped>
 .switches.motion { margin: 0.9rem 0 0.2rem; }
+.format { margin-bottom: 0.5rem; font-size: var(--step--1); color: var(--muted); }
+.what.avif { margin-top: 0.6rem; }
 </style>

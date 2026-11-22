@@ -245,16 +245,17 @@ test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once t
   const thumb = (accept: string) => api.get(`/api/assets/${render.id}/thumb`, { headers: { Accept: accept } })
 
   await page.goto('/#settings/performance')
-  const avif = page.getByRole('checkbox', { name: 'Send thumbnails as AVIF' })
-  // Each choice says what browsers get: the stored JPEG, then the AVIF made at the same sharpness.
+  // The format is picked above the choices, which each say the quality browsers get in it.
+  const format = page.getByRole('radiogroup', { name: 'Format' })
   const choice = (name: string) =>
     page.getByRole('radiogroup', { name: 'Thumbnails' }).locator('label').filter({ has: page.getByText(name, { exact: true }) })
-  await expect(avif).not.toBeChecked()
-  await expect(choice('Balanced')).toContainText('JPEG, quality 82. Hard to tell')
-  await avif.check()
+  await expect(format.getByRole('radio', { name: 'JPEG' })).toBeChecked()
+  await expect(choice('Balanced')).toContainText('Quality 82. Hard to tell')
+  await format.getByText('AVIF', { exact: true }).click()
+  await expect(format.getByRole('radio', { name: 'AVIF' })).toBeChecked()
   await expect.poll(async () => (await (await api.get('/api/admin/settings')).json()).options.thumb_avif.value).toBe(true)
-  await expect(choice('Balanced')).toContainText('AVIF, quality 68. Hard to tell')
-  await expect(choice('Sharper')).toContainText('AVIF, quality 80.')
+  await expect(choice('Balanced')).toContainText('Quality 68. Hard to tell')
+  await expect(choice('Sharper')).toContainText('Quality 80.')
   await expect(choice('Lossless')).toHaveText(/^Lossless\s*PNG, exactly as made\. Several times larger, and never sent as AVIF\.$/)
   try {
     // The stored picture goes out while the AVIF is made, not to be kept by the browser.
@@ -277,5 +278,5 @@ test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once t
     await api.put('/api/admin/settings', { headers: HOARD_HEADERS, data: { thumb_avif: null } })
   }
   await page.reload()
-  await expect(page.getByRole('checkbox', { name: 'Send thumbnails as AVIF' })).not.toBeChecked()
+  await expect(format.getByRole('radio', { name: 'JPEG' })).toBeChecked()
 })

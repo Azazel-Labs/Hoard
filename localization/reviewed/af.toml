@@ -10624,10 +10624,6 @@ translation = "Temas"
 source = "Thumbnails"
 translation = "Duimnaels"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Stuur duimnaels as AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Blaaiers wat AVIF wys, kry duimnaels so skerp as die keuse hierbo, dikwels minder as die helfte van die grootte. Elkeen word van die gestoorde duimnael gemaak die eerste keer dat dit gewys word en saam met die omskakelings bewaar; tot dan word die gestoorde een gestuur. Om hulle te maak hou tot twee kerne besig terwyl ’n groot biblioteek die eerste keer deurblaai word. Verlieslose duimnaels en pixelkuns word gestuur soos hulle is."
@@ -10640,6 +10636,10 @@ translation = "Gebalanseer"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Moeilik om van die oorspronklike te onderskei op duimnaelgrootte."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Formaat"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Verliesloos"
@@ -10648,13 +10648,13 @@ translation = "Verliesloos"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, presies soos gemaak. Etlike kere groter. Word nooit as AVIF gestuur nie."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kwaliteit { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Duimnaels: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kwaliteit { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

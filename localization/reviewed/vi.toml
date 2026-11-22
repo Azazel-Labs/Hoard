@@ -10377,10 +10377,6 @@ translation = "Chủ đề"
 source = "Thumbnails"
 translation = "Ảnh thu nhỏ"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Gửi ảnh thu nhỏ dưới dạng AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Trình duyệt hiển thị được AVIF sẽ nhận ảnh thu nhỏ sắc nét như lựa chọn ở trên, thường chưa tới một nửa kích thước. Mỗi ảnh được tạo từ ảnh thu nhỏ đã lưu vào lần đầu hiển thị và được giữ cùng các bản chuyển đổi; trước đó ảnh đã lưu sẽ được gửi. Việc tạo chúng chiếm tới hai lõi trong khi một thư viện lớn được duyệt lần đầu. Ảnh thu nhỏ không mất dữ liệu và pixel art được gửi nguyên trạng."
@@ -10393,6 +10389,10 @@ translation = "Cân bằng"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Khó phân biệt với bản gốc ở kích thước ảnh thu nhỏ."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Định dạng"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Không mất dữ liệu"
@@ -10401,13 +10401,13 @@ translation = "Không mất dữ liệu"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, đúng như khi tạo. Lớn hơn vài lần. Không bao giờ được gửi dưới dạng AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Chất lượng { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Ảnh thu nhỏ: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, chất lượng { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

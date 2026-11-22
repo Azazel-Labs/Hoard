@@ -10628,10 +10628,6 @@ translation = "Temaer"
 source = "Thumbnails"
 translation = "Miniatyrbilder"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Send miniatyrbilder som AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Nettlesere som viser AVIF, får miniatyrbilder like skarpe som valget ovenfor, ofte under halvparten av størrelsen. Hvert lages fra det lagrede miniatyrbildet første gang det vises, og tas vare på sammen med konverteringene; inntil da sendes det lagrede. Å lage dem holder opptil to kjerner opptatt mens et stort bibliotek blas gjennom for første gang. Tapsfrie miniatyrbilder og pikselkunst sendes som de er."
@@ -10644,6 +10640,10 @@ translation = "Balansert"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Vanskelig å skille fra originalen i miniatyrstørrelse."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Tapsfri"
@@ -10652,13 +10652,13 @@ translation = "Tapsfri"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, nøyaktig slik det ble laget. Flere ganger større. Sendes aldri som AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kvalitet { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatyrbilder: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kvalitet { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

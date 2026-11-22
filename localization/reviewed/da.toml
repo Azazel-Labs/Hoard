@@ -10626,10 +10626,6 @@ translation = "Temaer"
 source = "Thumbnails"
 translation = "Miniaturer"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Send miniaturer som AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Browsere, der kan vise AVIF, får miniaturer lige så skarpe som valget ovenfor, ofte under halvdelen af størrelsen. Hver laves ud fra den gemte miniature første gang, den vises, og gemmes sammen med konverteringerne; indtil da sendes den gemte. At lave dem holder op til to kerner beskæftiget, mens et stort bibliotek gennemses første gang. Tabsfri miniaturer og pixelkunst sendes, som de er."
@@ -10642,6 +10638,10 @@ translation = "Balanceret"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Svær at skelne fra originalen i miniaturestørrelse."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Tabsfri"
@@ -10650,13 +10650,13 @@ translation = "Tabsfri"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, præcis som lavet. Flere gange større. Sendes aldrig som AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kvalitet { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniaturer: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kvalitet { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

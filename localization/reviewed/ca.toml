@@ -10630,10 +10630,6 @@ translation = "Temes"
 source = "Thumbnails"
 translation = "Miniatures"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Envia les miniatures en AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Els navegadors que mostren AVIF reben miniatures tan nítides com l’opció de dalt, sovint de menys de la meitat de la mida. Cadascuna es fa a partir de la miniatura desada la primera vegada que es mostra i es guarda amb les conversions; fins aleshores s’envia la desada. Fer-les manté ocupats fins a dos nuclis mentre es navega per primera vegada per una biblioteca gran. Les miniatures sense pèrdua i el pixel art s’envien tal com són."
@@ -10646,6 +10642,10 @@ translation = "Equilibrades"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Difícils de distingir de l'original a mida de miniatura."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Sense pèrdua"
@@ -10654,13 +10654,13 @@ translation = "Sense pèrdua"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, exactament tal com es fan. Diverses vegades més grans. Mai no s’envien en AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Qualitat { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatures: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, qualitat { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

@@ -10629,10 +10629,6 @@ translation = "Thema’s"
 source = "Thumbnails"
 translation = "Miniaturen"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Miniaturen als AVIF versturen"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Browsers die AVIF tonen, krijgen miniaturen zo scherp als de keuze hierboven, vaak minder dan de helft zo groot. Elke miniatuur wordt de eerste keer dat hij getoond wordt gemaakt van de opgeslagen miniatuur en bij de conversies bewaard; tot die tijd wordt de opgeslagen versie verstuurd. Het maken houdt tot twee kernen bezig terwijl een grote bibliotheek voor het eerst doorgebladerd wordt. Verliesvrije miniaturen en pixelart worden verstuurd zoals ze zijn."
@@ -10645,6 +10641,10 @@ translation = "Gebalanceerd"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Op miniatuurformaat nauwelijks van het origineel te onderscheiden."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Formaat"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Verliesvrij"
@@ -10653,13 +10653,13 @@ translation = "Verliesvrij"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, precies zoals gemaakt. Een aantal keer groter. Worden nooit als AVIF verstuurd."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Kwaliteit { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniaturen: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, kwaliteit { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

@@ -10685,10 +10685,6 @@ translation = "Θέματα"
 source = "Thumbnails"
 translation = "Μικρογραφίες"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Αποστολή μικρογραφιών ως AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Τα προγράμματα περιήγησης που εμφανίζουν AVIF παίρνουν μικρογραφίες τόσο ευκρινείς όσο η παραπάνω επιλογή, συχνά κάτω από το μισό μέγεθος. Η καθεμία φτιάχνεται από την αποθηκευμένη μικρογραφία την πρώτη φορά που εμφανίζεται και κρατιέται μαζί με τις μετατροπές· μέχρι τότε στέλνεται η αποθηκευμένη. Η δημιουργία τους απασχολεί έως δύο πυρήνες όσο μια μεγάλη βιβλιοθήκη περιηγείται για πρώτη φορά. Οι μικρογραφίες χωρίς απώλειες και το pixel art στέλνονται όπως είναι."
@@ -10701,6 +10697,10 @@ translation = "Ισορροπημένες"
 source = "Hard to tell from the original at thumbnail size."
 translation = "Δύσκολα ξεχωρίζουν από το πρωτότυπο σε μέγεθος μικρογραφίας."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Μορφή"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Χωρίς απώλειες"
@@ -10709,13 +10709,13 @@ translation = "Χωρίς απώλειες"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, ακριβώς όπως δημιουργήθηκαν. Αρκετές φορές μεγαλύτερες. Δεν στέλνονται ποτέ ως AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Ποιότητα { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Μικρογραφίες: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, ποιότητα { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

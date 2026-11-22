@@ -10855,10 +10855,6 @@ translation = "Motywy"
 source = "Thumbnails"
 translation = "Miniatury"
 
-[messages.settings-thumbs-avif]
-source = "Send thumbnails as AVIF"
-translation = "Wysyłaj miniatury jako AVIF"
-
 [messages.settings-thumbs-avif-what]
 source = "Browsers that show AVIF get thumbnails as sharp as the choice above, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
 translation = "Przeglądarki, które wyświetlają AVIF, dostają miniatury tak ostre jak w wyborze powyżej, często mniejsze niż połowa rozmiaru. Każda powstaje z zapisanej miniatury przy pierwszym wyświetleniu i jest przechowywana razem z konwersjami; do tego czasu wysyłana jest zapisana. Ich tworzenie zajmuje do dwóch rdzeni, gdy duża biblioteka jest przeglądana po raz pierwszy. Bezstratne miniatury i pixel art są wysyłane bez zmian."
@@ -10871,6 +10867,10 @@ translation = "Zrównoważone"
 source = "Hard to tell from the original at thumbnail size."
 translation = "W rozmiarze miniatury trudno je odróżnić od oryginału."
 
+[messages.settings-thumbs-format]
+source = "Format"
+translation = "Format"
+
 [messages.settings-thumbs-lossless]
 source = "Lossless"
 translation = "Bezstratne"
@@ -10879,13 +10879,13 @@ translation = "Bezstratne"
 source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
 translation = "PNG, dokładnie takie, jak zostały utworzone. Kilka razy większe. Nigdy nie są wysyłane jako AVIF."
 
+[messages.settings-thumbs-quality]
+source = "Quality { $quality }."
+translation = "Jakość { $quality }."
+
 [messages.settings-thumbs-saved]
 source = "Thumbnails: { $quality }"
 translation = "Miniatury: { $quality }"
-
-[messages.settings-thumbs-sent]
-source = "{ $format }, quality { $quality }."
-translation = "{ $format }, jakość { $quality }."
 
 [messages.settings-thumbs-sharp]
 source = "Sharper"

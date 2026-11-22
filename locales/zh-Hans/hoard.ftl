@@ -39,6 +39,7 @@ error-not-a-hash = 不是 blake3 十六进制哈希
 error-merge-into-tag = into 必须是标签
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = “{ $text }”不是标签
+error-not-a-character = 只有角色才能播放其骨架的动画
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面
 error-nothing-to-merge = 没有可合并的内容
@@ -1945,6 +1946,10 @@ model-play = 播放
 model-animation-clip = 动画片段
 model-animation = 动画
 model-plays-on = 播放于角色
+model-plays-everywhere = 全部使用
+model-plays-everywhere-title = 在 { $name } 上播放此骨架的所有动画，缩略图也是
+model-plays-everywhere-done = 此骨架的动画现在在 { $name } 上播放。正在重新绘制它们的缩略图。
+model-plays-everywhere-failed = 无法更改播放它们的角色：{ $error }
 model-rest-pose = 静止姿势
 model-close-title = 关闭（Esc）
 model-full-screen = 全屏

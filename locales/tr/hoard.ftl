@@ -39,6 +39,7 @@ error-not-a-hash = bu bir blake3 onaltılık özeti değil
 error-merge-into-tag = into bir etiket olmalı
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" bir etiket değil
+error-not-a-character = iskeletin animasyonları yalnızca bir karakter üzerinde oynatılabilir
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } zaten { $tag } altında, bu yüzden { $tag } onun altına konamaz
 error-nothing-to-merge = birleştirilecek bir şey yok
@@ -1994,6 +1995,10 @@ model-play = Oynat
 model-animation-clip = Animasyon klibi
 model-animation = Animasyon
 model-plays-on = Oynatılacak karakter
+model-plays-everywhere = Her yerde kullan
+model-plays-everywhere-title = Bu iskeletin tüm animasyonlarını küçük resimleri dahil { $name } üzerinde oynat
+model-plays-everywhere-done = Bu iskeletin animasyonları artık { $name } üzerinde oynatılıyor. Küçük resimleri yeniden çiziliyor.
+model-plays-everywhere-failed = Oynatıldıkları karakter değiştirilemedi: { $error }
 model-rest-pose = Dinlenme pozu
 model-close-title = Kapat (Esc)
 model-full-screen = Tam ekran

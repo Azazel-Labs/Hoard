@@ -39,6 +39,7 @@ error-not-a-hash = nu este un hash blake3 hexazecimal
 error-merge-into-tag = into trebuie să fie o etichetă
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }” nu este o etichetă
+error-not-a-character = doar un personaj poate fi cel pe care sunt redate animațiile scheletului său
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } este deja sub { $tag }, deci { $tag } nu poate fi plasată sub ea
 error-nothing-to-merge = nimic de unit
@@ -2312,6 +2313,10 @@ model-play = Redare
 model-animation-clip = Clip de animație
 model-animation = Animație
 model-plays-on = Redă pe
+model-plays-everywhere = Folosește peste tot
+model-plays-everywhere-title = Redă fiecare animație cu acest schelet pe { $name }, inclusiv în miniaturi
+model-plays-everywhere-done = Animațiile cu acest schelet sunt acum redate pe { $name }. Miniaturile lor sunt desenate din nou.
+model-plays-everywhere-failed = Personajul pe care sunt redate nu a putut fi schimbat: { $error }
 model-rest-pose = Poză de repaus
 model-close-title = Închideți (Esc)
 model-full-screen = Ecran complet

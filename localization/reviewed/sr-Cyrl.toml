@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "c57db96716344aa847d7559e1fe2d5e482ceb243539e41e9ff1ff7eff455c08a"
 
 [messages.about-blender]
@@ -4810,6 +4810,10 @@ translation = "На серверу нема SoundFont-а на { $path }"
 source = "There's no SoundFont at { $path }"
 translation = "Нема SoundFont-а на { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "анимације скелета могу да се пуштају само на лику"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ово није blake3 хеш у хексадецималном облику"
@@ -7820,6 +7824,22 @@ translation = "Пусти"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Пусти (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Користи свуда"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Анимације са овим скелетом се сада пуштају на лику { $name }. Њихове сличице се поново цртају."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Није могуће променити лик на ком се пуштају: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Пуштај сваку анимацију са овим скелетом на лику { $name }, и у сличицама"
 
 [messages.model-plays-on]
 source = "Plays on"

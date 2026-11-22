@@ -39,6 +39,7 @@ error-not-a-hash = kein blake3-Hash in Hexadezimalschreibweise
 error-merge-into-tag = into muss ein Tag sein
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }“ ist kein Tag
+error-not-a-character = nur eine Figur kann die sein, auf der die Animationen ihres Skeletts laufen
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } steht schon unter { $tag }, deshalb kann { $tag } nicht darunter stehen
 error-nothing-to-merge = nichts zum Zusammenführen
@@ -2154,6 +2155,10 @@ model-play = Abspielen
 model-animation-clip = Animationsclip
 model-animation = Animation
 model-plays-on = Abspielen auf
+model-plays-everywhere = Überall verwenden
+model-plays-everywhere-title = Alle Animationen mit diesem Skelett auf { $name } abspielen, auch in ihren Vorschaubildern
+model-plays-everywhere-done = Animationen mit diesem Skelett laufen jetzt auf { $name }. Ihre Vorschaubilder werden neu gezeichnet.
+model-plays-everywhere-failed = Die Figur, auf der sie laufen, konnte nicht geändert werden: { $error }
 model-rest-pose = Ruhepose
 model-close-title = Schließen (Esc)
 model-full-screen = Vollbild

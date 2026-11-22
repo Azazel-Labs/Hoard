@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "4419cbdf5af1c5cd73dfc82dacc541ce70f5f08fd0dcf749135fda34c793eedf"
 
 [messages.about-blender]
@@ -4776,6 +4776,10 @@ translation = "Δεν υπάρχει SoundFont στο { $path } στον δια�
 source = "There's no SoundFont at { $path }"
 translation = "Δεν υπάρχει SoundFont στο { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "μόνο ένας χαρακτήρας μπορεί να είναι αυτός στον οποίο παίζουν οι κινήσεις του σκελετού του"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "δεν είναι δεκαεξαδικό hash blake3"
@@ -7802,6 +7806,22 @@ translation = "Αναπαραγωγή"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Αναπαραγωγή (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Χρήση παντού"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Οι κινήσεις με αυτόν τον σκελετό παίζουν πλέον στον χαρακτήρα { $name }. Οι μικρογραφίες τους σχεδιάζονται ξανά."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Δεν ήταν δυνατή η αλλαγή του χαρακτήρα στον οποίο παίζουν: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Αναπαραγωγή κάθε κίνησης με αυτόν τον σκελετό στον χαρακτήρα { $name }, και στις μικρογραφίες τους"
 
 [messages.model-plays-on]
 source = "Plays on"

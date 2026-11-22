@@ -39,6 +39,7 @@ error-not-a-hash = blake3 16진수 해시가 아닙니다
 error-merge-into-tag = into는 태그여야 합니다
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }"은(는) 태그가 아닙니다
+error-not-a-character = 스켈레톤의 애니메이션은 캐릭터에서만 재생할 수 있습니다
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent }이(가) 이미 { $tag } 아래에 있어서 { $tag }을(를) 그 아래에 넣을 수 없습니다
 error-nothing-to-merge = 병합할 것이 없습니다
@@ -1921,6 +1922,10 @@ model-play = 재생
 model-animation-clip = 애니메이션 클립
 model-animation = 애니메이션
 model-plays-on = 재생할 캐릭터
+model-plays-everywhere = 모든 곳에 사용
+model-plays-everywhere-title = 이 스켈레톤의 모든 애니메이션을 썸네일까지 { $name }에서 재생합니다
+model-plays-everywhere-done = 이 스켈레톤의 애니메이션이 이제 { $name }에서 재생됩니다. 썸네일을 다시 그리는 중입니다.
+model-plays-everywhere-failed = 재생할 캐릭터를 바꾸지 못했습니다: { $error }
 model-rest-pose = 기본 포즈
 model-close-title = 닫기(Esc)
 model-full-screen = 전체 화면

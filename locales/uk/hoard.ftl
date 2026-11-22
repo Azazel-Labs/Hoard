@@ -39,6 +39,7 @@ error-not-a-hash = це не хеш blake3 у шістнадцятковому �
 error-merge-into-tag = into має бути тегом
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = «{ $text }» не є тегом
+error-not-a-character = анімації скелета можна відтворювати лише на персонажі
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } уже під { $tag }, тому { $tag } не можна помістити під нього
 error-nothing-to-merge = немає чого об’єднувати
@@ -2403,6 +2404,10 @@ model-play = Відтворити
 model-animation-clip = Кліп анімації
 model-animation = Анімація
 model-plays-on = Відтворювати на
+model-plays-everywhere = Використовувати всюди
+model-plays-everywhere-title = Відтворювати всі анімації з цим скелетом на персонажі { $name }, зокрема в мініатюрах
+model-plays-everywhere-done = Анімації з цим скелетом тепер відтворюються на персонажі { $name }. Їхні мініатюри малюються заново.
+model-plays-everywhere-failed = Не вдалося змінити персонажа, на якому вони відтворюються: { $error }
 model-rest-pose = Поза спокою
 model-close-title = Закрити (Esc)
 model-full-screen = На весь екран

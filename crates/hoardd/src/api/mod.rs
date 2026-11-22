@@ -63,6 +63,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/collections/{id}/assets", post(collections::collection_members))
         .route("/api/assets/{id}", axum::routing::patch(assets::patch_asset))
         .route("/api/assets/{id}/history/{change}/revert", post(assets::revert_change))
+        .route("/api/assets/{id}/skeleton-body", axum::routing::put(assets::choose_skeleton_body))
         .route(
             "/api/assets/{id}/thumb",
             axum::routing::put(crate::previews::put_thumb)

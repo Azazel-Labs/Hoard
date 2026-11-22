@@ -39,6 +39,7 @@ error-not-a-hash = nem blake3 hexadecimális hash
 error-merge-into-tag = az into értéke csak címke lehet
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = A(z) „{ $text }” nem címke
+error-not-a-character = csak karakter lehet az, amelyen a csontváza animációi lejátszódnak
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = A(z) { $parent } már a(z) { $tag } alá tartozik, ezért a(z) { $tag } nem rendelhető alá
 error-nothing-to-merge = nincs mit összevonni
@@ -2022,6 +2023,10 @@ model-play = Lejátszás
 model-animation-clip = Animációs klip
 model-animation = Animáció
 model-plays-on = Lejátszás ezen
+model-plays-everywhere = Használat mindenhol
+model-plays-everywhere-title = A csontváz minden animációjának lejátszása ezen: { $name }, a bélyegképeken is
+model-plays-everywhere-done = A csontváz animációi mostantól ezen játszódnak: { $name }. A bélyegképeik újrarajzolása folyamatban.
+model-plays-everywhere-failed = Nem sikerült megváltoztatni a karaktert, amelyen lejátszódnak: { $error }
 model-rest-pose = Alappóz
 model-close-title = Bezárás (Esc)
 model-full-screen = Teljes képernyő

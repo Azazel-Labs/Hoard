@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "ad98ec3f2237a2b5ab0e6f3363770b9df9c68bf29c49e179edfa25706cd7ebec"
 
 [messages.about-blender]
@@ -4764,6 +4764,10 @@ translation = "Er staat geen SoundFont op { $path } op de server"
 source = "There's no SoundFont at { $path }"
 translation = "Er staat geen SoundFont op { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "alleen een personage kan het personage zijn waarop de animaties van zijn skelet afspelen"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "geen blake3-hash in hex"
@@ -7764,6 +7768,22 @@ translation = "Afspelen"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Afspelen (Spatie)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Overal gebruiken"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animaties met dit skelet spelen nu af op { $name }. Hun miniaturen worden opnieuw getekend."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Kan het personage waarop ze afspelen niet wijzigen: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Elke animatie met dit skelet afspelen op { $name }, ook in de miniaturen"
 
 [messages.model-plays-on]
 source = "Plays on"

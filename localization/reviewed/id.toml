@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "5c145ad92a4f48b6321a4514298f54705660673c84778e6e1e3be88d52788269"
 
 [messages.about-blender]
@@ -4651,6 +4651,10 @@ translation = "Tidak ada SoundFont di { $path } pada server"
 source = "There's no SoundFont at { $path }"
 translation = "Tidak ada SoundFont di { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "hanya karakter yang dapat menjadi tempat animasi kerangkanya diputar"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "bukan hash hex blake3"
@@ -7605,6 +7609,22 @@ translation = "Putar"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Putar (Spasi)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Pakai di mana-mana"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animasi dengan kerangka ini sekarang diputar pada { $name }. Gambar mininya sedang digambar ulang."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Tidak dapat mengganti karakter tempat animasi diputar: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Putar setiap animasi dengan kerangka ini pada { $name }, termasuk di gambar mininya"
 
 [messages.model-plays-on]
 source = "Plays on"

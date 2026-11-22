@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -4617,6 +4617,10 @@ translation = "서버의 { $path }에 SoundFont가 없습니다"
 source = "There's no SoundFont at { $path }"
 translation = "{ $path }에 SoundFont가 없습니다"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "스켈레톤의 애니메이션은 캐릭터에서만 재생할 수 있습니다"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "blake3 16진수 해시가 아닙니다"
@@ -7567,6 +7571,22 @@ translation = "재생"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "재생(Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "모든 곳에 사용"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "이 스켈레톤의 애니메이션이 이제 { $name }에서 재생됩니다. 썸네일을 다시 그리는 중입니다."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "재생할 캐릭터를 바꾸지 못했습니다: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "이 스켈레톤의 모든 애니메이션을 썸네일까지 { $name }에서 재생합니다"
 
 [messages.model-plays-on]
 source = "Plays on"

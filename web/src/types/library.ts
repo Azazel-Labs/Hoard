@@ -86,6 +86,10 @@ export interface Asset {
   fits?: Fit[]
   /** How many fit in all, when that's more than `fits` lists. */
   fits_total?: number | null
+  /** For an animation: the character it plays on wherever it's shown, its skeleton's. */
+  plays_on?: Fit | null
+  /** For a character: it's the one its skeleton's animations play on. */
+  plays_its_skeleton?: boolean
   /** Collections this asset is in. */
   collections?: CollectionRef[]
   /** What this file was converted from (an Unreal package). */

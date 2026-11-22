@@ -39,6 +39,7 @@ error-not-a-hash = nie 'n blake3-hekshash nie
 error-merge-into-tag = into moet 'n etiket wees
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" is nie 'n etiket nie
+error-not-a-character = net ’n karakter kan die een wees waarop sy skelet se animasies speel
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } is reeds onder { $tag }, so { $tag } kan nie daaronder gaan nie
 error-nothing-to-merge = niks om saam te voeg nie
@@ -2154,6 +2155,10 @@ model-play = Speel
 model-animation-clip = Animasiegreep
 model-animation = Animasie
 model-plays-on = Speel op
+model-plays-everywhere = Gebruik oral
+model-plays-everywhere-title = Speel elke animasie met hierdie skelet op { $name }, ook in hul duimnaels
+model-plays-everywhere-done = Animasies met hierdie skelet speel nou op { $name }. Hul duimnaels word weer geteken.
+model-plays-everywhere-failed = Kon nie die karakter waarop hulle speel verander nie: { $error }
 model-rest-pose = Rusposisie
 model-close-title = Sluit (Esc)
 model-full-screen = Volle skerm

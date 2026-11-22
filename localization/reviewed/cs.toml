@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "f7546468fd3611c4870cb915c81c0a74e9859af5deb4f3a4d7c3f316e3b19fca"
 
 [messages.about-blender]
@@ -4831,6 +4831,10 @@ translation = "Na serveru není na { $path } žádný SoundFont"
 source = "There's no SoundFont at { $path }"
 translation = "Na { $path } není žádný SoundFont"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "animace kostry se mohou přehrávat jen na postavě"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "toto není hexadecimální hash blake3"
@@ -7880,6 +7884,22 @@ translation = "Přehrát"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Přehrát (mezerník)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Použít všude"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animace s touto kostrou se teď přehrávají na postavě { $name }. Jejich náhledy se kreslí znovu."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Postavu, na které se přehrávají, se nepodařilo změnit: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Přehrávat všechny animace s touto kostrou na postavě { $name }, i v jejich náhledech"
 
 [messages.model-plays-on]
 source = "Plays on"

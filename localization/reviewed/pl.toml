@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "d0e6acc5bd4349cf2e38516e2111f5e558cb5c06ac0604e881c65c5a1160098e"
 
 [messages.about-blender]
@@ -4864,6 +4864,10 @@ translation = "Na serwerze nie ma pliku SoundFont pod ścieżką { $path }"
 source = "There's no SoundFont at { $path }"
 translation = "Nie ma pliku SoundFont pod ścieżką { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "animacje szkieletu można odtwarzać tylko na postaci"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "to nie jest skrót blake3 w zapisie szesnastkowym"
@@ -7902,6 +7906,22 @@ translation = "Odtwórz"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Odtwórz (Spacja)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Używaj wszędzie"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animacje z tym szkieletem są teraz odtwarzane na postaci { $name }. Ich miniatury są rysowane od nowa."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Nie udało się zmienić postaci, na której są odtwarzane: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Odtwarzaj każdą animację z tym szkieletem na postaci { $name }, także w miniaturach"
 
 [messages.model-plays-on]
 source = "Plays on"

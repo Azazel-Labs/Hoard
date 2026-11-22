@@ -39,6 +39,7 @@ error-not-a-hash = to nie jest skrót blake3 w zapisie szesnastkowym
 error-merge-into-tag = into musi być tagiem
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }” nie jest tagiem
+error-not-a-character = animacje szkieletu można odtwarzać tylko na postaci
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = Tag { $parent } jest już pod { $tag }, więc { $tag } nie może trafić pod niego
 error-nothing-to-merge = nic do scalenia
@@ -2351,6 +2352,10 @@ model-play = Odtwórz
 model-animation-clip = Klip animacji
 model-animation = Animacja
 model-plays-on = Odtwarzaj na
+model-plays-everywhere = Używaj wszędzie
+model-plays-everywhere-title = Odtwarzaj każdą animację z tym szkieletem na postaci { $name }, także w miniaturach
+model-plays-everywhere-done = Animacje z tym szkieletem są teraz odtwarzane na postaci { $name }. Ich miniatury są rysowane od nowa.
+model-plays-everywhere-failed = Nie udało się zmienić postaci, na której są odtwarzane: { $error }
 model-rest-pose = Poza spoczynkowa
 model-close-title = Zamknij (Esc)
 model-full-screen = Pełny ekran

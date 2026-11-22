@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "ba53414f761bfe22b8de76cd70f11c6ffe1e1dd97c499b1280e56b909a994a6c"
 
 [messages.about-blender]
@@ -4845,6 +4845,10 @@ translation = "Nu există niciun SoundFont la { $path } pe server"
 source = "There's no SoundFont at { $path }"
 translation = "Nu există niciun SoundFont la { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "doar un personaj poate fi cel pe care sunt redate animațiile scheletului său"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "nu este un hash blake3 hexazecimal"
@@ -7879,6 +7883,22 @@ translation = "Redare"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Redare (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Folosește peste tot"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animațiile cu acest schelet sunt acum redate pe { $name }. Miniaturile lor sunt desenate din nou."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Personajul pe care sunt redate nu a putut fi schimbat: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Redă fiecare animație cu acest schelet pe { $name }, inclusiv în miniaturi"
 
 [messages.model-plays-on]
 source = "Plays on"

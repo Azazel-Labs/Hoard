@@ -44,6 +44,7 @@ error-not-a-hash = not a blake3 hex hash
 error-merge-into-tag = into must be a tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" isn't a tag
+error-not-a-character = only a character can be the one its skeleton's animations play on
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } is already under { $tag }, so { $tag } can't go under it
 error-nothing-to-merge = nothing to merge
@@ -2402,6 +2403,10 @@ model-play = Play
 model-animation-clip = Animation clip
 model-animation = Animation
 model-plays-on = Plays on
+model-plays-everywhere = Use everywhere
+model-plays-everywhere-title = Play every animation with this skeleton on { $name }, in their thumbnails too
+model-plays-everywhere-done = Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again.
+model-plays-everywhere-failed = Couldn't change the character they play on: { $error }
 model-rest-pose = Rest pose
 model-close-title = Close (Esc)
 model-full-screen = Full screen

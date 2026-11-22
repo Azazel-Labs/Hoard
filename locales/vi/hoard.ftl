@@ -39,6 +39,7 @@ error-not-a-hash = không phải mã băm blake3 dạng hex
 error-merge-into-tag = into phải là một thẻ
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" không phải là thẻ
+error-not-a-character = chỉ nhân vật mới có thể là nơi phát hoạt ảnh của bộ xương
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } đã nằm dưới { $tag }, nên { $tag } không thể đặt dưới nó
 error-nothing-to-merge = không có gì để gộp
@@ -1945,6 +1946,10 @@ model-play = Phát
 model-animation-clip = Đoạn hoạt ảnh
 model-animation = Hoạt ảnh
 model-plays-on = Phát trên
+model-plays-everywhere = Dùng ở mọi nơi
+model-plays-everywhere-title = Phát mọi hoạt ảnh của bộ xương này trên { $name }, cả trong hình thu nhỏ
+model-plays-everywhere-done = Hoạt ảnh của bộ xương này giờ phát trên { $name }. Hình thu nhỏ của chúng đang được vẽ lại.
+model-plays-everywhere-failed = Không thể đổi nhân vật dùng để phát: { $error }
 model-rest-pose = Tư thế nghỉ
 model-close-title = Đóng (Esc)
 model-full-screen = Toàn màn hình

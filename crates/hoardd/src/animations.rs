@@ -8,6 +8,7 @@
 //! animation fits every character with its skeleton ([`fits_for`]): a Mixamo clip every Mixamo character.
 
 use std::borrow::Borrow;
+use std::cmp::Reverse;
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
@@ -265,8 +266,16 @@ fn fits_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<(Vec<Fit>, u
 }
 
 /// The animations that fit a character, or the characters an animation fits (see [`fits_of`]), with how many in
-/// all. The library's skeletons are read once and kept until a rig or a model's kind changes.
+/// all.
 pub(crate) async fn fits_for(state: &AppState, id: String) -> Result<(Vec<Fit>, usize)> {
+    with_skeletons(state, move |c, all| fits_of(c, all, &id)).await
+}
+
+/// Run `f` with the library's skeletons, read once and kept until a rig or a model's kind changes.
+async fn with_skeletons<T: Send + 'static>(
+    state: &AppState,
+    f: impl FnOnce(&Connection, &[Skeleton]) -> Result<T> + Send + 'static,
+) -> Result<T> {
     let kept = {
         let guard = state.skeletons.0.lock().unwrap_or_else(PoisonError::into_inner);
         guard.as_ref().filter(|(rev, _)| *rev == REVISION.load(Ordering::Acquire)).map(|(_, s)| Arc::clone(s))
@@ -281,9 +290,155 @@ pub(crate) async fn fits_for(state: &AppState, id: String) -> Result<(Vec<Fit>, 
             *st.skeletons.0.lock().unwrap_or_else(PoisonError::into_inner) = Some((rev, Arc::clone(&all)));
             all
         };
-        fits_of(c, &all, &id)
+        f(c, &all)
     })
     .await
+}
+
+/// Which skeleton a character has, as characters share one: its bones with names of their own (Mixamo's, Kenney's),
+/// in any pack. One named only in defaults (`Bone.001`), or with too few names to tell, is its pack's own.
+fn skeleton_key(s: &Skeleton) -> String {
+    let named: Vec<&str> = s.bones.iter().map(String::as_str).filter(|b| !generic(b)).collect();
+    let text = if named.len() >= ACROSS_PACKS {
+        named.join("\n")
+    } else {
+        format!("{}\n{}", s.pack_id, s.bones.iter().map(String::as_str).collect::<Vec<_>>().join("\n"))
+    };
+    blake3::hash(text.as_bytes()).to_hex()[..32].to_owned()
+}
+
+/// The character an animation plays on wherever it's shown (its thumbnails, the viewer, a download with its
+/// character): its skeleton's character. Its skeleton is that of the character it was made for (the file of takes
+/// it's one of, or the first its pack ships it for), or else of the first that fits it. `None` for a model, or an
+/// animation that fits no character.
+pub(crate) async fn plays_on(state: &AppState, id: String) -> Result<Option<Fit>> {
+    with_skeletons(state, move |c, all| {
+        let Some(body) = body_of(c, all, &id)? else { return Ok(None) };
+        fit_of(c, all, &body)
+    })
+    .await
+}
+
+/// For a character: whether it's the one its skeleton's animations play on.
+pub(crate) async fn plays_its_skeleton(state: &AppState, id: String) -> Result<bool> {
+    with_skeletons(state, move |c, all| {
+        let Some(me) = all.iter().find(|s| s.id == id && !s.animation) else { return Ok(false) };
+        Ok(skeleton_body(c, all, &skeleton_key(me))?.as_deref() == Some(id.as_str()))
+    })
+    .await
+}
+
+/// Make character `id` the one its skeleton's animations play on. Answers with the animations drawn on another
+/// character of that skeleton, whose thumbnails are now out of date; `None` when `id` isn't a character.
+pub(crate) async fn choose_body(state: &AppState, id: String) -> Result<Option<Vec<String>>> {
+    with_skeletons(state, move |c, all| {
+        let Some(me) = all.iter().find(|s| s.id == id && !s.animation) else { return Ok(None) };
+        let key = skeleton_key(me);
+        c.execute(
+            "INSERT INTO skeleton_bodies (skeleton, asset_id, chosen_at) VALUES (?1, ?2, ?3)
+             ON CONFLICT (skeleton) DO UPDATE SET asset_id = excluded.asset_id, chosen_at = excluded.chosen_at",
+            params![key, id, db::now()],
+        )?;
+        let others: Vec<&str> = all
+            .iter()
+            .filter(|s| !s.animation && s.id != id && skeleton_key(s) == key)
+            .map(|s| s.id.as_str())
+            .collect();
+        let mut stmt = c.prepare("SELECT asset_id FROM drawn_on WHERE body_id = ?1")?;
+        let mut drawn = Vec::new();
+        for o in others {
+            drawn.extend(stmt.query_map([o], |r| r.get::<_, String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?);
+        }
+        Ok(Some(drawn))
+    })
+    .await
+}
+
+/// The character animation `id` plays on (see [`plays_on`]).
+fn body_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<Option<String>> {
+    if !all.iter().any(|s| s.id == id && s.animation) {
+        return Ok(None);
+    }
+    let character = |id: &str| all.iter().find(|s| s.id == id && !s.animation);
+    let me = all.iter().find(|s| s.id == id).map(|s| s.take_of.as_deref());
+    // The file of takes it's one of, when that's a character; then those its pack ships it for; then any that fits.
+    let mut made_for = me.flatten().and_then(character);
+    if made_for.is_none() {
+        let linked: Vec<String> = conn
+            .prepare(
+                "SELECT l.from_id FROM asset_links l JOIN assets m ON m.id = l.from_id
+                  WHERE l.to_id = ?1 AND l.rel = 'animation' AND m.archived_at IS NULL ORDER BY m.path",
+            )?
+            .query_map([id], |r| r.get(0))?
+            .collect::<rusqlite::Result<_>>()?;
+        made_for = linked.iter().find_map(|l| character(l));
+    }
+    if made_for.is_none() {
+        made_for = fits_of(conn, all, id)?.0.first().and_then(|f| character(&f.id));
+    }
+    let Some(made_for) = made_for else { return Ok(None) };
+    Ok(skeleton_body(conn, all, &skeleton_key(made_for))?.or_else(|| Some(made_for.id.clone())))
+}
+
+/// The character skeleton `key`'s animations play on: the one chosen for it, while it's still a character with that
+/// skeleton and isn't archived; or else the best dressed (wearing a texture or material), then the one its pack ships the most clips
+/// for (its main character), then by pack and path. Archived ones and another format's copy of one are left out.
+fn skeleton_body(conn: &Connection, all: &[Skeleton], key: &str) -> Result<Option<String>> {
+    type Score<'a> = (bool, i64, Reverse<&'a str>, Reverse<String>);
+    let members = all.iter().filter(|s| !s.animation && skeleton_key(s) == key);
+    let chosen: Option<String> =
+        conn.query_row("SELECT asset_id FROM skeleton_bodies WHERE skeleton = ?1", [key], |r| r.get(0)).optional()?;
+    let mut stmt = conn.prepare(
+        "SELECT a.path,
+                EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = a.id AND l.rel IN ('texture', 'material', 'guess')),
+                (SELECT count(*) FROM asset_links l WHERE l.from_id = a.id AND l.rel = 'animation')
+           FROM assets a JOIN packs p ON p.id = a.pack_id
+          WHERE a.id = ?1 AND a.archived_at IS NULL AND p.archived_at IS NULL
+            AND NOT EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id AND l.rel = 'format')",
+    )?;
+    let mut best: Option<(Score, &str)> = None;
+    for m in members {
+        let Some((path, dressed, clips)) = stmt
+            .query_row([&m.id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, bool>(1)?, r.get::<_, i64>(2)?)))
+            .optional()?
+        else {
+            continue;
+        };
+        if chosen.as_deref() == Some(m.id.as_str()) {
+            return Ok(chosen);
+        }
+        let score = (dressed, clips, Reverse(m.pack_id.as_str()), Reverse(path));
+        if best.as_ref().is_none_or(|(b, _)| score > *b) {
+            best = Some((score, m.id.as_str()));
+        }
+    }
+    Ok(best.map(|(_, id)| id.to_owned()))
+}
+
+/// A character as a [`Fit`], for showing it: `None` when it's archived or gone.
+fn fit_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<Option<Fit>> {
+    let Some(s) = all.iter().find(|s| s.id == id) else { return Ok(None) };
+    Ok(conn
+        .query_row(
+            "SELECT a.name, a.path, a.pack_id, p.name, a.kind, a.thumb_hash IS NOT NULL, substr(a.thumb_hash, 1, 12)
+               FROM assets a JOIN packs p ON p.id = a.pack_id
+              WHERE a.id = ?1 AND a.archived_at IS NULL AND p.archived_at IS NULL",
+            [id],
+            |r| {
+                Ok(Fit {
+                    id: s.id.clone(),
+                    name: r.get(0)?,
+                    path: r.get(1)?,
+                    pack_id: r.get(2)?,
+                    pack_name: r.get(3)?,
+                    kind: AssetKind::parse(&r.get::<_, String>(4)?).unwrap_or(AssetKind::Model),
+                    has_thumb: r.get(5)?,
+                    thumb_rev: r.get(6)?,
+                    secs: None,
+                })
+            },
+        )
+        .optional()?)
 }
 
 /// A name as clip and file names are compared: letters and digits, lowercase (`Run`, `run`, `crouch-idle`).
@@ -746,5 +901,27 @@ mod tests {
 
         c.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
         assert_eq!(fits("run"), ["knight"]);
+        c.execute("UPDATE packs SET archived_at = NULL WHERE id = 'p'", []).unwrap();
+
+        // Every animation of a skeleton plays on one character, in any pack: the one its pack ships the most clips
+        // for (the GLB is only another format of it), until another is dressed or chosen.
+        let body = |id: &str| body_of(&c, &all, id).unwrap();
+        let key = skeleton_key(all.iter().find(|s| s.id == "hero").unwrap());
+        assert_eq!(key, skeleton_key(all.iter().find(|s| s.id == "knight").unwrap()), "the same bones, named alike");
+        assert_ne!(key, skeleton_key(all.iter().find(|s| s.id == "robot").unwrap()));
+        for id in ["wave", "nod", "run", "shrug"] {
+            assert_eq!(body(id).as_deref(), Some("hero"), "{id}");
+        }
+        assert_eq!(body("beep"), None, "it fits no character");
+        assert_eq!(body("hero"), None, "a character plays its own clips");
+        c.execute("INSERT INTO asset_links (from_id, to_id, rel) VALUES ('knight', 'robot', 'texture')", []).unwrap();
+        assert_eq!(body("wave").as_deref(), Some("knight"), "wearing a texture beats shipping more clips");
+        c.execute("INSERT INTO skeleton_bodies (skeleton, asset_id, chosen_at) VALUES (?1, 'hero', 'x')", [&key])
+            .unwrap();
+        assert_eq!(body("run").as_deref(), Some("hero"), "the one chosen");
+        let shown = fit_of(&c, &all, "hero").unwrap().unwrap();
+        assert_eq!((shown.name.as_str(), shown.pack_name.as_str()), ("hero", "Heroes"));
+        c.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
+        assert_eq!(body("run").as_deref(), Some("knight"), "the one chosen is archived");
     }
 }

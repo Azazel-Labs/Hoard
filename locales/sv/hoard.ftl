@@ -39,6 +39,7 @@ error-not-a-hash = inte en blake3-hash i hex
 error-merge-into-tag = into måste vara en tagg
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" är inte en tagg
+error-not-a-character = bara en figur kan vara den som skelettets animationer spelas på
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } ligger redan under { $tag }, så { $tag } kan inte läggas under den
 error-nothing-to-merge = inget att slå ihop
@@ -2157,6 +2158,10 @@ model-play = Spela upp
 model-animation-clip = Animationsklipp
 model-animation = Animation
 model-plays-on = Spelas på
+model-plays-everywhere = Använd överallt
+model-plays-everywhere-title = Spela alla animationer med det här skelettet på { $name }, även i miniatyrerna
+model-plays-everywhere-done = Animationer med det här skelettet spelas nu på { $name }. Deras miniatyrer ritas om.
+model-plays-everywhere-failed = Kunde inte byta figuren de spelas på: { $error }
 model-rest-pose = Vilopose
 model-close-title = Stäng (Esc)
 model-full-screen = Helskärm

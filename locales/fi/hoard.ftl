@@ -39,6 +39,7 @@ error-not-a-hash = ei ole blake3-heksatiiviste
 error-merge-into-tag = into-kohteen on oltava tunniste
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" ei ole tunniste
+error-not-a-character = vain hahmo voi olla se, jolla sen luurangon animaatiot toistetaan
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } on jo tunnisteen { $tag } alla, joten { $tag } ei voi mennä sen alle
 error-nothing-to-merge = ei yhdistettävää
@@ -2211,6 +2212,10 @@ model-play = Toista
 model-animation-clip = Animaatioleike
 model-animation = Animaatio
 model-plays-on = Toista hahmolla
+model-plays-everywhere = Käytä kaikkialla
+model-plays-everywhere-title = Toista kaikki tämän luurangon animaatiot hahmolla { $name }, myös pikkukuvissa
+model-plays-everywhere-done = Tämän luurangon animaatiot toistetaan nyt hahmolla { $name }. Niiden pikkukuvat piirretään uudelleen.
+model-plays-everywhere-failed = Hahmoa, jolla ne toistetaan, ei voitu vaihtaa: { $error }
 model-rest-pose = Lepoasento
 model-close-title = Sulje (Esc)
 model-full-screen = Koko näyttö

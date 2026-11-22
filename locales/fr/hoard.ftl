@@ -39,6 +39,7 @@ error-not-a-hash = ce n’est pas un hachage blake3 en hexadécimal
 error-merge-into-tag = into doit être une étiquette
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = « { $text } » n'est pas une étiquette
+error-not-a-character = seul un personnage peut être celui sur lequel sont jouées les animations de son squelette
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } est déjà sous { $tag }, donc { $tag } ne peut pas passer dessous
 error-nothing-to-merge = rien à fusionner
@@ -2184,6 +2185,10 @@ model-play = Lecture
 model-animation-clip = Clip d’animation
 model-animation = Animation
 model-plays-on = Jouée sur
+model-plays-everywhere = Utiliser partout
+model-plays-everywhere-title = Jouer chaque animation de ce squelette sur { $name }, y compris dans leurs miniatures
+model-plays-everywhere-done = Les animations de ce squelette sont désormais jouées sur { $name }. Leurs miniatures sont en cours de redessin.
+model-plays-everywhere-failed = Impossible de changer le personnage sur lequel elles sont jouées : { $error }
 model-rest-pose = Pose de repos
 model-close-title = Fermer (Esc)
 model-full-screen = Plein écran

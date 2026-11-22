@@ -39,6 +39,7 @@ error-not-a-hash = geen blake3-hash in hex
 error-merge-into-tag = into moet een tag zijn
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" is geen tag
+error-not-a-character = alleen een personage kan het personage zijn waarop de animaties van zijn skelet afspelen
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } staat al onder { $tag }, dus { $tag } kan er niet onder
 error-nothing-to-merge = niets om samen te voegen
@@ -2154,6 +2155,10 @@ model-play = Afspelen
 model-animation-clip = Animatieclip
 model-animation = Animatie
 model-plays-on = Afspelen op
+model-plays-everywhere = Overal gebruiken
+model-plays-everywhere-title = Elke animatie met dit skelet afspelen op { $name }, ook in de miniaturen
+model-plays-everywhere-done = Animaties met dit skelet spelen nu af op { $name }. Hun miniaturen worden opnieuw getekend.
+model-plays-everywhere-failed = Kan het personage waarop ze afspelen niet wijzigen: { $error }
 model-rest-pose = Rustpose
 model-close-title = Sluiten (Esc)
 model-full-screen = Volledig scherm

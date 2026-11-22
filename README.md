@@ -548,10 +548,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    copy of a character gets the copies of the clips beside it; so does `Model@Clip.fbx`. Across the library, a
    character's details list the "Animations that fit" it and an animation's the "Characters it fits": those with its
    skeleton (at least ten of the bones it moves, named the same once `mixamorig:` or `Armature|` is off, and not just
-   Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. An animation
-   plays in the 3D viewer on a character it fits, Plays on picking any other of them. Its thumbnail is drawn halfway
-   through the clip, on that character when it has no mesh of its own, and its tile shows its length. A character's
-   viewer plays its own clips and, under "Animations that fit", any of those, each fetched when picked. An animation's zip can take its character along ("Include the character":
+   Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. Every animation
+   with the same skeleton plays on the same character, in its thumbnail, the 3D viewer and a zip with its character:
+   the one Hoard picks for that skeleton (one wearing its textures, then its pack's main character), or the one an
+   editor picks in the viewer with Plays on → Use everywhere, which draws their thumbnails again. Plays on also shows
+   it on any other character it fits. Its thumbnail is drawn halfway through the clip, and its tile shows its
+   length. A character's viewer plays its own clips and, under "Animations that fit", any of those, each fetched when picked. An animation's zip can take its character along ("Include the character":
    one from another pack goes in a folder named for it), and it downloads as "Clip only, no mesh (GLB)", its skeleton
    and clips without the mesh it was saved on. A clip whose root travels (a walk, a run) plays with the character held
    in the frame over a ground grid that scrolls the other way, so it looks different from one made to play in place,

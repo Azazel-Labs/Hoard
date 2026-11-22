@@ -130,10 +130,35 @@ pub(super) async fn get_asset(State(state): State<AppState>, Path(id): Path<Stri
         o.kept_until = crate::reformat::kept_until(o, state.settings.get().conversion_rules.keep_days);
     }
     asset.near_copies = crate::nearcopies::for_asset(&state, id.clone()).await?;
-    let (fits, total) = crate::animations::fits_for(&state, id).await?;
+    let (fits, total) = crate::animations::fits_for(&state, id.clone()).await?;
     asset.fits_total = (total > fits.len()).then_some(total as u64);
     asset.fits = fits;
+    match asset.kind {
+        hoard_core::AssetKind::Animation => asset.plays_on = crate::animations::plays_on(&state, id).await?,
+        hoard_core::AssetKind::Model => {
+            asset.plays_its_skeleton = crate::animations::plays_its_skeleton(&state, id).await?;
+        }
+        _ => {}
+    }
     Ok(Json(asset))
+}
+
+/// `PUT /api/assets/{id}/skeleton-body`: make this character the one its skeleton's animations play on, everywhere
+/// they're shown, and draw again those drawn on another.
+pub(super) async fn choose_skeleton_body(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<StatusCode> {
+    let redo = crate::animations::choose_body(&state, id.clone())
+        .await?
+        .ok_or_else(|| AppError::bad_request(tr!("error-not-a-character")))?;
+    let st = std::sync::Arc::clone(&state);
+    tokio::spawn(async move {
+        if let Err(e) = crate::motion::redraw(&st, redo).await {
+            tracing::warn!(error = %format!("{e:#}"), "couldn't draw animations again on their skeleton's character");
+        }
+    });
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[derive(Deserialize)]

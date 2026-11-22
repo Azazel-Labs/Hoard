@@ -39,6 +39,7 @@ error-not-a-hash = non è un hash blake3 esadecimale
 error-merge-into-tag = into deve essere un tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" non è un tag
+error-not-a-character = solo un personaggio può essere quello su cui vengono riprodotte le animazioni del suo scheletro
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } è già sotto { $tag }, quindi { $tag } non può andare sotto di esso
 error-nothing-to-merge = niente da unire
@@ -2168,6 +2169,10 @@ model-play = Riproduci
 model-animation-clip = Clip di animazione
 model-animation = Animazione
 model-plays-on = Riprodotta su
+model-plays-everywhere = Usa ovunque
+model-plays-everywhere-title = Riproduci ogni animazione con questo scheletro su { $name }, anche nelle miniature
+model-plays-everywhere-done = Le animazioni con questo scheletro ora vengono riprodotte su { $name }. Le loro miniature vengono ridisegnate.
+model-plays-everywhere-failed = Impossibile cambiare il personaggio su cui vengono riprodotte: { $error }
 model-rest-pose = Posa di riposo
 model-close-title = Chiudi (Esc)
 model-full-screen = Schermo intero

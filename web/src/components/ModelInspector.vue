@@ -11,6 +11,7 @@ import { mayEdit } from '../auth'
 import { formatNumber, t } from '../i18n'
 // Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
 import type { Background, MapMode, ModelStage, SceneStats, StageInfo, ViewMode } from '../modelStage'
+import { mayChoose, playEverywhere, wearerName } from '../skeletonBody'
 
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ close: [] }>()
@@ -339,6 +340,12 @@ function onKey(e: KeyboardEvent) {
             <option v-for="w in info.wearers" :key="w.id" :value="w.id">{{ w.name }}</option>
           </select>
         </label>
+          <button
+            v-if="mayChoose && info.playsOn && info.on !== info.playsOn"
+            type="button"
+            :title="t('model-plays-everywhere-title', { name: wearerName(info) })"
+            @click="void playEverywhere(info)"
+          >{{ t('model-plays-everywhere') }}</button>
       </div>
       <button type="button" class="close" :aria-label="t('model-close-title')" :title="t('model-close-title')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>

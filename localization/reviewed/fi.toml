@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "19af1556db5b772a542174850d260c29dc1e0f9f92eb519c88ebd9c71e8bbcca"
 
 [messages.about-blender]
@@ -4776,6 +4776,10 @@ translation = "Palvelimella ei ole SoundFontia polussa { $path }"
 source = "There's no SoundFont at { $path }"
 translation = "Polussa { $path } ei ole SoundFontia"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "vain hahmo voi olla se, jolla sen luurangon animaatiot toistetaan"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ei ole blake3-heksatiiviste"
@@ -7781,6 +7785,22 @@ translation = "Toista"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Toista (välilyönti)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Käytä kaikkialla"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Tämän luurangon animaatiot toistetaan nyt hahmolla { $name }. Niiden pikkukuvat piirretään uudelleen."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Hahmoa, jolla ne toistetaan, ei voitu vaihtaa: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Toista kaikki tämän luurangon animaatiot hahmolla { $name }, myös pikkukuvissa"
 
 [messages.model-plays-on]
 source = "Plays on"

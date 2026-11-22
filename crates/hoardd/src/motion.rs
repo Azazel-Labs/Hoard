@@ -3,8 +3,9 @@
 //! animation's tile plays it when pointed at, a few seconds of the character moving as an animated WebP (its `motion`
 //! derivative), off until turned on in Settings → Thumbnails, as each takes room and a few seconds of rendering.
 //!
-//! A clip shipped without a mesh (`run.fbx`) is played on a character it fits (the first its pack ships it for, or
-//! else the first with its skeleton in any pack): its keys are copied onto that character's bones, matched by name.
+//! Every clip is played on its skeleton's character (see `animations::plays_on`), the one the viewer plays it on too,
+//! so a grid of a skeleton's clips is one character moving many ways: its keys are copied onto that character's
+//! bones, matched by name. A clip that moves none of them is played on its own mesh, when it has one.
 //! The character is posed at each frame by polysmelt and drawn by the thumbnail renderer in a tiled room scaled to it.
 //! A clip that stays put is drawn from one camera, so the character moves and the room holds still. One that travels
 //! (a fall, a run that goes somewhere) is followed, so the character stays big and the tiles stream past.
@@ -101,6 +102,37 @@ pub(crate) async fn remove_all(state: &AppState) -> Result<()> {
     .await?;
     let (count, bytes) = crate::jobs::delete_unused(state, blobs).await?;
     tracing::info!(count, freed = %crate::maintenance::human_bytes(bytes), "removed motion thumbnails");
+    Ok(())
+}
+
+/// Draw these animations again (another character was chosen for their skeleton): forget their thumbnails, deleting
+/// the files nothing else shows, and go round.
+pub(crate) async fn redraw(state: &AppState, ids: Vec<String>) -> Result<()> {
+    if ids.is_empty() {
+        return Ok(());
+    }
+    let blobs = db::call(&state.pool, move |c| {
+        let tx = c.transaction()?;
+        let mut blobs = Vec::new();
+        for id in &ids {
+            let mut stmt = tx.prepare(
+                "SELECT d.blob_hash, b.size FROM derivatives d JOIN blobs b ON b.hash = d.blob_hash
+                 WHERE d.asset_id = ?1 AND d.kind IN ('motion', 'still')",
+            )?;
+            blobs.extend(
+                stmt.query_map([id], |r| Ok((r.get(0)?, r.get(1)?)))?
+                    .collect::<rusqlite::Result<Vec<(String, i64)>>>()?,
+            );
+            drop(stmt);
+            tx.execute("DELETE FROM derivatives WHERE asset_id = ?1 AND kind IN ('motion', 'still')", [id])?;
+        }
+        tx.commit()?;
+        Ok(blobs)
+    })
+    .await?;
+    crate::jobs::delete_unused(state, blobs).await?;
+    FAILED.lock().unwrap_or_else(PoisonError::into_inner).clear();
+    kick(state);
     Ok(())
 }
 
@@ -223,22 +255,9 @@ pub(crate) async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Loc
 /// Draw one animation: its still from the middle of the clip, which becomes its thumbnail (unless a browser drew
 /// one), and its motion thumbnail when `motion`, at `fps` frames a second.
 async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> {
-    let (id, pack) = (t.id.clone(), t.pack_id.clone());
-    let linked = db::call(&state.pool, move |c| {
-        Ok(c.query_row(
-            "SELECT l.from_id, m.pack_id FROM asset_links l JOIN assets m ON m.id = l.from_id
-             WHERE l.to_id = ?1 AND l.rel = 'animation' ORDER BY m.path LIMIT 1",
-            [&id],
-            |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)),
-        )
-        .optional()?)
-    })
-    .await?;
-    // Its pack's character for it, or else the first with its skeleton, as its details play it on.
-    let body = match linked {
-        Some(b) => Some(b),
-        None => crate::animations::fits_for(state, t.id.clone()).await?.0.into_iter().next().map(|f| (f.id, f.pack_id)),
-    };
+    let pack = t.pack_id.clone();
+    // Its skeleton's character, as everywhere else shows it.
+    let body = crate::animations::plays_on(state, t.id.clone()).await?.map(|f| (f.id, f.pack_id));
     let (id, b) = (t.id.clone(), body.clone());
     let facings = db::call(&state.pool, move |c| {
         let clip_facing = db::asset_facing(c, &id, &pack)?;
@@ -252,12 +271,13 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
     let work = state.cfg.tmp_dir().join(format!("motion-{}", uuid::Uuid::now_v7()));
     let result = async {
         let clip = fetch(state, &t.id, &work.join("clip")).await?;
-        let body = match &body {
+        let local = match &body {
             Some((b, _)) => Some(fetch(state, b, &work.join("body")).await?),
             None => None,
         };
-        let (webp, still) =
-            crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings, motion.then_some(fps))).await??;
+        let (webp, still, on_body) =
+            crate::heavy::run("motion", move || draw(&clip, local.as_ref(), facings, motion.then_some(fps))).await??;
+        let drawn_on = body.filter(|_| on_body).map(|(b, _)| b);
         let motion = match webp {
             Some(webp) => Some(state.blobs.put_cache_bytes(webp).await?),
             None => None,
@@ -291,6 +311,14 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
                 )
                 .optional()?;
             tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL", params![id, still.hash])?;
+            match &drawn_on {
+                Some(b) => tx.execute(
+                    "INSERT INTO drawn_on (asset_id, body_id) VALUES (?1, ?2)
+                     ON CONFLICT (asset_id) DO UPDATE SET body_id = excluded.body_id",
+                    params![id, b],
+                )?,
+                None => tx.execute("DELETE FROM drawn_on WHERE asset_id = ?1", [&id])?,
+            };
             tx.commit()?;
             Ok(old)
         })
@@ -305,23 +333,30 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
     result
 }
 
-/// The clip drawn: its middle as a still thumbnail, and when `motion` all its frames as an animated WebP.
+/// The clip drawn: its middle as a still thumbnail, and when `motion` all its frames as an animated WebP; and whether
+/// it was drawn on `body` (its skeleton's character), which it is whenever it moves that character's bones, so every
+/// clip of a skeleton is drawn on the same one. Otherwise it's drawn on its own mesh, when it has one.
 /// `facings` turn the clip's own mesh and the character's: each its own way (see [`db::asset_facing`]).
 fn draw(
     clip: &Local,
     body: Option<&Local>,
     facings: (Facing, Facing),
     motion: Option<u32>,
-) -> Result<(Option<Vec<u8>>, Vec<u8>)> {
+) -> Result<(Option<Vec<u8>>, Vec<u8>, bool)> {
     let from = crate::meshes::posable(&clip.path, &clip.ext, &clip.root)?;
     let (index, secs) = take(&from.json).context("it has no clip to play")?;
-    let (mut doc, index, facing) = if from.counts().triangles > 0 {
-        (from, index, facings.0)
-    } else {
-        let body = body.ok_or(NoCharacter)?;
-        let mut doc = crate::meshes::posable(&body.path, &body.ext, &body.root)?;
-        let index = transplant(&from, index, &mut doc)?.context("it moves none of the character's bones")?;
-        (doc, index, facings.1)
+    let worn = match body {
+        Some(body) => {
+            let mut doc = crate::meshes::posable(&body.path, &body.ext, &body.root)?;
+            transplant(&from, index, &mut doc)?.map(|i| (doc, i))
+        }
+        None => None,
+    };
+    let (mut doc, index, facing, on_body) = match worn {
+        Some((doc, i)) => (doc, i, facings.1, true),
+        None if from.counts().triangles > 0 => (from, index, facings.0, false),
+        None if body.is_some() => return Err(anyhow!("it moves none of the character's bones")),
+        None => return Err(NoCharacter.into()),
     };
     crate::meshes::turn(&mut doc.json, facing);
     let fps = f64::from(motion.unwrap_or(crate::settings::DEFAULT_MOTION_FPS));
@@ -338,7 +373,7 @@ fn draw(
     drop(guard);
     let still = drawn.get(drawn.len() / 2).context("no frames")?.clone();
     let webp = if motion.is_some() { Some(encode(&drawn, ms)?) } else { None };
-    Ok((webp, crate::analyze::thumb_bytes(still, false)?))
+    Ok((webp, crate::analyze::thumb_bytes(still, false)?, on_body))
 }
 
 /// The clip a motion thumbnail plays, as its index and length: a document's first that isn't a pose.

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "9b9cdb0c0c213f51025310f204d8fd86748602acc18d04be07e8b2b164492a1d"
 
 [messages.about-blender]
@@ -4623,6 +4623,10 @@ translation = "ไม่มี SoundFont ที่ { $path } บนเซิร�
 source = "There's no SoundFont at { $path }"
 translation = "ไม่มี SoundFont ที่ { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "แอนิเมชันของโครงกระดูกเล่นได้บนตัวละครเท่านั้น"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ไม่ใช่แฮช blake3 แบบเลขฐานสิบหก"
@@ -7576,6 +7580,22 @@ translation = "เล่น"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "เล่น (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "ใช้ทุกที่"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "แอนิเมชันของโครงกระดูกนี้เล่นบน { $name } แล้ว กำลังวาดภาพขนาดย่อใหม่"
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "เปลี่ยนตัวละครที่ใช้เล่นไม่ได้: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "เล่นทุกแอนิเมชันของโครงกระดูกนี้บน { $name } รวมถึงในภาพขนาดย่อด้วย"
 
 [messages.model-plays-on]
 source = "Plays on"

@@ -65,6 +65,9 @@ export interface StageInfo {
    *  none. One from another pack (`away`) is named with its pack. */
   wearers: { id: string; name: string; away?: boolean }[]
   on: string
+  /** For an animation: the character its skeleton's animations play on everywhere (thumbnails too), first of
+   *  `wearers`; or none. */
+  playsOn: string
   /** For a character: the animations across the library that fit it and aren't among `clips`, each a clip name for
    *  `playClip` that loads it when first picked. One from another pack is named with its pack. */
   fitting: { clip: string; name: string }[]
@@ -232,24 +235,25 @@ export class ModelStage {
     // path, or point at a PSD where the pack ships a PNG.
     let { named, guesses, full } = await textureLinks(asset)
     // An animation plays on a character it fits: the character is what's drawn, and only the animation's clips play.
-    // Those its pack ships it for come first, then any other with its skeleton, in any pack.
+    // Its skeleton's character comes first, as its thumbnail plays it on that one; then those its pack ships it for,
+    // then any other with its skeleton, in any pack.
     let clipLinks = full.links.filter((l) => l.rel === 'animation')
     this.animation = full.kind === 'animation'
     // A take of a file of many plays on that file, the character it was made for, when it has a mesh to draw.
     const takeOf = typeof full.meta?.take_of === 'string' ? full.meta.take_of : ''
     const source = takeOf ? await api.asset(takeOf).catch(() => null) : null
     if (this.disposed) throw new Error('closed')
+    const plays = full.kind === 'animation' ? full.plays_on ?? null : null
+    const asWearer = (f: { id: string; name: string; pack_id: string; pack_name: string }) =>
+      f.pack_id === full.pack_id ? { id: f.id, name: f.name } : { id: f.id, name: `${f.name} · ${f.pack_name}`, away: true }
     const wearers =
       full.kind === 'animation'
         ? [
+            ...(plays ? [asWearer(plays)] : []),
             ...(source?.kind === 'model' ? [{ id: source.id, name: source.name }] : []),
             ...full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model' && l.id !== takeOf),
-            ...(full.fits ?? [])
-              .filter((f) => f.id !== takeOf)
-              .map((f) =>
-                f.pack_id === full.pack_id ? { id: f.id, name: f.name } : { id: f.id, name: `${f.name} · ${f.pack_name}`, away: true },
-              ),
-          ]
+            ...(full.fits ?? []).filter((f) => f.id !== takeOf).map(asWearer),
+          ].filter((w, i, all) => all.findIndex((o) => o.id === w.id) === i)
         : []
     // A character plays its own clips, and any animation that fits it once picked.
     const fitting =
@@ -477,6 +481,7 @@ export class ModelStage {
       facing: { ...this.facing },
       wearers,
       on: body ? body.id : '',
+      playsOn: plays?.id ?? '',
       fitting: fitting.map(({ clip, name }) => ({ clip, name })),
     }
   }

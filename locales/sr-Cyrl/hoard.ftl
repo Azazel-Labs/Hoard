@@ -39,6 +39,7 @@ error-not-a-hash = ово није blake3 хеш у хексадецимално
 error-merge-into-tag = into мора бити ознака
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }“ није ознака
+error-not-a-character = анимације скелета могу да се пуштају само на лику
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } је већ испод { $tag }, па { $tag } не може испод ње
 error-nothing-to-merge = нема шта да се споји
@@ -2252,6 +2253,10 @@ model-play = Пусти
 model-animation-clip = Анимациони клип
 model-animation = Анимација
 model-plays-on = Пусти на
+model-plays-everywhere = Користи свуда
+model-plays-everywhere-title = Пуштај сваку анимацију са овим скелетом на лику { $name }, и у сличицама
+model-plays-everywhere-done = Анимације са овим скелетом се сада пуштају на лику { $name }. Њихове сличице се поново цртају.
+model-plays-everywhere-failed = Није могуће променити лик на ком се пуштају: { $error }
 model-rest-pose = Поза мировања
 model-close-title = Затвори (Esc)
 model-full-screen = Цео екран

@@ -39,6 +39,7 @@ error-not-a-hash = bukan hash hex blake3
 error-merge-into-tag = into harus berupa tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" bukan tag
+error-not-a-character = hanya karakter yang dapat menjadi tempat animasi kerangkanya diputar
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } sudah ada di bawah { $tag }, jadi { $tag } tidak bisa ditaruh di bawahnya
 error-nothing-to-merge = tidak ada yang perlu digabungkan
@@ -1977,6 +1978,10 @@ model-play = Putar
 model-animation-clip = Klip animasi
 model-animation = Animasi
 model-plays-on = Diputar pada
+model-plays-everywhere = Pakai di mana-mana
+model-plays-everywhere-title = Putar setiap animasi dengan kerangka ini pada { $name }, termasuk di gambar mininya
+model-plays-everywhere-done = Animasi dengan kerangka ini sekarang diputar pada { $name }. Gambar mininya sedang digambar ulang.
+model-plays-everywhere-failed = Tidak dapat mengganti karakter tempat animasi diputar: { $error }
 model-rest-pose = Pose diam
 model-close-title = Tutup (Esc)
 model-full-screen = Layar penuh

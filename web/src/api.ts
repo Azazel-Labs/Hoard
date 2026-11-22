@@ -164,6 +164,8 @@ export const api = {
   assetSite: (id: string) => request<{ url: string; expires: number }>(`/api/assets/${id}/site`),
   /** What's been changed on it, the latest first. */
   history: (id: string) => request<Change[]>(`/api/assets/${id}/history`),
+  /** Make this character the one its skeleton's animations play on, everywhere they're shown. */
+  chooseSkeletonBody: (id: string) => request<void>(`/api/assets/${id}/skeleton-body`, { method: 'PUT' }),
   /** Put back what one change changed. */
   revertChange: (id: string, change: number) =>
     post<Asset>(`/api/assets/${id}/history/${change}/revert`, {}).then(normalize),

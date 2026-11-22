@@ -39,6 +39,7 @@ error-not-a-hash = ไม่ใช่แฮช blake3 แบบเลขฐา�
 error-merge-into-tag = into ต้องเป็นแท็ก
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" ไม่ใช่แท็ก
+error-not-a-character = แอนิเมชันของโครงกระดูกเล่นได้บนตัวละครเท่านั้น
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } อยู่ใต้ { $tag } อยู่แล้ว จึงใส่ { $tag } ไว้ใต้แท็กนั้นไม่ได้
 error-nothing-to-merge = ไม่มีอะไรให้รวม
@@ -1945,6 +1946,10 @@ model-play = เล่น
 model-animation-clip = คลิปแอนิเมชัน
 model-animation = แอนิเมชัน
 model-plays-on = เล่นบนตัวละคร
+model-plays-everywhere = ใช้ทุกที่
+model-plays-everywhere-title = เล่นทุกแอนิเมชันของโครงกระดูกนี้บน { $name } รวมถึงในภาพขนาดย่อด้วย
+model-plays-everywhere-done = แอนิเมชันของโครงกระดูกนี้เล่นบน { $name } แล้ว กำลังวาดภาพขนาดย่อใหม่
+model-plays-everywhere-failed = เปลี่ยนตัวละครที่ใช้เล่นไม่ได้: { $error }
 model-rest-pose = ท่าพัก
 model-close-title = ปิด (Esc)
 model-full-screen = เต็มจอ

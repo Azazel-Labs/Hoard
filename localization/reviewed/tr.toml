@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -4661,6 +4661,10 @@ translation = "Sunucuda şu yolda SoundFont yok: { $path }"
 source = "There's no SoundFont at { $path }"
 translation = "Şu yolda SoundFont yok: { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "iskeletin animasyonları yalnızca bir karakter üzerinde oynatılabilir"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "bu bir blake3 onaltılık özeti değil"
@@ -7615,6 +7619,22 @@ translation = "Oynat"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Oynat (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Her yerde kullan"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Bu iskeletin animasyonları artık { $name } üzerinde oynatılıyor. Küçük resimleri yeniden çiziliyor."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Oynatıldıkları karakter değiştirilemedi: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Bu iskeletin tüm animasyonlarını küçük resimleri dahil { $name } üzerinde oynat"
 
 [messages.model-plays-on]
 source = "Plays on"

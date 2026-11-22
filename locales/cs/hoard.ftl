@@ -39,6 +39,7 @@ error-not-a-hash = toto není hexadecimální hash blake3
 error-merge-into-tag = into musí být štítek
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }“ není štítek
+error-not-a-character = animace kostry se mohou přehrávat jen na postavě
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } je už pod { $tag }, takže { $tag } nejde zařadit pod něj
 error-nothing-to-merge = není co sloučit
@@ -2313,6 +2314,10 @@ model-play = Přehrát
 model-animation-clip = Klip animace
 model-animation = Animace
 model-plays-on = Přehrát na
+model-plays-everywhere = Použít všude
+model-plays-everywhere-title = Přehrávat všechny animace s touto kostrou na postavě { $name }, i v jejich náhledech
+model-plays-everywhere-done = Animace s touto kostrou se teď přehrávají na postavě { $name }. Jejich náhledy se kreslí znovu.
+model-plays-everywhere-failed = Postavu, na které se přehrávají, se nepodařilo změnit: { $error }
 model-rest-pose = Klidová póza
 model-close-title = Zavřít (Esc)
 model-full-screen = Celá obrazovka

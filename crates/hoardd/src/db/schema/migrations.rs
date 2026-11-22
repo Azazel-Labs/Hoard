@@ -1101,4 +1101,21 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // 101: what's new in Hoard that each person has seen (see `me`), and whether they want new things pointed out, as
     // JSON, so a new browser doesn't light everything up again.
     "ALTER TABLE users ADD COLUMN news_seen TEXT;",
+    // 102: one character for each skeleton, which its animations play on wherever they're shown (their thumbnails,
+    // the viewer, a download with the character): the one chosen for it here, or else the one Hoard picks (see
+    // `animations::plays_on`). `drawn_on` is the character each animation's thumbnail was drawn on, so choosing
+    // another draws those again. Every animation is drawn again, on its skeleton's character.
+    "CREATE TABLE skeleton_bodies (
+       skeleton   TEXT PRIMARY KEY,
+       asset_id   TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       chosen_at  TEXT NOT NULL
+     );
+     CREATE INDEX skeleton_bodies_asset ON skeleton_bodies (asset_id);
+     CREATE TABLE drawn_on (
+       asset_id TEXT PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
+       body_id  TEXT NOT NULL
+     );
+     CREATE INDEX drawn_on_body ON drawn_on (body_id);
+     DELETE FROM derivatives WHERE kind IN ('motion', 'still')
+       AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
 ];

@@ -131,10 +131,12 @@ const material = computed(() => props.asset.material ?? null)
 const partOf = computed(() => props.asset.materials ?? [])
 const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
 const anims = computed(() => animsOf(props.asset))
-/** For an animation: the character it plays on first (one its pack ships it for, else the first that fits), which
- *  its zip can take along with what that needs. */
+/** For an animation: the character it plays on (its skeleton's, else one its pack ships it for, else the first that
+ *  fits), which its zip can take along with what that needs. */
 const character = computed(() => {
   if (props.asset.kind !== 'animation') return null
+  const plays = props.asset.plays_on
+  if (plays) return { id: plays.id, name: plays.pack_id === props.asset.pack_id ? plays.name : `${plays.name} · ${plays.pack_name}` }
   const own = props.asset.linked_from.find((l) => l.rel === 'animation' && l.kind === 'model')
   if (own) return { id: own.id, name: own.name }
   const fit = props.asset.fits?.find((f) => f.kind === 'model')

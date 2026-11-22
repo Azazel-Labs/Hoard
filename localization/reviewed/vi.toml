@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "3890c90fa88633a6ab70ef57bf24cb23df5f0ca93b1323895034945b5971b327"
 
 [messages.about-blender]
@@ -4620,6 +4620,10 @@ translation = "Không có SoundFont tại { $path } trên máy chủ"
 source = "There's no SoundFont at { $path }"
 translation = "Không có SoundFont tại { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "chỉ nhân vật mới có thể là nơi phát hoạt ảnh của bộ xương"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "không phải mã băm blake3 dạng hex"
@@ -7573,6 +7577,22 @@ translation = "Phát"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Phát (Space)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Dùng ở mọi nơi"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Hoạt ảnh của bộ xương này giờ phát trên { $name }. Hình thu nhỏ của chúng đang được vẽ lại."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Không thể đổi nhân vật dùng để phát: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Phát mọi hoạt ảnh của bộ xương này trên { $name }, cả trong hình thu nhỏ"
 
 [messages.model-plays-on]
 source = "Plays on"

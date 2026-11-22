@@ -39,6 +39,7 @@ error-not-a-hash = 不是 blake3 十六進位雜湊值
 error-merge-into-tag = into 必須是標籤
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = 「{ $text }」不是標籤
+error-not-a-character = 只有角色才能播放其骨架的動畫
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面
 error-nothing-to-merge = 沒有可合併的項目
@@ -1951,6 +1952,10 @@ model-play = 播放
 model-animation-clip = 動畫片段
 model-animation = 動畫
 model-plays-on = 播放於角色
+model-plays-everywhere = 全部使用
+model-plays-everywhere-title = 在 { $name } 上播放此骨架的所有動畫，縮圖也是
+model-plays-everywhere-done = 此骨架的動畫現在在 { $name } 上播放。正在重新繪製它們的縮圖。
+model-plays-everywhere-failed = 無法變更播放它們的角色：{ $error }
 model-rest-pose = 靜止姿勢
 model-close-title = 關閉（Esc）
 model-full-screen = 全螢幕

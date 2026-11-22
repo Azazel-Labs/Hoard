@@ -8,6 +8,7 @@ import type { Asset, ThumbUpload } from '../api'
 import { drawThumb, wantsBrowserThumb } from '../browserThumbs'
 import { t } from '../i18n'
 import type { ModelStage, StageInfo } from '../modelStage'
+import { mayChoose, playEverywhere, wearerName } from '../skeletonBody'
 
 const props = defineProps<{ asset: Asset; paused?: boolean }>()
 const emit = defineEmits<{ expand: []; thumb: [ThumbUpload] }>()
@@ -118,6 +119,13 @@ onBeforeUnmount(teardown)
           <option v-for="w in info.wearers" :key="w.id" :value="w.id">{{ w.name }}</option>
         </select>
       </label>
+        <button
+          v-if="mayChoose && info.playsOn && info.on !== info.playsOn"
+          type="button"
+          class="btn ghost everywhere"
+          :title="t('model-plays-everywhere-title', { name: wearerName(info) })"
+          @click="void playEverywhere(info)"
+        >{{ t('model-plays-everywhere') }}</button>
       <p v-if="missing.length" class="missing" :title="missing.join('\n')">
         {{ missing.length === 1 ? t('model-missing-one', { name: missing[0] }) : t('model-missing-count', { count: missing.length }) }}
       </p>
@@ -149,5 +157,6 @@ onBeforeUnmount(teardown)
   font-size: 0.78rem; color: var(--muted);
 }
 .hud .field { width: auto; padding: 0.2em 0.4em; font-size: 0.78rem; }
+.hud .everywhere { padding: 0.2em 0.55em; font-size: 0.78rem; }
 .missing { flex-basis: 100%; margin: 0; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

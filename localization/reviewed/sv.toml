@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "7df23a6d55c8b7e2671eb75dcb168701d8751d71c86d193212d830c73e16516f"
 
 [messages.about-blender]
@@ -4764,6 +4764,10 @@ translation = "Det finns ingen SoundFont på { $path } på servern"
 source = "There's no SoundFont at { $path }"
 translation = "Det finns ingen SoundFont på { $path }"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "bara en figur kan vara den som skelettets animationer spelas på"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "inte en blake3-hash i hex"
@@ -7761,6 +7765,22 @@ translation = "Spela upp"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "Spela upp (blanksteg)"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "Använd överallt"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "Animationer med det här skelettet spelas nu på { $name }. Deras miniatyrer ritas om."
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "Kunde inte byta figuren de spelas på: { $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "Spela alla animationer med det här skelettet på { $name }, även i miniatyrerna"
 
 [messages.model-plays-on]
 source = "Plays on"

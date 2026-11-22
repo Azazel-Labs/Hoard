@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "91c24792705962b35bb2755a99dd1767f08fa5c0d3283a7c962b309c4364c946"
+source = "4539c4a0efeba5eef9f2c630ddc81ff24feafaa4f2f867ce32c6a9e2224f466a"
 translation = "dfa154e4e2c244ac9b5bd0c069e7aef203d0da135fdc9b3c5f3448615a30c08f"
 
 [messages.about-blender]
@@ -4623,6 +4623,10 @@ translation = "服务器上的 { $path } 处没有 SoundFont"
 source = "There's no SoundFont at { $path }"
 translation = "{ $path } 处没有 SoundFont"
 
+[messages.error-not-a-character]
+source = "only a character can be the one its skeleton's animations play on"
+translation = "只有角色才能播放其骨架的动画"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "不是 blake3 十六进制哈希"
@@ -7587,6 +7591,22 @@ translation = "播放"
 [messages.model-play-title]
 source = "Play (Space)"
 translation = "播放（Space）"
+
+[messages.model-plays-everywhere]
+source = "Use everywhere"
+translation = "全部使用"
+
+[messages.model-plays-everywhere-done]
+source = "Animations with this skeleton now play on { $name }. Their thumbnails are being drawn again."
+translation = "此骨架的动画现在在 { $name } 上播放。正在重新绘制它们的缩略图。"
+
+[messages.model-plays-everywhere-failed]
+source = "Couldn't change the character they play on: { $error }"
+translation = "无法更改播放它们的角色：{ $error }"
+
+[messages.model-plays-everywhere-title]
+source = "Play every animation with this skeleton on { $name }, in their thumbnails too"
+translation = "在 { $name } 上播放此骨架的所有动画，缩略图也是"
 
 [messages.model-plays-on]
 source = "Plays on"

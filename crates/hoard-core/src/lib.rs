@@ -253,6 +253,13 @@ pub struct Asset {
     /// How many fit in all, when that's more than `fits` lists.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fits_total: Option<u64>,
+    /// For an animation, the character it plays on wherever it's shown (its thumbnails, the viewer, a download with
+    /// its character): the one its skeleton's animations play on. Detail view only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plays_on: Option<Fit>,
+    /// For a character, whether it's the one its skeleton's animations play on. Detail view only.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub plays_its_skeleton: bool,
     /// Collections this asset is in (detail view only).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub collections: Vec<CollectionRef>,

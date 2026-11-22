@@ -39,6 +39,7 @@ error-not-a-hash = blake3 の 16 進ハッシュではありません
 error-merge-into-tag = into はタグでなければなりません
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = 「{ $text }」はタグではありません
+error-not-a-character = スケルトンのアニメーションを再生するのはキャラクターだけです
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = { $parent } はすでに { $tag } の下にあるため、{ $tag } をその下に入れることはできません
 error-nothing-to-merge = 統合するものがありません
@@ -1945,6 +1946,10 @@ model-play = 再生
 model-animation-clip = アニメーションクリップ
 model-animation = アニメーション
 model-plays-on = 再生するキャラクター
+model-plays-everywhere = どこでも使う
+model-plays-everywhere-title = このスケルトンのアニメーションを、サムネイルも含めてすべて { $name } で再生します
+model-plays-everywhere-done = このスケルトンのアニメーションは { $name } で再生されるようになりました。サムネイルを描き直しています。
+model-plays-everywhere-failed = 再生するキャラクターを変更できませんでした: { $error }
 model-rest-pose = レストポーズ
 model-close-title = 閉じる（Esc）
 model-full-screen = 全画面

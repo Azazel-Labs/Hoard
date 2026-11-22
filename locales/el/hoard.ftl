@@ -39,6 +39,7 @@ error-not-a-hash = δεν είναι δεκαεξαδικό hash blake3
 error-merge-into-tag = το into πρέπει να είναι ετικέτα
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = Το «{ $text }» δεν είναι ετικέτα
+error-not-a-character = μόνο ένας χαρακτήρας μπορεί να είναι αυτός στον οποίο παίζουν οι κινήσεις του σκελετού του
 # Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
 error-tag-parent-loop = Η { $parent } είναι ήδη κάτω από την { $tag }, οπότε η { $tag } δεν μπορεί να μπει κάτω από αυτήν
 error-nothing-to-merge = τίποτα προς συγχώνευση
@@ -2204,6 +2205,10 @@ model-play = Αναπαραγωγή
 model-animation-clip = Κλιπ animation
 model-animation = Animation
 model-plays-on = Αναπαραγωγή σε
+model-plays-everywhere = Χρήση παντού
+model-plays-everywhere-title = Αναπαραγωγή κάθε κίνησης με αυτόν τον σκελετό στον χαρακτήρα { $name }, και στις μικρογραφίες τους
+model-plays-everywhere-done = Οι κινήσεις με αυτόν τον σκελετό παίζουν πλέον στον χαρακτήρα { $name }. Οι μικρογραφίες τους σχεδιάζονται ξανά.
+model-plays-everywhere-failed = Δεν ήταν δυνατή η αλλαγή του χαρακτήρα στον οποίο παίζουν: { $error }
 model-rest-pose = Στάση ηρεμίας
 model-close-title = Κλείσιμο (Esc)
 model-full-screen = Πλήρης οθόνη

@@ -164,6 +164,68 @@ pub(crate) fn tag_tree(conn: &Connection) -> Result<Vec<(String, String)>> {
     Ok(stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
 }
 
+/// The tag tree, looked up both ways: each tag's narrower tags and its broader ones, however deep. Read whole when a
+/// search needs it: there are a few hundred tags at most, and most libraries have none under others.
+#[derive(Debug, Default)]
+pub(crate) struct Tree {
+    below: std::collections::HashMap<String, Vec<String>>,
+    above: std::collections::HashMap<String, Vec<String>>,
+}
+
+impl Tree {
+    pub(crate) fn load(conn: &Connection) -> Result<Tree> {
+        Ok(Tree::of(&tag_tree(conn)?))
+    }
+
+    /// The tree of these (tag, broader tag) pairs.
+    pub(crate) fn of(pairs: &[(String, String)]) -> Tree {
+        use std::collections::HashMap;
+        let mut parents: HashMap<&str, Vec<&str>> = HashMap::new();
+        let mut children: HashMap<&str, Vec<&str>> = HashMap::new();
+        for (tag, parent) in pairs {
+            parents.entry(tag).or_default().push(parent);
+            children.entry(parent).or_default().push(tag);
+        }
+        // Everything reachable from a tag, however deep, not the tag itself. A loop ends where it started.
+        let reach = |from: &str, step: &HashMap<&str, Vec<&str>>| {
+            let (mut seen, mut next) = (Vec::<String>::new(), vec![from]);
+            while let Some(t) = next.pop() {
+                for &n in step.get(t).into_iter().flatten() {
+                    if n != from && !seen.iter().any(|s| s == n) {
+                        seen.push(n.to_owned());
+                        next.push(n);
+                    }
+                }
+            }
+            seen.sort();
+            seen
+        };
+        Tree {
+            below: children.keys().map(|&t| (t.to_owned(), reach(t, &children))).collect(),
+            above: parents.keys().map(|&t| (t.to_owned(), reach(t, &parents))).collect(),
+        }
+    }
+
+    pub(crate) fn is_empty(&self) -> bool {
+        self.below.is_empty()
+    }
+
+    /// Every tag under `tag`, however deep.
+    pub(crate) fn narrower(&self, tag: &str) -> &[String] {
+        self.below.get(tag).map_or(&[], Vec::as_slice)
+    }
+
+    /// Each tag with tags under it, with them.
+    pub(crate) fn broad(&self) -> impl Iterator<Item = (&str, &[String])> {
+        self.below.iter().map(|(t, under)| (t.as_str(), under.as_slice()))
+    }
+
+    /// Every tag `tag` goes under, however high.
+    pub(crate) fn broader(&self, tag: &str) -> &[String] {
+        self.above.get(tag).map_or(&[], Vec::as_slice)
+    }
+}
+
 /// The longest description a tag keeps.
 pub(crate) const TAG_DESCRIPTION_MAX: usize = 4000;
 
@@ -359,6 +421,24 @@ mod tests {
     use super::*;
     use crate::db::{get_asset, get_pack, open, search};
     use hoard_core::SearchQuery;
+
+    #[test]
+    fn the_tree_looks_up_both_ways_however_deep() {
+        let pair = |t: &str, p: &str| (t.to_owned(), p.to_owned());
+        let tree = Tree::of(&[
+            pair("car", "vehicle"),
+            pair("sedan", "car"),
+            pair("sedan", "red"),
+            pair("a", "b"),
+            pair("b", "a"),
+        ]);
+        assert_eq!(tree.narrower("vehicle"), ["car", "sedan"]);
+        assert_eq!(tree.broader("sedan"), ["car", "red", "vehicle"]);
+        assert!(tree.narrower("sedan").is_empty() && tree.broader("vehicle").is_empty());
+        // A loop ends where it started.
+        assert_eq!((tree.narrower("a"), tree.broader("a")), (&["b".to_owned()][..], &["b".to_owned()][..]));
+        assert!(Tree::of(&[]).is_empty());
+    }
 
     #[test]
     fn a_tag_says_what_it_means_and_keeps_it_through_a_merge() {

@@ -7,7 +7,7 @@ use hoard_core::{Asset, Facet, SearchQuery};
 use rusqlite::types::Value as SqlValue;
 use rusqlite::{Connection, params, params_from_iter};
 
-use super::{ASSET_COLS, asset_from_row, attach_tags};
+use super::{ASSET_COLS, Tree, asset_from_row, attach_tags};
 
 /// Turn free text into a safe FTS5 query: every term becomes a quoted prefix match, and all must match.
 fn fts_query(q: &str) -> Option<String> {
@@ -35,6 +35,13 @@ struct Words {
 const OWN_COLUMNS: &str = "{name words category description tags}";
 
 fn words(q: &str) -> Words {
+    words_in(q, &Tree::default())
+}
+
+/// [`words`], where a word that is a tag finds what has any tag under it too, and leaves it out after a `-`: with sedan
+/// under vehicle, `vehicle` finds the sedans and `-vehicle` leaves them out. (The tag tree has tags whole, so those
+/// under it are found as they are, not as the start of a word.)
+fn words_in(q: &str, tree: &Tree) -> Words {
     /// One word or phrase, as FTS5 has it.
     fn term(text: &str, exact: bool) -> Option<String> {
         let parts: Vec<String> =
@@ -77,7 +84,15 @@ fn words(q: &str) -> Words {
             continue;
         }
         let Some(t) = term(&text, exact) else { continue };
-        let t = if pack { format!("pack_name : {t}") } else { t };
+        let under = if pack { &[][..] } else { tree.narrower(&text.trim().to_lowercase()) };
+        let t = if pack {
+            format!("pack_name : {t}")
+        } else if under.is_empty() {
+            t
+        } else {
+            let under = under.iter().filter_map(|n| term(n, true)).map(|n| format!("tags : {n}"));
+            format!("({})", std::iter::once(t).chain(under).collect::<Vec<_>>().join(" OR "))
+        };
         if not {
             without.push(t);
         } else {
@@ -220,9 +235,9 @@ fn music_filter(q: &SearchQuery, f: &mut Filter) {
     }
 }
 
-fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) -> Filter {
+fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>, tree: &Tree) -> Filter {
     let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
-    let fts = q.q.as_deref().and_then(fts_query);
+    let Words { find: fts, without, .. } = q.q.as_deref().map_or_else(Words::default, |t| words_in(t, tree));
     match (fts, look) {
         // The word matches are in temp.word_rank already, and with the look's in temp.blend (see search_ranked).
         (Some(_), Some(look)) if look.blend => {
@@ -242,7 +257,7 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
         }
     }
     // Words after a `-`: nothing that has them, whether it matched the words or the look.
-    if let Some(without) = q.q.as_deref().and_then(|t| words(t).without) {
+    if let Some(without) = without {
         f.clauses
             .push("IFNULL(a.fts_row, 0) NOT IN (SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?)".to_owned());
         f.params.push(SqlValue::Text(without));
@@ -354,8 +369,15 @@ fn folder_skip(folder: &str) -> i64 {
 /// (42)"), and browsing a folder, the folders in it with how many matches are under each. Each of these used to be a
 /// pass of its own, which in a big pack meant asking whether every file in it was a supporting one four times over.
 /// The sidebar's tags take one more pass, when asked for.
-fn count(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter, with_facets: bool) -> Result<Counts> {
-    let w = wide_filter(q, look);
+fn count(
+    conn: &Connection,
+    q: &SearchQuery,
+    look: Option<&LookRank>,
+    f: &Filter,
+    with_facets: bool,
+    tree: &Tree,
+) -> Result<Counts> {
+    let w = wide_filter(q, look, tree);
     // Searching words in a folder finds what's anywhere under it, so there are no folders to show.
     let mut params = Vec::new();
     let rest = match browsed_folder(q).filter(|_| fts_query_of(q).is_none()) {
@@ -401,15 +423,15 @@ fn count(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter
     let facet = |(value, count): (String, i64)| Facet { value, count: count as u64 };
     let mut folders = folders.into_iter().map(facet).collect::<Vec<_>>();
     folders.sort_by_cached_key(|f| f.value.to_ascii_lowercase());
-    let tags = if with_facets { Some(tags(conn, f)?) } else { None };
+    let tags = if with_facets { Some(tags(conn, f, tree)?) } else { None };
     Ok(Counts { total, supporting_hidden, kinds: kind_facets(kinds), folders, tags })
 }
 
 /// The search without the three things [`count`] tells apart: the kind, whether a file supports another, and in a
 /// folder, whether it's directly in it or in a folder of its own.
-fn wide_filter(q: &SearchQuery, look: Option<&LookRank>) -> Filter {
+fn wide_filter(q: &SearchQuery, look: Option<&LookRank>, tree: &Tree) -> Filter {
     let wide = SearchQuery { kind: None, hide_supporting: false, folder: None, ..q.clone() };
-    let mut w = build_filter(&wide, false, look);
+    let mut w = build_filter(&wide, false, look, tree);
     if let Some(folder) = browsed_folder(q).filter(|f| !f.is_empty()) {
         w.clauses.push("a.path > ? AND a.path < ?".to_owned());
         w.params.push(SqlValue::Text(format!("{folder}/")));
@@ -429,8 +451,14 @@ fn kind_facets(kinds: std::collections::HashMap<String, i64>) -> Vec<Facet> {
 /// and its counts but the tags. Ranking the matches goes through all of them anyway, which for the first letter typed
 /// is most of the library, and counting them was a second pass as long. (Searching words finds what's anywhere under
 /// a folder, so there are no folders to count.)
-fn rank_and_count(conn: &Connection, q: &SearchQuery, order: &str, blobs: &str) -> Result<(Vec<i64>, Counts)> {
-    let w = wide_filter(q, None);
+fn rank_and_count(
+    conn: &Connection,
+    q: &SearchQuery,
+    order: &str,
+    blobs: &str,
+    tree: &Tree,
+) -> Result<(Vec<i64>, Counts)> {
+    let w = wide_filter(q, None, tree);
     let supporting = if q.hide_supporting { SUPPORTING } else { "0" };
     let mut stmt = conn.prepare(&format!(
         "SELECT a.rowid, a.kind, {supporting} FROM assets a {blobs} {} {} ORDER BY {order}",
@@ -535,7 +563,7 @@ fn chosen_order(sort: Option<&str>) -> Option<&'static str> {
 /// Every asset a search finds, in no particular order: for doing something to all of them. Not for searches by look
 /// (`similar`, `color`, `imitation`), whose matches are worked out elsewhere.
 pub(crate) fn matching_ids(conn: &Connection, q: &SearchQuery) -> Result<Vec<String>> {
-    let f = build_filter(q, true, None);
+    let f = build_filter(q, true, None, &Tree::load(conn)?);
     let mut stmt = conn.prepare(&format!("SELECT a.id FROM assets a {} {}", f.join, f.where_sql()))?;
     let ids = stmt.query_map(params_from_iter(&f.params), |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
     Ok(ids)
@@ -555,6 +583,7 @@ pub(crate) fn search_ranked(
 ) -> Result<SearchPage> {
     let limit = i64::from(q.limit.unwrap_or(60).clamp(1, 5000));
     let offset = i64::from(q.offset.unwrap_or(0));
+    let tree = Tree::load(conn)?;
     if let Some(look) = look {
         conn.execute_batch(
             "CREATE TEMP TABLE IF NOT EXISTS look_rank (hash TEXT PRIMARY KEY, score REAL NOT NULL) WITHOUT ROWID;
@@ -565,7 +594,7 @@ pub(crate) fn search_ranked(
             insert.execute(params![hash, f64::from(*score)])?;
         }
         if look.blend
-            && let Some(fts) = fts_query_of(q)
+            && let Some(fts) = q.q.as_deref().and_then(|t| words_in(t, &tree).find)
         {
             conn.execute_batch(
                 "CREATE TEMP TABLE IF NOT EXISTS word_rank (asset_id TEXT PRIMARY KEY, rank REAL NOT NULL) WITHOUT ROWID;
@@ -579,7 +608,7 @@ pub(crate) fn search_ranked(
             conn.prepare_cached(blend_candidates(look))?.execute([])?;
         }
     }
-    let f = build_filter(q, true, look);
+    let f = build_filter(q, true, look, &tree);
     let where_sql = f.where_sql();
     // Only the sizes are needed to put the page in order: the rest of each asset is read once it's on the page, not for
     // everything the search finds.
@@ -610,7 +639,7 @@ pub(crate) fn search_ranked(
     let ranked = match order_key.as_deref().and_then(|k| kept_ranked(k, writes)) {
         Some(ranked) => Some(ranked),
         None if words => {
-            let (found, counts) = rank_and_count(conn, q, order, blobs)?;
+            let (found, counts) = rank_and_count(conn, q, order, blobs, &tree)?;
             counted = Some(counts);
             let found = Arc::new(found);
             if let Some(k) = order_key {
@@ -622,8 +651,8 @@ pub(crate) fn search_ranked(
     };
     // A search by words has what it finds already: its tags are counted from those, not by searching again.
     let sidebar_tags = || match &ranked {
-        Some(found) => tags_of_rows(conn, found),
-        None => tags(conn, &f),
+        Some(found) => tags_of_rows(conn, found, &tree),
+        None => tags(conn, &f, &tree),
     };
     let counts = match (key.as_deref().and_then(|k| kept_counts(k, writes)), counted) {
         // The next page of a search, or the same search again, while the library is the same.
@@ -632,7 +661,7 @@ pub(crate) fn search_ranked(
         (Some(counts), _) => Counts { tags: Some(sidebar_tags()?), ..counts },
         (None, Some(counts)) if with_facets => Counts { tags: Some(sidebar_tags()?), ..counts },
         (None, Some(counts)) => counts,
-        (None, None) => count(conn, q, look, &f, with_facets)?,
+        (None, None) => count(conn, q, look, &f, with_facets, &tree)?,
     };
     if let Some(key) = key {
         keep_counts(key, writes, &counts);
@@ -689,38 +718,84 @@ struct Counts {
     tags: Option<Vec<Facet>>,
 }
 
-/// The sidebar's tags: the most common among what the search finds.
-fn tags(conn: &Connection, f: &Filter) -> Result<Vec<Facet>> {
-    Ok(conn
+/// The most tags the sidebar shows.
+const SIDEBAR_TAGS: usize = 60;
+
+/// The sidebar's tags: the most common among what the search finds. A tag with tags under it counts what has any of
+/// them, once each (see [`with_broader`]).
+fn tags(conn: &Connection, f: &Filter, tree: &Tree) -> Result<Vec<Facet>> {
+    let found = format!("SELECT a.id FROM assets a {} {}", f.join, f.where_sql());
+    let direct = conn
         .prepare(&format!(
-            "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.tag NOT LIKE 'set:%' AND t.asset_id IN
-               (SELECT a.id FROM assets a {} {})
-             GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT 60",
-            f.join,
-            f.where_sql()
+            "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.tag NOT LIKE 'set:%' AND t.asset_id IN ({found})
+             GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT {SIDEBAR_TAGS}"
         ))?
         .query_map(params_from_iter(&f.params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
-        .collect::<rusqlite::Result<Vec<_>>>()?)
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    with_broader(conn, tree, direct, &found, f.params.iter().cloned())
 }
 
 /// [`tags`] of what a search by words found (see [`rank_and_count`]), by row: what it finds is already worked out,
 /// where [`tags`] matches the words and goes through every filter again for each asset.
-fn tags_of_rows(conn: &Connection, rows: &[i64]) -> Result<Vec<Facet>> {
+fn tags_of_rows(conn: &Connection, rows: &[i64], tree: &Tree) -> Result<Vec<Facet>> {
     if rows.is_empty() {
         return Ok(Vec::new());
     }
+    let rows = serde_json::to_string(rows)?;
     // CROSS JOIN keeps the order: from the rows found to their assets to their tags, never through every tag.
-    Ok(conn
-        .prepare_cached(
+    let direct = conn
+        .prepare_cached(&format!(
             "SELECT t.tag, COUNT(*) FROM json_each(?1) j CROSS JOIN assets a ON a.rowid = j.value
                CROSS JOIN asset_tags t ON t.asset_id = a.id
               WHERE t.tag NOT LIKE 'set:%'
-              GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT 60",
-        )?
-        .query_map([serde_json::to_string(rows)?], |r| {
-            Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 })
-        })?
-        .collect::<rusqlite::Result<Vec<_>>>()?)
+              GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT {SIDEBAR_TAGS}"
+        ))?
+        .query_map([&rows], |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let found = "SELECT a.id FROM json_each(?) j JOIN assets a ON a.rowid = j.value";
+    with_broader(conn, tree, direct, found, [SqlValue::Text(rows)])
+}
+
+/// The sidebar's tags counted one by one, with each tag that has tags under it counting what has any of them, once
+/// each: vehicle counts the cars and the sedans, and shows even when nothing is tagged vehicle itself. `found` is the
+/// SQL for the ids of what the search found, with `params` its parameters.
+fn with_broader(
+    conn: &Connection,
+    tree: &Tree,
+    mut tags: Vec<Facet>,
+    found: &str,
+    params: impl IntoIterator<Item = SqlValue>,
+) -> Result<Vec<Facet>> {
+    if tree.is_empty() {
+        return Ok(tags);
+    }
+    // Each broad tag with itself and every tag under it: (tag, broad tag).
+    let up: Vec<(&str, &str)> = tree
+        .broad()
+        .filter(|(broad, _)| !broad.starts_with("set:"))
+        .flat_map(|(broad, under)| {
+            std::iter::once((broad, broad)).chain(under.iter().map(move |t| (t.as_str(), broad)))
+        })
+        .collect();
+    let mut all = vec![SqlValue::Text(serde_json::to_string(&up)?)];
+    all.extend(params);
+    let broad = conn
+        .prepare(&format!(
+            "WITH up (tag, broad) AS (SELECT value ->> 0, value ->> 1 FROM json_each(?))
+             SELECT up.broad, COUNT(DISTINCT t.asset_id) FROM up JOIN asset_tags t ON t.tag = up.tag
+              WHERE t.asset_id IN ({found}) GROUP BY up.broad"
+        ))?
+        .query_map(params_from_iter(&all), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    for b in broad {
+        match tags.iter_mut().find(|t| t.value == b.value) {
+            Some(t) => t.count = b.count,
+            None => tags.push(b),
+        }
+    }
+    tags.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
+    tags.truncate(SIDEBAR_TAGS);
+    Ok(tags)
 }
 
 /// How many recent searches' counts are kept.
@@ -1205,13 +1280,89 @@ mod tests {
         let shown = |q: &SearchQuery| {
             let listed = |tags: &[Facet]| tags.iter().map(|t| format!("{} {}", t.value, t.count)).collect::<Vec<_>>();
             let found = listed(&search(&conn, q, true).unwrap().tags);
-            assert_eq!(found, listed(&tags(&conn, &build_filter(q, true, None)).unwrap()), "{q:?}");
+            assert_eq!(
+                found,
+                listed(&tags(&conn, &build_filter(q, true, None, &Tree::default()), &Tree::default()).unwrap()),
+                "{q:?}"
+            );
             found
         };
         assert_eq!(shown(&rock), ["grey 2", "mossy 2"]);
         assert_eq!(shown(&SearchQuery { kind: Some("texture".into()), ..rock.clone() }), ["mossy 2", "grey 1"]);
         assert_eq!(shown(&SearchQuery { hide_supporting: false, ..rock.clone() }), ["grey 3", "mossy 2", "dark 1"]);
         assert_eq!(shown(&SearchQuery { q: Some("nothing".into()), ..rock }), Vec::<String>::new());
+    }
+
+    #[test]
+    fn typed_words_and_the_sidebar_follow_the_tag_tree() {
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO tag_parents (tag, parent) VALUES ('car', 'vehicle'), ('sedan', 'car'), ('hard surface', 'car');",
+        )
+        .unwrap();
+        for (id, name, tags) in [
+            ("s", "blue one", "sedan,blue"),
+            ("c", "red one", "car,sedan,red"),
+            ("h", "grey one", "hard surface"),
+            ("v", "old one", "vehicle"),
+            ("r", "rock", "grey"),
+        ] {
+            conn.execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                 VALUES (?1, 'p1', 'h', ?1 || '.png', ?2, 'png', 'texture', 'x', 'x')",
+                params![id, name],
+            )
+            .unwrap();
+            conn.execute_batch(&format!(
+                "INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, '', '{}' FROM assets
+                   WHERE id = '{id}';
+                 UPDATE assets SET fts_row = rowid WHERE id = '{id}';",
+                tags.replace(',', " ")
+            ))
+            .unwrap();
+            for tag in tags.split(',') {
+                conn.execute("INSERT INTO asset_tags (asset_id, tag, source) VALUES (?1, ?2, 'x')", params![id, tag])
+                    .unwrap();
+            }
+        }
+        let found = |q: &str| {
+            let mut ids = search(&conn, &SearchQuery { q: Some(q.into()), ..Default::default() }, false)
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|a| a.id)
+                .collect::<Vec<_>>();
+            ids.sort();
+            ids.concat()
+        };
+        assert_eq!(found("vehicle"), "chsv");
+        assert_eq!(found("Car"), "chs");
+        assert_eq!(found("car or rock"), "chrs");
+        assert_eq!(found("one -car"), "v");
+        assert_eq!(found("-vehicle"), "r");
+        assert_eq!(found("one -\"hard surface\""), "csv");
+        // A word that only starts a broad tag is a word like any other.
+        assert_eq!(found("veh"), "v");
+
+        let shown = |q: SearchQuery| {
+            let listed = |tags: &[Facet]| tags.iter().map(|t| format!("{} {}", t.value, t.count)).collect::<Vec<_>>();
+            let found = listed(&search(&conn, &q, true).unwrap().tags);
+            let tree = Tree::load(&conn).unwrap();
+            assert_eq!(found, listed(&tags(&conn, &build_filter(&q, true, None, &tree), &tree).unwrap()), "{q:?}");
+            found
+        };
+        // Each counted once: the red car is a car and a sedan.
+        assert_eq!(
+            shown(SearchQuery::default()),
+            ["vehicle 4", "car 3", "sedan 2", "blue 1", "grey 1", "hard surface 1", "red 1"]
+        );
+        // From what a search by words found: vehicle shows though nothing found is tagged vehicle itself.
+        assert_eq!(
+            shown(SearchQuery { q: Some("blue".into()), ..Default::default() }),
+            ["blue 1", "car 1", "sedan 1", "vehicle 1"]
+        );
     }
 
     #[test]
@@ -1428,12 +1579,13 @@ mod tests {
             println!("{label}: {} of {} in {:.1?}", page.items.len(), page.total, started.elapsed());
         };
         let alone = |label: &str, q: SearchQuery| {
-            let f = build_filter(&q, true, None);
+            let tree = Tree::load(&conn).unwrap();
+            let f = build_filter(&q, true, None, &tree);
             let started = std::time::Instant::now();
-            let counts = count(&conn, &q, None, &f, false).unwrap();
+            let counts = count(&conn, &q, None, &f, false, &tree).unwrap();
             let counted = started.elapsed();
             let started = std::time::Instant::now();
-            let tags = tags(&conn, &f).unwrap();
+            let tags = tags(&conn, &f, &tree).unwrap();
             println!(
                 "{label}: counted {} in {counted:.1?}, {} tags in {:.1?}",
                 counts.total,
@@ -1443,7 +1595,7 @@ mod tests {
         };
         // The page alone, put in order without counting: what's left of a search once its counts are kept.
         let page_alone = |label: &str, q: SearchQuery| {
-            let f = build_filter(&q, true, None);
+            let f = build_filter(&q, true, None, &Tree::default());
             let started = std::time::Instant::now();
             let n = conn
                 .prepare(&format!(

@@ -4,6 +4,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type Facet } from '../api'
 import { formatNumber, t } from '../i18n'
+import { markSeen } from '../news'
 import { prefs } from '../prefs'
 import { confirmDialog, showError, showOk } from '../ui'
 import NewPip from './NewPip.vue'
@@ -56,16 +57,54 @@ const tree = computed(() => {
     under.set(e.parent, [...(under.get(e.parent) ?? []), e.tag])
     isChild.add(e.tag)
   }
-  const rows: { tag: string; depth: number; key: string }[] = []
+  const rows: { tag: string; depth: number; key: string; parent?: string }[] = []
   // A tag under two broader ones shows under each; `path` stops a loop going on forever.
   const walk = (tag: string, depth: number, path: string[]) => {
-    rows.push({ tag, depth, key: [...path, tag].join('>') })
+    rows.push({ tag, depth, key: [...path, tag].join('>'), parent: path.at(-1) })
     if (path.includes(tag)) return
     for (const c of (under.get(tag) ?? []).sort()) walk(c, depth + 1, [...path, tag])
   }
   for (const root of [...under.keys()].filter((p) => !isChild.has(p)).sort()) walk(root, 0, [])
   return rows
 })
+/** The broader tags a tag goes under now. */
+const parentsOf = (tag: string) => edges.value.filter((e) => e.tag === tag).map((e) => e.parent)
+// Putting one tag under another right here, as its tag page does.
+const child = ref('')
+const parent = ref('')
+const nesting = ref(false)
+const nestReady = computed(() => {
+  const [c, p] = [child.value.trim(), parent.value.trim()]
+  return !!c && !!p && c.toLowerCase() !== p.toLowerCase()
+})
+async function setParents(tag: string, parents: string[], note: string) {
+  const was = parentsOf(tag)
+  try {
+    await api.setTagParents(tag, parents)
+    markSeen('tag-tree')
+    await load()
+    showOk(note, { label: t('asset-undo'), run: () => void api.setTagParents(tag, was).then(load).then(() => emit('changed')) })
+    emit('changed')
+  } catch (e) {
+    showError(t('tag-page-save-failed', { error: (e as Error).message }))
+  }
+}
+async function nest() {
+  if (!nestReady.value || nesting.value) return
+  const [c, p] = [child.value.trim().toLowerCase(), parent.value.trim().toLowerCase()]
+  nesting.value = true
+  const have = parentsOf(c)
+  if (!have.includes(p)) await setParents(c, [...have, p], t('tag-page-parent-saved', { tag: c, parent: p }))
+  child.value = ''
+  parent.value = ''
+  nesting.value = false
+}
+function unnest(tag: string, from: string) {
+  void setParents(tag, parentsOf(tag).filter((p) => p !== from), t('tag-page-parent-removed', { tag, parent: from }))
+}
+/** Every tag, offered as each box is typed into. */
+const known = computed(() => [...everyCount.value.keys()].sort())
+
 function toggle(tag: string) {
   picked.value = picked.value.includes(tag) ? picked.value.filter((t) => t !== tag) : [...picked.value, tag]
 }
@@ -149,14 +188,35 @@ watch(moreEl, (el) => {
 
 <template>
   <div class="tags">
-    <section v-if="tree.length">
+    <section>
       <div class="sh"><h3>{{ t('tags-tree-heading') }}<NewPip id="tag-tree" /></h3></div>
       <p class="what">{{ t('tags-tree-what') }}</p>
-      <ul class="list tree">
+      <form class="nest" @submit.prevent="nest">
+        <label class="visually-hidden" for="tags-nest-child">{{ t('tags-tree-tag-label') }}</label>
+        <input id="tags-nest-child" v-model="child" class="field mono" list="tags-known" autocomplete="off" spellcheck="false" :placeholder="t('tags-tree-tag-placeholder')" />
+        <span class="under">{{ t('tags-tree-goes-under') }}</span>
+        <label class="visually-hidden" for="tags-nest-parent">{{ t('tags-tree-parent-label') }}</label>
+        <input id="tags-nest-parent" v-model="parent" class="field mono" list="tags-known" autocomplete="off" spellcheck="false" :placeholder="t('tag-page-parent-placeholder')" />
+        <button class="btn" type="submit" :disabled="!nestReady || nesting">{{ t('tags-tree-put') }}</button>
+        <datalist id="tags-known"><option v-for="tag in known" :key="tag" :value="tag" /></datalist>
+      </form>
+      <p v-if="!tree.length" class="what none">{{ t('tags-tree-none') }}</p>
+      <ul v-else class="list tree">
         <li v-for="row in tree" :key="row.key" :style="{ paddingInlineStart: `${row.depth * 1.25}rem` }">
           <span v-if="row.depth" class="branch" aria-hidden="true">└</span>
           <button type="button" class="linkbtn mono grow" :title="t('tags-browse-title', { tag: row.tag })" @click="emit('tag', row.tag)">{{ row.tag }}</button>
           <span class="n">{{ formatNumber(everyCount.get(row.tag) ?? 0) }}</span>
+          <button
+            v-if="row.parent"
+            type="button"
+            class="btn ghost small unnest"
+            :title="t('tag-page-parent-remove', { tag: row.tag, parent: row.parent })"
+            :aria-label="t('tag-page-parent-remove', { tag: row.tag, parent: row.parent })"
+            @click="unnest(row.tag, row.parent)"
+          >
+            <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+          </button>
+          <span v-else class="unnest-room" aria-hidden="true" />
         </li>
       </ul>
     </section>
@@ -259,5 +319,11 @@ section { display: grid; gap: 0.6rem; }
 .tree li { gap: 0.4rem; }
 .tree .linkbtn { padding-inline: 0; text-align: start; justify-content: flex-start; }
 .branch { color: var(--faint); }
+.nest { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.nest .field { flex: 1 1 10rem; min-width: 0; max-width: 16rem; }
+.under { color: var(--muted); white-space: nowrap; }
+.unnest, .unnest-room { flex: none; width: 1.9rem; display: inline-grid; place-items: center; }
+.unnest { color: var(--muted); }
+.unnest:hover { color: var(--text); }
 @media (max-width: 560px) { .into { flex-direction: column; align-items: stretch; } }
 </style>

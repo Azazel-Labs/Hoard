@@ -2293,7 +2293,13 @@ tag-page-narrower = 下層標籤：
 tag-page-narrower-title = 搜尋 { $tag } 時，也會找到這些
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = 上層與下層
-tags-tree-what = 在標籤頁面中放到更廣泛標籤下的標籤。搜尋一個標籤時，也會找到它底下的所有內容。
+tags-tree-what = 在這裡或標籤頁面上把標籤放到更廣泛的標籤下，搜尋廣泛的標籤時也會找到它底下的一切。
+tags-tree-none = 還沒有標籤放在其他標籤下。試試把「汽車」放到「交通工具」下。
+tags-tree-tag-label = 要放到上層標籤下的標籤
+tags-tree-tag-placeholder = 標籤，例如汽車
+tags-tree-goes-under = 放到
+tags-tree-parent-label = 上層標籤
+tags-tree-put = 設為下層
 
 ## 素材庫統計
 
@@ -3026,6 +3032,7 @@ news-to-find =
        *[other] 還有 { $count } 項待發現
     }
 news-close = 關閉
+news-got-it = 知道了
 news-take-me = 帶我去看
 news-look-again = 再看一次
 news-none = 目前沒有新功能可看。
@@ -3046,7 +3053,7 @@ news-motion-trails-body = 動畫的縮圖會描出角色走過的路徑，並用
 news-text-size-title = 文字大小與間距
 news-text-size-body = 把文字調大或調小、頁面調得寬鬆或緊湊，並選擇圖塊和頂端列顯示的內容。
 news-tag-tree-title = 標籤中的標籤
-news-tag-tree-body = 把標籤放到更廣泛的標籤下，搜尋「交通工具」時也能找到「汽車」和「轎車」。「設定 → 標籤」會以樹狀圖顯示它們。
+news-tag-tree-body = 把標籤放到更廣泛的標籤下，搜尋「交通工具」時也能找到「汽車」和「轎車」。可在「設定 → 標籤」或各標籤自己的頁面上巢狀排列它們。
 news-bulk-edit-title = 批次編輯
 news-bulk-edit-body = 選取一些素材後按 E，就能一起變更它們的標籤、授權、評分等，而且可以復原。
 news-backups-title = 排程備份

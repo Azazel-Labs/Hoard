@@ -7706,6 +7706,10 @@ translation = """
 source = "Close"
 translation = "닫기"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "확인"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "다시 보기"
@@ -7762,8 +7766,8 @@ source = "Stop pointing out new things"
 translation = "새로운 것 알려 주지 않기"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그에서 트리로 보여 줍니다."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그나 각 태그 페이지에서 중첩할 수 있습니다."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12187,13 +12191,37 @@ translation = "많이 쓰인 순"
 source = "A–Z"
 translation = "이름순"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "→ 상위 태그:"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "상위 및 하위"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "아직 아래에 넣은 태그가 없습니다. 자동차를 탈것 아래에 넣어 보세요."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "더 넓은 태그"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "아래에 넣기"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "더 넓은 태그 아래에 넣을 태그"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "태그, 예: 자동차"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "태그 페이지에서 더 넓은 태그 아래에 넣은 태그입니다. 태그를 검색하면 그 아래에 있는 모든 것도 함께 찾아요."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "여기나 태그 페이지에서 태그를 더 넓은 태그 아래에 넣으면, 넓은 태그를 검색할 때 그 아래에 있는 것도 모두 찾습니다."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -2535,7 +2535,13 @@ tag-page-narrower = Più specifici:
 tag-page-narrower-title = Cercando { $tag } troverai anche questi
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Più ampi e più specifici
-tags-tree-what = Tag messi sotto tag più ampi dalle loro pagine. Cercando un tag si trova anche tutto ciò che c'è sotto.
+tags-tree-what = Metti un tag sotto uno più ampio, qui o nella sua pagina, e cercando quello più ampio trovi anche tutto ciò che sta sotto.
+tags-tree-none = Non c’è ancora niente sotto qualcos’altro. Prova a mettere auto sotto veicolo.
+tags-tree-tag-label = Tag da mettere sotto uno più ampio
+tags-tree-tag-placeholder = Un tag, per esempio auto
+tags-tree-goes-under = va sotto
+tags-tree-parent-label = Tag più ampio
+tags-tree-put = Metti sotto
 
 ## LibraryStats.vue
 
@@ -3298,6 +3304,7 @@ news-to-find =
        *[other] { $count } da scoprire
     }
 news-close = Chiudi
+news-got-it = Ho capito
 news-take-me = Portami lì
 news-look-again = Guarda di nuovo
 news-none = Nessuna novità da scoprire per ora.
@@ -3319,7 +3326,7 @@ news-motion-trails-body = La miniatura di un’animazione traccia il percorso de
 news-text-size-title = Dimensione del testo e spaziatura
 news-text-size-body = Ingrandisci o rimpicciolisci il testo, rendi la pagina più ariosa o più compatta e scegli cosa mostrano i riquadri e la barra superiore.
 news-tag-tree-title = Tag dentro i tag
-news-tag-tree-body = Metti un tag sotto uno più ampio, così cercando veicolo trovi anche auto e berlina. Impostazioni → Tag li mostra come un albero.
+news-tag-tree-body = Metti un tag sotto uno più ampio, così cercando veicolo trovi anche auto e berlina. Annidali in Impostazioni → Tag o nella pagina di ciascun tag.
 news-bulk-edit-title = Modifica più asset insieme
 news-bulk-edit-body = Seleziona alcuni asset e premi E per cambiarne insieme tag, licenza, valutazione e altro, con Annulla.
 news-backups-title = Backup pianificati

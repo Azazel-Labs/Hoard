@@ -7726,6 +7726,10 @@ translation = """
 source = "Close"
 translation = "閉じる"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "了解"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "もう一度見る"
@@ -7782,8 +7786,8 @@ source = "Stop pointing out new things"
 translation = "新着を知らせない"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ ではツリーとして表示されます。"
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ か、各タグのページで入れ子にできます。"
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12234,13 +12238,37 @@ translation = "使用数順"
 source = "A–Z"
 translation = "名前順"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "を次の下に:"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "上位と下位"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "まだ何も入れ子になっていません。「車」を「乗り物」の下に入れてみましょう。"
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "上位のタグ"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "下に入れる"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "上位タグの下に入れるタグ"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "タグ（例: 車）"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "タグのページで上位タグの下に入れたタグです。タグを検索すると、その下にあるものもすべて見つかります。"
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "ここかタグのページで、タグを上位のタグの下に入れられます。上位のタグを検索すると、その下にあるものもすべて見つかります。"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

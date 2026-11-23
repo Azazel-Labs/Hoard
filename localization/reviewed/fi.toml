@@ -7939,6 +7939,10 @@ translation = """
 source = "Close"
 translation = "Sulje"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Selvä"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Katso uudelleen"
@@ -7996,8 +8000,8 @@ source = "Stop pointing out new things"
 translation = "Lopeta uusista asioista huomauttaminen"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Asetukset → Tunnisteet piirtää ne puuksi."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Sisäkkäistä niitä kohdassa Asetukset → Tunnisteet tai tunnisteen omalla sivulla."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12570,13 +12574,37 @@ translation = "Käytetyimmät"
 source = "A–Z"
 translation = "A–Ö"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "kuuluu alle:"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Laajemmat ja suppeammat"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Mikään ei ole vielä minkään alla. Kokeile asettaa auto ajoneuvon alle."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Laajempi tunniste"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Aseta alle"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Laajemman alle asetettava tunniste"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Tunniste, esim. auto"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Tunnisteet, jotka on asetettu laajempien alle tunnisteiden omilla sivuilla. Tunnistetta hakemalla löydät myös kaiken sen alla olevan."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Aseta tunniste laajemman alle täällä tai sen omalla sivulla, niin laajemman haku löytää myös kaiken sen alla olevan."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

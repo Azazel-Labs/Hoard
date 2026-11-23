@@ -2721,7 +2721,13 @@ tag-page-narrower = Mai înguste:
 tag-page-narrower-title = Căutarea după { $tag } le găsește și pe acestea
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Mai largi și mai înguste
-tags-tree-what = Etichete plasate sub etichete mai largi din paginile lor. Căutarea după o etichetă găsește și tot ce este sub ea.
+tags-tree-what = Plasați o etichetă sub una mai largă, aici sau pe pagina ei, iar căutarea celei mai largi găsește și tot ce se află sub ea.
+tags-tree-none = Încă nu se află nimic sub altceva. Încercați să plasați mașină sub vehicul.
+tags-tree-tag-label = Eticheta de plasat sub una mai largă
+tags-tree-tag-placeholder = O etichetă, de exemplu mașină
+tags-tree-goes-under = intră sub
+tags-tree-parent-label = Etichetă mai largă
+tags-tree-put = Plasați sub
 
 ## LibraryStats.vue
 
@@ -3537,6 +3543,7 @@ news-to-find =
        *[other] { $count } de descoperit
     }
 news-close = Închide
+news-got-it = Am înțeles
 news-take-me = Du-mă acolo
 news-look-again = Priviți din nou
 news-none = Nimic nou de descoperit deocamdată.
@@ -3559,7 +3566,7 @@ news-motion-trails-body = Miniatura unei animații trasează drumul pe care îl 
 news-text-size-title = Mărimea textului și spațiere
 news-text-size-body = Măriți sau micșorați textul, faceți pagina mai aerisită sau mai compactă și alegeți ce arată dalele și bara de sus.
 news-tag-tree-title = Etichete în etichete
-news-tag-tree-body = Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Setări → Etichete le arată ca arbore.
+news-tag-tree-body = Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Le puteți încadra în Setări → Etichete sau pe pagina fiecărei etichete.
 news-bulk-edit-title = Editați mai multe deodată
 news-bulk-edit-body = Selectați câteva resurse și apăsați E pentru a le schimba împreună etichetele, licența, evaluarea și altele, cu posibilitate de anulare.
 news-backups-title = Copii de rezervă programate

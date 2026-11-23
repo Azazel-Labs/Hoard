@@ -2527,7 +2527,13 @@ tag-page-narrower = Mais específicas:
 tag-page-narrower-title = Buscar { $tag } também encontra estas
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Mais amplas e mais específicas
-tags-tree-what = Tags colocadas dentro de tags mais amplas a partir das páginas delas. Buscar uma tag também encontra tudo que está dentro dela.
+tags-tree-what = Coloque uma tag dentro de outra mais ampla, aqui ou na página dela, e buscar a mais ampla encontra também tudo o que está dentro.
+tags-tree-none = Ainda não há nada dentro de nada. Experimente colocar carro dentro de veículo.
+tags-tree-tag-label = Tag para colocar dentro de outra mais ampla
+tags-tree-tag-placeholder = Uma tag, como carro
+tags-tree-goes-under = fica dentro de
+tags-tree-parent-label = Tag mais ampla
+tags-tree-put = Colocar dentro
 
 ## LibraryStats.vue
 
@@ -3295,6 +3301,7 @@ news-to-find =
        *[other] { $count } para descobrir
     }
 news-close = Fechar
+news-got-it = Entendi
 news-take-me = Me leve até lá
 news-look-again = Ver de novo
 news-none = Nenhuma novidade para descobrir agora.
@@ -3316,7 +3323,7 @@ news-motion-trails-body = A miniatura de uma animação traça o caminho que o p
 news-text-size-title = Tamanho do texto e espaçamento
 news-text-size-body = Deixe o texto maior ou menor e a página mais espaçosa ou mais compacta, e escolha o que os blocos e a barra superior mostram.
 news-tag-tree-title = Tags dentro de tags
-news-tag-tree-body = Coloque uma tag dentro de outra mais ampla, para que buscar veículo encontre também carro e sedã. Configurações → Tags mostra todas como uma árvore.
+news-tag-tree-body = Coloque uma tag dentro de outra mais ampla, para que buscar veículo encontre também carro e sedã. Aninhe as tags em Configurações → Tags ou na página de cada tag.
 news-bulk-edit-title = Editar vários de uma vez
 news-bulk-edit-body = Selecione alguns assets e pressione E para mudar as tags, a licença, a avaliação e mais de todos de uma vez, com Desfazer.
 news-backups-title = Backups agendados

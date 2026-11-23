@@ -2738,7 +2738,13 @@ tag-page-narrower = Węższe:
 tag-page-narrower-title = Wyszukanie { $tag } znajdzie też te
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Szersze i węższe
-tags-tree-what = Tagi umieszczone pod szerszymi tagami na ich stronach. Wyszukanie tagu znajdzie też wszystko, co jest pod nim.
+tags-tree-what = Umieść tag pod szerszym, tutaj lub na jego stronie, a wyszukiwanie szerszego znajdzie też wszystko, co jest pod nim.
+tags-tree-none = Nic nie jest jeszcze pod niczym. Spróbuj umieścić samochód pod pojazdem.
+tags-tree-tag-label = Tag do umieszczenia pod szerszym
+tags-tree-tag-placeholder = Tag, np. samochód
+tags-tree-goes-under = należy do
+tags-tree-parent-label = Szerszy tag
+tags-tree-put = Umieść pod
 
 ## LibraryStats.vue
 
@@ -3583,6 +3589,7 @@ news-to-find =
        *[other] { $count } do odkrycia
     }
 news-close = Zamknij
+news-got-it = Rozumiem
 news-take-me = Przejdź tam
 news-look-again = Zobacz ponownie
 news-none = Na razie nie ma nic nowego do odkrycia.
@@ -3606,7 +3613,7 @@ news-motion-trails-body = Miniatura animacji kreśli drogę, którą pokonuje po
 news-text-size-title = Rozmiar tekstu i odstępy
 news-text-size-body = Powiększ lub pomniejsz tekst, zrób stronę przestronniejszą lub bardziej zwartą i wybierz, co pokazują kafelki i górny pasek.
 news-tag-tree-title = Tagi w tagach
-news-tag-tree-body = Umieść tag pod szerszym, a wyszukiwanie „pojazd” znajdzie też „samochód” i „sedan”. Ustawienia → Tagi pokazują je jako drzewo.
+news-tag-tree-body = Umieść tag pod szerszym, a wyszukiwanie „pojazd” znajdzie też „samochód” i „sedan”. Zagnieżdżaj je w Ustawienia → Tagi albo na stronie danego tagu.
 news-bulk-edit-title = Edycja wielu naraz
 news-bulk-edit-body = Zaznacz kilka zasobów i naciśnij E, aby zmienić naraz ich tagi, licencję, ocenę i nie tylko, z możliwością cofnięcia.
 news-backups-title = Zaplanowane kopie zapasowe

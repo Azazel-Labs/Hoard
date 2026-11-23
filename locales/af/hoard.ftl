@@ -2521,7 +2521,13 @@ tag-page-narrower = Smaller:
 tag-page-narrower-title = As jy { $tag } soek, vind jy ook hierdie
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Breër en smaller
-tags-tree-what = Etikette wat vanaf hul etiketbladsye onder breër etikette geplaas is. As jy 'n etiket soek, vind jy ook alles daaronder.
+tags-tree-what = Plaas ’n etiket onder ’n breër een, hier of op sy etiketbladsy, en ’n soektog na die breër een vind ook alles daaronder.
+tags-tree-none = Niks is nog onder iets nie. Probeer motor onder voertuig plaas.
+tags-tree-tag-label = Etiket om onder ’n breër een te plaas
+tags-tree-tag-placeholder = ’n Etiket, soos motor
+tags-tree-goes-under = gaan onder
+tags-tree-parent-label = Breër etiket
+tags-tree-put = Plaas onder
 
 ## LibraryStats.vue
 
@@ -3282,6 +3288,7 @@ news-to-find =
        *[other] { $count } om te vind
     }
 news-close = Maak toe
+news-got-it = Reg so
 news-take-me = Neem my soontoe
 news-look-again = Kyk weer
 news-none = Niks nuuts om nou te vind nie.
@@ -3303,7 +3310,7 @@ news-motion-trails-body = ’n Animasie se duimnael trek die pad na wat sy karak
 news-text-size-title = Teksgrootte en spasiëring
 news-text-size-body = Maak die skrif groter of kleiner en die bladsy ruimer of kompakter, en kies wat die teëls en die boonste balk wys.
 news-tag-tree-title = Etikette binne etikette
-news-tag-tree-body = Plaas ’n etiket onder ’n breër een, sodat ’n soektog na voertuig ook motor en sedan vind. Instellings → Etikette teken hulle as ’n boom.
+news-tag-tree-body = Plaas ’n etiket onder ’n breër een, sodat ’n soektog na voertuig ook motor en sedan vind. Plaas hulle in mekaar op Instellings → Etikette of op ’n etiket se eie bladsy.
 news-bulk-edit-title = Wysig baie tegelyk
 news-bulk-edit-body = Kies ’n paar bates en druk E om hul etikette, lisensie, gradering en meer saam te verander, met Ontdoen.
 news-backups-title = Geskeduleerde rugsteun

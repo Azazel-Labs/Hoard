@@ -7979,6 +7979,10 @@ translation = """
 source = "Close"
 translation = "Затвори"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Важи"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Погледај поново"
@@ -8039,8 +8043,8 @@ source = "Stop pointing out new things"
 translation = "Не истичи новине"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Ставите ознаку испод шире, па претрага за „возило“ налази и „аутомобил“ и „седан“. Подешавања → Ознаке их приказују као стабло."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Ставите ознаку испод шире, па претрага за „возило“ налази и „аутомобил“ и „седан“. Угнездите их у Подешавања → Ознаке или на страници ознаке."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12649,13 +12653,37 @@ translation = "Најкоришћеније"
 source = "A–Z"
 translation = "А–Ш"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "иде испод"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Шире и уже"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Још ништа није испод нечега. Пробајте да ставите аутомобил испод возило."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Шира ознака"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Стави испод"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Ознака коју треба ставити испод шире"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Ознака, на пример аутомобил"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Ознаке стављене испод ширих на својим страницама. Претрагом ознаке налази се и све испод ње."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Ставите ознаку испод шире, овде или на њеној страници, па претрага шире налази и све што је испод ње."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -2527,7 +2527,13 @@ tag-page-narrower = Mais específicas:
 tag-page-narrower-title = Pesquisar { $tag } também encontra estas
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Mais amplas e mais específicas
-tags-tree-what = Etiquetas colocadas dentro de etiquetas mais amplas a partir das respetivas páginas. Pesquisar uma etiqueta também encontra tudo o que está dentro dela.
+tags-tree-what = Coloque uma etiqueta dentro de outra mais ampla, aqui ou na página dela, e pesquisar a mais ampla encontra também tudo o que está dentro.
+tags-tree-none = Ainda não há nada dentro de nada. Experimente colocar automóvel dentro de veículo.
+tags-tree-tag-label = Etiqueta a colocar dentro de outra mais ampla
+tags-tree-tag-placeholder = Uma etiqueta, como automóvel
+tags-tree-goes-under = fica dentro de
+tags-tree-parent-label = Etiqueta mais ampla
+tags-tree-put = Colocar dentro
 
 ## LibraryStats.vue
 
@@ -3295,6 +3301,7 @@ news-to-find =
        *[other] { $count } por descobrir
     }
 news-close = Fechar
+news-got-it = Percebi
 news-take-me = Ir para lá
 news-look-again = Ver outra vez
 news-none = Não há novidades por descobrir de momento.
@@ -3316,7 +3323,7 @@ news-motion-trails-body = A miniatura de uma animação traça o caminho que a p
 news-text-size-title = Tamanho do texto e espaçamento
 news-text-size-body = Torne o texto maior ou mais pequeno e a página mais espaçosa ou mais compacta, e escolha o que os mosaicos e a barra superior mostram.
 news-tag-tree-title = Etiquetas dentro de etiquetas
-news-tag-tree-body = Coloque uma etiqueta dentro de outra mais ampla, para que pesquisar veículo encontre também automóvel e berlina. Definições → Etiquetas mostra-as como uma árvore.
+news-tag-tree-body = Coloque uma etiqueta dentro de outra mais ampla, para que pesquisar veículo encontre também automóvel e berlina. Aninhe-as em Definições → Etiquetas ou na página de cada etiqueta.
 news-bulk-edit-title = Editar vários de uma vez
 news-bulk-edit-body = Selecione alguns recursos e prima E para alterar de uma vez as etiquetas, a licença, a classificação e mais, com Anular.
 news-backups-title = Cópias de segurança agendadas

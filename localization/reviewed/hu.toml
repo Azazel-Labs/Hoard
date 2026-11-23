@@ -7783,6 +7783,10 @@ translation = """
 source = "Close"
 translation = "Bezárás"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Értem"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Megnézem újra"
@@ -7840,8 +7844,8 @@ source = "Stop pointing out new things"
 translation = "Újdonságok jelzésének kikapcsolása"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldal faként rajzolja ki őket."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldalon vagy a címkék saját oldalán ágyazhatja egymásba őket."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12314,13 +12318,37 @@ translation = "Leggyakoribb"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "alá tartozik:"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Tágabb és szűkebb"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Még semmi sincs semmi alatt. Próbálja az autót a jármű alá rendelni."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Tágabb címke"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Alárendelés"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Tágabb alá rendelendő címke"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Egy címke, például autó"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "A címkeoldalukon tágabb címkék alá rendelt címkék. Ha egy címkére keres, mindent megtalál, ami alatta van."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Rendeljen egy címkét egy tágabb alá itt vagy a címke oldalán, és a tágabbra keresve minden alatta lévő is előkerül."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

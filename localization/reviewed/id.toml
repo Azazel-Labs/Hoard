@@ -7744,6 +7744,10 @@ translation = """
 source = "Close"
 translation = "Tutup"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Mengerti"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Lihat lagi"
@@ -7800,8 +7804,8 @@ source = "Stop pointing out new things"
 translation = "Berhenti menandai hal baru"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Pengaturan → Tag menampilkannya sebagai pohon."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Susun bertingkat di Pengaturan → Tag atau di halaman tag itu sendiri."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12252,13 +12256,37 @@ translation = "Paling sering"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "masuk di bawah"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Lebih luas dan lebih sempit"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Belum ada yang ditaruh di bawah apa pun. Coba taruh mobil di bawah kendaraan."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Tag yang lebih luas"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Taruh di bawah"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Tag yang akan ditaruh di bawah tag yang lebih luas"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Sebuah tag, misalnya mobil"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Tag yang ditaruh di bawah tag yang lebih luas dari halaman tag-nya. Mencari sebuah tag juga menemukan semua yang ada di bawahnya."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Taruh tag di bawah tag yang lebih luas, di sini atau di halaman tagnya, dan mencari tag yang lebih luas juga menemukan semua yang ada di bawahnya."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

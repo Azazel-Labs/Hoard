@@ -2527,7 +2527,13 @@ tag-page-narrower = Más específicas:
 tag-page-narrower-title = Al buscar { $tag }, también se encuentran estas
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Más amplias y más específicas
-tags-tree-what = Etiquetas puestas debajo de otras más amplias desde sus páginas. Al buscar una etiqueta, también se encuentra todo lo que tiene debajo.
+tags-tree-what = Pon una etiqueta debajo de otra más amplia, aquí o en su página, y al buscar la más amplia también encontrarás todo lo que tiene debajo.
+tags-tree-none = Todavía no hay nada debajo de nada. Prueba a poner auto debajo de vehículo.
+tags-tree-tag-label = Etiqueta para poner debajo de otra más amplia
+tags-tree-tag-placeholder = Una etiqueta, como auto
+tags-tree-goes-under = va debajo de
+tags-tree-parent-label = Etiqueta más amplia
+tags-tree-put = Poner debajo
 
 ## LibraryStats.vue
 
@@ -3295,6 +3301,7 @@ news-to-find =
        *[other] { $count } por descubrir
     }
 news-close = Cerrar
+news-got-it = Entendido
 news-take-me = Llévame ahí
 news-look-again = Volver a verlo
 news-none = No hay nada nuevo que descubrir por ahora.
@@ -3316,7 +3323,7 @@ news-motion-trails-body = La miniatura de una animación traza el recorrido de s
 news-text-size-title = Tamaño del texto y espaciado
 news-text-size-body = Haz la letra más grande o más pequeña y la página más holgada o más compacta, y elige qué muestran los mosaicos y la barra superior.
 news-tag-tree-title = Etiquetas dentro de etiquetas
-news-tag-tree-body = Pon una etiqueta debajo de otra más amplia y, al buscar vehículo, también encontrarás auto y sedán. Configuración → Etiquetas las muestra como un árbol.
+news-tag-tree-body = Pon una etiqueta debajo de otra más amplia y, al buscar vehículo, también encontrarás auto y sedán. Anídalas en Configuración → Etiquetas o en la página de cada etiqueta.
 news-bulk-edit-title = Editar muchos a la vez
 news-bulk-edit-body = Selecciona varios recursos y presiona E para cambiar a la vez sus etiquetas, licencia, valoración y más, con Deshacer.
 news-backups-title = Copias de seguridad programadas

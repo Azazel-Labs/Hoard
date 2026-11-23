@@ -2364,7 +2364,13 @@ tag-page-narrower = Szűkebbek:
 tag-page-narrower-title = A(z) { $tag } keresése ezeket is megtalálja
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Tágabb és szűkebb
-tags-tree-what = A címkeoldalukon tágabb címkék alá rendelt címkék. Ha egy címkére keres, mindent megtalál, ami alatta van.
+tags-tree-what = Rendeljen egy címkét egy tágabb alá itt vagy a címke oldalán, és a tágabbra keresve minden alatta lévő is előkerül.
+tags-tree-none = Még semmi sincs semmi alatt. Próbálja az autót a jármű alá rendelni.
+tags-tree-tag-label = Tágabb alá rendelendő címke
+tags-tree-tag-placeholder = Egy címke, például autó
+tags-tree-goes-under = alá tartozik:
+tags-tree-parent-label = Tágabb címke
+tags-tree-put = Alárendelés
 
 ## Könyvtárstatisztika
 
@@ -3113,6 +3119,7 @@ news-to-find =
        *[other] { $count } felfedezésre vár
     }
 news-close = Bezárás
+news-got-it = Értem
 news-take-me = Ugrás oda
 news-look-again = Megnézem újra
 news-none = Most nincs felfedeznivaló újdonság.
@@ -3134,7 +3141,7 @@ news-motion-trails-body = Az animációk bélyegképe kirajzolja a karakter útj
 news-text-size-title = Szövegméret és térköz
 news-text-size-body = Legyen nagyobb vagy kisebb a szöveg, tágasabb vagy tömörebb az oldal, és válassza ki, mit mutassanak a csempék és a felső sáv.
 news-tag-tree-title = Címkék a címkéken belül
-news-tag-tree-body = Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldal faként rajzolja ki őket.
+news-tag-tree-body = Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldalon vagy a címkék saját oldalán ágyazhatja egymásba őket.
 news-bulk-edit-title = Sok asset szerkesztése egyszerre
 news-bulk-edit-body = Jelöljön ki néhány assetet, és nyomja meg az E billentyűt, hogy egyszerre módosítsa a címkéiket, licencüket, értékelésüket és még sok mást – mindez visszavonható.
 news-backups-title = Ütemezett biztonsági mentések

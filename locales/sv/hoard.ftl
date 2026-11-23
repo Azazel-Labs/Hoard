@@ -2524,7 +2524,13 @@ tag-page-narrower = Smalare:
 tag-page-narrower-title = Att söka på { $tag } hittar även dessa
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Bredare och smalare
-tags-tree-what = Taggar som lagts under bredare taggar från sina taggsidor. Att söka på en tagg hittar även allt under den.
+tags-tree-what = Lägg en tagg under en bredare, här eller på taggens sida, så hittar en sökning på den bredare även allt under den.
+tags-tree-none = Inget ligger under något ännu. Prova att lägga bil under fordon.
+tags-tree-tag-label = Tagg att lägga under en bredare
+tags-tree-tag-placeholder = En tagg, till exempel bil
+tags-tree-goes-under = hör till
+tags-tree-parent-label = Bredare tagg
+tags-tree-put = Lägg under
 
 ## LibraryStats.vue
 
@@ -3292,6 +3298,7 @@ news-to-find =
        *[other] { $count } att upptäcka
     }
 news-close = Stäng
+news-got-it = Uppfattat
 news-take-me = Ta mig dit
 news-look-again = Titta igen
 news-none = Inget nytt att upptäcka just nu.
@@ -3313,7 +3320,7 @@ news-motion-trails-body = En animations miniatyrbild ritar upp vägen figuren ta
 news-text-size-title = Textstorlek och avstånd
 news-text-size-body = Gör texten större eller mindre och sidan luftigare eller mer kompakt, och välj vad rutorna och toppfältet visar.
 news-tag-tree-title = Taggar i taggar
-news-tag-tree-body = Lägg en tagg under en bredare, så att en sökning på fordon även hittar bil och sedan. Inställningar → Taggar visar dem som ett träd.
+news-tag-tree-body = Lägg en tagg under en bredare, så att en sökning på fordon även hittar bil och sedan. Ordna dem i varandra under Inställningar → Taggar eller på en taggs egen sida.
 news-bulk-edit-title = Redigera många på en gång
 news-bulk-edit-body = Välj några resurser och tryck på E för att ändra deras taggar, licens, betyg med mera på en gång, med Ångra.
 news-backups-title = Schemalagda säkerhetskopior

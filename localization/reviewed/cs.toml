@@ -8042,6 +8042,10 @@ translation = """
 source = "Close"
 translation = "Zavřít"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Rozumím"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Podívat se znovu"
@@ -8103,8 +8107,8 @@ source = "Stop pointing out new things"
 translation = "Přestat upozorňovat na novinky"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Nastavení → Štítky je vykreslí jako strom."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Vnořujte je v Nastavení → Štítky nebo na stránce štítku."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12751,13 +12755,37 @@ translation = "Nejpoužívanější"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "patří pod"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Širší a užší"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Zatím není nic pod ničím. Zkuste zařadit auto pod vozidlo."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Širší štítek"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Zařadit"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Štítek, který zařadit pod širší"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Štítek, třeba auto"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Štítky zařazené pod širší štítky na svých stránkách. Vyhledáním štítku najdete i vše, co je pod ním."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Zařaďte štítek pod širší, tady nebo na jeho stránce, a hledání širšího štítku najde i vše pod ním."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

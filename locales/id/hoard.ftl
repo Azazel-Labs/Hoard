@@ -2319,7 +2319,13 @@ tag-page-narrower = Lebih sempit:
 tag-page-narrower-title = Mencari { $tag } juga menemukan ini
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Lebih luas dan lebih sempit
-tags-tree-what = Tag yang ditaruh di bawah tag yang lebih luas dari halaman tag-nya. Mencari sebuah tag juga menemukan semua yang ada di bawahnya.
+tags-tree-what = Taruh tag di bawah tag yang lebih luas, di sini atau di halaman tagnya, dan mencari tag yang lebih luas juga menemukan semua yang ada di bawahnya.
+tags-tree-none = Belum ada yang ditaruh di bawah apa pun. Coba taruh mobil di bawah kendaraan.
+tags-tree-tag-label = Tag yang akan ditaruh di bawah tag yang lebih luas
+tags-tree-tag-placeholder = Sebuah tag, misalnya mobil
+tags-tree-goes-under = masuk di bawah
+tags-tree-parent-label = Tag yang lebih luas
+tags-tree-put = Taruh di bawah
 
 ## LibraryStats.vue
 
@@ -3052,6 +3058,7 @@ news-to-find =
        *[other] { $count } menunggu ditemukan
     }
 news-close = Tutup
+news-got-it = Mengerti
 news-take-me = Bawa saya ke sana
 news-look-again = Lihat lagi
 news-none = Tidak ada hal baru untuk saat ini.
@@ -3072,7 +3079,7 @@ news-motion-trails-body = Gambar mini animasi menggambar jalur yang ditempuh kar
 news-text-size-title = Ukuran teks dan jarak
 news-text-size-body = Perbesar atau perkecil tulisan, buat halaman lebih lega atau lebih ringkas, dan pilih apa yang ditampilkan ubin dan bilah atas.
 news-tag-tree-title = Tag di dalam tag
-news-tag-tree-body = Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Pengaturan → Tag menampilkannya sebagai pohon.
+news-tag-tree-body = Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Susun bertingkat di Pengaturan → Tag atau di halaman tag itu sendiri.
 news-bulk-edit-title = Edit banyak sekaligus
 news-bulk-edit-body = Pilih beberapa aset lalu tekan E untuk mengubah tag, lisensi, peringkat, dan lainnya sekaligus, dengan Urungkan.
 news-backups-title = Cadangan terjadwal

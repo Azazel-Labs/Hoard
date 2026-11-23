@@ -1271,7 +1271,10 @@ function teachFile(a: Asset) {
 }
 const openNews = () => (newsTray.value = true)
 const closeNews = () => (newsTray.value = false)
-/** Take someone to something new (from the tray or the palette): to its page, scrolled to its pip. */
+/** How long the pip of something gone to from the tray glints before going: long enough to see where it was. */
+const SHOWN_FOR = 1800
+/** Take someone to something new (from the tray or the palette): to its page, scrolled to its pip. Going there is
+ * seeing it. */
 function goToNew(n: NewThing) {
   const w = n.where
   if ('library' in w) {
@@ -1286,9 +1289,11 @@ function goToNew(n: NewThing) {
   let tries = 0
   const find = () => {
     const pip = document.querySelector<HTMLElement>(`.settings-pane [data-new="${n.id}"]`)
-    if (pip) pip.scrollIntoView({ block: 'center', behavior: reducedMotion.matches ? 'auto' : 'smooth' })
-    else if (++tries < 20) setTimeout(find, 100)
-    // Nowhere on the page to point at (pips turned off, or a tag tree with nothing in it yet).
+    if (pip) {
+      pip.scrollIntoView({ block: 'center', behavior: reducedMotion.matches ? 'auto' : 'smooth' })
+      setTimeout(() => markSeen(n.id), SHOWN_FOR)
+    } else if (++tries < 20) setTimeout(find, 100)
+    // Nowhere on the page to point at (pips turned off).
     else markSeen(n.id)
   }
   void nextTick(find)

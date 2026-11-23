@@ -7726,6 +7726,10 @@ translation = """
 source = "Close"
 translation = "关闭"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "知道了"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "再看一次"
@@ -7782,8 +7786,8 @@ source = "Stop pointing out new things"
 translation = "不再提示新功能"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "把标签放到更宽泛的标签下，搜索“交通工具”时也能找到“汽车”和“轿车”。“设置 → 标签”会以树状图显示它们。"
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "把标签放到更宽泛的标签下，搜索“交通工具”时也能找到“汽车”和“轿车”。可在“设置 → 标签”或各标签自己的页面上嵌套它们。"
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12234,13 +12238,37 @@ translation = "最常用"
 source = "A–Z"
 translation = "按名称"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "放到"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "上级与下级"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "还没有标签放在其他标签下。试试把“汽车”放到“交通工具”下。"
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "上级标签"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "设为下级"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "要放到上级标签下的标签"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "标签，例如汽车"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "在标签页中放到更宽泛标签下的标签。搜索一个标签时，也会找到它下面的所有内容。"
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "在这里或标签页面上把标签放到更宽泛的标签下，搜索宽泛的标签时也会找到它下面的一切。"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

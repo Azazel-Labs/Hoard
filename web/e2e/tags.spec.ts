@@ -13,7 +13,7 @@ test.describe('settings: tags', () => {
 
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`e2em${u}`)
-    const list = page.locator('.tags .list').first()
+    const list = page.locator('.tags .list:not(.tree)').first()
     await expect(list.getByRole('checkbox')).toHaveCount(2)
     await list.getByLabel(`e2em${u}-alpha`).check()
     await list.getByLabel(`e2em${u}-beta`).check()
@@ -51,7 +51,7 @@ test.describe('settings: tags', () => {
 
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`e2eold${u}`)
-    const list = page.locator('.tags .list').first()
+    const list = page.locator('.tags .list:not(.tree)').first()
     await list.getByLabel(`set:e2eold${u}`).check()
     const name = page.getByLabel('New name')
     await expect(name).toHaveValue(`set:e2eold${u}`)
@@ -83,7 +83,7 @@ test.describe('settings: tags', () => {
     // Renaming one shows the name as the server will keep it, marks and all.
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`संगीत${u}`)
-    await page.locator('.tags .list').first().getByLabel(`संगीत${u}:क्षेत्र`).check()
+    await page.locator('.tags .list:not(.tree)').first().getByLabel(`संगीत${u}:क्षेत्र`).check()
     await page.getByLabel('New name').fill(`संगीत${u}: ताल वाद्य`)
     await expect(page.getByText(`Saved as संगीत${u}:ताल-वाद्य`)).toBeVisible()
   })
@@ -103,5 +103,25 @@ test.describe('settings: tags', () => {
     expect(asset).toContain(`e2ekeep${u}`)
     await page.getByRole('button', { name: 'Cancel' }).click()
     await expect(page.getByLabel('New name')).toHaveCount(0)
+  })
+
+  test('puts a tag under a broader one right on the page, and takes it out again', async ({ page, api, seed }) => {
+    const u = unique()
+    const id = seed.assets[`${BIG}/Img 140`]
+    await addTags(api, id, [`e2ecar${u}`, `e2evehicle${u}`])
+    await page.goto('/#settings/tags')
+    await page.getByLabel('Tag to put under a broader one').fill(`e2ecar${u}`)
+    await page.getByLabel('Broader tag').fill(`e2evehicle${u}`)
+    await page.getByRole('button', { name: 'Put under', exact: true }).click()
+    await expect(page.getByRole('status').filter({ hasText: `e2ecar${u} is now under e2evehicle${u}` })).toBeVisible()
+    const tree = page.locator('.tags .list.tree')
+    const nested = tree.locator('li').filter({ hasText: `e2ecar${u}` })
+    await expect(nested).toBeVisible()
+    const edges = (await (await api.get('/api/tags/tree')).json()) as { tag: string; parent: string }[]
+    expect(edges).toContainEqual({ tag: `e2ecar${u}`, parent: `e2evehicle${u}` })
+
+    await nested.getByRole('button', { name: `Take e2ecar${u} out from under e2evehicle${u}` }).click()
+    await expect(page.getByRole('status').filter({ hasText: `e2ecar${u} is no longer under e2evehicle${u}` })).toBeVisible()
+    await expect(tree.locator('li').filter({ hasText: `e2ecar${u}` })).toHaveCount(0)
   })
 })

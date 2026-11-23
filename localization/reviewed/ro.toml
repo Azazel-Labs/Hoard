@@ -8039,6 +8039,10 @@ translation = """
 source = "Close"
 translation = "Închide"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Am înțeles"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Priviți din nou"
@@ -8098,8 +8102,8 @@ source = "Stop pointing out new things"
 translation = "Nu mai semnalați noutățile"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Setări → Etichete le arată ca arbore."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Le puteți încadra în Setări → Etichete sau pe pagina fiecărei etichete."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12728,13 +12732,37 @@ translation = "Cele mai folosite"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "intră sub"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Mai largi și mai înguste"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Încă nu se află nimic sub altceva. Încercați să plasați mașină sub vehicul."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Etichetă mai largă"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Plasați sub"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Eticheta de plasat sub una mai largă"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "O etichetă, de exemplu mașină"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Etichete plasate sub etichete mai largi din paginile lor. Căutarea după o etichetă găsește și tot ce este sub ea."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Plasați o etichetă sub una mai largă, aici sau pe pagina ei, iar căutarea celei mai largi găsește și tot ce se află sub ea."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -2287,7 +2287,13 @@ tag-page-narrower = 下级标签：
 tag-page-narrower-title = 搜索 { $tag } 时，也会找到这些
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = 上级与下级
-tags-tree-what = 在标签页中放到更宽泛标签下的标签。搜索一个标签时，也会找到它下面的所有内容。
+tags-tree-what = 在这里或标签页面上把标签放到更宽泛的标签下，搜索宽泛的标签时也会找到它下面的一切。
+tags-tree-none = 还没有标签放在其他标签下。试试把“汽车”放到“交通工具”下。
+tags-tree-tag-label = 要放到上级标签下的标签
+tags-tree-tag-placeholder = 标签，例如汽车
+tags-tree-goes-under = 放到
+tags-tree-parent-label = 上级标签
+tags-tree-put = 设为下级
 
 ## LibraryStats.vue
 
@@ -3020,6 +3026,7 @@ news-to-find =
        *[other] 还有 { $count } 项待发现
     }
 news-close = 关闭
+news-got-it = 知道了
 news-take-me = 带我去看
 news-look-again = 再看一次
 news-none = 暂时没有新功能可看。
@@ -3040,7 +3047,7 @@ news-motion-trails-body = 动画的缩略图会描出角色走过的路径，并
 news-text-size-title = 文字大小与间距
 news-text-size-body = 把文字调大或调小、页面调得宽松或紧凑，并选择图块和顶栏显示的内容。
 news-tag-tree-title = 标签套标签
-news-tag-tree-body = 把标签放到更宽泛的标签下，搜索“交通工具”时也能找到“汽车”和“轿车”。“设置 → 标签”会以树状图显示它们。
+news-tag-tree-body = 把标签放到更宽泛的标签下，搜索“交通工具”时也能找到“汽车”和“轿车”。可在“设置 → 标签”或各标签自己的页面上嵌套它们。
 news-bulk-edit-title = 批量编辑
 news-bulk-edit-body = 选中一些资源后按 E，即可一起更改它们的标签、许可证、评分等，并且可以撤销。
 news-backups-title = 定时备份

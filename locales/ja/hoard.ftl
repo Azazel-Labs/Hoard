@@ -2287,7 +2287,13 @@ tag-page-narrower = 下位タグ:
 tag-page-narrower-title = { $tag } を検索すると、これらも見つかります
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = 上位と下位
-tags-tree-what = タグのページで上位タグの下に入れたタグです。タグを検索すると、その下にあるものもすべて見つかります。
+tags-tree-what = ここかタグのページで、タグを上位のタグの下に入れられます。上位のタグを検索すると、その下にあるものもすべて見つかります。
+tags-tree-none = まだ何も入れ子になっていません。「車」を「乗り物」の下に入れてみましょう。
+tags-tree-tag-label = 上位タグの下に入れるタグ
+tags-tree-tag-placeholder = タグ（例: 車）
+tags-tree-goes-under = を次の下に:
+tags-tree-parent-label = 上位のタグ
+tags-tree-put = 下に入れる
 
 ## LibraryStats.vue
 
@@ -3020,6 +3026,7 @@ news-to-find =
        *[other] 未確認 { $count } 件
     }
 news-close = 閉じる
+news-got-it = 了解
 news-take-me = 見に行く
 news-look-again = もう一度見る
 news-none = 今のところ新着はありません。
@@ -3040,7 +3047,7 @@ news-motion-trails-body = アニメーションのサムネイルにキャラク
 news-text-size-title = 文字の大きさと余白
 news-text-size-body = 文字を大きくも小さくも、ページをゆったりともコンパクトにもできます。タイルと上部バーに表示するものも選べます。
 news-tag-tree-title = タグの中のタグ
-news-tag-tree-body = タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ ではツリーとして表示されます。
+news-tag-tree-body = タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ か、各タグのページで入れ子にできます。
 news-bulk-edit-title = まとめて編集
 news-bulk-edit-body = アセットをいくつか選んで E を押すと、タグ、ライセンス、評価などをまとめて変更できます。元に戻すこともできます。
 news-backups-title = 定期バックアップ

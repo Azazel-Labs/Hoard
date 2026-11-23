@@ -8094,6 +8094,10 @@ translation = """
 source = "Close"
 translation = "Закрити"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Зрозуміло"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Подивитися ще раз"
@@ -8156,8 +8160,8 @@ source = "Stop pointing out new things"
 translation = "Не позначати нове"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Помістіть тег під ширший, і пошук за «транспорт» знайде також «автомобіль» і «седан». У «Налаштування → Теги» вони показані деревом."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Помістіть тег під ширший, і пошук за «транспорт» знайде також «автомобіль» і «седан». Вкладати теги можна в «Налаштування → Теги» або на сторінці тегу."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12846,13 +12850,37 @@ translation = "Найуживаніші"
 source = "A–Z"
 translation = "А–Я"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "входить до"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Ширші й вужчі"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Поки нічого ні під чим немає. Спробуйте помістити «автомобіль» під «транспорт»."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Ширший тег"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Помістити"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Тег, який помістити під ширший"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Тег, наприклад автомобіль"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Теги, поміщені під ширші на своїх сторінках. При пошуку тега знаходиться й усе, що під ним."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Помістіть тег під ширший тут або на сторінці тегу, і пошук за ширшим тегом знайде все, що під ним."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

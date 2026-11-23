@@ -1,5 +1,6 @@
 // What's new in Hoard: a short list of things recent releases added, each pointed out with a glinting gold pip where
-// it lives until it's been seen (on screen for a moment, or used), and gathered in the top bar's "N new" tray.
+// it lives until it's been seen (used, dismissed from its pip, or gone to from the tray), and gathered in the top
+// bar's "N new" tray.
 // What's been seen is kept with the account (so a new browser doesn't point it all out again), and in this browser
 // for guests. Only what this account may use is pointed out: an admin's settings never glint for anyone else.
 import { computed, reactive, ref, watch } from 'vue'
@@ -152,6 +153,10 @@ const unseenIds = computed(() => new Set(unseen.value.map((n) => n.id)))
 /** Whether to point out this new thing (or new things at all, without an id). */
 export function isNew(id: string): boolean {
   return !news.off && unseenIds.value.has(id)
+}
+/** The new thing with this id. */
+export function newThing(id: string): NewThing | undefined {
+  return NEWS.find((n) => n.id === id)
 }
 /** The new things on a page of Settings still to see. */
 export function newOnPage(page: string): string[] {

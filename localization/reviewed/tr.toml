@@ -7755,6 +7755,10 @@ translation = """
 source = "Close"
 translation = "Kapat"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Anladım"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Yeniden bak"
@@ -7812,8 +7816,8 @@ source = "Stop pointing out new things"
 translation = "Yeni şeyleri işaretlemeyi bırak"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Ayarlar → Etiketler bunları bir ağaç olarak gösterir."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Bunları Ayarlar → Etiketler’de ya da her etiketin kendi sayfasında iç içe koyabilirsiniz."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12286,13 +12290,37 @@ translation = "En çok kullanılan"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "şunun altına:"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Daha geniş ve daha dar"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Henüz hiçbir şey bir şeyin altında değil. Otomobil etiketini araç etiketinin altına koymayı deneyin."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Daha geniş etiket"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Altına koy"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Daha geniş bir etiketin altına konacak etiket"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Bir etiket, örneğin otomobil"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Etiket sayfalarından daha geniş etiketlerin altına konan etiketler. Bir etiketi aradığınızda altındaki her şey de bulunur."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Bir etiketi burada ya da kendi sayfasında daha geniş bir etiketin altına koyun; geniş olanı aramak altındaki her şeyi de bulur."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

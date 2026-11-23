@@ -2582,7 +2582,13 @@ tag-page-narrower = Suppeammat:
 tag-page-narrower-title = Kun haet tunnistetta { $tag }, löydät myös nämä
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Laajemmat ja suppeammat
-tags-tree-what = Tunnisteet, jotka on asetettu laajempien alle tunnisteiden omilla sivuilla. Tunnistetta hakemalla löydät myös kaiken sen alla olevan.
+tags-tree-what = Aseta tunniste laajemman alle täällä tai sen omalla sivulla, niin laajemman haku löytää myös kaiken sen alla olevan.
+tags-tree-none = Mikään ei ole vielä minkään alla. Kokeile asettaa auto ajoneuvon alle.
+tags-tree-tag-label = Laajemman alle asetettava tunniste
+tags-tree-tag-placeholder = Tunniste, esim. auto
+tags-tree-goes-under = kuuluu alle:
+tags-tree-parent-label = Laajempi tunniste
+tags-tree-put = Aseta alle
 
 ## Kirjaston tilastot
 
@@ -3374,6 +3380,7 @@ news-to-find =
        *[other] { $count } löydettävänä
     }
 news-close = Sulje
+news-got-it = Selvä
 news-take-me = Vie minut sinne
 news-look-again = Katso uudelleen
 news-none = Juuri nyt ei ole mitään uutta löydettävää.
@@ -3395,7 +3402,7 @@ news-motion-trails-body = Animaation pikkukuva piirtää hahmon kulkeman reitin 
 news-text-size-title = Tekstin koko ja välit
 news-text-size-body = Suurenna tai pienennä tekstiä, tee sivusta väljempi tai tiiviimpi ja valitse, mitä ruudut ja yläpalkki näyttävät.
 news-tag-tree-title = Tunnisteita tunnisteiden sisällä
-news-tag-tree-body = Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Asetukset → Tunnisteet piirtää ne puuksi.
+news-tag-tree-body = Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Sisäkkäistä niitä kohdassa Asetukset → Tunnisteet tai tunnisteen omalla sivulla.
 news-bulk-edit-title = Muokkaa montaa kerralla
 news-bulk-edit-body = Valitse resursseja ja paina E muuttaaksesi niiden tunnisteita, lisenssiä, arvosanaa ja muuta kerralla. Kumoa toimii myös.
 news-backups-title = Ajastetut varmuuskopiot

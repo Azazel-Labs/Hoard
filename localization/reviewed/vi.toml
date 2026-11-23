@@ -7712,6 +7712,10 @@ translation = """
 source = "Close"
 translation = "Đóng"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Đã hiểu"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Xem lại"
@@ -7768,8 +7772,8 @@ source = "Stop pointing out new things"
 translation = "Ngừng đánh dấu những điều mới"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Cài đặt → Thẻ vẽ chúng thành dạng cây."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Lồng chúng vào nhau trong Cài đặt → Thẻ hoặc trên trang riêng của từng thẻ."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12220,13 +12224,37 @@ translation = "Dùng nhiều nhất"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "nằm dưới"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Rộng hơn và hẹp hơn"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Chưa có thẻ nào nằm dưới thẻ khác. Hãy thử đặt “ô tô” dưới “phương tiện”."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Thẻ rộng hơn"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Đặt dưới"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Thẻ cần đặt dưới một thẻ rộng hơn"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Một thẻ, ví dụ ô tô"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Các thẻ được đặt dưới thẻ rộng hơn từ trang thẻ của chúng. Tìm một thẻ cũng sẽ thấy mọi thứ nằm dưới nó."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Đặt một thẻ dưới thẻ rộng hơn, tại đây hoặc trên trang của thẻ đó, và tìm thẻ rộng hơn cũng sẽ thấy mọi thứ bên dưới."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

@@ -2521,7 +2521,13 @@ tag-page-narrower = Smallere:
 tag-page-narrower-title = Zoeken op { $tag } vindt ook deze
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Breder en smaller
-tags-tree-what = Tags die vanaf hun tagpagina onder bredere tags zijn gezet. Zoeken op een tag vindt ook alles eronder.
+tags-tree-what = Plaats een tag onder een bredere, hier of op de tagpagina, en zoeken op de bredere vindt ook alles wat eronder valt.
+tags-tree-none = Er staat nog niets onder iets anders. Probeer auto onder voertuig te plaatsen.
+tags-tree-tag-label = Tag om onder een bredere te plaatsen
+tags-tree-tag-placeholder = Een tag, zoals auto
+tags-tree-goes-under = valt onder
+tags-tree-parent-label = Bredere tag
+tags-tree-put = Plaats eronder
 
 ## LibraryStats.vue
 
@@ -3284,6 +3290,7 @@ news-to-find =
        *[other] { $count } te ontdekken
     }
 news-close = Sluiten
+news-got-it = Begrepen
 news-take-me = Breng me erheen
 news-look-again = Nog eens bekijken
 news-none = Op dit moment niets nieuws te ontdekken.
@@ -3305,7 +3312,7 @@ news-motion-trails-body = De miniatuur van een animatie tekent het pad dat het p
 news-text-size-title = Tekstgrootte en ruimte
 news-text-size-body = Maak de tekst groter of kleiner en de pagina ruimer of compacter, en kies wat de tegels en de bovenbalk laten zien.
 news-tag-tree-title = Tags in tags
-news-tag-tree-body = Zet een tag onder een bredere, zodat zoeken op voertuig ook auto en sedan vindt. Instellingen → Tags tekent ze als een boom.
+news-tag-tree-body = Zet een tag onder een bredere, zodat zoeken op voertuig ook auto en sedan vindt. Nest ze bij Instellingen → Tags of op de eigen pagina van een tag.
 news-bulk-edit-title = Veel tegelijk bewerken
 news-bulk-edit-body = Selecteer een paar assets en druk op E om hun tags, licentie, beoordeling en meer tegelijk te wijzigen, met Ongedaan maken.
 news-backups-title = Geplande back-ups

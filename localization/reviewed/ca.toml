@@ -7916,6 +7916,10 @@ translation = """
 source = "Close"
 translation = "Tanca"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Entesos"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Torna-ho a veure"
@@ -7973,8 +7977,8 @@ source = "Stop pointing out new things"
 translation = "Deixa d’assenyalar les novetats"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Configuració → Etiquetes les mostra com un arbre."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Niua-les a Configuració → Etiquetes o a la pàgina de cada etiqueta."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12501,13 +12505,37 @@ translation = "Més usades"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "va sota"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Més àmplies i més específiques"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Encara no hi ha res sota res. Prova de posar cotxe sota vehicle."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Etiqueta més àmplia"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Posa-la a sota"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Etiqueta per posar sota una de més àmplia"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Una etiqueta, com ara cotxe"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Etiquetes posades sota altres de més àmplies des de les seves pàgines. En cercar una etiqueta, també es troba tot el que té a sota."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Posa una etiqueta sota una de més àmplia, aquí o a la seva pàgina, i en cercar la més àmplia també trobaràs tot el que hi ha a sota."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

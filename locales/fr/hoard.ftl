@@ -2555,7 +2555,13 @@ tag-page-narrower = Plus précises :
 tag-page-narrower-title = Chercher { $tag } trouve aussi celles-ci
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Plus larges et plus précises
-tags-tree-what = Étiquettes placées sous des plus larges depuis leur page. Chercher une étiquette trouve aussi tout ce qui est dessous.
+tags-tree-what = Placez une étiquette sous une plus large, ici ou sur sa page, et chercher la plus large trouve aussi tout ce qui est dessous.
+tags-tree-none = Rien n’est encore sous quoi que ce soit. Essayez de placer voiture sous véhicule.
+tags-tree-tag-label = Étiquette à placer sous une plus large
+tags-tree-tag-placeholder = Une étiquette, comme voiture
+tags-tree-goes-under = va sous
+tags-tree-parent-label = Étiquette plus large
+tags-tree-put = Placer dessous
 
 ## LibraryStats.vue
 
@@ -3331,6 +3337,7 @@ news-to-find =
        *[other] { $count } à découvrir
     }
 news-close = Fermer
+news-got-it = Compris
 news-take-me = M’y emmener
 news-look-again = Revoir
 news-none = Rien de nouveau à découvrir pour l’instant.
@@ -3352,7 +3359,7 @@ news-motion-trails-body = La miniature d’une animation trace le chemin suivi p
 news-text-size-title = Taille du texte et espacement
 news-text-size-body = Agrandissez ou réduisez le texte, aérez ou resserrez la page, et choisissez ce que montrent les vignettes et la barre du haut.
 news-tag-tree-title = Des étiquettes dans les étiquettes
-news-tag-tree-body = Placez une étiquette sous une plus large, et chercher véhicule trouvera aussi voiture et berline. Paramètres → Étiquettes les affiche en arbre.
+news-tag-tree-body = Placez une étiquette sous une plus large, et chercher véhicule trouvera aussi voiture et berline. Imbriquez-les dans Paramètres → Étiquettes ou sur la page d’une étiquette.
 news-bulk-edit-title = Modifier plusieurs ressources à la fois
 news-bulk-edit-body = Sélectionnez des ressources et appuyez sur E pour modifier ensemble leurs étiquettes, leur licence, leur note et plus encore, avec Annuler.
 news-backups-title = Sauvegardes planifiées

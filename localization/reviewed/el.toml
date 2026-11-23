@@ -7957,6 +7957,10 @@ translation = """
 source = "Close"
 translation = "Κλείσιμο"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Εντάξει"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Δείτε ξανά"
@@ -8014,8 +8018,8 @@ source = "Stop pointing out new things"
 translation = "Διακοπή επισήμανσης νέων πραγμάτων"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Βάλτε μια ετικέτα κάτω από μια ευρύτερη, ώστε η αναζήτηση για όχημα να βρίσκει και αυτοκίνητο και σεντάν. Οι Ρυθμίσεις → Ετικέτες τις δείχνουν ως δέντρο."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Βάλτε μια ετικέτα κάτω από μια ευρύτερη, ώστε η αναζήτηση για όχημα να βρίσκει και αυτοκίνητο και σεντάν. Εμφωλεύστε τες στις Ρυθμίσεις → Ετικέτες ή στη σελίδα κάθε ετικέτας."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12576,13 +12580,37 @@ translation = "Πιο συχνές"
 source = "A–Z"
 translation = "Α–Ω"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "πηγαίνει κάτω από"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Ευρύτερες και στενότερες"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Τίποτα δεν βρίσκεται ακόμη κάτω από κάτι άλλο. Δοκιμάστε να βάλετε το αυτοκίνητο κάτω από το όχημα."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Ευρύτερη ετικέτα"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Τοποθέτηση"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Ετικέτα που θα μπει κάτω από μια ευρύτερη"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Μια ετικέτα, όπως αυτοκίνητο"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Ετικέτες που μπήκαν κάτω από ευρύτερες από τις σελίδες τους. Η αναζήτηση μιας ετικέτας βρίσκει και ό,τι υπάρχει κάτω από αυτήν."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Βάλτε μια ετικέτα κάτω από μια ευρύτερη, εδώ ή στη σελίδα της, και η αναζήτηση της ευρύτερης βρίσκει και ό,τι υπάρχει από κάτω."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

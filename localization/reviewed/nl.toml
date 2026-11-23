@@ -7915,6 +7915,10 @@ translation = """
 source = "Close"
 translation = "Sluiten"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "Begrepen"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "Nog eens bekijken"
@@ -7972,8 +7976,8 @@ source = "Stop pointing out new things"
 translation = "Nieuwe dingen niet meer aanwijzen"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "Zet een tag onder een bredere, zodat zoeken op voertuig ook auto en sedan vindt. Instellingen → Tags tekent ze als een boom."
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "Zet een tag onder een bredere, zodat zoeken op voertuig ook auto en sedan vindt. Nest ze bij Instellingen → Tags of op de eigen pagina van een tag."
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12495,13 +12499,37 @@ translation = "Meest gebruikt"
 source = "A–Z"
 translation = "A–Z"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "valt onder"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "Breder en smaller"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "Er staat nog niets onder iets anders. Probeer auto onder voertuig te plaatsen."
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "Bredere tag"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "Plaats eronder"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "Tag om onder een bredere te plaatsen"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "Een tag, zoals auto"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "Tags die vanaf hun tagpagina onder bredere tags zijn gezet. Zoeken op een tag vindt ook alles eronder."
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "Plaats een tag onder een bredere, hier of op de tagpagina, en zoeken op de bredere vindt ook alles wat eronder valt."
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

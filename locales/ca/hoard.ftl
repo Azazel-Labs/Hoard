@@ -2527,7 +2527,13 @@ tag-page-narrower = Més específiques:
 tag-page-narrower-title = En cercar { $tag }, també es troben aquestes
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Més àmplies i més específiques
-tags-tree-what = Etiquetes posades sota altres de més àmplies des de les seves pàgines. En cercar una etiqueta, també es troba tot el que té a sota.
+tags-tree-what = Posa una etiqueta sota una de més àmplia, aquí o a la seva pàgina, i en cercar la més àmplia també trobaràs tot el que hi ha a sota.
+tags-tree-none = Encara no hi ha res sota res. Prova de posar cotxe sota vehicle.
+tags-tree-tag-label = Etiqueta per posar sota una de més àmplia
+tags-tree-tag-placeholder = Una etiqueta, com ara cotxe
+tags-tree-goes-under = va sota
+tags-tree-parent-label = Etiqueta més àmplia
+tags-tree-put = Posa-la a sota
 
 ## LibraryStats.vue
 
@@ -3293,6 +3299,7 @@ news-to-find =
        *[other] { $count } per descobrir
     }
 news-close = Tanca
+news-got-it = Entesos
 news-take-me = Porta-m’hi
 news-look-again = Torna-ho a veure
 news-none = Ara mateix no hi ha res de nou per descobrir.
@@ -3314,7 +3321,7 @@ news-motion-trails-body = La miniatura d’una animació traça el camí que fa 
 news-text-size-title = Mida del text i espaiat
 news-text-size-body = Fes la lletra més gran o més petita i la pàgina més espaiosa o més compacta, i tria què mostren les miniatures i la barra superior.
 news-tag-tree-title = Etiquetes dins d’etiquetes
-news-tag-tree-body = Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Configuració → Etiquetes les mostra com un arbre.
+news-tag-tree-body = Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Niua-les a Configuració → Etiquetes o a la pàgina de cada etiqueta.
 news-bulk-edit-title = Edita’n molts alhora
 news-bulk-edit-body = Selecciona uns quants recursos i prem E per canviar-ne alhora les etiquetes, la llicència, la valoració i més, amb Desfés.
 news-backups-title = Còpies de seguretat programades

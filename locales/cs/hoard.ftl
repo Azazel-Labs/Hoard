@@ -2715,7 +2715,13 @@ tag-page-narrower = Užší:
 tag-page-narrower-title = Vyhledáním { $tag } najdete i tyto
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Širší a užší
-tags-tree-what = Štítky zařazené pod širší štítky na svých stránkách. Vyhledáním štítku najdete i vše, co je pod ním.
+tags-tree-what = Zařaďte štítek pod širší, tady nebo na jeho stránce, a hledání širšího štítku najde i vše pod ním.
+tags-tree-none = Zatím není nic pod ničím. Zkuste zařadit auto pod vozidlo.
+tags-tree-tag-label = Štítek, který zařadit pod širší
+tags-tree-tag-placeholder = Štítek, třeba auto
+tags-tree-goes-under = patří pod
+tags-tree-parent-label = Širší štítek
+tags-tree-put = Zařadit
 
 ## LibraryStats.vue
 
@@ -3555,6 +3561,7 @@ news-to-find =
        *[other] { $count } k objevení
     }
 news-close = Zavřít
+news-got-it = Rozumím
 news-take-me = Přejít tam
 news-look-again = Podívat se znovu
 news-none = Teď tu není nic nového k objevení.
@@ -3578,7 +3585,7 @@ news-motion-trails-body = Miniatura animace kreslí dráhu, kterou urazí její 
 news-text-size-title = Velikost textu a rozestupy
 news-text-size-body = Zvětšete nebo zmenšete písmo, udělejte stránku vzdušnější nebo kompaktnější a vyberte, co ukazují dlaždice a horní lišta.
 news-tag-tree-title = Štítky ve štítcích
-news-tag-tree-body = Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Nastavení → Štítky je vykreslí jako strom.
+news-tag-tree-body = Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Vnořujte je v Nastavení → Štítky nebo na stránce štítku.
 news-bulk-edit-title = Upravit mnoho najednou
 news-bulk-edit-body = Vyberte několik assetů a stisknutím E změňte jejich štítky, licenci, hodnocení a další najednou, i s možností Zpět.
 news-backups-title = Plánované zálohy

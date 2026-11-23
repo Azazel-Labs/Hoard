@@ -2814,7 +2814,13 @@ tag-page-narrower = Narrower:
 tag-page-narrower-title = Searching { $tag } finds these too
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Broader and narrower
-tags-tree-what = Tags put under broader ones from their tag pages. Searching a tag finds everything under it too.
+tags-tree-what = Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too.
+tags-tree-none = Nothing is under anything yet. Try putting car under vehicle.
+tags-tree-tag-label = Tag to put under a broader one
+tags-tree-tag-placeholder = A tag, like car
+tags-tree-goes-under = goes under
+tags-tree-parent-label = Broader tag
+tags-tree-put = Put under
 
 ## LibraryStats.vue
 
@@ -3669,6 +3675,7 @@ news-to-find =
        *[other] { $count } to find
     }
 news-close = Close
+news-got-it = Got it
 news-take-me = Take me there
 news-look-again = Look again
 news-none = Nothing new to find right now.
@@ -3691,7 +3698,7 @@ news-motion-trails-body = An animation’s thumbnail traces the path its charact
 news-text-size-title = Text size and spacing
 news-text-size-body = Make the writing bigger or smaller and the page roomier or more compact, and pick what the tiles and the top bar show.
 news-tag-tree-title = Tags inside tags
-news-tag-tree-body = Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree.
+news-tag-tree-body = Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page.
 news-bulk-edit-title = Edit many at once
 news-bulk-edit-body = Select some assets and press E to change their tags, license, rating and more together, with Undo.
 news-backups-title = Scheduled backups

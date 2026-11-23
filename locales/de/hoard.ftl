@@ -2521,7 +2521,13 @@ tag-page-narrower = Spezieller:
 tag-page-narrower-title = Die Suche nach { $tag } findet auch diese
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Allgemeiner und spezieller
-tags-tree-what = Tags, die auf ihren Tag-Seiten unter allgemeinere Tags gestellt wurden. Die Suche nach einem Tag findet auch alles darunter.
+tags-tree-what = Stell ein Tag unter ein allgemeineres, hier oder auf seiner Tag-Seite, dann findet die Suche nach dem allgemeineren auch alles darunter.
+tags-tree-none = Noch steht nichts unter etwas anderem. Stell doch mal Auto unter Fahrzeug.
+tags-tree-tag-label = Tag, das unter ein allgemeineres soll
+tags-tree-tag-placeholder = Ein Tag, z. B. Auto
+tags-tree-goes-under = gehört unter
+tags-tree-parent-label = Allgemeineres Tag
+tags-tree-put = Einordnen
 
 ## LibraryStats.vue
 
@@ -3284,6 +3290,7 @@ news-to-find =
        *[other] { $count } zu entdecken
     }
 news-close = Schließen
+news-got-it = Verstanden
 news-take-me = Bring mich hin
 news-look-again = Noch mal ansehen
 news-none = Gerade gibt es nichts Neues zu entdecken.
@@ -3305,7 +3312,7 @@ news-motion-trails-body = Das Vorschaubild einer Animation zeichnet den Weg nach
 news-text-size-title = Textgröße und Abstände
 news-text-size-body = Mach die Schrift größer oder kleiner und die Seite großzügiger oder kompakter, und wähle, was die Kacheln und die obere Leiste zeigen.
 news-tag-tree-title = Tags in Tags
-news-tag-tree-body = Stell ein Tag unter ein allgemeineres, dann findet die Suche nach Fahrzeug auch Auto und Limousine. Einstellungen → Tags zeigt sie als Baum.
+news-tag-tree-body = Stell ein Tag unter ein allgemeineres, dann findet die Suche nach Fahrzeug auch Auto und Limousine. Verschachteln kannst du sie unter Einstellungen → Tags oder auf der Seite eines Tags.
 news-bulk-edit-title = Viele auf einmal bearbeiten
 news-bulk-edit-body = Wähle ein paar Assets aus und drück E, um ihre Tags, Lizenz, Bewertung und mehr gemeinsam zu ändern, mit Rückgängig.
 news-backups-title = Geplante Sicherungen

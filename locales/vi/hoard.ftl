@@ -2287,7 +2287,13 @@ tag-page-narrower = Hẹp hơn:
 tag-page-narrower-title = Tìm { $tag } cũng sẽ thấy các thẻ này
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Rộng hơn và hẹp hơn
-tags-tree-what = Các thẻ được đặt dưới thẻ rộng hơn từ trang thẻ của chúng. Tìm một thẻ cũng sẽ thấy mọi thứ nằm dưới nó.
+tags-tree-what = Đặt một thẻ dưới thẻ rộng hơn, tại đây hoặc trên trang của thẻ đó, và tìm thẻ rộng hơn cũng sẽ thấy mọi thứ bên dưới.
+tags-tree-none = Chưa có thẻ nào nằm dưới thẻ khác. Hãy thử đặt “ô tô” dưới “phương tiện”.
+tags-tree-tag-label = Thẻ cần đặt dưới một thẻ rộng hơn
+tags-tree-tag-placeholder = Một thẻ, ví dụ ô tô
+tags-tree-goes-under = nằm dưới
+tags-tree-parent-label = Thẻ rộng hơn
+tags-tree-put = Đặt dưới
 
 ## Thống kê thư viện
 
@@ -3020,6 +3026,7 @@ news-to-find =
        *[other] Còn { $count } điều để khám phá
     }
 news-close = Đóng
+news-got-it = Đã hiểu
 news-take-me = Đưa tôi đến đó
 news-look-again = Xem lại
 news-none = Hiện chưa có gì mới để khám phá.
@@ -3040,7 +3047,7 @@ news-motion-trails-body = Ảnh thu nhỏ của hoạt ảnh vẽ lại đườn
 news-text-size-title = Cỡ chữ và khoảng cách
 news-text-size-body = Làm chữ to hơn hoặc nhỏ hơn, trang thoáng hơn hoặc gọn hơn, và chọn những gì các ô và thanh trên cùng hiển thị.
 news-tag-tree-title = Thẻ lồng trong thẻ
-news-tag-tree-body = Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Cài đặt → Thẻ vẽ chúng thành dạng cây.
+news-tag-tree-body = Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Lồng chúng vào nhau trong Cài đặt → Thẻ hoặc trên trang riêng của từng thẻ.
 news-bulk-edit-title = Sửa nhiều mục cùng lúc
 news-bulk-edit-body = Chọn vài tài nguyên rồi nhấn E để đổi thẻ, giấy phép, xếp hạng và nhiều thứ khác cùng lúc, có thể hoàn tác.
 news-backups-title = Sao lưu theo lịch

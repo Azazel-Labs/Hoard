@@ -2263,7 +2263,13 @@ tag-page-narrower = 하위 태그:
 tag-page-narrower-title = { $tag }을(를) 검색하면 이 태그도 함께 찾아요
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = 상위 및 하위
-tags-tree-what = 태그 페이지에서 더 넓은 태그 아래에 넣은 태그입니다. 태그를 검색하면 그 아래에 있는 모든 것도 함께 찾아요.
+tags-tree-what = 여기나 태그 페이지에서 태그를 더 넓은 태그 아래에 넣으면, 넓은 태그를 검색할 때 그 아래에 있는 것도 모두 찾습니다.
+tags-tree-none = 아직 아래에 넣은 태그가 없습니다. 자동차를 탈것 아래에 넣어 보세요.
+tags-tree-tag-label = 더 넓은 태그 아래에 넣을 태그
+tags-tree-tag-placeholder = 태그, 예: 자동차
+tags-tree-goes-under = → 상위 태그:
+tags-tree-parent-label = 더 넓은 태그
+tags-tree-put = 아래에 넣기
 
 ## LibraryStats.vue
 
@@ -2987,6 +2993,7 @@ news-to-find =
        *[other] 확인할 항목 { $count }개
     }
 news-close = 닫기
+news-got-it = 확인
 news-take-me = 바로 가기
 news-look-again = 다시 보기
 news-none = 지금은 새로운 항목이 없습니다.
@@ -3007,7 +3014,7 @@ news-motion-trails-body = 애니메이션 썸네일에 캐릭터가 지나가는
 news-text-size-title = 글자 크기와 간격
 news-text-size-body = 글자를 크거나 작게, 페이지를 여유 있거나 촘촘하게 만들고, 타일과 상단 막대에 보여 줄 것을 고를 수 있습니다.
 news-tag-tree-title = 태그 안의 태그
-news-tag-tree-body = 태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그에서 트리로 보여 줍니다.
+news-tag-tree-body = 태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그나 각 태그 페이지에서 중첩할 수 있습니다.
 news-bulk-edit-title = 여러 개를 한 번에 편집
 news-bulk-edit-body = 에셋 몇 개를 선택하고 E를 누르면 태그, 라이선스, 평점 등을 한꺼번에 바꿀 수 있고, 실행 취소도 됩니다.
 news-backups-title = 예약 백업

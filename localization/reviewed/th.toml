@@ -7715,6 +7715,10 @@ translation = """
 source = "Close"
 translation = "ปิด"
 
+[messages.news-got-it]
+source = "Got it"
+translation = "รับทราบ"
+
 [messages.news-look-again]
 source = "Look again"
 translation = "ดูอีกครั้ง"
@@ -7771,8 +7775,8 @@ source = "Stop pointing out new things"
 translation = "หยุดชี้สิ่งใหม่"
 
 [messages.news-tag-tree-body]
-source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Settings → Tags draws them as a tree."
-translation = "ใส่แท็กไว้ใต้แท็กที่กว้างกว่า เพื่อให้ค้นหา “ยานพาหนะ” แล้วเจอ “รถยนต์” และ “รถเก๋ง” ด้วย การตั้งค่า → แท็ก จะแสดงแท็กเหล่านี้เป็นแผนผังต้นไม้"
+source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
+translation = "ใส่แท็กไว้ใต้แท็กที่กว้างกว่า เพื่อให้ค้นหา “ยานพาหนะ” แล้วเจอ “รถยนต์” และ “รถเก๋ง” ด้วย จัดซ้อนกันได้ที่ การตั้งค่า → แท็ก หรือในหน้าของแต่ละแท็ก"
 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
@@ -12223,13 +12227,37 @@ translation = "ใช้มากที่สุด"
 source = "A–Z"
 translation = "ก–ฮ"
 
+[messages.tags-tree-goes-under]
+source = "goes under"
+translation = "อยู่ใต้"
+
 [messages.tags-tree-heading]
 source = "Broader and narrower"
 translation = "กว้างกว่าและแคบกว่า"
 
+[messages.tags-tree-none]
+source = "Nothing is under anything yet. Try putting car under vehicle."
+translation = "ยังไม่มีแท็กใดอยู่ใต้แท็กอื่น ลองใส่ “รถยนต์” ไว้ใต้ “ยานพาหนะ” ดู"
+
+[messages.tags-tree-parent-label]
+source = "Broader tag"
+translation = "แท็กที่กว้างกว่า"
+
+[messages.tags-tree-put]
+source = "Put under"
+translation = "ใส่ไว้ใต้"
+
+[messages.tags-tree-tag-label]
+source = "Tag to put under a broader one"
+translation = "แท็กที่จะใส่ไว้ใต้แท็กที่กว้างกว่า"
+
+[messages.tags-tree-tag-placeholder]
+source = "A tag, like car"
+translation = "แท็ก เช่น รถยนต์"
+
 [messages.tags-tree-what]
-source = "Tags put under broader ones from their tag pages. Searching a tag finds everything under it too."
-translation = "แท็กที่ใส่ไว้ใต้แท็กที่กว้างกว่าจากหน้าแท็กของแต่ละแท็ก ค้นหาแท็กแล้วจะเจอทุกอย่างที่อยู่ใต้แท็กนั้นด้วย"
+source = "Put a tag under a broader one, here or on its tag page, and searching the broader one finds everything under it too."
+translation = "ใส่แท็กไว้ใต้แท็กที่กว้างกว่า ที่นี่หรือในหน้าของแท็กนั้น แล้วการค้นหาแท็กที่กว้างกว่าจะเจอทุกอย่างที่อยู่ใต้มันด้วย"
 
 [messages.tags-what]
 source = "Pick tags that mean the same thing and merge them, or pick one to rename it."

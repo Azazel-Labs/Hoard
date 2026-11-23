@@ -2336,7 +2336,13 @@ tag-page-narrower = Daha dar:
 tag-page-narrower-title = { $tag } aranınca bunlar da bulunur
 # Settings → Tags: the tags put under broader ones, as a tree.
 tags-tree-heading = Daha geniş ve daha dar
-tags-tree-what = Etiket sayfalarından daha geniş etiketlerin altına konan etiketler. Bir etiketi aradığınızda altındaki her şey de bulunur.
+tags-tree-what = Bir etiketi burada ya da kendi sayfasında daha geniş bir etiketin altına koyun; geniş olanı aramak altındaki her şeyi de bulur.
+tags-tree-none = Henüz hiçbir şey bir şeyin altında değil. Otomobil etiketini araç etiketinin altına koymayı deneyin.
+tags-tree-tag-label = Daha geniş bir etiketin altına konacak etiket
+tags-tree-tag-placeholder = Bir etiket, örneğin otomobil
+tags-tree-goes-under = şunun altına:
+tags-tree-parent-label = Daha geniş etiket
+tags-tree-put = Altına koy
 
 ## LibraryStats.vue
 
@@ -3085,6 +3091,7 @@ news-to-find =
        *[other] Keşfedilecek { $count } şey
     }
 news-close = Kapat
+news-got-it = Anladım
 news-take-me = Beni oraya götür
 news-look-again = Yeniden bak
 news-none = Şu an keşfedilecek yeni bir şey yok.
@@ -3106,7 +3113,7 @@ news-motion-trails-body = Bir animasyonun küçük resmi, karakterin izlediği y
 news-text-size-title = Metin boyutu ve aralıklar
 news-text-size-body = Yazıyı büyütün ya da küçültün, sayfayı daha ferah ya da daha sıkı yapın ve kutucuklarla üst çubuğun ne göstereceğini seçin.
 news-tag-tree-title = Etiket içinde etiket
-news-tag-tree-body = Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Ayarlar → Etiketler bunları bir ağaç olarak gösterir.
+news-tag-tree-body = Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Bunları Ayarlar → Etiketler’de ya da her etiketin kendi sayfasında iç içe koyabilirsiniz.
 news-bulk-edit-title = Birçoğunu birden düzenleyin
 news-bulk-edit-body = Birkaç varlık seçin ve E’ye basarak etiketlerini, lisanslarını, puanlarını ve daha fazlasını birlikte değiştirin; hepsi geri alınabilir.
 news-backups-title = Zamanlanmış yedekler

@@ -302,7 +302,7 @@ pub(crate) fn start() {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(crate) struct Since {
     /// The `seq` of the last answer: only what's newer comes back.
     #[serde(default)]

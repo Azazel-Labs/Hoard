@@ -95,7 +95,8 @@ felhőben futóra, és neveket meg leírásokat is ír.
   rögzítve, így minden csapattag és buildgép ugyanazokat a bájtokat kapja.
 - **Letöltés másként**: GLB, PNG, WAV, MP3 vagy spritelap-formátum, menet közben átalakítva, a textúrák neveit a
   stúdiója konvenciója szerint adva.
-- **MI-ügynökök** keresnek, vizsgálnak meg és töltenek le asseteket MCP-n keresztül.
+- **MI-ügynökök** keresnek, vizsgálnak meg és töltenek le asseteket MCP-n keresztül, és bármi mást is megtehetnek,
+  amit a portál, annak a fióknak vagy tokennek a jogaival, amellyel bejelentkeznek.
 
 ### Egyszer tárolva, biztonságban
 

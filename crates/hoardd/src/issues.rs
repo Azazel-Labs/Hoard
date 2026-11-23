@@ -463,7 +463,7 @@ pub(crate) async fn list(State(state): State<AppState>) -> ApiResult<Json<Value>
 }
 
 /// The issues an action is for: their ids as [`list`] gives them, or every one of a kind.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct Pick {
     #[serde(default)]
     ids: Vec<String>,

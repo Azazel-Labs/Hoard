@@ -95,7 +95,8 @@ yang kompatibel dengan OpenAI, lokal atau dihosting, dan Hoard juga menuliskan n
   sehingga setiap rekan tim dan mesin build mendapat byte yang sama.
 - **Unduh sebagai** GLB, PNG, WAV, MP3, atau format lembar sprite, dikonversi seketika, dengan nama tekstur mengikuti
   konvensi studio Anda.
-- **Agen AI** mencari, memeriksa, dan mengambil aset melalui MCP.
+- **Agen AI** mencari, memeriksa, dan mengambil aset melalui MCP, dan dapat melakukan apa pun yang dilakukan
+  portal, dengan izin akun atau token yang mereka pakai untuk masuk.
 
 ### Disimpan sekali, dijaga tetap aman
 

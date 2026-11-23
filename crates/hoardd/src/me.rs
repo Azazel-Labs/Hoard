@@ -5,26 +5,61 @@
 use crate::i18n::tr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::routing::get;
-use axum::{Extension, Json, Router};
+use axum::{Extension, Json};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
-
 use crate::AppState;
 use crate::auth::Who;
+use crate::catalog::{Access, Operation};
 use crate::db;
 use crate::error::{ApiResult, AppError};
 
-/// Behind [`crate::auth::require_user`].
-pub(crate) fn router() -> Router<AppState> {
-    Router::new()
-        .route("/api/me/favorites", get(list_favorites).post(change_favorites))
-        .route("/api/me/searches", get(list_searches).post(save_search))
-        .route("/api/me/searches/{id}", axum::routing::put(change_search).delete(delete_search))
-        .route("/api/me/hoard", get(get_hoard).put(set_hoard))
-        .route("/api/me/news", get(get_news).put(set_news))
+/// What's the signed-in person's own.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::SignedIn;
+    vec![
+        SignedIn
+            .get("/api/me/favorites", list_favorites)
+            .named("list_favorites", "The assets you've starred, most recently starred first."),
+        SignedIn.post("/api/me/favorites", change_favorites).named(
+            "change_favorites",
+            "Star or unstar assets; answers with all of them. Ids that aren't assets are passed over.",
+        ),
+        SignedIn
+            .get("/api/me/searches", list_searches)
+            .named("list_saved_searches", "Your saved searches, and which the library opens to."),
+        SignedIn.post("/api/me/searches", save_search).named(
+            "save_search",
+            "Save a search (what the library's address holds after `?`); one with the same name is replaced. Answers \
+             with all of them.",
+        ),
+        SignedIn.put("/api/me/searches/{id}", change_search).named(
+            "change_saved_search",
+            "Rename a saved search, change what it searches, or make it what the library opens to. Answers with all \
+             of them.",
+        ),
+        SignedIn
+            .delete("/api/me/searches/{id}", delete_search)
+            .named("delete_saved_search", "Delete one of your saved searches."),
+        SignedIn.get("/api/me/hoard", get_hoard).named(
+            "get_collected",
+            "What you've collected in the portal's collecting game, or `null` before you've collected anything.",
+        ),
+        SignedIn.put("/api/me/hoard", set_hoard).named(
+            "set_collected",
+            "Record what you've collected in the portal's collecting game, replacing what was recorded.",
+        ),
+        SignedIn.get("/api/me/news", get_news).named(
+            "get_news_seen",
+            "What you've seen of what's new in Hoard, or `null` before anything's been recorded.",
+        ),
+        SignedIn.put("/api/me/news", set_news).named(
+            "set_news_seen",
+            "Record what you've seen of what's new in Hoard, replacing what was recorded.",
+        ),
+    ]
 }
 
 /// The person `who` is, or acts for.
@@ -44,7 +79,7 @@ async fn list_favorites(State(state): State<AppState>, Extension(who): Extension
     Ok(Json(json!({ "assets": ids })))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct FavoriteChange {
     #[serde(default)]
     add: Vec<String>,
@@ -104,7 +139,7 @@ fn searches(c: &Connection, user: i64) -> anyhow::Result<Vec<Value>> {
 }
 
 /// A search to keep: its name and the portal's query string (`q=rock&kind=texture`).
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct NewSearch {
     name: String,
     query: String,
@@ -138,7 +173,7 @@ async fn save_search(
 }
 
 /// What to change about a saved search: its name, what it searches, or whether the library opens to it.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct SearchChange {
     #[serde(default)]
     name: Option<String>,
@@ -247,7 +282,7 @@ async fn get_hoard(State(state): State<AppState>, Extension(who): Extension<Who>
     Ok(Json(json!({ "seen": seen })))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct HoardChange {
     seen: Hoard,
 }
@@ -274,7 +309,7 @@ async fn set_hoard(
 /// What's new in Hoard that a person has seen: each new thing's id (the portal's list names them) with when they saw
 /// it, and whether they've asked not to have new things pointed out. Kept with the account so that signing in on
 /// another browser doesn't point everything out again.
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, schemars::JsonSchema)]
 struct News {
     #[serde(default)]
     seen: BTreeMap<String, String>,

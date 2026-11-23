@@ -299,7 +299,7 @@ fn resolve(c: &Connection, req: &CreditsRequest) -> Result<Result<BTreeSet<Strin
 }
 
 /// `?format=md` for `CREDITS.md`; JSON otherwise.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct FormatQuery {
     #[serde(default)]
     format: Option<String>,

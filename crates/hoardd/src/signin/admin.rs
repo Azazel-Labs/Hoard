@@ -3,29 +3,44 @@
 
 use std::sync::Arc;
 use std::time::Duration;
-
 use anyhow::Result;
 use axum::extract::State;
 use axum::http::{HeaderMap, header};
-use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::Json;
 use serde::Deserialize;
 use serde_json::{Value, json};
-
 use super::oauth::callback_url;
 use super::{AuthConfig, Decision, Ldap, decide, http_url};
 use crate::AppState;
+use crate::catalog::{Access, Operation};
 use crate::db;
 use crate::directory;
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 
-/// Behind `require_admin`.
-pub(crate) fn admin_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/auth", get(get_config).put(put_config))
-        .route("/api/admin/auth/ldap/test", post(test_ldap))
-        .route("/api/admin/auth/oauth/discover", post(discover))
+/// Settings → Sign-in.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::Admin;
+    vec![
+        Admin.get("/api/admin/auth", get_config).named(
+            "get_sign_in_settings",
+            "How people may sign in: passwords, a directory (LDAP), and sign-in providers (OpenID Connect), with \
+             secrets left out.",
+        ),
+        Admin
+            .put("/api/admin/auth", put_config)
+            .named("change_sign_in_settings", "Change how people may sign in.")
+            .for_people("who may sign in, and how, is for a person to decide"),
+        Admin.post("/api/admin/auth/ldap/test", test_ldap).named(
+            "test_ldap",
+            "Try each directory (LDAP) server: reach it, start TLS, and sign in as the account that looks people up; \
+             with a name and password, sign in as them too and say what Hoard would make of it.",
+        ),
+        Admin.post("/api/admin/auth/oauth/discover", discover).named(
+            "discover_sign_in_provider",
+            "Fill in a sign-in provider's addresses from its OpenID Connect discovery document.",
+        ),
+    ]
 }
 
 async fn get_config(State(state): State<AppState>, headers: HeaderMap) -> Json<Value> {
@@ -108,7 +123,7 @@ async fn put_config(
     Ok(get_config(State(state), headers).await)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct LdapTest {
     /// `ldap` or `ad`: which saved settings fill in a password left empty.
     kind: String,
@@ -176,7 +191,7 @@ async fn test_ldap(State(state): State<AppState>, Json(body): Json<LdapTest>) ->
     Ok(Json(json!({ "servers": servers, "user": user })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Discover {
     issuer: String,
 }

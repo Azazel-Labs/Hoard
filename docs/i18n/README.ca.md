@@ -96,7 +96,8 @@ local o allotjat, i també escriurà noms i descripcions.
   manera que tots els companys d'equip i totes les màquines de compilació reben els mateixos bytes.
 - **Baixa com a** GLB, PNG, WAV, MP3 o un format de full de sprites, convertit al moment, amb noms de textura segons la
   convenció del vostre estudi.
-- **Els agents d'IA** cerquen, inspeccionen i obtenen recursos per MCP.
+- **Els agents d'IA** cerquen, inspeccionen i obtenen recursos per MCP, i poden fer qualsevol altra cosa que fa el
+  portal, amb els permisos del compte o el token amb què inicien la sessió.
 
 ### Desat una vegada, ben protegit
 

@@ -11,18 +11,16 @@ use std::collections::HashMap;
 use std::io::Write as _;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
-
 use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{delete, get, post};
-use axum::{Json, Router};
+use axum::Json;
 use futures_util::StreamExt as _;
 use rusqlite::params_from_iter;
 use rusqlite::types::Value as Sql;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-
+use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::sidecar::{self, SIDECAR_BYTES, Sidecar};
 use crate::store_formats::{self, Format};
@@ -47,13 +45,38 @@ const TRY_ON: i64 = 40;
 /// Text files bigger than this aren't read.
 const MAX_TOML: usize = 64 * 1024;
 
-pub(crate) fn router() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/store-formats", get(list).post(save))
-        .route("/api/admin/store-formats/unread", get(unread_files))
-        .route("/api/admin/store-formats/try", post(try_format))
-        .route("/api/admin/store-formats/share", post(share))
-        .route("/api/admin/store-formats/{file}", delete(remove))
+/// Store formats: the files that say how to read a store's own description of a pack.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::Admin;
+    vec![
+        Admin.get("/api/admin/store-formats", list).named(
+            "list_store_formats",
+            "The store formats: how Hoard reads the file a store puts in a pack about it (name, author, license, \
+             tags). Built-in ones and the data folder's own.",
+        ),
+        Admin.post("/api/admin/store-formats", save).named(
+            "save_store_format",
+            "Keep a store format in the data folder, and read again the packs with files it reads.",
+        ),
+        Admin.get("/api/admin/store-formats/unread", unread_files).named(
+            "list_unread_store_files",
+            "Files in the library that may be a store's description of its pack but that no format reads: what a new \
+             format is wanted for. `fresh` works it out again.",
+        ),
+        Admin.post("/api/admin/store-formats/try", try_format).named(
+            "try_store_format",
+            "What a store format would make of an example file and of the library's files like it, without saving it.",
+        ),
+        Admin.post("/api/admin/store-formats/share", share).named(
+            "share_store_format",
+            "A zip of a store format, its example and what it reads as, laid out to add to Hoard's repository.",
+        ),
+        Admin.delete("/api/admin/store-formats/{file}", remove).named(
+            "delete_store_format",
+            "Stop using a store format from the data folder. A built-in one of that name comes back; what packs were \
+             given stays.",
+        ),
+    ]
 }
 
 #[derive(Serialize)]
@@ -117,7 +140,7 @@ static LOOKING: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 /// Counts the formats saved and removed: what was worked out with others is outdated.
 static FORMATS: AtomicU64 = AtomicU64::new(0);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct UnreadAsk {
     /// Wait for it to be worked out again when it's outdated, rather than answer with the one kept.
     #[serde(default)]
@@ -272,13 +295,13 @@ async fn unread_example(state: &AppState, g: &Group) -> Option<Place> {
     None
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Example {
     path: String,
     text: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Trial {
     toml: String,
     example: Option<Example>,
@@ -397,7 +420,7 @@ async fn try_on_library(state: &AppState, f: Format) -> anyhow::Result<LibraryRe
     Ok(LibraryRead { files, packs, tried })
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Save {
     toml: String,
     /// The file it was opened from, which goes if the name changed.
@@ -489,7 +512,7 @@ async fn remove(Path(file): Path<String>) -> ApiResult<StatusCode> {
     Ok(StatusCode::NO_CONTENT)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Share {
     toml: String,
     example: Example,

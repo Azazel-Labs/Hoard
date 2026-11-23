@@ -3,38 +3,72 @@
 
 use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
-use axum::routing::{get, post};
-use axum::{Extension, Json, Router};
+use axum::{Extension, Json};
 use rusqlite::{OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::{Value, json};
-
 use super::{
     Role, Who, check_name, check_new, check_password, digest, hash_password, owner_filter, password_matches,
     random_bytes, session_token, sign_out_everywhere,
 };
 use crate::AppState;
+use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use crate::signin::Source;
 use crate::{db, tools};
 
-/// Behind [`require_user`]: everyone's own password and tokens. An admin sees and can revoke everyone's tokens.
-pub(crate) fn account_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/auth/password", post(change_password))
-        .route("/api/admin/tokens", get(list_tokens).post(create_token))
-        .route("/api/admin/tokens/{id}", axum::routing::delete(delete_token).patch(patch_token))
+/// Everyone's own password and tokens (an admin sees and can revoke everyone's tokens), and an admin's accounts.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::{Admin, SignedIn};
+    const ACCESS: &str = "who may sign in, and what they and their tokens may do, is for a person to decide";
+    vec![
+        SignedIn
+            .post("/api/auth/password", change_password)
+            .named("change_password", "Change your own password. Signs out your other sessions.")
+            .for_people("a password is for its owner to type"),
+        SignedIn.get("/api/admin/tokens", list_tokens).named(
+            "list_tokens",
+            "Your access tokens (an admin's: everyone's): name, what each may do, and when each was last used.",
+        ),
+        SignedIn
+            .post("/api/admin/tokens", create_token)
+            .named(
+                "create_token",
+                "A new access token. The token itself is in this answer and nowhere else: only its hash is kept.",
+            )
+            .for_people(ACCESS),
+        SignedIn.delete("/api/admin/tokens/{id}", delete_token).named(
+            "revoke_token",
+            "Revoke an access token: whatever uses it is refused from its next request.",
+        ),
+        SignedIn
+            .patch("/api/admin/tokens/{id}", patch_token)
+            .named(
+                "change_token",
+                "Let an access token do more or less, from its next request. Never more than you can do.",
+            )
+            .for_people(ACCESS),
+        Admin.get("/api/admin/users", list_users).named(
+            "list_accounts",
+            "Every account: name, role, where it signs in from, and when it last did.",
+        ),
+        Admin
+            .post("/api/admin/users", create_user)
+            .named("create_account", "Make an account with a name, a password and a role.")
+            .for_people(ACCESS),
+        Admin
+            .delete("/api/admin/users/{id}", delete_user)
+            .named("delete_account", "Delete an account, its sessions and its tokens. Not your own.")
+            .for_people(ACCESS),
+        Admin
+            .patch("/api/admin/users/{id}", patch_user)
+            .named("change_account", "Give an account another role. Not your own.")
+            .for_people(ACCESS),
+    ]
 }
 
-/// Behind [`require_admin`].
-pub(crate) fn admin_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/users", get(list_users).post(create_user))
-        .route("/api/admin/users/{id}", axum::routing::delete(delete_user).patch(patch_user))
-}
-
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct PasswordChange {
     current: String,
     new: String,
@@ -94,7 +128,7 @@ async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who
     Ok(Json(json!({ "users": users })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct NewAccount {
     username: String,
     /// Not for accounts that sign in through a directory or OAuth.
@@ -137,7 +171,7 @@ async fn create_user(
     Ok((StatusCode::CREATED, Json(made)))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct AccountChange {
     role: String,
 }
@@ -211,7 +245,7 @@ async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Wh
     Ok(Json(json!({ "tokens": tokens })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct NewToken {
     name: String,
     /// Up to the maker's own role, which is the default.
@@ -246,7 +280,7 @@ async fn create_token(
     Ok(Json(json!({ "id": id, "name": name, "token": token, "role": role.as_str() })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct TokenChange {
     role: String,
 }

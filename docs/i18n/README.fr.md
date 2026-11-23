@@ -98,7 +98,8 @@ descriptions.
   verrouillage, pour que chaque coéquipier et chaque machine de build obtienne les mêmes octets.
 - **Télécharger en** GLB, PNG, WAV, MP3 ou dans un format de planche de sprites, converti à la volée, avec des noms de
   textures qui suivent la convention de votre studio.
-- **Les agents IA** recherchent, inspectent et récupèrent des ressources via MCP.
+- **Les agents IA** recherchent, inspectent et récupèrent des ressources via MCP, et peuvent faire tout ce que fait
+  le portail, avec les droits du compte ou du jeton avec lequel ils se connectent.
 
 ### Stocké une fois, gardé en sécurité
 

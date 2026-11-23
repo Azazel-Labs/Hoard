@@ -95,7 +95,8 @@ OpenAI, local o alojado, y también escribirá nombres y descripciones.
   que cada compañero de equipo y cada máquina de compilación reciba los mismos bytes.
 - **Descargar como** GLB, PNG, WAV, MP3 o un formato de hoja de sprites, convertido sobre la marcha, con nombres de
   textura según la convención de tu estudio.
-- **Los agentes de IA** buscan, inspeccionan y obtienen recursos mediante MCP.
+- **Los agentes de IA** buscan, inspeccionan y obtienen recursos mediante MCP, y pueden hacer cualquier otra cosa
+  que hace el portal, con los permisos de la cuenta o el token con el que inician sesión.
 
 ### Guardado una vez, a salvo
 

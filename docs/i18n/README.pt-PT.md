@@ -95,7 +95,8 @@ alojado, e também escreve nomes e descrições.
   colega de equipa e cada máquina de compilação receba os mesmos bytes.
 - **Transferir como** GLB, PNG, WAV, MP3 ou um formato de folha de sprites, convertido na hora, com os nomes das
   texturas segundo a convenção do seu estúdio.
-- **Agentes de IA** pesquisam, inspecionam e obtêm recursos através do MCP.
+- **Agentes de IA** pesquisam, inspecionam e obtêm recursos através do MCP, e podem fazer tudo o resto que o portal
+  faz, com as permissões da conta ou do token com que iniciam sessão.
 
 ### Guardado uma vez, mantido em segurança
 

@@ -26,7 +26,7 @@ use crate::db;
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum Mode {
     Managed,
@@ -112,7 +112,7 @@ pub(crate) fn watched_root(c: &Connection, pack_id: &str) -> Result<Option<PathB
     .optional()?)
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
 pub(crate) struct NewLocation {
     #[serde(default)]
     pub(crate) name: Option<String>,
@@ -124,7 +124,7 @@ pub(crate) struct NewLocation {
     pub(crate) catch_all: bool,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
 pub(crate) struct LocationPatch {
     name: Option<String>,
     kinds: Option<Vec<String>>,
@@ -426,7 +426,7 @@ pub(crate) async fn patch_location(
     Ok(Json(loc))
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, schemars::JsonSchema)]
 pub(crate) struct DeleteQuery {
     /// Remove a managed location that can't be reached anyway (a dead disk): files still on it go missing.
     #[serde(default)]
@@ -518,7 +518,7 @@ pub(crate) fn remove(c: &mut Connection, id: i64) -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct BrowseQuery {
     #[serde(default)]
     path: String,

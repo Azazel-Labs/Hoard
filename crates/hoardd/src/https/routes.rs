@@ -7,7 +7,7 @@ use anyhow::Result;
 use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::get;
 use axum::{Json, Router};
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -16,6 +16,7 @@ use super::certs::{Upload, build, ca_info, check_dates, covers, read_pair, serve
 use super::names::{clean_name, found_names, request_host, sort_names};
 use super::{HTTPS, Mode, activate, save, try_handshake};
 use crate::AppState;
+use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 
@@ -25,10 +26,26 @@ pub(crate) fn router() -> Router<AppState> {
 }
 
 /// Settings → Connection.
-pub(crate) fn admin_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/https", get(get_status).put(put_change))
-        .route("/api/admin/https/check", post(check))
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::Admin;
+    vec![
+        Admin.get("/api/admin/https", get_status).named(
+            "get_https",
+            "How Hoard serves HTTPS: off, its own certificate authority, or a certificate given it, with the names \
+             and dates it covers.",
+        ),
+        Admin
+            .put("/api/admin/https", put_change)
+            .named(
+                "change_https",
+                "Change how Hoard serves HTTPS. The new setup is tried before it's switched to.",
+            )
+            .for_people("a wrong change can cut off every device, the one asking included"),
+        Admin.post("/api/admin/https/check", check).named(
+            "check_certificate",
+            "What a pasted certificate is (names, dates, who issued it) and whether it can be used, without saving it.",
+        ),
+    ]
 }
 
 async fn ca_cert() -> Response {
@@ -80,7 +97,7 @@ async fn get_status(State(state): State<AppState>, headers: HeaderMap) -> Json<V
     Json(status(&state, &headers))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct Change {
     mode: Option<Mode>,
@@ -161,7 +178,7 @@ async fn put_change(
     Ok(Json(status(&state, &headers)))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct CheckBody {
     cert: String,
     key: String,

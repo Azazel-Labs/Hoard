@@ -13,6 +13,7 @@ mod auth;
 mod blender;
 mod blobs;
 mod bundle;
+mod catalog;
 mod chatgpt;
 mod check;
 mod chiptune;

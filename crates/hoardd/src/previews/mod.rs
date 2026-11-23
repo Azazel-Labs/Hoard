@@ -241,7 +241,7 @@ fn rank(source: Option<&str>) -> u8 {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct ThumbParams {
     /// `browser` (default) or `browser-partial`.
     #[serde(default)]

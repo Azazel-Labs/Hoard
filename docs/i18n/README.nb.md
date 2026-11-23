@@ -93,7 +93,8 @@ det navn og beskrivelser også.
   og byggemaskin får de samme bytene.
 - **Last ned som** GLB, PNG, WAV, MP3 eller et spritearkformat, konvertert fortløpende, med teksturnavn etter studioets
   konvensjon.
-- **AI-agenter** søker i, undersøker og henter ressurser over MCP.
+- **AI-agenter** søker i, undersøker og henter ressurser over MCP, og kan gjøre alt annet portalen gjør, med
+  rettighetene til kontoen eller tokenet de logger på med.
 
 ### Lagret én gang, holdt trygt
 

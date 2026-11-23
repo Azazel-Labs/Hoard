@@ -95,7 +95,8 @@ OpenAI nào, chạy cục bộ hay được lưu trữ, và nó cũng sẽ viế
   máy build đều nhận được đúng những byte giống nhau.
 - **Tải xuống dưới dạng** GLB, PNG, WAV, MP3 hoặc một định dạng bảng sprite, chuyển đổi tức thì, với tên texture theo
   quy ước của studio bạn.
-- **Agent AI** tìm kiếm, kiểm tra và lấy tài nguyên qua MCP.
+- **Agent AI** tìm kiếm, kiểm tra và lấy tài nguyên qua MCP, và làm được mọi việc khác mà cổng web làm, với quyền
+  của tài khoản hoặc token mà chúng dùng để đăng nhập.
 
 ### Lưu một lần, giữ an toàn
 

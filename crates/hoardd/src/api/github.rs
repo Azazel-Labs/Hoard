@@ -23,12 +23,26 @@ use crate::i18n::tr;
 use crate::{AppState, db};
 
 /// Connecting GitHub, from Settings → Tools.
-pub(super) fn admin_router() -> axum::Router<AppState> {
-    use axum::routing::post;
-    axum::Router::new()
-        .route("/api/admin/unreal/github/start", post(start))
-        .route("/api/admin/unreal/github/poll", post(poll))
-        .route("/api/admin/unreal/github/cancel", post(cancel))
+pub(super) fn operations() -> Vec<crate::catalog::Operation> {
+    use crate::catalog::Access::Admin;
+    const SIGN_IN: &str = "signing in to GitHub means entering a code at GitHub in a browser";
+    vec![
+        Admin
+            .post("/api/admin/unreal/github/start", start)
+            .named("connect_github", "Start connecting GitHub: a code to enter at GitHub, and where.")
+            .for_people(SIGN_IN),
+        Admin
+            .post("/api/admin/unreal/github/poll", poll)
+            .named(
+                "check_github_connection",
+                "Whether the code from `connect_github` has been entered yet: `waiting`, `expired`, `denied`, or `done`.",
+            )
+            .for_people(SIGN_IN),
+        Admin.post("/api/admin/unreal/github/cancel", cancel).named(
+            "cancel_github_connection",
+            "Stop waiting for the GitHub code from `connect_github` (its dialog was closed).",
+        ),
+    ]
 }
 
 const DEVICE_CODE: &str = "https://github.com/login/device/code";

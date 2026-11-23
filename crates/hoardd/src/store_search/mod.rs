@@ -99,7 +99,7 @@ pub(crate) struct StoreMatches {
     failed: Vec<&'static str>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct MatchQuery {
     q: Option<String>,
     /// Search again instead of showing what the last lookup found.

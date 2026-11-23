@@ -11,7 +11,7 @@ use hoard_core::{Asset, AssetPatch, SearchQuery, SearchResult};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct AssetsParams {
     q: Option<String>,
     kind: Option<String>,
@@ -161,7 +161,7 @@ pub(super) async fn choose_skeleton_body(
     Ok(StatusCode::NO_CONTENT)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct DuplicatesQuery {
     #[serde(default)]
     offset: usize,
@@ -238,7 +238,7 @@ pub(super) async fn revert_change(
 }
 
 /// The same edit to many assets at once, in one transaction: to those listed, or to everything a search finds.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct BulkEdit {
     #[serde(default)]
     ids: Vec<String>,
@@ -290,7 +290,7 @@ pub(super) async fn bulk_assets(
 }
 
 /// Packs and assets to archive, restore or delete for good. `all` (purge only) empties the whole archive.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct ArchiveItems {
     #[serde(default)]
     packs: Vec<String>,
@@ -353,7 +353,7 @@ pub(super) async fn purge(
     Ok(Json(n))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct TagParams {
     #[serde(default)]
     prefix: String,
@@ -369,7 +369,7 @@ pub(super) async fn tags(State(state): State<AppState>, Query(p): Query<TagParam
     Ok(Json(json!(rows)))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct SuggestParams {
     #[serde(default)]
     q: String,
@@ -391,7 +391,7 @@ pub(super) async fn categories(State(state): State<AppState>) -> ApiResult<Json<
     Ok(Json(db::call(&state.pool, |c| db::category_counts(c, 500)).await?))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct MergeTags {
     from: Vec<String>,
     into: String,
@@ -411,7 +411,7 @@ pub(super) async fn merge_tags(State(state): State<AppState>, Json(m): Json<Merg
     Ok(Json(json!({ "into": into, "assets": assets })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct TagInfoParams {
     tag: String,
 }
@@ -430,7 +430,7 @@ pub(super) async fn tag_info(
     Ok(Json(db::call(&state.pool, move |c| db::tag_info(c, &tag)).await?))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct SetTagInfo {
     tag: String,
     /// Left out leaves it; empty clears it.
@@ -459,7 +459,7 @@ pub(super) async fn set_tag_info(
     info.map(Json).ok_or_else(|| AppError::not_found(tr!("error-asset-gone")))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct SetTagParents {
     tag: String,
     /// The broader tags it goes under, in place of those it had.
@@ -504,7 +504,7 @@ pub(super) async fn tag_aliases(State(state): State<AppState>) -> ApiResult<Json
     Ok(Json(json!(rows.into_iter().map(|(tag, into)| json!({ "tag": tag, "into": into })).collect::<Vec<_>>())))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct AliasParams {
     tag: String,
 }

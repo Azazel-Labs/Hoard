@@ -96,7 +96,8 @@ malliin, paikalliseen tai pilvessä toimivaan, niin se kirjoittaa myös nimet ja
   jokainen tiimiläinen ja käännöskone saa täsmälleen samat tavut.
 - **Lataa muodossa** GLB, PNG, WAV, MP3 tai sprite-arkkiformaatti, muunnettuna lennossa ja tekstuurien nimet studiosi
   käytännön mukaisina.
-- **Tekoälyagentit** hakevat, tarkastelevat ja noutavat resursseja MCP:n kautta.
+- **Tekoälyagentit** hakevat, tarkastelevat ja noutavat resursseja MCP:n kautta ja voivat tehdä kaiken muunkin,
+  mitä portaali tekee, sen tilin tai tunnuksen oikeuksin, jolla ne kirjautuvat.
 
 ### Tallennettu kerran, pidetty turvassa
 

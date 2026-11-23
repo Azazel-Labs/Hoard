@@ -7,34 +7,43 @@
 
 use crate::i18n::tr;
 use std::collections::BTreeMap;
-
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::routing::{delete, get, post, put};
-use axum::{Extension, Json, Router};
+use axum::{Extension, Json};
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-
 use crate::AppState;
 use crate::auth::Who;
+use crate::catalog::{Access, Operation};
 use crate::db;
 use crate::error::{ApiResult, AppError};
 
-/// What anyone who can browse may see. Behind [`crate::auth::require_reader`].
-pub(crate) fn read_router() -> Router<AppState> {
-    Router::new().route("/api/projects", get(list)).route("/api/usage", post(usage))
-}
-
-/// Reporting a sync: looking is enough, since it changes nothing in the library. Behind
-/// [`crate::auth::require_user`].
-pub(crate) fn report_router() -> Router<AppState> {
-    Router::new().route("/api/projects/{name}", put(report))
-}
-
-/// Forgetting a project (by name). Behind [`crate::auth::require_editor`].
-pub(crate) fn edit_router() -> Router<AppState> {
-    Router::new().route("/api/projects/{name}", delete(forget))
+/// Projects (games using the library through `hoard sync`) and what they use. Reporting a sync needs only to be
+/// signed in, since it changes nothing in the library.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::{Editor, Reader, SignedIn};
+    vec![
+        Reader.get("/api/projects", list).named(
+            "list_projects",
+            "The projects (games using the library through `hoard sync`): when each last synced, who reported it, and \
+             how many assets it uses.",
+        ),
+        Reader.post("/api/usage", usage).named(
+            "find_usage",
+            "Which projects use any of these packs or assets, most-using first: what to check before deleting or \
+             changing something.",
+        ),
+        SignedIn.put("/api/projects/{name}", report).named(
+            "report_project",
+            "Record what a project's `hoard.lock` holds now, replacing what it held (what `hoard sync` sends). Ids that \
+             aren't assets are counted and passed over.",
+        ),
+        Editor.delete("/api/projects/{name}", forget).named(
+            "forget_project",
+            "Forget a project (by name) and what it used. Its game is untouched; its next sync reports it again.",
+        ),
+    ]
 }
 
 #[derive(Debug, Serialize)]
@@ -71,12 +80,12 @@ async fn list(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     Ok(Json(json!({ "projects": projects })))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct Report {
     assets: Vec<ReportedAsset>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct ReportedAsset {
     id: String,
     /// Where the project keeps it, relative to its `out_dir`.
@@ -145,7 +154,7 @@ async fn forget(State(state): State<AppState>, Path(name): Path<String>) -> ApiR
     Ok(StatusCode::NO_CONTENT)
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, schemars::JsonSchema)]
 struct UsageRequest {
     /// Whole packs: every asset in them.
     #[serde(default)]

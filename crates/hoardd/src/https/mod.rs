@@ -39,7 +39,7 @@ use crate::i18n::tr;
 pub(crate) use certs::server_config;
 use certs::{build, own_needs_issue};
 use names::{clean_name, wanted_names};
-pub(crate) use routes::{admin_router, router};
+pub(crate) use routes::{operations, router};
 
 /// The row in `settings` that holds [`Saved`].
 const KEY: &str = "https";
@@ -49,7 +49,7 @@ const RENEW_DAYS: i64 = 30;
 /// How often addresses and expiry dates are looked at again.
 const REFRESH: Duration = Duration::from_hours(6);
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum Mode {
     #[default]

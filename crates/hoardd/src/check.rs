@@ -26,7 +26,7 @@ use crate::{AppState, db};
 /// The most hashes one check takes.
 pub(crate) const MAX_HASHES: usize = 20_000;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(crate) struct CheckRequest {
     pub(crate) hashes: Vec<String>,
 }

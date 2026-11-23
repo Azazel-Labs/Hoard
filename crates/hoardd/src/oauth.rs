@@ -51,14 +51,32 @@ pub(crate) fn router() -> Router<AppState> {
         .route("/oauth/token", post(token))
 }
 
-/// Behind `require_user`: the portal's consent page and Settings → Account.
-pub(crate) fn portal_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/oauth/request", get(describe_request))
-        .route("/api/oauth/approve", post(approve))
-        .route("/api/admin/connections", get(list_connections))
-        .route("/api/mcp/live", get(crate::mcp::live::list))
-        .route("/api/admin/connections/{id}", axum::routing::delete(disconnect))
+/// The portal's consent page and Settings → Account.
+pub(crate) fn operations() -> Vec<crate::catalog::Operation> {
+    use crate::catalog::Access::SignedIn;
+    vec![
+        SignedIn
+            .get("/api/oauth/request", describe_request)
+            .named("describe_app_request", "What an app asking to connect wants, for the page asking you to let it.")
+            .for_people("letting an app in is for a person to decide"),
+        SignedIn
+            .post("/api/oauth/approve", approve)
+            .named("approve_app", "Let an app asking to connect in, with what it may do.")
+            .for_people("letting an app in is for a person to decide"),
+        SignedIn.get("/api/admin/connections", list_connections).named(
+            "list_connected_apps",
+            "The apps connected to Hoard (an admin's: everyone's): which, for whom, what each may do, and when each was \
+             last used.",
+        ),
+        SignedIn.get("/api/mcp/live", crate::mcp::live::list).named(
+            "list_live_apps",
+            "The apps that asked Hoard something in the last few minutes, most recent first (an admin's: everyone's).",
+        ),
+        SignedIn.delete("/api/admin/connections/{id}", disconnect).named(
+            "disconnect_app",
+            "Disconnect an app: its sign-in stops working from its next request.",
+        ),
+    ]
 }
 
 /// `WWW-Authenticate` for a 401 from `/mcp`: where to find out how to sign in.
@@ -279,7 +297,7 @@ fn redirect_matches(registered: &[String], given: &str) -> bool {
 // ---------------------------------------------------------------------------------------------
 // Authorization (the portal's consent page)
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, schemars::JsonSchema)]
 struct AuthRequest {
     response_type: Option<String>,
     client_id: Option<String>,
@@ -338,7 +356,7 @@ async fn describe_request(
     Ok(Json(json!({ "client": ok.client_name, "redirect_host": host })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct Approval {
     allow: bool,
     #[serde(flatten)]

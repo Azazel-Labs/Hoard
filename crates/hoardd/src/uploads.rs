@@ -26,20 +26,18 @@
 use crate::i18n::tr;
 use std::collections::HashSet;
 use std::path::PathBuf;
-
 use anyhow::Context;
-use axum::extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State};
+use axum::extract::{Multipart, Path, Query, Request, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post, put};
-use axum::{Json, Router};
+use axum::Json;
 use futures_util::StreamExt;
 use hoard_core::Pack;
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::io::{AsyncSeekExt, AsyncWriteExt};
-
+use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::ingest::safe_rel_path;
 use crate::{AppState, db, jobs};
@@ -60,22 +58,60 @@ fn stalled(path: &str) -> AppError {
     AppError { status: StatusCode::REQUEST_TIMEOUT, err: anyhow::anyhow!(tr!("error-upload-stalled", path = path)) }
 }
 
-pub(crate) fn router() -> Router<AppState> {
-    Router::new()
-        .route("/api/uploads", post(create).layer(DefaultBodyLimit::max(64 << 20)))
-        .route("/api/uploads/{id}", get(status).delete(abort))
-        .route("/api/uploads/{id}/chunk", put(chunk).layer(DefaultBodyLimit::max(MAX_REQUEST_BYTES)))
-        .route("/api/uploads/{id}/batch", post(batch).layer(DefaultBodyLimit::max(MAX_REQUEST_BYTES)))
-        .route("/api/uploads/{id}/complete", post(complete))
+/// Sending a pack's files in pieces.
+pub(crate) fn operations() -> Vec<Operation> {
+    use Access::Editor;
+    vec![
+        Editor
+            .post("/api/uploads", create)
+            .named(
+                "create_upload",
+                "Start sending a pack's files a piece at a time, for a pack too big to send in one request: list every \
+                 file's relative path and size, and get an upload id and what has arrived already (so an interrupted \
+                 upload carries on). Send each file with `send_upload_chunk` (big ones) or `send_upload_batch` (many \
+                 small ones), then `complete_upload`. A pack with exactly these files already is added to, unless \
+                 `copy`.",
+            )
+            .limit(64 << 20),
+        Editor.get("/api/uploads/{id}", status).named(
+            "get_upload",
+            "What an upload in pieces has received so far, file by file, to carry on from where it stopped.",
+        ),
+        Editor.delete("/api/uploads/{id}", abort).named(
+            "cancel_upload",
+            "Cancel an upload in pieces and throw away what it received. `claim` (from `create_upload`) leaves it be if \
+             the same files were registered again since.",
+        ),
+        Editor
+            .put("/api/uploads/{id}/chunk", chunk)
+            .named(
+                "send_upload_chunk",
+                "Send part of one file of an upload in pieces: the bytes from `offset` on, of the file at `path`.",
+            )
+            .limit(MAX_REQUEST_BYTES),
+        Editor
+            .post("/api/uploads/{id}/batch", batch)
+            .named(
+                "send_upload_batch",
+                "Send many small, whole files of an upload in pieces in one request: a multipart form with a `relpath` \
+                 text field, then a `file`, repeated.",
+            )
+            .limit(MAX_REQUEST_BYTES),
+        Editor.post("/api/uploads/{id}/complete", complete).named(
+            "complete_upload",
+            "Finish an upload in pieces once every file has arrived: the pack is made (or added to) and read, and \
+             answered with (202).",
+        ),
+    ]
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct NewFile {
     path: String,
     size: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct CreateBody {
     #[serde(default)]
     name: Option<String>,
@@ -410,7 +446,7 @@ impl Drop for InFlight<'_> {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 struct ChunkParams {
     path: String,
     offset: u64,
@@ -628,7 +664,7 @@ fn hand_over(tx: &rusqlite::Transaction<'_>, upload: &str, target: &str) -> anyh
     Ok(true)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 struct AbortParams {
     /// The claim registering the upload gave. If the same files were registered again since (dropped again to retry),
     /// the upload is the later registration's, and cancelling the earlier one leaves it be. Without one, it's cancelled

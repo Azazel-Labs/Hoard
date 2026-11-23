@@ -95,7 +95,8 @@ OpenAI, local sau găzduit, și va scrie, de asemenea, nume și descrieri.
   coleg de echipă și fiecare mașină de build să primească aceiași octeți.
 - **Descărcați ca** GLB, PNG, WAV, MP3 sau un format de foaie de sprite-uri, convertit pe loc, cu numele texturilor
   după convenția studioului dvs.
-- **Agenții AI** caută, inspectează și preiau resurse prin MCP.
+- **Agenții AI** caută, inspectează și preiau resurse prin MCP și pot face orice altceva face portalul, cu
+  permisiunile contului sau tokenului cu care se conectează.
 
 ### Stocat o dată, păstrat în siguranță
 

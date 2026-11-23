@@ -94,7 +94,8 @@ hostovaný, a bude psát i názvy a popisy.
   týmu i každý build server dostane tytéž bajty.
 - **Stáhnout jako** GLB, PNG, WAV, MP3 nebo formát listu spritů, převedené za běhu, s názvy textur podle konvence vašeho
   studia.
-- **AI agenti** hledají, prohlížejí a stahují assety přes MCP.
+- **AI agenti** hledají, prohlížejí a stahují assety přes MCP a mohou dělat cokoli dalšího, co umí portál, s
+  oprávněními účtu nebo tokenu, kterým se přihlásí.
 
 ### Uloženo jednou, v bezpečí
 

@@ -95,7 +95,8 @@ Modell, lokal oder gehostet, und es schreibt auch Namen und Beschreibungen.
   Teammitglied und jede Build-Maschine dieselben Bytes bekommt.
 - **Herunterladen als** GLB, PNG, WAV, MP3 oder ein Spritesheet-Format, im Handumdrehen konvertiert, mit Texturnamen
   nach der Konvention Ihres Studios.
-- **KI-Agents** suchen, untersuchen und holen Assets über MCP.
+- **KI-Agents** suchen, untersuchen und holen Assets über MCP und können alles andere, was das Portal kann, mit den
+  Rechten des Kontos oder Tokens, mit dem sie sich anmelden.
 
 ### Einmal gespeichert, sicher aufbewahrt
 

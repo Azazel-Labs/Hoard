@@ -96,7 +96,8 @@ writes names and descriptions too.
   build machine gets the same bytes.
 - **Download as** GLB, PNG, WAV, MP3 or a sprite sheet format, converted on the fly, with texture names in your
   studio's convention.
-- **AI agents** search, inspect and fetch assets over MCP.
+- **AI agents** search, inspect and fetch assets over MCP, and can do anything else the portal does, with the
+  permissions of the account or token they sign in with.
 
 ### Stored once, kept safe
 
@@ -1147,9 +1148,21 @@ both connect.
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
 | `check_files` | given the BLAKE3 hashes of the files a project ships: which came from Hoard, their credits, and which need a look (unknown or limiting license, AI-made images); see [Ship check](#ship-check) |
-| `tag_asset`, `update_asset` | edits, recorded as human |
+| `tag_asset`, `update_asset` | edits, recorded in the asset's history as made over MCP |
 | `next_to_tag` | the next files nothing has described yet (up to 16, one pack at a time), with facts, the pack's store page and README, and a numbered contact sheet image |
 | `save_tags` | names, categories, descriptions and tags for a batch (and the pack), recorded as AI-made exactly like Hoard's own AI tagger: a person's edits always win |
+| `find_operations` | every other operation of the [HTTP API](#api-overview) this sign-in may call, found by a few words ("tag parents", "rename pack") or listed by group |
+| `describe_operation` | what one takes: its path and query parameters and its body, as JSON Schema read off the handler itself |
+| `read_operation`, `run_operation` | call one (GET, or a change) through the same router and permission checks as the portal, with the same sign-in; a file comes back as its URL |
+
+**Everything else, too.** The tools above are the ones worth having at hand; everything else the portal does
+(reparenting and merging tags, renaming packs, collections, the archive, projects, locations, Settings, maintenance) is
+an operation of the HTTP API, and every operation is declared once, in one catalog, that the router is built from. So
+`find_operations` → `describe_operation` → `read_operation`/`run_operation` reaches all of it, a new route is there for
+agents the moment it's added, and an agent can do exactly what its account or token may, no more: one that can only
+look isn't offered `run_operation`, and only an admin's finds the admin operations. A few are left for a person to do
+themselves and aren't offered over MCP: passwords, access tokens, accounts, sign-in and HTTPS settings, signing in to
+ChatGPT or GitHub, and letting apps in.
 
 The `tag_pack` prompt (in Claude Code: `/mcp__hoard__tag_pack <pack name>`) tells the agent to loop `next_to_tag` →
 look → `save_tags` until the pack is done, with the same naming, category and tag rules Hoard's built-in tagger uses.
@@ -1410,6 +1423,10 @@ Every request needs a signed-in session or `Authorization: Bearer <token>`, exce
 Requests that change something are marked 🔒: guests and accounts that can only look can't make them. Those under
 `/api/admin/` (except your own tokens and connected apps), deleting a pack and emptying the archive need an admin. A
 browser session's changes must also carry an `X-Hoard` header, which pages on other sites can't add.
+
+`GET /api/openapi.json` describes every operation as OpenAPI 3.1: its name, what it does, who may call it, and the
+parameters and body it takes, read off the server's own types. It's the same catalog the server's routes and the MCP
+operation tools are built from, so it can't fall behind them.
 
 **Assets**
 

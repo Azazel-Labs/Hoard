@@ -16,7 +16,7 @@ use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use crate::previews::AvifThumb;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct FileParams {
     #[serde(default)]
     download: Option<u8>,
@@ -47,7 +47,7 @@ pub(super) async fn asset_file(
     serve_blob(&state, &hash, &headers, &mime, disposition).await
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct ThumbQuery {
     /// The thumbnail's revision (`Asset::thumb_rev`). With it the URL names one picture, cached for good; without
     /// it the picture may change, so browsers check again.

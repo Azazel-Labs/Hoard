@@ -308,12 +308,23 @@ async fn forget_stopped(state: &AppState, job: &db::JobRow) {
 }
 
 /// Stopping background work: one job, every job of a kind, or a Maintenance task. An admin's to do.
-pub(crate) fn stop_router() -> axum::Router<AppState> {
-    use axum::routing::post;
-    axum::Router::new()
-        .route("/api/admin/jobs/stop", post(stop_kind_route))
-        .route("/api/admin/jobs/{id}/stop", post(stop_route))
-        .route("/api/admin/maintenance/{task}/stop", post(crate::maintenance::stop_route))
+pub(crate) fn operations() -> Vec<crate::catalog::Operation> {
+    use crate::catalog::Access::Admin;
+    vec![
+        Admin.post("/api/admin/jobs/stop", stop_kind_route).named(
+            "stop_jobs_of_kind",
+            "Stop every job of a kind (`{\"kind\": \"llm_tag\"}`, a kind `list_jobs` shows), waiting or running; \
+             answers with how many.",
+        ),
+        Admin.post("/api/admin/jobs/{id}/stop", stop_route).named(
+            "stop_job",
+            "Stop one job: one waiting is taken off the queue (204), one running is asked to stop at its next wait (202).",
+        ),
+        Admin.post("/api/admin/maintenance/{task}/stop", crate::maintenance::stop_route).named(
+            "stop_maintenance",
+            "Ask a running Maintenance task to stop after what it's doing now.",
+        ),
+    ]
 }
 
 pub(crate) fn stop_path(id: i64) -> String {
@@ -387,7 +398,7 @@ pub(crate) async fn stop_route(
     stop(&state, id).await
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, schemars::JsonSchema)]
 pub(crate) struct StopKind {
     kind: String,
 }

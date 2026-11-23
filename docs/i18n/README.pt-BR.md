@@ -95,7 +95,8 @@ ou hospedado, e ele também escreve nomes e descrições.
   colega de equipe e cada máquina de build receba os mesmos bytes.
 - **Baixar como** GLB, PNG, WAV, MP3 ou um formato de folha de sprites, convertido na hora, com os nomes das texturas
   na convenção do seu estúdio.
-- **Agentes de IA** buscam, inspecionam e baixam assets via MCP.
+- **Agentes de IA** buscam, inspecionam e baixam assets via MCP, e podem fazer qualquer outra coisa que o portal
+  faz, com as permissões da conta ou do token com que entram.
 
 ### Guardado uma vez, mantido em segurança
 

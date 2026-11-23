@@ -19,8 +19,12 @@ pub(crate) struct Actor {
 }
 
 impl Actor {
-    /// Someone signed in (`human`), or an app with one of their access tokens (`app`).
+    /// Someone signed in (`human`), an app with one of their access tokens (`app`), or an assistant calling the
+    /// same operation over MCP (`mcp`).
     pub(crate) fn of(who: &crate::auth::Who) -> Self {
+        if crate::mcp::operations::over_mcp() {
+            return Self::mcp(who);
+        }
         Self { who: Some(who.name().to_owned()), source: if who.is_token() { "app" } else { "human" } }
     }
 
@@ -33,7 +37,7 @@ impl Actor {
 /// One change in an asset's history. `field` is a column (`name`, `category`, `description`, `license`,
 /// `source_url`, `rating`, `reviewed`), `tag:<tag>` (old and new are its source then, `ai:0.83` with a confidence
 /// under 1, or nothing where it didn't have it) or `field:<name>` for a field of the library's own.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, schemars::JsonSchema)]
 pub(crate) struct Change {
     pub id: i64,
     pub field: String,

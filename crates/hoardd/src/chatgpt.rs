@@ -549,7 +549,7 @@ pub(crate) async fn get_status(State(state): State<AppState>) -> ApiResult<Json<
     Ok(Json(status_json(&account(&state).await?)))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(crate) struct StartBody {
     /// The port the browser reaches Hoard on, so a browser on the server's own machine comes straight back.
     port: u16,
@@ -578,7 +578,7 @@ pub(crate) async fn start(State(state): State<AppState>, Json(body): Json<StartB
     Ok(Json(json!({ "url": url })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(crate) struct FinishBody {
     /// The address the browser was sent to after signing in, pasted from its address bar.
     url: String,

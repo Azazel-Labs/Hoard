@@ -96,7 +96,8 @@ schrijft ook namen en beschrijvingen.
   teamgenoot en elke buildmachine dezelfde bytes krijgt.
 - **Downloaden als** GLB, PNG, WAV, MP3 of een spritesheetformaat, ter plekke geconverteerd, met texturenamen volgens
   de conventie van je studio.
-- **AI-agents** zoeken, inspecteren en halen assets op via MCP.
+- **AI-agents** zoeken, inspecteren en halen assets op via MCP, en kunnen alles wat het portaal kan, met de rechten
+  van het account of token waarmee ze inloggen.
 
 ### Eén keer opgeslagen, veilig bewaard
 

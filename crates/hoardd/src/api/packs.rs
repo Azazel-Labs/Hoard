@@ -92,7 +92,7 @@ pub(super) async fn put_pack_context(
     saved.map(Json).ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct PacksParams {
     /// The archive's packs instead of the library's.
     #[serde(default)]
@@ -123,7 +123,7 @@ pub(super) async fn get_pack(State(state): State<AppState>, Path(id): Path<Strin
         .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct PackPatch {
     name: Option<String>,
     facing: Option<hoard_core::Facing>,
@@ -281,7 +281,7 @@ pub(crate) fn pack_name_from_files(files: &[String]) -> Option<String> {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct RetagBody {
     #[serde(default = "yes")]
     rules: bool,

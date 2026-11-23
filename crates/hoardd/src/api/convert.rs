@@ -16,7 +16,7 @@ use crate::{db, jobs};
 
 use super::files::serve_blob;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct AsParams {
     /// Scale images down so neither side exceeds this (a power of two, 64-16384).
     #[serde(default)]
@@ -182,7 +182,7 @@ pub(super) async fn unreal_status(
     .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct PendingParams {
     #[serde(default)]
     limit: Option<u32>,
@@ -196,7 +196,7 @@ pub(super) async fn unreal_pending(
     Ok(Json(db::call(&state.pool, move |c| crate::extract::pending(c, limit)).await?))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct ReplaceParams {
     /// Extension of the uploaded file (`fbx`, `png`, …).
     ext: String,
@@ -290,7 +290,7 @@ pub(super) async fn unreal_finish(State(state): State<AppState>, Path(id): Path<
     Ok(StatusCode::ACCEPTED)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct PreviewBody {
     rules: crate::reformat::Rules,
 }

@@ -95,7 +95,8 @@ lokalnego lub hostowanego, Hoard pisze też nazwy i opisy.
   członek zespołu i każda maszyna budująca dostaje te same bajty.
 - **Pobierz jako** GLB, PNG, WAV, MP3 lub format arkusza sprite’ów, z konwersją w locie i z nazwami tekstur zgodnymi
   z konwencją studia.
-- **Agenci AI** wyszukują, sprawdzają i pobierają zasoby przez MCP.
+- **Agenci AI** wyszukują, sprawdzają i pobierają zasoby przez MCP, a także mogą zrobić wszystko inne, co robi
+  portal, z uprawnieniami konta lub tokenu, którym się logują.
 
 ### Zapisane raz, bezpiecznie przechowane
 

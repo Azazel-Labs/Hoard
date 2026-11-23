@@ -1,5 +1,6 @@
 //! The Settings page's reads and writes, and the AI models it can list or fetch.
 
+use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use crate::{AppState, db};
@@ -198,7 +199,7 @@ fn settings_json_sync(state: &AppState) -> Value {
     })
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct ModelsBody {
     url: String,
     /// Absent: the saved key, when `url` is the address in use. Empty: no key.
@@ -225,7 +226,7 @@ pub(super) async fn llm_models(State(state): State<AppState>, Json(body): Json<M
     Ok(Json(json!({ "models": models })))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct LocalBody {
     url: String,
     /// `list` (the default), `download` or `delete`.
@@ -267,7 +268,7 @@ fn option(value: impl serde::Serialize, default: impl serde::Serialize, saved: b
     json!({ "value": value, "default": default, "saved": saved })
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct SoundFontAsk {
     /// The file's name where it came from.
     name: String,
@@ -323,13 +324,36 @@ fn soundfont_name(sent: &str) -> String {
     format!("{}.sf2", if stem.is_empty() { "soundfont" } else { stem })
 }
 
-/// Settings, and the models an LLM setting could use. (Sending a SoundFont is in the main router, for its size limit.)
-pub(super) fn admin_router() -> axum::Router<AppState> {
-    use axum::routing::{get, post};
-    axum::Router::new()
-        .route("/api/admin/settings", get(get_settings).put(put_settings))
-        .route("/api/admin/llm/models", post(llm_models))
-        .route("/api/admin/llm/local", post(llm_local))
+/// Settings, and the models an LLM setting could use.
+pub(super) fn operations() -> Vec<Operation> {
+    use Access::Admin;
+    vec![
+        Admin.get("/api/admin/settings", get_settings).named(
+            "get_settings",
+            "Every setting, as Settings shows them: each one's value, and whether it's the server's own default.",
+        ),
+        Admin.put("/api/admin/settings", put_settings).named(
+            "change_settings",
+            "Change settings: a JSON object of just the ones to change (names as `get_settings` gives them), `null` \
+             to go back to the default. They take effect at once. Answers with every setting.",
+        ),
+        Admin.post("/api/admin/llm/models", llm_models).named(
+            "list_ai_models",
+            "The models an AI service offers, which doubles as a test of reaching it with that key.",
+        ),
+        Admin.post("/api/admin/llm/local", llm_local).named(
+            "manage_local_models",
+            "The local model server (llama.cpp in router mode): what it has, and downloading or deleting a model. \
+             Answers with the list, or `reachable: false` and why.",
+        ),
+        Admin
+            .post("/api/admin/soundfont", upload_soundfont)
+            .named(
+                "upload_soundfont",
+                "Send a SoundFont (.sf2) for playing MIDI files, the file's bytes as the body. It replaces the one used.",
+            )
+            .upload(),
+    ]
 }
 
 pub(super) async fn get_settings(State(state): State<AppState>) -> Json<Value> {

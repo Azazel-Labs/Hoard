@@ -29,7 +29,7 @@ use crate::auth::Role;
 use crate::i18n::tr;
 
 pub(crate) use accounts::{Source, account_for};
-pub(crate) use admin::admin_router;
+pub(crate) use admin::operations;
 pub(crate) use ldap::{recheck_loop, roots_from_pem, server_url};
 pub(crate) use oauth::router;
 

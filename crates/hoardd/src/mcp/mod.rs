@@ -10,6 +10,7 @@
 
 mod calls;
 pub(crate) mod live;
+pub(crate) mod operations;
 mod sound_tools;
 mod tools;
 
@@ -39,7 +40,7 @@ much of a color in them. To find a sound by what it sounds like, use search_soun
 noise (\"WHOOOM\", \"pew\", \"krssh\") as `imitation` and, when you can tell more than the spelling says, your own reading \
 of it as `shape`; describe_sound says what a sound sounds like and sounds_like finds others like it. To actually \
 fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL. \
-To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how).";
+To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how). Everything else the Hoard web app does is here too, with this sign-in's permissions: reorganizing tags (parents, merges, aliases), renaming and retagging packs, collections, the archive, projects, storage locations, settings and maintenance. find_operations finds the operation for what you want to do, describe_operation says what it takes, and read_operation (to look) or run_operation (to change) calls it. Say what you're about to change before a change that touches many things or deletes.";
 
 pub(crate) fn router(_state: &AppState) -> Router<AppState> {
     Router::new().route("/mcp", post(handle).get(|| async { StatusCode::METHOD_NOT_ALLOWED }))
@@ -160,10 +161,17 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             let result = if !may_change && CHANGES.contains(&name.as_str()) {
                 Err(ToolError::Failed("this account can look but not change anything".into()))
             } else {
-                call_tool(&state, &who, &name, args, &base).await
+                match operations::call(&state, who.role(), &name, &args, &headers, &base).await {
+                    Some(result) => result,
+                    None => call_tool(&state, &who, &name, args, &base).await,
+                }
             };
             match result {
                 Ok(mut value) => {
+                    // Structured content is always an object.
+                    if !value.is_object() {
+                        value = json!({ "result": value });
+                    }
                     let previews = value.as_object_mut().and_then(|o| o.remove(PREVIEWS_KEY));
                     let sheet = value.as_object_mut().and_then(|o| o.remove(SHEET_KEY));
                     let mut content = vec![

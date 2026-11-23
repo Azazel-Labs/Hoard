@@ -439,7 +439,7 @@ pub struct PendingPackage {
 }
 
 /// Options for converting a pack's Unreal packages.
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UnrealConvertRequest {
     /// Discard each original package once its content is out.
     #[serde(default)]
@@ -560,7 +560,7 @@ pub struct CollectionRef {
 }
 
 /// Create or rename a collection.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CollectionPatch {
     #[serde(default)]
     pub name: Option<String>,
@@ -569,7 +569,7 @@ pub struct CollectionPatch {
 }
 
 /// Add assets to, or take them out of, a collection.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CollectionMembers {
     #[serde(default)]
     pub add: Vec<String>,
@@ -579,7 +579,7 @@ pub struct CollectionMembers {
 
 /// Where a pack came from and what it is, as written by its seller. The LLM tagger sees this with every file,
 /// because a store page saying "120 ice and fire spells" explains `spell35.wav` better than the file can.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PackContext {
     /// Store or marketplace, e.g. "Fab", "itch.io", "Humble Bundle".
     #[serde(default)]
@@ -779,7 +779,7 @@ pub struct Pack {
 /// is up or front (OBJ, STL, PLY, 3DS, Collada), or say it wrongly: a tip about the side-to-side axis, then a turn
 /// about the up axis, each a multiple of 90 degrees. Thumbnails, the 3D viewer and GLB downloads show the models
 /// turned; their files are left as they were made.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Facing {
     /// Degrees about the up axis, counterclockwise seen from above: 0, 90, 180 or 270.
     #[serde(default)]
@@ -811,7 +811,7 @@ impl Facing {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SearchQuery {
     /// Free text (FTS5 over name, path, category, description, tags).
     #[serde(default)]
@@ -909,7 +909,7 @@ pub struct SearchResult {
 }
 
 /// A change to an asset. Each field left out stays as it is; an empty text clears what it's for.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AssetPatch {
     pub name: Option<String>,
     pub category: Option<String>,
@@ -951,7 +951,7 @@ pub struct AssetPatch {
 }
 
 /// Request a flat, engine-friendly list of files: either explicit ids, a search, or both.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ManifestRequest {
     #[serde(default)]
     pub ids: Vec<String>,
@@ -967,7 +967,7 @@ pub struct ManifestRequest {
 
 /// Credits for the packs a project uses: whole packs, collections, assets, and selections as `hoard.toml` writes
 /// them. Everything given is put together into one list of packs.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct CreditsRequest {
     /// Pack ids or names.
     #[serde(default)]

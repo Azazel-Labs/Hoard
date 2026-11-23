@@ -96,7 +96,8 @@ OpenAI, locale o in hosting, e scriverà anche nomi e descrizioni.
   membro del team e ogni macchina di build riceve gli stessi byte.
 - **Scarica come** GLB, PNG, WAV, MP3 o un formato di fogli di sprite, convertito al volo, con i nomi delle texture
   secondo la convenzione del tuo studio.
-- **Gli agenti IA** cercano, esaminano e scaricano asset tramite MCP.
+- **Gli agenti IA** cercano, esaminano e scaricano asset tramite MCP, e possono fare qualsiasi altra cosa che fa il
+  portale, con i permessi dell'account o del token con cui accedono.
 
 ### Salvato una volta, al sicuro
 

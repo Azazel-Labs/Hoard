@@ -40,6 +40,6 @@ pub(crate) fn router() -> Router<AppState> {
     Router::new()
 }
 
-pub(crate) fn admin_router() -> Router<AppState> {
-    Router::new()
+pub(crate) const fn operations() -> Vec<crate::catalog::Operation> {
+    Vec::new()
 }

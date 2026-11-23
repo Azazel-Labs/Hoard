@@ -93,7 +93,8 @@ den også navne og beskrivelser.
   og alle build-maskiner får de samme bytes.
 - **Download som** GLB, PNG, WAV, MP3 eller et sprite-ark-format, konverteret i farten, med teksturnavne efter dit
   studies konvention.
-- **AI-agenter** søger i, undersøger og henter assets via MCP.
+- **AI-agenter** søger i, undersøger og henter assets via MCP og kan alt andet, portalen kan, med de rettigheder,
+  kontoen eller tokenet de logger ind med, har.
 
 ### Gemt én gang, holdt sikkert
 

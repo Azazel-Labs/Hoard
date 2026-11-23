@@ -37,7 +37,7 @@ use crate::i18n::tr;
 use crate::signin::Gate;
 use crate::{db, tools};
 
-pub(crate) use accounts::{account_router, admin_router};
+pub(crate) use accounts::operations;
 pub(crate) use signing_in::router;
 
 /// The session cookie over plain `http://`.

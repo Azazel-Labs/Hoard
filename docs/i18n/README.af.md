@@ -92,7 +92,8 @@ skryf ook name en beskrywings.
   elke boumasjien dieselfde grepe kry.
 - **Laai af as** GLB, PNG, WAV, MP3 of 'n sprite-bladformaat, terstond omgeskakel, met tekstuurname volgens jou ateljee
   se konvensie.
-- **KI-agente** soek, ondersoek en haal bates oor MCP.
+- **KI-agente** soek, ondersoek en haal bates oor MCP, en kan enigiets anders doen wat die portaal doen, met die
+  regte van die rekening of token waarmee hulle aanmeld.
 
 ### Een keer gestoor, veilig bewaar
 

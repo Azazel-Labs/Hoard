@@ -95,7 +95,8 @@ så skriver den namn och beskrivningar också.
   byggmaskin får samma byte.
 - **Ladda ner som** GLB, PNG, WAV, MP3 eller ett spritearkformat, konverterat i farten, med texturnamn enligt din
   studios konvention.
-- **AI-agenter** söker efter, inspekterar och hämtar resurser via MCP.
+- **AI-agenter** söker efter, inspekterar och hämtar resurser via MCP, och kan göra allt annat portalen gör, med
+  behörigheterna hos kontot eller token de loggar in med.
 
 ### Lagras en gång, hålls säkert
 

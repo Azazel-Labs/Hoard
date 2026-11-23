@@ -4,7 +4,7 @@
 use serde_json::{Value, json};
 
 /// The tools that change the library, which accounts that can only look don't get.
-pub(super) const CHANGES: [&str; 3] = ["tag_asset", "update_asset", "save_tags"];
+pub(super) const CHANGES: [&str; 4] = ["tag_asset", "update_asset", "save_tags", "run_operation"];
 
 pub(super) fn tool_list(may_change: bool) -> Value {
     let (read, write) = (read_hints(), write_hints());
@@ -131,6 +131,7 @@ pub(super) fn tool_list(may_change: bool) -> Value {
         if !may_change {
             list.retain(|t| !t["name"].as_str().is_some_and(|n| CHANGES.contains(&n)));
         }
+        list.extend(super::operations::tools(may_change));
     }
     all
 }

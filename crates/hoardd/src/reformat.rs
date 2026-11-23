@@ -56,7 +56,7 @@ pub(crate) fn sources(to: &str) -> Vec<&'static str> {
 }
 
 /// Settings → Conversion: the rules, and how long originals are kept.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Rules {
     #[serde(default)]
@@ -81,7 +81,7 @@ fn yes() -> bool {
 }
 
 /// Files in any of the formats `from` become `to`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Rule {
     #[serde(default = "yes")]

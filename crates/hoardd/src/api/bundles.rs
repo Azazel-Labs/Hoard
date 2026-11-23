@@ -85,7 +85,7 @@ fn manifest_entry(a: Asset, bundle: Option<(String, String)>, file_name: Option<
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct BundleParams {
     #[serde(default)]
     animations: Option<u8>,
@@ -151,7 +151,7 @@ fn character_files(
     Ok(files)
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct SelectionParams {
     /// Comma-separated asset ids.
     ids: String,
@@ -413,7 +413,7 @@ fn unzip_glb(bytes: &[u8]) -> anyhow::Result<crate::glbfiles::Split> {
     Ok(crate::glbfiles::Split { glb: glb.context("the GLB's zip has no GLB")?, textures })
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct CollectionZipParams {
     #[serde(default)]
     animations: Option<u8>,

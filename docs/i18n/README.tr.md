@@ -96,7 +96,8 @@ OpenAI uyumlu herhangi bir modele yönlendirin; adları ve açıklamaları da o 
   böylece her ekip arkadaşı ve derleme makinesi aynı baytları alır.
 - **Farklı indir**: GLB, PNG, WAV, MP3 ya da bir sprite sayfası biçimi; anında dönüştürülür, doku adları stüdyonuzun
   adlandırma kuralına uyar.
-- **Yapay zekâ ajanları** MCP üzerinden varlıkları arar, inceler ve getirir.
+- **Yapay zekâ ajanları** MCP üzerinden varlıkları arar, inceler ve getirir; portalın yaptığı her şeyi de, oturum
+  açtıkları hesabın ya da belirtecin yetkileriyle yapabilir.
 
 ### Bir kez saklanır, güvende tutulur
 

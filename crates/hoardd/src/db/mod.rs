@@ -136,6 +136,57 @@ fn turn_over() {
     freed.notify_all();
 }
 
+/// How long one slice of a long run of writes holds the database (see [`Slices`]).
+const SLICE: Duration = Duration::from_millis(100);
+
+/// A long run of writes (a big pack's materials, say) in short transactions, so the other writers waiting meanwhile
+/// (someone saving a setting) get a turn every [`SLICE`] rather than once it's all done. Each slice is all or
+/// nothing; the run as a whole isn't, so it must be fine for others to see it partly done.
+pub(crate) struct Slices<'c> {
+    conn: &'c Connection,
+    tx: Option<rusqlite::Transaction<'c>>,
+    since: Instant,
+}
+
+impl<'c> Slices<'c> {
+    pub(crate) fn new(conn: &'c Connection) -> Self {
+        Self { conn, tx: None, since: Instant::now() }
+    }
+
+    /// The transaction to write in next: a new one once the last has held the database for a slice.
+    pub(crate) fn tx(&mut self) -> Result<&rusqlite::Transaction<'c>> {
+        if self.since.elapsed() >= SLICE {
+            self.turn()?;
+        }
+        if self.tx.is_none() {
+            self.tx = Some(rusqlite::Transaction::new_unchecked(self.conn, TransactionBehavior::Immediate)?);
+            self.since = Instant::now();
+        }
+        Ok(self.tx.as_ref().expect("just begun"))
+    }
+
+    /// Commit what's written so far, and give any writer waiting a moment to go first.
+    pub(crate) fn turn(&mut self) -> Result<()> {
+        let Some(tx) = self.tx.take() else { return Ok(()) };
+        tx.commit()?;
+        // The commit woke the waiters (see `turn_over`), but this thread would usually begin again before they look:
+        // wait for one of them to finish, or a few milliseconds if nobody's waiting.
+        let (writes, freed) = &TURN;
+        let seen = writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let at = *seen;
+        drop(freed.wait_timeout_while(seen, Duration::from_millis(5), |n| *n == at));
+        Ok(())
+    }
+
+    /// Commit the last slice.
+    pub(crate) fn commit(mut self) -> Result<()> {
+        match self.tx.take() {
+            Some(tx) => Ok(tx.commit()?),
+            None => Ok(()),
+        }
+    }
+}
+
 /// How many times the library has been written to since the server started.
 static WRITES: AtomicU64 = AtomicU64::new(0);
 

@@ -59,20 +59,22 @@ pub(in crate::materials) fn link_models(tx: &Connection, pack_id: &str) -> Resul
     let mut insert = tx.prepare_cached(
         "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'material') ON CONFLICT DO NOTHING",
     )?;
+    // Each material's name and folder, worked out once rather than once per model: a big pack has thousands of each.
+    let keyed: Vec<(Vec<String>, String)> =
+        materials.iter().map(|(_, path, ..)| (words(stem_of(path)), dir_key(dir_of(path)))).collect();
     for (model_id, model_path) in &models {
         if stem_of(model_path).contains('@') {
             continue;
         }
         let model_words = words(stem_of(model_path));
         let model_dir = dir_key(dir_of(model_path));
-        for (mat_id, mat_path, maps, unity) in &materials {
+        let below = format!("{model_dir}/");
+        for ((mat_id, _, maps, unity), (key, mat_dir)) in materials.iter().zip(&keyed) {
             // A model whose slots wear Unity's materials wears no others of Unity's by its file name.
             if *unity && slotted.contains(model_id) {
                 continue;
             }
-            let key = words(stem_of(mat_path));
-            let mat_dir = dir_key(dir_of(mat_path));
-            let near = model_dir == mat_dir || mat_dir.starts_with(&format!("{model_dir}/")) || model_dir.is_empty();
+            let near = model_dir == *mat_dir || mat_dir.starts_with(&below) || model_dir.is_empty();
             let named = !key.is_empty() && model_words.len() >= key.len() && model_words[..key.len()] == key[..];
             if !(near && named) {
                 continue;

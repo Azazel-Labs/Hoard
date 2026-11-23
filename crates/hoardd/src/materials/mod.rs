@@ -278,10 +278,12 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     }
 
     let now = db::now();
-    let tx = conn.transaction()?;
-    let were_maps = crate::naming::maps_of_pack(&tx, pack_id)?;
+    let were_maps = crate::naming::maps_of_pack(conn, pack_id)?;
+    // A big pack has thousands: in slices, so nobody else waits seconds to write meanwhile.
+    let mut slices = db::Slices::new(conn);
     let mut kept = HashSet::new();
     for m in &made {
+        let tx = slices.tx()?;
         let f = &m.found;
         let id = existing.get(&f.path).map_or_else(|| uuid::Uuid::now_v7().to_string(), |(id, ..)| id.clone());
         kept.insert(id.clone());
@@ -292,7 +294,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
             )?;
         }
         let meta = m.meta();
-        let tags = material_tags(&tx, &textures, f)?;
+        let tags = material_tags(tx, &textures, f)?;
         let category = tagger::categorize(AssetKind::Material, &tags);
         tx.execute(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
@@ -323,9 +325,9 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
             [&id],
         )?;
         for s in tags.into_vec() {
-            db::upsert_tag(&tx, &id, &s.tag, s.source, s.confidence)?;
+            db::upsert_tag(tx, &id, &s.tag, s.source, s.confidence)?;
         }
-        db::reindex_asset(&tx, &id)?;
+        db::reindex_asset(tx, &id)?;
         tx.execute("DELETE FROM material_maps WHERE material_id = ?1", [&id])?;
         tx.execute("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'texture'", [&id])?;
         for (i, role, res) in &f.maps {
@@ -340,16 +342,16 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 params![id, t],
             )?;
         }
-        link_source(&tx, &id, f)?;
+        link_source(tx, &id, f)?;
     }
     // Materials whose maps are gone (or no longer form a set).
     for (id, _, _, synthetic) in existing.values() {
         if *synthetic && !kept.contains(id) {
-            tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
+            slices.tx()?.execute("DELETE FROM assets WHERE id = ?1", [id])?;
         }
     }
-    tie_up(&tx, pack_id, &were_maps)?;
-    tx.commit()?;
+    tie_up(&mut slices, pack_id, &were_maps)?;
+    slices.commit()?;
     Ok(made.len())
 }
 
@@ -400,11 +402,16 @@ fn link_source(tx: &Connection, id: &str, f: &Found) -> Result<()> {
 }
 
 /// Once a pack's materials are in: name their maps, put the materials on the models, and group the pack's files.
-fn tie_up(tx: &Connection, pack_id: &str, were_maps: &[(String, String)]) -> Result<()> {
-    crate::naming::rename_maps(tx, pack_id, were_maps)?;
-    link_models(tx, pack_id)?;
-    mark_owned(tx, pack_id)?;
-    links::assign_families(tx, pack_id)?;
+/// Each step is its own transaction.
+fn tie_up(slices: &mut db::Slices<'_>, pack_id: &str, were_maps: &[(String, String)]) -> Result<()> {
+    slices.turn()?;
+    crate::naming::rename_maps(slices.tx()?, pack_id, were_maps)?;
+    slices.turn()?;
+    link_models(slices.tx()?, pack_id)?;
+    slices.turn()?;
+    mark_owned(slices.tx()?, pack_id)?;
+    slices.turn()?;
+    links::assign_families(slices.tx()?, pack_id)?;
     Ok(())
 }
 

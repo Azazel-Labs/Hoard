@@ -102,3 +102,42 @@ fn an_import_with_searches_alongside_is_never_locked_out() {
     assert!(slowest < Duration::from_secs(10), "a batch took {slowest:?}");
     assert!(searches > 0);
 }
+
+/// A long run of writes in slices leaves room between them: a setting saved while it runs waits a slice at most, not
+/// for the whole run.
+#[test]
+fn a_long_run_in_slices_lets_others_write_meanwhile() {
+    let dir = tempfile::tempdir().unwrap();
+    let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+    let run = Duration::from_millis(1500);
+    let longest = std::thread::scope(|s| {
+        let long = s.spawn(|| {
+            let c = pool.get().unwrap();
+            let mut slices = super::Slices::new(&c);
+            let started = Instant::now();
+            let mut i = 0;
+            while started.elapsed() < run {
+                let tx = slices.tx().unwrap();
+                tx.execute("INSERT INTO blobs (hash, size, created_at) VALUES (?1, 1, 'x')", [format!("long{i}")])
+                    .unwrap();
+                std::thread::sleep(Duration::from_millis(2));
+                i += 1;
+            }
+            slices.commit().unwrap();
+        });
+        std::thread::sleep(Duration::from_millis(100));
+        let mut longest = Duration::ZERO;
+        for i in 0..10 {
+            let at = Instant::now();
+            pool.get()
+                .unwrap()
+                .execute("INSERT INTO blobs (hash, size, created_at) VALUES (?1, 1, 'x')", [format!("short{i}")])
+                .unwrap();
+            longest = longest.max(at.elapsed());
+            std::thread::sleep(Duration::from_millis(90));
+        }
+        long.join().unwrap();
+        longest
+    });
+    assert!(longest < Duration::from_millis(500), "a short write waited {longest:?}");
+}

@@ -16,6 +16,7 @@ use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{Connection, InterruptHandle, TransactionBehavior};
 
 mod assets;
+mod changes;
 mod collections;
 mod edits;
 mod jobs;
@@ -29,6 +30,7 @@ mod tags;
 mod upkeep;
 
 pub(crate) use assets::*;
+pub(crate) use changes::library_writes;
 pub(crate) use collections::*;
 pub(crate) use edits::*;
 pub(crate) use jobs::*;
@@ -55,29 +57,32 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     Connection::open(path)
         .and_then(|c| c.execute_batch("PRAGMA journal_mode = WAL;"))
         .with_context(|| format!("open {}", path.display()))?;
+    // Upgraded (and rewritten if need be) on a connection of its own first: the pool's each note what's changed with triggers on the tables
+    // there are as they open (see `changes::watch`), and r2d2 opens them all at once.
+    {
+        let mut conn = Connection::open(path).with_context(|| format!("open {}", path.display()))?;
+        set_up(&mut conn)?;
+        migrate(&mut conn, backups, MIGRATIONS)?;
+        // (It sets `temp_store`, which would throw away a pool connection's triggers.)
+        upkeep::give_back_room_over_time(&conn);
+    }
     let manager = SqliteConnectionManager::file(path).with_init(|c| {
-        // Transactions take the write lock when they begin. A deferred one that reads and then writes can't wait for
-        // another writer (SQLite would deadlock), so it fails at once with "database is locked", busy_timeout or not:
-        // two tag edits at the same moment did.
-        c.set_transaction_behavior(TransactionBehavior::Immediate);
-        // Waiting first: switching to WAL takes a lock, and connections opened at once must wait for it rather than
-        // fail with "database is locked".
-        c.busy_handler(Some(wait_turn))?;
-        c.rollback_hook(Some(turn_over))?;
-        // The log is used again from the start once everything in it is in the database, but never made smaller: after
-        // a big import, or writes while a long search kept it from being reused, it stayed hundreds of megabytes.
-        // `journal_size_limit` cuts it back to 64 MB each time it's reused.
-        c.execute_batch(
-            "PRAGMA journal_mode = WAL;
-             PRAGMA synchronous = NORMAL;
-             PRAGMA foreign_keys = ON;
-             PRAGMA temp_store = MEMORY;
-             PRAGMA journal_size_limit = 67108864;",
-        )?;
+        // First: setting `temp_store` throws away temporary triggers.
+        set_up(c)?;
+        // What each transaction changes, for what's kept from the library to be put right (see `changes`).
+        let pending = Arc::new(Mutex::new(changes::Pending::default()));
+        // (Its lock is only ever free: a connection is used by one thread at a time.)
+        changes::watch(c, &pending)?;
+        let (rolled, committed) = (Arc::clone(&pending), pending);
+        c.rollback_hook(Some(move || {
+            changes::rolled_back(&mut rolled.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
+            turn_over();
+        }))?;
         // Every write counts, on whichever connection (see `writes`), once it's there for others to read: unlike a
         // commit hook, which runs just before. Taking the place of SQLite's own hook, this checkpoints the log the
         // way that does (at 1000 pages, without waiting on readers).
-        c.wal_hook(Some(|wal: &mut rusqlite::hooks::Wal, pages| {
+        c.wal_hook(Some(move |wal: &mut rusqlite::hooks::Wal, pages| {
+            changes::committed(&mut committed.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
             WRITES.fetch_add(1, Ordering::AcqRel);
             turn_over();
             if pages >= 1000 {
@@ -90,10 +95,28 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     // Readers don't wait for each other or for the writer (WAL), so there's room for many: searches (at most
     // READ_LANE of them, see `read`), the job workers and every other request at once.
     let pool = r2d2::Pool::builder().max_size(24).build(manager).context("open sqlite pool")?;
-    let mut conn = pool.get()?;
-    migrate(&mut conn, backups, MIGRATIONS)?;
-    upkeep::give_back_room_over_time(&conn);
     Ok(pool)
+}
+
+/// How every connection to the library behaves.
+fn set_up(c: &mut Connection) -> rusqlite::Result<()> {
+    // Transactions take the write lock when they begin. A deferred one that reads and then writes can't wait for
+    // another writer (SQLite would deadlock), so it fails at once with "database is locked", busy_timeout or not:
+    // two tag edits at the same moment did.
+    c.set_transaction_behavior(TransactionBehavior::Immediate);
+    // Waiting first: switching to WAL takes a lock, and connections opened at once must wait for it rather than
+    // fail with "database is locked".
+    c.busy_handler(Some(wait_turn))?;
+    // The log is used again from the start once everything in it is in the database, but never made smaller: after
+    // a big import, or writes while a long search kept it from being reused, it stayed hundreds of megabytes.
+    // `journal_size_limit` cuts it back to 64 MB each time it's reused.
+    c.execute_batch(
+        "PRAGMA journal_mode = WAL;
+         PRAGMA synchronous = NORMAL;
+         PRAGMA foreign_keys = ON;
+         PRAGMA temp_store = MEMORY;
+         PRAGMA journal_size_limit = 67108864;",
+    )
 }
 
 /// How long a write waits for the one before it to finish before giving up with "database is locked".

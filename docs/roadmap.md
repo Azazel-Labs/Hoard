@@ -7,19 +7,21 @@ isn't yet.
 
 Measured against a generated library of 300,000 assets in 200 packs, with names drawn from 26,000 words and a tag
 tree over its tags (`cargo test -p hoardd --lib big_library --release -- --ignored --nocapture`, which prints a
-timing for each step; last run 2026-11-22). Quick already: browsing everything with its counts and sidebar (0.14 s),
-a big pack (0.12 s) and its top folder (0.14 s), a search by words (45 ms), a broad tag picked or typed with
-everything under it (0.3 to 0.35 s), the pack list (31 ms), a pack's card (under a millisecond), tag suggestions,
-Settings → Issues, sorting by name or size and a search's next pages (a millisecond or two), and the library's
-numbers, report, near copies and store files no format reads, which are kept, saved for the next start and worked
-out again in the background. The sidebar's tags are counted from each tag's assets, kept until the library changes,
-in a few milliseconds. Still slow, worst first:
+timing for each step; last run 2026-11-22). Quick already: browsing everything with its counts and sidebar (9 ms), a
+big pack (3 ms), a broad tag picked with everything under it (6 ms), a search by words (16 ms), the first letter typed
+(0.12 s, nearly all of it the search index finding 285,000 matches), the pack list (46 ms), a pack's card (under a
+millisecond), tag suggestions, Settings → Issues, sorting by name or size and a search's next pages (a millisecond or
+two), and the library's numbers, report, near copies and store files no format reads, which are kept, saved for the
+next start and worked out again in the background. What a search tells assets apart by (kind, pack, archived,
+supporting, newest first) is kept for every asset and searched in memory, and the sidebar's tags are counted from each
+tag's assets; both are kept as tags, ratings and thumbnails change, and the tags put right in place. Still slow, worst
+first:
 
-- **The first letter typed in search: 0.4 s.** One or two letters are no longer ranked (what they find goes newest
-  first), but every match (285,000 for one letter) is still looked up in the library to count it for the total.
-- **The sidebar's tags just after the library changed: about 0.25 s more**, to read each tag's assets again. During
-  an import that's every time the sidebar asks; the tags of the assets that changed could be put right in place.
-- **Words and pictures together: 0.23 s**: what looks like a picture is ranked for every match of the words.
+- **The first search after assets are added, removed or moved: about 0.38 s more**, to read again what's kept of
+  every asset. During an import that's every search; the assets that changed could be put right in place instead.
+- **Words and pictures together: 0.3 s**: what looks like a picture is ranked for every match of the words.
+- **A broad tag typed: 0.26 s**: its 140,000 matches are ranked by how well they match.
+- **A pack's folders: 0.13 to 0.18 s**: every asset in the pack is looked at to find what's in the folder.
 
 ## What a converted file came from
 

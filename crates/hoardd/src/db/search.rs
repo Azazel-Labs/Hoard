@@ -661,25 +661,38 @@ pub(crate) fn search_ranked(
 
     // Kept for the next pages of the same search while the library stays the same (a ranking by look is worked out
     // afresh each time, so its counts aren't). Read before counting, so a write while counting makes them stale.
-    let writes = super::writes();
+    let writes = super::library_writes();
     let key = if look.is_none() { counts_key(conn, q) } else { None };
     // A search by words goes through all it finds to rank them, so what it finds in order is kept too, for its next
     // pages, and counted on the way.
     let words = look.is_none() && f.ranked;
-    let order_key = key.as_ref().filter(|_| words).map(|k| format!("{k}\n{}", q.sort.as_deref().unwrap_or_default()));
+    // So is what a search finds when it asks only for what's kept of every asset (see [`Facts`]): found and counted
+    // in memory, in one pass.
+    let quick = if look.is_none() { facts_search(q, &tree) } else { None };
+    let in_order = words || quick.is_some();
+    let order_key =
+        key.as_ref().filter(|_| in_order).map(|k| format!("{k}\n{}", q.sort.as_deref().unwrap_or_default()));
     let mut counted = None;
-    let ranked = match order_key.as_deref().and_then(|k| kept_ranked(k, writes)) {
-        Some(ranked) => Some(ranked),
-        None if words => {
-            let (found, counts) = rank_and_count(conn, q, order, blobs, &tree)?;
+    let ranked = if let Some(ranked) = order_key.as_deref().and_then(|k| kept_ranked(k, writes)) {
+        Some(ranked)
+    } else {
+        let quick = match &quick {
+            Some(s) => facts(conn)?.map(|facts| search_facts(conn, &facts, s, &tree)).transpose()?,
+            None => None,
+        };
+        let found = match quick {
+            Some(found) => Some(found),
+            None if words => Some(rank_and_count(conn, q, order, blobs, &tree)?),
+            None => None,
+        };
+        found.map(|(found, counts)| {
             counted = Some(counts);
             let found = Arc::new(found);
             if let Some(k) = order_key {
                 keep_ranked(k, writes, &found);
             }
-            Some(found)
-        }
-        None => None,
+            found
+        })
     };
     // A search by words has what it finds already: its tags are counted from those, not by searching again.
     let sidebar_tags = || match &ranked {
@@ -769,18 +782,12 @@ fn tags_of_rows(conn: &Connection, rows: &[i64], tree: &Tree) -> Result<Vec<Face
         return Ok(Vec::new());
     }
     let kept = tag_rows(conn, tree)?;
-    let mut found = vec![0_u64; rows.iter().max().map_or(0, |&m| usize::try_from(m).unwrap_or(0) / 64 + 1)];
-    for &r in rows {
-        if let Ok(r) = usize::try_from(r) {
-            found[r / 64] |= 1 << (r % 64);
-        }
-    }
-    let has = |r: u32| found.get(r as usize / 64).is_some_and(|w| w >> (r % 64) & 1 == 1);
+    let found = Rows::of(rows.iter().copied());
     let mut tags: Vec<Facet> = kept
-        .iter()
+        .all()
         .filter_map(|(tag, rows)| {
-            let n = rows.iter().filter(|&&r| has(r)).count();
-            (n > 0).then(|| Facet { value: tag.clone(), count: n as u64 })
+            let n = rows.iter().filter(|&&r| found.has(i64::from(r))).count();
+            (n > 0).then(|| Facet { value: tag.to_owned(), count: n as u64 })
         })
         .collect();
     tags.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
@@ -788,64 +795,405 @@ fn tags_of_rows(conn: &Connection, rows: &[i64], tree: &Tree) -> Result<Vec<Face
     Ok(tags)
 }
 
-/// Every tag but `set:` ones, with the rows of the assets that have it, archived or not (a search leaves those out of
-/// what it finds). A tag with tags under it has the rows of every asset with any of them, once each: vehicle has the
-/// cars and the sedans, and is there even when nothing is tagged vehicle itself. (A row is taken as fitting in 32
-/// bits: four billion assets.)
-type TagRows = Vec<(String, Vec<u32>)>;
+/// Some assets by row, a bit each.
+struct Rows(Vec<u64>);
 
-/// [`TagRows`], kept until the library changes, with its path and how many writes it had had: counting the tags of a
-/// quarter of a million assets in SQL took a second, and going through these for them takes a few milliseconds.
+impl Rows {
+    fn of(rows: impl Iterator<Item = i64> + Clone) -> Rows {
+        let most = rows.clone().max().map_or(0, |m| usize::try_from(m).unwrap_or(0));
+        let mut bits = vec![0_u64; most / 64 + 1];
+        for r in rows {
+            if let Ok(r) = usize::try_from(r) {
+                bits[r / 64] |= 1 << (r % 64);
+            }
+        }
+        Rows(bits)
+    }
+
+    fn has(&self, row: i64) -> bool {
+        usize::try_from(row).is_ok_and(|r| self.0.get(r / 64).is_some_and(|w| w >> (r % 64) & 1 == 1))
+    }
+}
+
+/// Every tag but `set:` ones, with the rows of the assets that have it, archived or not (a search leaves those out of
+/// what it finds), in no order. A tag with tags under it has the rows of every asset with any of them, once each:
+/// vehicle has the cars and the sedans, and is there even when nothing is tagged vehicle itself. (A row is taken as
+/// fitting in 32 bits: four billion assets.)
+#[derive(Clone, Default)]
+struct TagRows {
+    /// Each tag's own assets.
+    own: std::collections::HashMap<String, Vec<u32>>,
+    /// Each tag with tags under it, with its own assets and theirs.
+    broad: std::collections::HashMap<String, Vec<u32>>,
+}
+
+impl TagRows {
+    /// The assets with `tag`, or with it or a tag under it for a broad one.
+    fn rows_of(&self, tag: &str) -> &[u32] {
+        self.broad.get(tag).or_else(|| self.own.get(tag)).map_or(&[], Vec::as_slice)
+    }
+
+    /// Each tag with its assets, and those under it for a broad one.
+    fn all(&self) -> impl Iterator<Item = (&str, &[u32])> {
+        let own = self.own.iter().filter(|(t, _)| !self.broad.contains_key(*t));
+        own.chain(&self.broad).map(|(t, rows)| (t.as_str(), rows.as_slice()))
+    }
+
+    /// Add these (tag, row) pairs to the tags' own assets.
+    fn add_own(&mut self, pairs: impl IntoIterator<Item = (String, u32)>) {
+        for (tag, row) in pairs {
+            self.own.entry(tag).or_default().push(row);
+        }
+    }
+
+    /// Work out the broad tags' assets from their own and those under them.
+    fn work_out_broad(&mut self, tree: &Tree) {
+        self.broad = tree
+            .broad()
+            .filter(|(broad, _)| !broad.starts_with("set:"))
+            .map(|(broad, under)| {
+                let mut rows: Vec<u32> = std::iter::once(broad)
+                    .chain(under.iter().map(String::as_str))
+                    .filter_map(|t| self.own.get(t))
+                    .flatten()
+                    .copied()
+                    .collect();
+                rows.sort_unstable();
+                rows.dedup();
+                (broad.to_owned(), rows)
+            })
+            .collect();
+    }
+}
+
+/// [`TagRows`], kept with the library's path and how many writes to it there had been (see
+/// [`super::library_writes`]): counting the tags of a quarter of a million assets in SQL took a second, and going
+/// through these for them takes a few milliseconds. Reading them all again took a quarter of a second, so when the
+/// library changes only the assets that changed are put right, unless a great many did (see [`super::changes`]).
 static TAG_ROWS: std::sync::Mutex<Option<(String, u64, Arc<TagRows>)>> = std::sync::Mutex::new(None);
 
+/// Each asset's tags, by its row: every one but `set:` ones (a pack's own sets, as many as there are packs).
+const TAG_PAIRS: &str = "SELECT t.tag, a.rowid FROM assets a JOIN asset_tags t ON t.asset_id = a.id
+     WHERE t.tag NOT LIKE 'set:%'";
+
 fn tag_rows(conn: &Connection, tree: &Tree) -> Result<Arc<TagRows>> {
-    // Read before reading the tags, so a write meanwhile leaves them stale. (The tag tree changing is a write.)
-    let writes = super::writes();
-    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
-    let path = conn.path().filter(|p| !p.is_empty());
-    if let Some(path) = path {
-        let kept = TAG_ROWS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        if let Some((_, _, rows)) = kept.as_ref().filter(|(p, at, _)| p == path && *at == writes) {
+    // Read before reading the tags, so a write meanwhile is put right next time. (The tag tree changing is a write.)
+    let writes = super::library_writes();
+    // An in-memory library (a test's) has no writes counted for it.
+    let Some(path) = conn.path().filter(|p| !p.is_empty()) else { return Ok(Arc::new(read_tag_rows(conn, tree)?)) };
+    let mut kept = TAG_ROWS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if let Some((_, at, rows)) = kept.as_mut().filter(|(p, _, _)| p == path) {
+        if *at == writes {
+            return Ok(Arc::clone(rows));
+        }
+        if let Some(changed) = super::changes::since(*at, writes).filter(|c| !c.too_much) {
+            put_right(conn, Arc::make_mut(rows), &changed, tree)?;
+            *at = writes;
             return Ok(Arc::clone(rows));
         }
     }
-    let mut by_tag: std::collections::HashMap<String, Vec<u32>> = std::collections::HashMap::new();
-    let mut stmt = conn.prepare_cached(
-        "SELECT t.tag, a.rowid FROM assets a JOIN asset_tags t ON t.asset_id = a.id WHERE t.tag NOT LIKE 'set:%'",
-    )?;
+    let rows = Arc::new(read_tag_rows(conn, tree)?);
+    *kept = Some((path.to_owned(), writes, Arc::clone(&rows)));
+    Ok(rows)
+}
+
+/// [`TagRows`] read from the whole library.
+fn read_tag_rows(conn: &Connection, tree: &Tree) -> Result<TagRows> {
+    let mut all = TagRows::default();
+    let mut stmt = conn.prepare_cached(TAG_PAIRS)?;
     let mut rows = stmt.query([])?;
     while let Some(r) = rows.next()? {
         let Ok(row) = u32::try_from(r.get::<_, i64>(1)?) else { continue };
         let tag = r.get_ref(0)?.as_str()?;
-        match by_tag.get_mut(tag) {
+        match all.own.get_mut(tag) {
             Some(rows) => rows.push(row),
             None => {
-                by_tag.insert(tag.to_owned(), vec![row]);
+                all.own.insert(tag.to_owned(), vec![row]);
             }
         }
     }
-    let broad: Vec<(String, Vec<u32>)> = tree
-        .broad()
-        .filter(|(broad, _)| !broad.starts_with("set:"))
-        .map(|(broad, under)| {
-            let mut rows: Vec<u32> = std::iter::once(broad)
-                .chain(under.iter().map(String::as_str))
-                .filter_map(|t| by_tag.get(t))
-                .flatten()
-                .copied()
-                .collect();
-            rows.sort_unstable();
-            rows.dedup();
-            (broad.to_owned(), rows)
-        })
-        .collect();
-    by_tag.extend(broad);
-    let all = Arc::new(by_tag.into_iter().collect::<TagRows>());
-    if let Some(path) = path {
-        *TAG_ROWS.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
-            Some((path.to_owned(), writes, Arc::clone(&all)));
-    }
+    all.work_out_broad(tree);
     Ok(all)
+}
+
+/// Put right in place the tags of the assets that `changed`: each is taken out of every tag's assets, and put back in
+/// those it has now.
+fn put_right(conn: &Connection, kept: &mut TagRows, changed: &super::changes::Changed, tree: &Tree) -> Result<()> {
+    let mut rows: Vec<i64> = changed.rows.iter().copied().collect();
+    if !changed.tagged.is_empty() {
+        let ids = serde_json::to_string(&changed.tagged)?;
+        let mut stmt = conn.prepare_cached("SELECT rowid FROM assets WHERE id IN (SELECT value FROM json_each(?1))")?;
+        rows.extend(stmt.query_map([ids], |r| r.get::<_, i64>(0))?.collect::<rusqlite::Result<Vec<_>>>()?);
+    }
+    if !rows.is_empty() {
+        let gone = Rows::of(rows.iter().copied());
+        for list in kept.own.values_mut().chain(kept.broad.values_mut()) {
+            list.retain(|&r| !gone.has(i64::from(r)));
+        }
+        kept.own.retain(|_, list| !list.is_empty());
+    }
+    let mut stmt = conn.prepare_cached(&format!("{TAG_PAIRS} AND a.rowid IN (SELECT value FROM json_each(?1))"))?;
+    let mut now = Vec::new();
+    if !rows.is_empty() {
+        let mut found = stmt.query([serde_json::to_string(&rows)?])?;
+        while let Some(r) = found.next()? {
+            if let Ok(row) = u32::try_from(r.get::<_, i64>(1)?) {
+                now.push((r.get::<_, String>(0)?, row));
+            }
+        }
+    }
+    if changed.tree {
+        kept.add_own(now);
+        kept.work_out_broad(tree);
+        return Ok(());
+    }
+    // Each asset goes once in each broad tag one of its tags is under (or is).
+    let mut broad = std::collections::HashSet::new();
+    for (tag, row) in &now {
+        for b in std::iter::once(tag).chain(tree.broader(tag)) {
+            if kept.broad.contains_key(b) {
+                broad.insert((b.clone(), *row));
+            }
+        }
+    }
+    for (b, row) in broad {
+        if let Some(list) = kept.broad.get_mut(&b) {
+            list.push(row);
+        }
+    }
+    kept.add_own(now);
+    Ok(())
+}
+
+/// What a search tells assets apart by, for every asset in the library by its row: its kind and pack, whether it's in
+/// the library rather than the archive, whether it supports another, and where browsing shows it. With these, a
+/// search by words goes through the index's matches, and browsing through the library in order, without reading each
+/// asset for them: the first letter typed finds most of a big library, and joining each match to its asset took a
+/// third of a second. Kept while none of it changes (see [`super::changes::Changed::facts`]): tags, ratings and
+/// thumbnails come and go without it being read again.
+struct Facts {
+    /// Each row's kind, as its place in `kinds`: [`NO_ASSET`] for a row no asset has.
+    kind: Vec<u16>,
+    /// Each row's [`IN_LIBRARY`] and [`SUPPORTS`].
+    flags: Vec<u8>,
+    /// Each row's pack, as its place in `packs`.
+    pack: Vec<u32>,
+    kinds: Vec<String>,
+    packs: std::collections::HashMap<String, u32>,
+    /// The row of the asset each row of the search index is of, by the index's row ([`NO_ASSET`] for none).
+    by_fts_row: Vec<u32>,
+    /// Every asset's row, newest first, as browsing goes.
+    order: Vec<u32>,
+}
+
+const NO_ASSET: u16 = u16::MAX;
+const NO_ROW: u32 = u32::MAX;
+/// Neither the asset nor its pack is archived (see [`LIVE`]).
+const IN_LIBRARY: u8 = 1;
+/// See [`SUPPORTING`].
+const SUPPORTS: u8 = 2;
+
+/// [`Facts`], kept with the library's path and how many writes to it there had been (see [`super::library_writes`]).
+static FACTS: std::sync::Mutex<Option<(String, u64, Arc<Facts>)>> = std::sync::Mutex::new(None);
+
+/// The library's [`Facts`], or `None` if its rows are too far apart to keep by row.
+fn facts(conn: &Connection) -> Result<Option<Arc<Facts>>> {
+    let writes = super::library_writes();
+    // An in-memory library (a test's) has no writes counted for it.
+    let Some(path) = conn.path().filter(|p| !p.is_empty()) else { return Ok(read_facts(conn)?.map(Arc::new)) };
+    let mut kept = FACTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if let Some((_, at, facts)) = kept.as_mut().filter(|(p, _, _)| p == path)
+        && (*at == writes || super::changes::since(*at, writes).is_some_and(|c| !c.facts && !c.too_much))
+    {
+        *at = writes;
+        return Ok(Some(Arc::clone(facts)));
+    }
+    let facts = read_facts(conn)?.map(Arc::new);
+    *kept = facts.as_ref().map(|f| (path.to_owned(), writes, Arc::clone(f)));
+    Ok(facts)
+}
+
+/// [`Facts`] read from the whole library.
+fn read_facts(conn: &Connection) -> Result<Option<Facts>> {
+    let (rows, most_row, most_fts_row): (i64, i64, i64) =
+        conn.query_row("SELECT count(*), IFNULL(max(rowid), 0), IFNULL(max(fts_row), 0) FROM assets", [], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+        })?;
+    // Kept by row, a few bytes each: rows much further apart than there are assets would take more than they save.
+    let room = 8 * rows + 1_000_000;
+    if most_row > room || most_fts_row > room {
+        return Ok(None);
+    }
+    let (Ok(most_row), Ok(most_fts_row)) = (usize::try_from(most_row), usize::try_from(most_fts_row)) else {
+        return Ok(None);
+    };
+    let mut facts = Facts {
+        kind: vec![NO_ASSET; most_row + 1],
+        flags: vec![0; most_row + 1],
+        pack: vec![0; most_row + 1],
+        kinds: Vec::new(),
+        packs: std::collections::HashMap::new(),
+        by_fts_row: vec![NO_ROW; most_fts_row + 1],
+        order: Vec::with_capacity(usize::try_from(rows).unwrap_or(0)),
+    };
+    let mut stmt = conn.prepare(&format!(
+        "SELECT a.rowid, a.fts_row, a.kind, a.pack_id, {LIVE}, {SUPPORTING} FROM assets a
+          ORDER BY a.created_at DESC, a.path ASC"
+    ))?;
+    let mut found = stmt.query([])?;
+    while let Some(r) = found.next()? {
+        let (Ok(row), Ok(at)) = (u32::try_from(r.get::<_, i64>(0)?), usize::try_from(r.get::<_, i64>(0)?)) else {
+            return Ok(None);
+        };
+        if let Some(fts_row) = r.get::<_, Option<i64>>(1)?.and_then(|f| usize::try_from(f).ok()) {
+            facts.by_fts_row[fts_row] = row;
+        }
+        let kind = r.get_ref(2)?.as_str()?;
+        let kind = if let Some(k) = facts.kinds.iter().position(|k| k == kind) {
+            k
+        } else {
+            facts.kinds.push(kind.to_owned());
+            facts.kinds.len() - 1
+        };
+        let Some(kind) = u16::try_from(kind).ok().filter(|&k| k != NO_ASSET) else { return Ok(None) };
+        let pack = r.get_ref(3)?.as_str()?;
+        let next = u32::try_from(facts.packs.len()).unwrap_or(NO_ROW);
+        let pack = match facts.packs.get(pack) {
+            Some(p) => *p,
+            None => *facts.packs.entry(pack.to_owned()).or_insert(next),
+        };
+        facts.kind[at] = kind;
+        facts.pack[at] = pack;
+        facts.flags[at] = (u8::from(r.get::<_, bool>(4)?) * IN_LIBRARY) | (u8::from(r.get::<_, bool>(5)?) * SUPPORTS);
+        facts.order.push(row);
+    }
+    Ok(Some(facts))
+}
+
+/// What a search asks of [`Facts`], when it asks for nothing they don't keep.
+struct FactsSearch {
+    /// The words, as the search index takes them.
+    find: Option<String>,
+    /// Words after a `-`.
+    without: Option<String>,
+    /// Best match first, rather than newest first.
+    ranked: bool,
+    kind: Option<String>,
+    pack: Option<String>,
+    tags: Vec<String>,
+    hide_supporting: bool,
+}
+
+/// The search as one [`Facts`] can do, or `None` if it asks for something they don't keep (a folder, a rating, an
+/// order but the best match or the newest first).
+fn facts_search(q: &SearchQuery, tree: &Tree) -> Option<FactsSearch> {
+    let set = |t: &String| t.starts_with("set:");
+    let fits = browsed_folder(q).is_none()
+        && q.ext.as_deref().is_none_or(str::is_empty)
+        && q.reviewed.is_none()
+        && q.rating_min.is_none_or(|n| n == 0)
+        && q.bpm_min.is_none()
+        && q.bpm_max.is_none()
+        && q.key.as_deref().is_none_or(|k| k.trim().is_empty())
+        && q.favorites_of.is_none()
+        && q.project.as_deref().is_none_or(str::is_empty)
+        && q.collection.as_deref().is_none_or(str::is_empty)
+        && !q.archived
+        // `set:` tags aren't in [`TagRows`].
+        && !q.tags.iter().any(|t| set(t) || tree.narrower(t).iter().any(set));
+    // Any other order is put together in SQL. (A sort that isn't one is the usual order.)
+    let newest = match chosen_order(q.sort.as_deref()) {
+        None => false,
+        Some("a.created_at DESC, a.path ASC") => true,
+        Some(_) => return None,
+    };
+    if !fits {
+        return None;
+    }
+    let Words { find, without, short, .. } = q.q.as_deref().map_or_else(Words::default, |t| words_in(t, tree));
+    Some(FactsSearch {
+        ranked: find.is_some() && !short && !newest,
+        find,
+        without,
+        kind: q.kind.clone().filter(|k| !k.is_empty()),
+        pack: q.pack.clone().filter(|p| !p.is_empty()),
+        tags: q.tags.clone(),
+        hide_supporting: q.hide_supporting,
+    })
+}
+
+/// The rows of the assets with the index's rows that match `words`, in the index's order or best first.
+fn matched_rows(conn: &Connection, facts: &Facts, words: &str, ranked: bool) -> Result<Vec<u32>> {
+    let sql = if ranked {
+        "SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?1
+          ORDER BY bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0)"
+    } else {
+        "SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?1"
+    };
+    let mut stmt = conn.prepare_cached(sql)?;
+    let mut found = stmt.query([words])?;
+    let mut rows = Vec::new();
+    while let Some(r) = found.next()? {
+        let row = usize::try_from(r.get::<_, i64>(0)?).ok().and_then(|f| facts.by_fts_row.get(f)).copied();
+        if let Some(row) = row.filter(|&r| r != NO_ROW) {
+            rows.push(row);
+        }
+    }
+    Ok(rows)
+}
+
+/// [`rank_and_count`] (or for browsing, [`count`] and the page) from [`Facts`].
+fn search_facts(conn: &Connection, facts: &Facts, s: &FactsSearch, tree: &Tree) -> Result<(Vec<i64>, Counts)> {
+    let matched = s.find.as_deref().map(|w| matched_rows(conn, facts, w, s.ranked)).transpose()?;
+    let without = s.without.as_deref().map(|w| matched_rows(conn, facts, w, false)).transpose()?;
+    let without = without.map(|w| Rows::of(w.into_iter().map(i64::from)));
+    let tagged = if s.tags.is_empty() {
+        Vec::new()
+    } else {
+        let kept = tag_rows(conn, tree)?;
+        s.tags.iter().map(|t| Rows::of(kept.rows_of(t).iter().map(|&r| i64::from(r)))).collect()
+    };
+    // A kind or pack no asset has finds nothing (`u16`/`u32::MAX`, which no asset is of).
+    let kind = s
+        .kind
+        .as_deref()
+        .map(|k| facts.kinds.iter().position(|n| n == k).map_or(NO_ASSET, |k| u16::try_from(k).unwrap_or(NO_ASSET)));
+    let pack = s.pack.as_deref().map(|p| facts.packs.get(p).copied().unwrap_or(NO_ROW));
+    let candidates: Box<dyn Iterator<Item = u32>> = match matched {
+        Some(rows) if s.ranked => Box::new(rows.into_iter()),
+        Some(rows) => {
+            let matched = Rows::of(rows.iter().map(|&r| i64::from(r)));
+            Box::new(facts.order.iter().copied().filter(move |&r| matched.has(i64::from(r))))
+        }
+        None => Box::new(facts.order.iter().copied()),
+    };
+    let (mut found, mut supporting_hidden) = (Vec::new(), 0);
+    let mut kinds = vec![0_i64; facts.kinds.len()];
+    for row in candidates {
+        let at = row as usize;
+        let (k, flags) = (facts.kind[at], facts.flags[at]);
+        if k == NO_ASSET
+            || flags & IN_LIBRARY == 0
+            || pack.is_some_and(|p| facts.pack[at] != p)
+            || without.as_ref().is_some_and(|w| w.has(i64::from(row)))
+            || !tagged.iter().all(|t| t.has(i64::from(row)))
+        {
+            continue;
+        }
+        let of_kind = kind.is_none_or(|kind| kind == k);
+        // Kinds count every kind; the rest only the kind asked for. Supporting files count only as hidden ones.
+        if s.hide_supporting && flags & SUPPORTS != 0 {
+            supporting_hidden += i64::from(of_kind);
+            continue;
+        }
+        if of_kind {
+            found.push(i64::from(row));
+        }
+        kinds[usize::from(k)] += 1;
+    }
+    let kinds = facts.kinds.iter().cloned().zip(kinds).filter(|(_, n)| *n > 0).collect();
+    let total = found.len() as i64;
+    Ok((found, Counts { total, supporting_hidden, kinds: kind_facets(kinds), folders: Vec::new(), tags: None }))
 }
 
 /// How many recent searches' counts are kept.
@@ -853,7 +1201,7 @@ const COUNTS_KEPT: usize = 16;
 
 /// What a search's counts depend on: the library's file and the search, but not which page or in what order.
 fn counts_key(conn: &Connection, q: &SearchQuery) -> Option<String> {
-    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
+    // An in-memory library (a test's) has no writes counted for it.
     let path = conn.path().filter(|p| !p.is_empty())?;
     let q = SearchQuery { limit: None, offset: None, sort: None, ..q.clone() };
     Some(format!(
@@ -925,8 +1273,8 @@ pub(crate) fn category_counts(conn: &Connection, limit: u32) -> Result<Vec<Facet
 /// those containing it.
 pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit: u32) -> Result<Vec<Facet>> {
     // Read before counting, so a write while counting leaves them stale.
-    let writes = super::writes();
-    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
+    let writes = super::library_writes();
+    // An in-memory library (a test's) has no writes counted for it.
     let path = conn.path().filter(|p| !p.is_empty());
     let kept = path.and_then(|path| {
         let kept = TAG_COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1019,6 +1367,67 @@ mod tests {
             )
             .unwrap();
         assert_eq!(counted(60), (2, vec![("texture".to_owned(), 2)]));
+    }
+
+    #[test]
+    fn tag_rows_put_right_in_place_are_as_if_read_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a', 'p1', 'h', 'a.png', 'a', 'png', 'texture', 'x', 'x'),
+               ('b', 'p1', 'h', 'b.png', 'b', 'png', 'texture', 'x', 'x'),
+               ('c', 'p1', 'h', 'c.png', 'c', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source) VALUES
+               ('a', 'red', 'x'), ('b', 'blue', 'x'), ('c', 'red', 'x'), ('c', 'set:one', 'x');
+             INSERT INTO tag_parents (tag, parent) VALUES
+               ('red', 'warm'), ('blue', 'cool'), ('warm', 'colored'), ('cool', 'colored');",
+        )
+        .unwrap();
+        let listed = |rows: &TagRows| {
+            let mut all: Vec<(String, Vec<u32>)> = rows
+                .all()
+                .map(|(t, r)| {
+                    let mut r = r.to_vec();
+                    r.sort_unstable();
+                    (t.to_owned(), r)
+                })
+                .collect();
+            all.sort();
+            all
+        };
+        let put_right_after = |kept: &mut TagRows, changes: &str| {
+            let before = crate::db::library_writes();
+            conn.execute_batch(changes).unwrap();
+            let changed = crate::db::changes::since(before, crate::db::library_writes()).unwrap();
+            assert!(!changed.too_much);
+            let tree = Tree::load(&conn).unwrap();
+            put_right(&conn, kept, &changed, &tree).unwrap();
+            assert_eq!(listed(kept), listed(&read_tag_rows(&conn, &tree).unwrap()), "after {changes}");
+        };
+        let mut kept = read_tag_rows(&conn, &Tree::load(&conn).unwrap()).unwrap();
+        assert!(listed(&kept).iter().any(|(t, r)| t == "colored" && r.len() == 3));
+        // Tags added and taken off, an asset removed (its tags with it) and one added.
+        put_right_after(
+            &mut kept,
+            "INSERT INTO asset_tags (asset_id, tag, source) VALUES ('a', 'blue', 'x');
+             DELETE FROM asset_tags WHERE asset_id = 'c' AND tag = 'red';
+             DELETE FROM assets WHERE id = 'b';
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('d', 'p1', 'h', 'd.png', 'd', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source) VALUES ('d', 'red', 'x'), ('d', 'moss', 'x');",
+        );
+        // The tree changing: moss is put under cool, and red is no longer warm.
+        put_right_after(
+            &mut kept,
+            "INSERT INTO tag_parents (tag, parent) VALUES ('moss', 'cool');
+             DELETE FROM tag_parents WHERE tag = 'red';",
+        );
+        // A tag renamed in place.
+        put_right_after(&mut kept, "UPDATE asset_tags SET tag = 'moss' WHERE asset_id = 'a' AND tag = 'blue';");
     }
 
     #[test]
@@ -1692,6 +2101,9 @@ mod tests {
                 started.elapsed()
             );
         };
+        let started = std::time::Instant::now();
+        let kept = read_facts(&conn).unwrap().map_or(0, |f| f.order.len());
+        println!("what's kept of every asset: {kept} read in {:.1?}", started.elapsed());
         pieces("the first letter, in pieces", "t");
         pieces("two letters, in pieces", "th");
         pieces("words, in pieces", "rock");
@@ -1748,17 +2160,9 @@ mod tests {
             println!("tags like {prefix:?}: {} in {:.1?}", tags.len(), started.elapsed());
         }
 
-        // The same with a tag tree: the colors under warm and cool, both under colored, and in the index's tags.
+        // The same with a tag tree.
         let started = std::time::Instant::now();
-        conn.execute_batch(
-            "BEGIN;
-             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 11)
-             INSERT INTO tag_parents (tag, parent) SELECT 'color:' || i, CASE WHEN i < 6 THEN 'warm' ELSE 'cool' END FROM k;
-             INSERT INTO tag_parents (tag, parent) VALUES ('warm', 'colored'), ('cool', 'colored');
-             UPDATE assets_fts SET tags = 'color:' || (rowid % 12);
-             COMMIT;",
-        )
-        .unwrap();
+        add_a_tag_tree(&conn);
         println!("with a tag tree, made in {:.1?}:", started.elapsed());
         alone("  everything, alone", SearchQuery { hide_supporting: true, ..Default::default() });
         alone("  the first letter, alone", letter());
@@ -1772,6 +2176,116 @@ mod tests {
         let picked = SearchQuery { tags: vec!["warm".into()], hide_supporting: true, ..Default::default() };
         time("  a broad tag picked", picked.clone(), true, None);
         time("  a broad tag picked, no facets", picked, false, None);
+
+        // What's kept from the library after it changes: a setting (nothing a search reads), then one asset's tags.
+        for (what, change) in [
+            ("a setting", "INSERT INTO settings (key, value) VALUES ('timing', 'x')"),
+            ("one asset's tags", "INSERT INTO asset_tags (asset_id, tag, source) VALUES ('a7', 'warm', 'x')"),
+        ] {
+            conn.execute(change, []).unwrap();
+            time(&format!("  the first letter typed, {what} changed"), letter(), true, None);
+        }
+    }
+
+    /// What's kept of every asset (see [`Facts`]) finds and counts what SQL does, in the same order, and is read again
+    /// when what it keeps changes, but not when only tags do.
+    #[test]
+    fn what_is_kept_of_every_asset_finds_what_the_library_has() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        make_big_library(&conn, 3000);
+        add_a_tag_tree(&conn);
+        let typed = |t: &str| SearchQuery { q: Some(t.into()), ..Default::default() };
+        let hiding = |q: SearchQuery| SearchQuery { hide_supporting: true, ..q };
+        let queries = [
+            SearchQuery::default(),
+            hiding(SearchQuery::default()),
+            hiding(SearchQuery { kind: Some("texture".into()), ..Default::default() }),
+            SearchQuery { pack: Some("p0".into()), ..Default::default() },
+            SearchQuery { pack: Some("nowhere".into()), ..Default::default() },
+            typed("t"),
+            typed("rock"),
+            typed("t -rock"),
+            hiding(SearchQuery { sort: Some("created".into()), ..typed("rock") }),
+            hiding(SearchQuery { kind: Some("model".into()), ..typed("thing") }),
+            SearchQuery { tags: vec!["warm".into()], ..Default::default() },
+            hiding(SearchQuery { tags: vec!["warm".into(), "color:1".into()], ..typed("thing") }),
+            SearchQuery { tags: vec!["nothing".into()], ..Default::default() },
+        ];
+        let kinds = |k: &[Facet]| k.iter().map(|f| format!("{} {}", f.value, f.count)).collect::<Vec<_>>();
+        let check = |when: &str| {
+            let tree = Tree::load(&conn).unwrap();
+            let facts = facts(&conn).unwrap().unwrap();
+            for q in &queries {
+                let s = facts_search(q, &tree).unwrap();
+                let (mut found, counts) = search_facts(&conn, &facts, &s, &tree).unwrap();
+                let f = build_filter(q, true, None, &tree);
+                let order = if s.ranked { "a.rowid" } else { "a.created_at DESC, a.path ASC" };
+                let sql = conn
+                    .prepare(&format!("SELECT a.rowid FROM assets a {} {} ORDER BY {order}", f.join, f.where_sql()))
+                    .unwrap()
+                    .query_map(params_from_iter(&f.params), |r| r.get::<_, i64>(0))
+                    .unwrap()
+                    .collect::<rusqlite::Result<Vec<_>>>()
+                    .unwrap();
+                // Best match first: matches as good as each other can go either way.
+                if s.ranked {
+                    found.sort_unstable();
+                }
+                assert_eq!(found, sql, "{when}: {q:?}");
+                let c = count(&conn, q, None, false, &tree).unwrap();
+                assert_eq!(
+                    (counts.total, counts.supporting_hidden, kinds(&counts.kinds)),
+                    (c.total, c.supporting_hidden, kinds(&c.kinds)),
+                    "{when}: {q:?}"
+                );
+            }
+        };
+        check("at first");
+        for (when, change) in [
+            (
+                "a pack and an asset archived, and a kind changed",
+                "UPDATE packs SET archived_at = 'x' WHERE id = 'p3'; UPDATE assets SET archived_at = 'x' WHERE id = 'a10';
+                 UPDATE assets SET kind = 'audio' WHERE id = 'a20';",
+            ),
+            ("a link made, so a file supports another", "INSERT INTO asset_links (from_id, to_id, rel) VALUES ('a30', 'a32', 'buffer')"),
+            (
+                "an asset added and one removed",
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                   VALUES ('new', 'p1', 'b1', 'new.png', 'thing new', 'png', 'texture', '2027', 'x');
+                 INSERT INTO assets_fts (asset_id, name, words, tags) VALUES ('new', 'thing new', '', '');
+                 UPDATE assets SET fts_row = (SELECT rowid FROM assets_fts WHERE asset_id = 'new') WHERE id = 'new';
+                 DELETE FROM assets WHERE id = 'a40';",
+            ),
+            ("an animation", "UPDATE assets SET kind = 'animation' WHERE id = 'a63'"),
+            ("a take of it", "UPDATE assets SET meta = json_object('take_of', 'a63') WHERE id = 'a61'"),
+        ] {
+            conn.execute_batch(change).unwrap();
+            check(when);
+        }
+        // Tags, a rating and a name change nothing kept.
+        let before = facts(&conn).unwrap().unwrap();
+        conn.execute_batch(
+            "INSERT INTO asset_tags (asset_id, tag, source) VALUES ('a50', 'warm', 'x');
+             UPDATE assets SET rating = 4, name = 'renamed' WHERE id = 'a51';",
+        )
+        .unwrap();
+        check("tags changed");
+        assert!(Arc::ptr_eq(&before, &facts(&conn).unwrap().unwrap()), "kept as it was");
+    }
+
+    /// The colors under warm and cool, both under colored, and in the index's tags (see [`big_library`]).
+    fn add_a_tag_tree(conn: &Connection) {
+        conn.execute_batch(
+            "BEGIN;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 11)
+             INSERT INTO tag_parents (tag, parent) SELECT 'color:' || i, CASE WHEN i < 6 THEN 'warm' ELSE 'cool' END FROM k;
+             INSERT INTO tag_parents (tag, parent) VALUES ('warm', 'colored'), ('cool', 'colored');
+             UPDATE assets_fts SET tags = 'color:' || (rowid % 12);
+             COMMIT;",
+        )
+        .unwrap();
     }
 
     /// A generated library of `n` assets in 200 packs, for timing searches in: two in five in one big pack, one in

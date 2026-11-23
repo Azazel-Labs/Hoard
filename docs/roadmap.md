@@ -14,14 +14,15 @@ millisecond), tag suggestions, Settings → Issues, sorting by name or size and 
 two), and the library's numbers, report, near copies and store files no format reads, which are kept, saved for the
 next start and worked out again in the background. What a search tells assets apart by (kind, pack, archived,
 supporting, newest first) is kept for every asset and searched in memory, and the sidebar's tags are counted from each
-tag's assets; both are kept as tags, ratings and thumbnails change, and the tags put right in place. Still slow, worst
-first:
+tag's assets; both are kept as tags, ratings and thumbnails change, and put right in place as assets are added,
+removed, moved or change kind (browsing again during an import takes 10 to 15 ms, not the 0.4 s reading them all
+again took). Still slow, worst first:
 
-- **The first search after assets are added, removed or moved: about 0.38 s more**, to read again what's kept of
-  every asset. During an import that's every search; the assets that changed could be put right in place instead.
 - **Words and pictures together: 0.3 s**: what looks like a picture is ranked for every match of the words.
 - **A broad tag typed: 0.26 s**: its 140,000 matches are ranked by how well they match.
 - **A pack's folders: 0.13 to 0.18 s**: every asset in the pack is looked at to find what's in the folder.
+- **The first letter typed again after any change to the library: 0.12 s**, as the first time: an asset's tags
+  changing, say, sends the search index looking for all its matches again.
 
 ## What a converted file came from
 

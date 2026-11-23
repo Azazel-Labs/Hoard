@@ -57,9 +57,16 @@ pub(crate) struct Changed {
     pub(crate) rows: HashSet<i64>,
     /// The tag tree changed.
     pub(crate) tree: bool,
-    /// What a search tells assets apart by changed, which it keeps for all of them (see `search::Facts`): an asset
-    /// was added or removed, or its kind, pack, place in the library, or whether it's archived or supports another
-    /// changed, or a pack was added, removed, archived or brought back.
+    /// Assets whose part of what a search keeps of every asset (see `search::Facts`) may have changed, by row: added,
+    /// removed, or with a new kind, pack, place in the library, or whether it's archived or supports another.
+    pub(crate) fact_rows: HashSet<i64>,
+    /// Of [`Self::fact_rows`], those added, removed, or moved in browsing's order (their time or path changed).
+    pub(crate) placed: HashSet<i64>,
+    /// Assets whose part of what a search keeps may have changed because another did, by id, with the materials they
+    /// own (see `search::SUPPORTING`): one added or removed, or one a take is of.
+    pub(crate) fact_ids: HashSet<String>,
+    /// What a search keeps of every asset changed for more of them than are named: a pack was archived or brought
+    /// back.
     pub(crate) facts: bool,
     /// More changed than is named here: everything kept has to be worked out again.
     pub(crate) too_much: bool,
@@ -73,20 +80,21 @@ impl Changed {
         if !self.too_much {
             self.tagged.extend(other.tagged.iter().cloned());
             self.rows.extend(&other.rows);
+            self.fact_rows.extend(&other.fact_rows);
+            self.placed.extend(&other.placed);
+            self.fact_ids.extend(other.fact_ids.iter().cloned());
         }
         self.check_size();
     }
 
     fn check_size(&mut self) {
-        if self.too_much || self.tagged.len() + self.rows.len() > MOST {
-            self.too_much = true;
-            self.tagged = HashSet::new();
-            self.rows = HashSet::new();
+        if self.too_much || self.size() > MOST {
+            *self = Changed { tree: self.tree, facts: self.facts, too_much: true, ..Changed::default() };
         }
     }
 
     fn size(&self) -> usize {
-        self.tagged.len() + self.rows.len()
+        self.tagged.len() + self.rows.len() + self.fact_rows.len() + self.fact_ids.len()
     }
 }
 
@@ -118,6 +126,12 @@ pub(crate) fn watch(c: &mut Connection, pending: &Arc<Mutex<Pending>>) -> rusqli
         noted(&mut seen.lock().unwrap_or_else(PoisonError::into_inner), &table, asset);
         Ok(rusqlite::types::Null)
     })?;
+    let seen = Arc::clone(pending);
+    c.create_scalar_function("hoard_fact", 3, FunctionFlags::SQLITE_UTF8, move |f| {
+        let (row, placed, id) = (f.get(0)?, f.get(1)?, f.get(2)?);
+        fact_noted(&mut seen.lock().unwrap_or_else(PoisonError::into_inner), row, placed, id);
+        Ok(rusqlite::types::Null)
+    })?;
     let tables: Vec<String> = c
         .prepare(
             "SELECT name FROM pragma_table_list
@@ -144,26 +158,37 @@ pub(crate) fn watch(c: &mut Connection, pending: &Arc<Mutex<Pending>>) -> rusqli
     c.execute_batch(&sql)
 }
 
-/// Triggers noting what a search keeps of each asset changing (see [`Changed::facts`]), which the update hook can't
-/// tell apart from what it doesn't keep (a thumbnail made, a rating). Whether an asset supports another depends on
-/// what its meta says it's a take of or owned by.
+/// Triggers noting what a search keeps of each asset changing (see [`Changed::fact_rows`]), which the update hook
+/// can't tell apart from what it doesn't keep (a thumbnail made, a rating). Whether an asset supports another depends
+/// on the asset its meta says it's owned by being there (a material's model), and on there being a take of it (an
+/// animation's): adding or removing either, or a take changing what it's of, changes what's kept of that one too.
+/// (Ids go as text, as the library compares them with its ids.) An archived pack's assets are all out of the library:
+/// one archived, brought back, or added or removed archived changes what's kept of every one of them.
 const FACT_TRIGGERS: &str = "
     CREATE TEMP TRIGGER IF NOT EXISTS noted_assets_added AFTER INSERT ON main.assets
-      BEGIN SELECT hoard_noted('assets', NULL); END;
+      BEGIN SELECT hoard_fact(new.rowid, 1, new.id),
+                   hoard_fact(NULL, 0, CAST(json_extract(new.meta, '$.take_of') AS TEXT)); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_assets_removed AFTER DELETE ON main.assets
-      BEGIN SELECT hoard_noted('assets', NULL); END;
+      BEGIN SELECT hoard_fact(old.rowid, 1, old.id),
+                   hoard_fact(NULL, 0, CAST(json_extract(old.meta, '$.take_of') AS TEXT)); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_assets_changed
       AFTER UPDATE OF id, pack_id, kind, ext, path, created_at, archived_at, supports, fts_row ON main.assets
-      BEGIN SELECT hoard_noted('assets', NULL); END;
+      BEGIN SELECT hoard_fact(new.rowid, old.created_at IS NOT new.created_at OR old.path IS NOT new.path,
+                              NULLIF(old.id, new.id)),
+                   hoard_fact(NULL, 0, NULLIF(new.id, old.id)); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_assets_meta AFTER UPDATE OF meta ON main.assets
       WHEN json_extract(old.meta, '$.take_of') IS NOT json_extract(new.meta, '$.take_of')
         OR json_extract(old.meta, '$.owned_by') IS NOT json_extract(new.meta, '$.owned_by')
-      BEGIN SELECT hoard_noted('assets', NULL); END;
+      BEGIN SELECT hoard_fact(new.rowid, 0, CAST(json_extract(old.meta, '$.take_of') AS TEXT)),
+                   hoard_fact(NULL, 0, CAST(json_extract(new.meta, '$.take_of') AS TEXT)); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_packs_added AFTER INSERT ON main.packs
+      WHEN new.archived_at IS NOT NULL
       BEGIN SELECT hoard_noted('packs', NULL); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_packs_removed AFTER DELETE ON main.packs
+      WHEN old.archived_at IS NOT NULL
       BEGIN SELECT hoard_noted('packs', NULL); END;
     CREATE TEMP TRIGGER IF NOT EXISTS noted_packs_changed AFTER UPDATE OF id, archived_at ON main.packs
+      WHEN old.id IS NOT new.id OR old.archived_at IS NOT new.archived_at
       BEGIN SELECT hoard_noted('packs', NULL); END;
 ";
 
@@ -208,8 +233,29 @@ fn noted(pending: &mut Pending, table: &str, asset: Option<String>) {
             None => changed.too_much = true,
         },
         "tag_parents" => changed.tree = true,
-        "assets" | "packs" => changed.facts = true,
+        "packs" => changed.facts = true,
         _ => {}
+    }
+    changed.check_size();
+}
+
+/// What a search keeps of an asset may have changed (one of [`FACT_TRIGGERS`]): of the one at `row`, `placed` if it
+/// was added, removed or moved, and of the one with `id` and those it owns.
+fn fact_noted(pending: &mut Pending, row: Option<i64>, placed: bool, id: Option<String>) {
+    pending.seen = true;
+    pending.library = true;
+    let changed = &mut pending.changed;
+    if changed.too_much {
+        return;
+    }
+    if let Some(row) = row {
+        changed.fact_rows.insert(row);
+        if placed {
+            changed.placed.insert(row);
+        }
+    }
+    if let Some(id) = id {
+        changed.fact_ids.insert(id);
     }
     changed.check_size();
 }
@@ -225,8 +271,8 @@ const KEPT: usize = 512;
 const KEPT_ASSETS: usize = 4 * MOST;
 
 /// What each recent write to the library changed, with its number ([`library_writes`] once it was made), oldest
-/// first.
-static JOURNAL: Mutex<VecDeque<(u64, Changed)>> = Mutex::new(VecDeque::new());
+/// first. (Shared, so what's read from it is put together once it's let go: each write waits for it to commit.)
+static JOURNAL: Mutex<VecDeque<(u64, Arc<Changed>)>> = Mutex::new(VecDeque::new());
 
 /// How many writes to the library (see [`NOT_SEARCHED`]) there have been since the server started.
 static LIBRARY_WRITES: AtomicU64 = AtomicU64::new(0);
@@ -252,7 +298,7 @@ pub(crate) fn committed(pending: &mut Pending) {
     let mut journal = JOURNAL.lock().unwrap_or_else(PoisonError::into_inner);
     // In the journal before it's counted, so whoever reads the count finds what changed up to it.
     let number = LIBRARY_WRITES.load(Ordering::Acquire) + 1;
-    journal.push_back((number, changed));
+    journal.push_back((number, Arc::new(changed)));
     let mut size: usize = journal.iter().map(|(_, c)| c.size()).sum();
     while journal.len() > KEPT || (journal.len() > 1 && size > KEPT_ASSETS) {
         if let Some((_, c)) = journal.pop_front() {
@@ -265,17 +311,20 @@ pub(crate) fn committed(pending: &mut Pending) {
 /// What changed in the library after its `from`th write, up to and including its `to`th, or `None` if that's no
 /// longer known (it was too long ago).
 pub(crate) fn since(from: u64, to: u64) -> Option<Changed> {
-    let journal = JOURNAL.lock().unwrap_or_else(PoisonError::into_inner);
     let mut changed = Changed::default();
     if from >= to {
         return Some(changed);
     }
-    // Everything after `from` has to be there.
-    if journal.front().is_none_or(|(n, _)| *n > from + 1) {
-        return None;
-    }
-    for (_, c) in journal.iter().filter(|(n, _)| *n > from && *n <= to) {
-        changed.add(c);
+    let writes: Vec<Arc<Changed>> = {
+        let journal = JOURNAL.lock().unwrap_or_else(PoisonError::into_inner);
+        // Everything after `from` has to be there.
+        if journal.front().is_none_or(|(n, _)| *n > from + 1) {
+            return None;
+        }
+        journal.iter().filter(|(n, _)| *n > from && *n <= to).map(|(_, c)| Arc::clone(c)).collect()
+    };
+    for c in writes {
+        changed.add(&c);
         if changed.too_much {
             break;
         }
@@ -324,7 +373,21 @@ mod tests {
         assert!(changed.rows.contains(&a1));
         let before = library_writes();
         conn.execute("UPDATE assets SET kind = 'model' WHERE id = 'journal-2'", []).unwrap();
-        assert!(since(before, library_writes()).unwrap().facts, "a kind is something a search keeps");
+        let changed = since(before, library_writes()).unwrap();
+        assert!(changed.fact_rows.contains(&a2), "a kind is something a search keeps");
+        assert!(!changed.placed.contains(&a2) && !changed.facts);
+        let before = library_writes();
+        conn.execute(
+            "UPDATE assets SET name = 'two', meta = '{\"take_of\": \"journal-1\"}' WHERE id = 'journal-2'",
+            [],
+        )
+        .unwrap();
+        let changed = since(before, library_writes()).unwrap();
+        assert!(changed.fact_ids.contains("journal-1"), "what a take is of");
+        let before = library_writes();
+        conn.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
+        assert!(since(before, library_writes()).unwrap().facts, "every asset of the pack");
+        conn.execute("UPDATE packs SET archived_at = NULL WHERE id = 'p'", []).unwrap();
 
         // An asset removed takes its tags with it; the tree changing is noted.
         let before = library_writes();
@@ -336,12 +399,13 @@ mod tests {
         let changed = since(before, library_writes()).unwrap();
         assert!(changed.tagged.contains("journal-1"));
         assert!(changed.rows.contains(&a1) && changed.rows.contains(&a2));
+        assert!(changed.placed.contains(&a1) && changed.fact_ids.contains("journal-1"));
         assert!(changed.tree);
     }
 
     #[test]
     fn what_was_too_long_ago_is_not_known() {
-        let mut journal = VecDeque::from([(5, Changed::default())]);
+        let mut journal = VecDeque::from([(5, Arc::new(Changed::default()))]);
         std::mem::swap(&mut journal, &mut JOURNAL.lock().unwrap());
         // (Put back at once: other tests use it.)
         let (old, now) = (since(3, 5), since(4, 5));

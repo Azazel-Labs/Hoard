@@ -969,8 +969,9 @@ fn put_right(conn: &Connection, kept: &mut TagRows, changed: &super::changes::Ch
 /// the library rather than the archive, whether it supports another, and where browsing shows it. With these, a
 /// search by words goes through the index's matches, and browsing through the library in order, without reading each
 /// asset for them: the first letter typed finds most of a big library, and joining each match to its asset took a
-/// third of a second. Kept while none of it changes (see [`super::changes::Changed::facts`]): tags, ratings and
-/// thumbnails come and go without it being read again.
+/// third of a second. Tags, ratings and thumbnails come and go without them changing, and where they do change (an
+/// import adding assets, say) only those assets are read again (see [`patch_facts`]).
+#[derive(Clone)]
 struct Facts {
     /// Each row's kind, as its place in `kinds`: [`NO_ASSET`] for a row no asset has.
     kind: Vec<u16>,
@@ -980,10 +981,13 @@ struct Facts {
     pack: Vec<u32>,
     kinds: Vec<String>,
     packs: std::collections::HashMap<String, u32>,
-    /// The row of the asset each row of the search index is of, by the index's row ([`NO_ASSET`] for none).
+    /// The row of the asset each row of the search index is of, by the index's row ([`NO_ROW`] for none).
     by_fts_row: Vec<u32>,
     /// Every asset's row, newest first, as browsing goes.
     order: Vec<u32>,
+    /// The rows of the materials each asset owns, by its id (see [`SUPPORTING`]), and some it no longer does: whether
+    /// they support it changes when it's added or removed.
+    owners: std::collections::HashMap<String, Vec<u32>>,
 }
 
 const NO_ASSET: u16 = u16::MAX;
@@ -992,6 +996,19 @@ const NO_ROW: u32 = u32::MAX;
 const IN_LIBRARY: u8 = 1;
 /// See [`SUPPORTING`].
 const SUPPORTS: u8 = 2;
+
+/// What [`Facts`] read of each asset, as `a`: its row, its row in the search index, kind, pack, whether it's
+/// [`IN_LIBRARY`], whether it [`SUPPORTS`] another, and the asset owning it, for a material (as text, as the
+/// library compares it with its ids).
+fn fact_columns() -> String {
+    format!(
+        "a.rowid, a.fts_row, a.kind, a.pack_id, {LIVE}, {SUPPORTING},
+         CASE WHEN a.ext = 'material' THEN CAST(json_extract(a.meta, '$.owned_by') AS TEXT) END"
+    )
+}
+
+/// The most assets [`patch_facts`] reads again one by one: past this, reading them all is about as quick.
+const MOST_PATCHED: usize = 10_000;
 
 /// [`Facts`], kept with the library's path and how many writes to it there had been (see [`super::library_writes`]).
 static FACTS: std::sync::Mutex<Option<(String, u64, Arc<Facts>)>> = std::sync::Mutex::new(None);
@@ -1002,72 +1019,270 @@ fn facts(conn: &Connection) -> Result<Option<Arc<Facts>>> {
     // An in-memory library (a test's) has no writes counted for it.
     let Some(path) = conn.path().filter(|p| !p.is_empty()) else { return Ok(read_facts(conn)?.map(Arc::new)) };
     let mut kept = FACTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    if let Some((_, at, facts)) = kept.as_mut().filter(|(p, _, _)| p == path)
-        && (*at == writes || super::changes::since(*at, writes).is_some_and(|c| !c.facts && !c.too_much))
-    {
-        *at = writes;
-        return Ok(Some(Arc::clone(facts)));
+    // Taken while it's put right, so it's gone if that fails partway.
+    if let Some((path, at, mut facts)) = kept.take().filter(|(p, _, _)| p == path) {
+        let changed =
+            if at == writes { Some(super::changes::Changed::default()) } else { super::changes::since(at, writes) };
+        if let Some(c) = changed.filter(|c| !c.facts && !c.too_much)
+            && ((c.fact_rows.is_empty() && c.fact_ids.is_empty()) || patch_facts(conn, Arc::make_mut(&mut facts), &c)?)
+        {
+            *kept = Some((path, writes, Arc::clone(&facts)));
+            return Ok(Some(facts));
+        }
     }
     let facts = read_facts(conn)?.map(Arc::new);
     *kept = facts.as_ref().map(|f| (path.to_owned(), writes, Arc::clone(f)));
     Ok(facts)
 }
 
+/// One asset's [`fact_columns`] but its row.
+struct AssetFacts {
+    fts_row: Option<usize>,
+    kind: String,
+    pack: String,
+    flags: u8,
+    owner: Option<String>,
+}
+
+impl AssetFacts {
+    /// From [`fact_columns`], after the row.
+    fn of(r: &rusqlite::Row) -> rusqlite::Result<Self> {
+        Ok(Self {
+            fts_row: r.get::<_, Option<i64>>(1)?.and_then(|f| usize::try_from(f).ok()),
+            kind: r.get(2)?,
+            pack: r.get(3)?,
+            flags: (u8::from(r.get::<_, bool>(4)?) * IN_LIBRARY) | (u8::from(r.get::<_, bool>(5)?) * SUPPORTS),
+            owner: r.get(6)?,
+        })
+    }
+}
+
+impl Facts {
+    /// Rows up to `rows` kept, and the search index's up to `fts_rows`.
+    fn make_room(&mut self, rows: usize, fts_rows: usize) {
+        if self.kind.len() <= rows {
+            self.kind.resize(rows + 1, NO_ASSET);
+            self.flags.resize(rows + 1, 0);
+            self.pack.resize(rows + 1, 0);
+        }
+        if self.by_fts_row.len() <= fts_rows {
+            self.by_fts_row.resize(fts_rows + 1, NO_ROW);
+        }
+    }
+
+    /// Keeps `facts` as the asset at `at`'s, or returns `false` if there are too many kinds to.
+    fn set(&mut self, row: u32, facts: AssetFacts) -> bool {
+        let at = row as usize;
+        if let Some(fts_row) = facts.fts_row {
+            self.by_fts_row[fts_row] = row;
+        }
+        let kind = if let Some(k) = self.kinds.iter().position(|k| *k == facts.kind) {
+            k
+        } else {
+            self.kinds.push(facts.kind);
+            self.kinds.len() - 1
+        };
+        let Some(kind) = u16::try_from(kind).ok().filter(|&k| k != NO_ASSET) else { return false };
+        let next = u32::try_from(self.packs.len()).unwrap_or(NO_ROW);
+        self.pack[at] = *self.packs.entry(facts.pack).or_insert(next);
+        self.kind[at] = kind;
+        self.flags[at] = facts.flags;
+        if let Some(owner) = facts.owner {
+            let owned = self.owners.entry(owner).or_default();
+            if !owned.contains(&row) {
+                owned.push(row);
+            }
+        }
+        true
+    }
+}
+
+/// Rows and the search index's rows past this would take more room kept by row than they save.
+fn most_row(assets: usize) -> usize {
+    assets.saturating_mul(8).saturating_add(1_000_000)
+}
+
 /// [`Facts`] read from the whole library.
 fn read_facts(conn: &Connection) -> Result<Option<Facts>> {
-    let (rows, most_row, most_fts_row): (i64, i64, i64) =
+    let (rows, most, most_fts): (i64, i64, i64) =
         conn.query_row("SELECT count(*), IFNULL(max(rowid), 0), IFNULL(max(fts_row), 0) FROM assets", [], |r| {
             Ok((r.get(0)?, r.get(1)?, r.get(2)?))
         })?;
-    // Kept by row, a few bytes each: rows much further apart than there are assets would take more than they save.
-    let room = 8 * rows + 1_000_000;
-    if most_row > room || most_fts_row > room {
+    let (Ok(rows), Ok(most), Ok(most_fts)) = (usize::try_from(rows), usize::try_from(most), usize::try_from(most_fts))
+    else {
+        return Ok(None);
+    };
+    if most > most_row(rows) || most_fts > most_row(rows) {
         return Ok(None);
     }
-    let (Ok(most_row), Ok(most_fts_row)) = (usize::try_from(most_row), usize::try_from(most_fts_row)) else {
-        return Ok(None);
-    };
     let mut facts = Facts {
-        kind: vec![NO_ASSET; most_row + 1],
-        flags: vec![0; most_row + 1],
-        pack: vec![0; most_row + 1],
+        kind: Vec::new(),
+        flags: Vec::new(),
+        pack: Vec::new(),
         kinds: Vec::new(),
         packs: std::collections::HashMap::new(),
-        by_fts_row: vec![NO_ROW; most_fts_row + 1],
-        order: Vec::with_capacity(usize::try_from(rows).unwrap_or(0)),
+        by_fts_row: Vec::new(),
+        order: Vec::with_capacity(rows),
+        owners: std::collections::HashMap::new(),
     };
-    let mut stmt = conn.prepare(&format!(
-        "SELECT a.rowid, a.fts_row, a.kind, a.pack_id, {LIVE}, {SUPPORTING} FROM assets a
-          ORDER BY a.created_at DESC, a.path ASC"
-    ))?;
+    facts.make_room(most, most_fts);
+    let mut stmt =
+        conn.prepare(&format!("SELECT {} FROM assets a ORDER BY a.created_at DESC, a.path ASC", fact_columns()))?;
     let mut found = stmt.query([])?;
     while let Some(r) = found.next()? {
-        let (Ok(row), Ok(at)) = (u32::try_from(r.get::<_, i64>(0)?), usize::try_from(r.get::<_, i64>(0)?)) else {
+        let Some(row) = u32::try_from(r.get::<_, i64>(0)?).ok().filter(|&r| r as usize <= most_row(rows)) else {
             return Ok(None);
         };
-        if let Some(fts_row) = r.get::<_, Option<i64>>(1)?.and_then(|f| usize::try_from(f).ok()) {
-            facts.by_fts_row[fts_row] = row;
+        let asset = AssetFacts::of(r)?;
+        // (Room for a row or index row written since the most were read.)
+        match asset.fts_row {
+            Some(f) if f > most_row(rows) => return Ok(None),
+            f => facts.make_room(row as usize, f.unwrap_or(0)),
         }
-        let kind = r.get_ref(2)?.as_str()?;
-        let kind = if let Some(k) = facts.kinds.iter().position(|k| k == kind) {
-            k
-        } else {
-            facts.kinds.push(kind.to_owned());
-            facts.kinds.len() - 1
-        };
-        let Some(kind) = u16::try_from(kind).ok().filter(|&k| k != NO_ASSET) else { return Ok(None) };
-        let pack = r.get_ref(3)?.as_str()?;
-        let next = u32::try_from(facts.packs.len()).unwrap_or(NO_ROW);
-        let pack = match facts.packs.get(pack) {
-            Some(p) => *p,
-            None => *facts.packs.entry(pack.to_owned()).or_insert(next),
-        };
-        facts.kind[at] = kind;
-        facts.pack[at] = pack;
-        facts.flags[at] = (u8::from(r.get::<_, bool>(4)?) * IN_LIBRARY) | (u8::from(r.get::<_, bool>(5)?) * SUPPORTS);
+        if !facts.set(row, asset) {
+            return Ok(None);
+        }
         facts.order.push(row);
     }
     Ok(Some(facts))
+}
+
+/// Puts `facts` right where `changed` says what they keep may have changed, reading again only those assets, or
+/// returns `false` if they're better read again from the whole library (and are left to be).
+fn patch_facts(conn: &Connection, facts: &mut Facts, changed: &super::changes::Changed) -> Result<bool> {
+    use rusqlite::OptionalExtension as _;
+    let mut rows = changed.fact_rows.clone();
+    let mut by_id = conn.prepare_cached("SELECT rowid FROM assets WHERE id = ?1")?;
+    for id in &changed.fact_ids {
+        if let Some(row) = by_id.query_row([id], |r| r.get::<_, i64>(0)).optional()? {
+            rows.insert(row);
+        }
+        if let Some(owned) = facts.owners.get(id) {
+            rows.extend(owned.iter().map(|&r| i64::from(r)));
+        }
+    }
+    if rows.len() > MOST_PATCHED {
+        return Ok(false);
+    }
+    let most = most_row(facts.order.len() + rows.len());
+    let mut read = conn
+        .prepare_cached(&format!("SELECT {}, a.created_at, a.path FROM assets a WHERE a.rowid = ?1", fact_columns()))?;
+    // Each asset read again, with where browsing shows it if it's to be put there: `None` for one that's gone.
+    let mut fresh = Vec::with_capacity(rows.len());
+    let (mut most_read, mut most_fts) = (0, 0);
+    for row in rows {
+        let Some(r) = u32::try_from(row).ok().filter(|&r| (r as usize) <= most) else { return Ok(false) };
+        let asset = read
+            .query_row([row], |r| {
+                let place: (String, String) = (r.get(7)?, r.get(8)?);
+                Ok((AssetFacts::of(r)?, place))
+            })
+            .optional()?;
+        if let Some((a, _)) = &asset {
+            if a.fts_row.is_some_and(|f| f > most) {
+                return Ok(false);
+            }
+            most_fts = most_fts.max(a.fts_row.unwrap_or(0));
+        }
+        most_read = most_read.max(r as usize);
+        fresh.push((r, asset));
+    }
+    facts.make_room(most_read, most_fts);
+    // What the search index's rows were of, for the assets read again, is what they've just been read as.
+    let mut again = vec![false; facts.kind.len()];
+    for (row, _) in &fresh {
+        again[*row as usize] = true;
+    }
+    for of in &mut facts.by_fts_row {
+        if *of != NO_ROW && again[*of as usize] {
+            *of = NO_ROW;
+        }
+    }
+    let mut moved = Vec::new();
+    let mut placing = Vec::new();
+    for (row, asset) in fresh {
+        let placed = changed.placed.contains(&i64::from(row));
+        if placed {
+            moved.push(row);
+        }
+        if let Some((asset, place)) = asset {
+            if !facts.set(row, asset) {
+                return Ok(false);
+            }
+            if placed {
+                placing.push((place, row));
+            }
+        } else {
+            facts.kind[row as usize] = NO_ASSET;
+            facts.flags[row as usize] = 0;
+            moved.push(row);
+        }
+    }
+    if moved.is_empty() {
+        return Ok(true);
+    }
+    again.fill(false);
+    for row in moved {
+        again[row as usize] = true;
+    }
+    facts.order.retain(|r| !again[*r as usize]);
+    // Newest first, by path where they're as new; as `assets_created` has them.
+    placing.sort_unstable_by(|((at, path), _), ((at2, path2), _)| at2.cmp(at).then_with(|| path.cmp(path2)));
+    let first = match facts.order.first() {
+        Some(&row) => conn
+            .query_row("SELECT created_at, path FROM assets WHERE rowid = ?1", [row], |r| {
+                Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
+            })
+            .optional()?,
+        None => None,
+    };
+    // What's added is usually newer than everything there: it goes first. A few others are each put in place, and
+    // for more, the order is read again, which only the index has to be.
+    let newest = match (placing.last(), &first) {
+        (Some(((at, path), _)), Some((first_at, first_path))) => at > first_at || (at == first_at && path < first_path),
+        _ => facts.order.is_empty() || placing.is_empty(),
+    };
+    if newest {
+        facts.order.splice(0..0, placing.into_iter().map(|(_, row)| row));
+    } else if placing.len() > MOST_PLACED || !place_each(conn, &mut facts.order, placing)? {
+        let mut stmt = conn.prepare_cached("SELECT rowid FROM assets ORDER BY created_at DESC, path ASC")?;
+        let order = stmt.query_map([], |r| r.get::<_, i64>(0))?;
+        facts.order.clear();
+        for row in order {
+            let Some(row) = u32::try_from(row?).ok().filter(|&r| (r as usize) < facts.kind.len()) else {
+                return Ok(false);
+            };
+            facts.order.push(row);
+        }
+    }
+    Ok(true)
+}
+
+/// The most assets [`patch_facts`] puts in browsing's order one by one, each found by halves.
+const MOST_PLACED: usize = 64;
+
+/// Puts each of `placing` where it goes in `order` (see [`Facts::order`]), found by halves, or returns `false` if one
+/// is as new as one there and at the same path, or one there is gone: then it's for the index to say.
+fn place_each(conn: &Connection, order: &mut Vec<u32>, placing: Vec<((String, String), u32)>) -> Result<bool> {
+    use rusqlite::OptionalExtension as _;
+    let mut place = conn.prepare_cached("SELECT created_at, path FROM assets WHERE rowid = ?1")?;
+    for ((at, path), row) in placing {
+        let (mut from, mut to) = (0, order.len());
+        while from < to {
+            let mid = from + (to - from) / 2;
+            let there =
+                place.query_row([order[mid]], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))).optional()?;
+            let Some((there_at, there_path)) = there else { return Ok(false) };
+            // Newest first, by path where as new.
+            match there_at.cmp(&at).reverse().then_with(|| there_path.cmp(&path)) {
+                std::cmp::Ordering::Less => from = mid + 1,
+                std::cmp::Ordering::Greater => to = mid,
+                std::cmp::Ordering::Equal => return Ok(false),
+            }
+        }
+        order.insert(from, row);
+    }
+    Ok(true)
 }
 
 /// What a search asks of [`Facts`], when it asks for nothing they don't keep.
@@ -2075,32 +2290,7 @@ mod tests {
                 .count();
             println!("{label}: {n} in order in {:.1?}", started.elapsed());
         };
-        // A search by words in pieces: the index's matches alone, ranked, joined to the library and put in order, and
-        // the sidebar's tags of what it found.
-        let pieces = |label: &str, typed: &str| {
-            let q = SearchQuery { q: Some(typed.into()), hide_supporting: true, ..Default::default() };
-            let tree = Tree::load(&conn).unwrap();
-            let fts = words_in(typed, &tree).find.unwrap();
-            let one = |sql: &str| {
-                let started = std::time::Instant::now();
-                let n: i64 = conn.query_row(sql, [&fts], |r| r.get(0)).unwrap();
-                (n, started.elapsed())
-            };
-            let (n, matched) = one("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH ?");
-            let (_, ranked) = one("SELECT count(*) FROM (SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?
-                  ORDER BY bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0))");
-            let started = std::time::Instant::now();
-            let (found, _) = rank_and_count(&conn, &q, "f.rank ASC", "", &tree).unwrap();
-            let in_order = started.elapsed();
-            let started = std::time::Instant::now();
-            tags_of_rows(&conn, &found, &tree).unwrap();
-            println!(
-                "{label}: {n} matched in {matched:.1?}, ranked in {ranked:.1?}, {} in order and counted in \
-                 {in_order:.1?}, their tags in {:.1?}",
-                found.len(),
-                started.elapsed()
-            );
-        };
+        let pieces = |label: &str, typed: &str| time_in_pieces(&conn, label, typed);
         let started = std::time::Instant::now();
         let kept = read_facts(&conn).unwrap().map_or(0, |f| f.order.len());
         println!("what's kept of every asset: {kept} read in {:.1?}", started.elapsed());
@@ -2185,6 +2375,45 @@ mod tests {
             conn.execute(change, []).unwrap();
             time(&format!("  the first letter typed, {what} changed"), letter(), true, None);
         }
+        // An import adding assets as it goes: newer than the rest, then one older (put in order again).
+        let browse = || SearchQuery { hide_supporting: true, ..Default::default() };
+        for (what, at) in [("an asset added", "2027"), ("another", "2028"), ("an older one", "2000")] {
+            conn.execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                   VALUES (?1, 'p1', 'b1', ?1, ?1, 'png', 'texture', ?2, 'x')",
+                [&format!("added {at}"), at],
+            )
+            .unwrap();
+            time(&format!("  browse everything, {what}"), browse(), true, None);
+        }
+    }
+
+    /// A search by words in pieces (see [`big_library`]): the index's matches alone, ranked, joined to the library and
+    /// put in order, and the sidebar's tags of what it found.
+    #[expect(clippy::print_stdout, reason = "the timings are its output")]
+    fn time_in_pieces(conn: &Connection, label: &str, typed: &str) {
+        let q = SearchQuery { q: Some(typed.into()), hide_supporting: true, ..Default::default() };
+        let tree = Tree::load(conn).unwrap();
+        let fts = words_in(typed, &tree).find.unwrap();
+        let one = |sql: &str| {
+            let started = std::time::Instant::now();
+            let n: i64 = conn.query_row(sql, [&fts], |r| r.get(0)).unwrap();
+            (n, started.elapsed())
+        };
+        let (n, matched) = one("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH ?");
+        let (_, ranked) = one("SELECT count(*) FROM (SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?
+              ORDER BY bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0))");
+        let started = std::time::Instant::now();
+        let (found, _) = rank_and_count(conn, &q, "f.rank ASC", "", &tree).unwrap();
+        let in_order = started.elapsed();
+        let started = std::time::Instant::now();
+        tags_of_rows(conn, &found, &tree).unwrap();
+        println!(
+            "{label}: {n} matched in {matched:.1?}, ranked in {ranked:.1?}, {} in order and counted in \
+             {in_order:.1?}, their tags in {:.1?}",
+            found.len(),
+            started.elapsed()
+        );
     }
 
     /// What's kept of every asset (see [`Facts`]) finds and counts what SQL does, in the same order, and is read again
@@ -2243,6 +2472,23 @@ mod tests {
             }
         };
         check("at first");
+        // Put right where it changed, it's what's read afresh.
+        let same = |kept: &Facts, when: &str| {
+            let read = read_facts(&conn).unwrap().unwrap();
+            assert_eq!(kept.order, read.order, "{when}: order");
+            let of = |f: &Facts, r: usize| {
+                let k = f.kind.get(r).copied().filter(|&k| k != NO_ASSET)?;
+                let pack = f.packs.iter().find(|(_, p)| **p == f.pack[r]).map(|(n, _)| n.clone());
+                Some((f.kinds[usize::from(k)].clone(), f.flags[r], pack))
+            };
+            for r in 0..kept.kind.len().max(read.kind.len()) {
+                assert_eq!(of(kept, r), of(&read, r), "{when}: row {r}");
+            }
+            let fts = |f: &Facts, i: usize| f.by_fts_row.get(i).copied().unwrap_or(NO_ROW);
+            for i in 0..kept.by_fts_row.len().max(read.by_fts_row.len()) {
+                assert_eq!(fts(kept, i), fts(&read, i), "{when}: index row {i}");
+            }
+        };
         for (when, change) in [
             (
                 "a pack and an asset archived, and a kind changed",
@@ -2260,19 +2506,46 @@ mod tests {
             ),
             ("an animation", "UPDATE assets SET kind = 'animation' WHERE id = 'a63'"),
             ("a take of it", "UPDATE assets SET meta = json_object('take_of', 'a63') WHERE id = 'a61'"),
+            (
+                "a material of an asset that isn't there",
+                "UPDATE assets SET ext = 'material', meta = json_object('owned_by', 'owner') WHERE id = 'a70'",
+            ),
+            (
+                "the asset it's of added, older than the rest",
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                   VALUES ('owner', 'p2', 'b2', 'owner.glb', 'owner', 'glb', 'model', '2000', 'x')",
+            ),
+            ("an asset moved", "UPDATE assets SET created_at = '1999' WHERE id = 'a80'"),
+            ("many moved", "UPDATE assets SET created_at = '1998' WHERE rowid % 40 = 0"),
+            ("the take removed", "DELETE FROM assets WHERE id = 'a61'"),
+            ("the asset the material is of removed", "DELETE FROM assets WHERE id = 'owner'"),
         ] {
+            let mut kept = Facts::clone(&facts(&conn).unwrap().unwrap());
+            let before = crate::db::library_writes();
             conn.execute_batch(change).unwrap();
+            // (What other tests change in libraries of their own meanwhile is noted too.)
+            let changed = crate::db::changes::since(before, crate::db::library_writes());
+            if let Some(c) = changed.filter(|c| !c.facts && !c.too_much) {
+                assert!(patch_facts(&conn, &mut kept, &c).unwrap(), "{when}: put right");
+                same(&kept, when);
+            }
             check(when);
         }
         // Tags, a rating and a name change nothing kept.
-        let before = facts(&conn).unwrap().unwrap();
+        let before = crate::db::library_writes();
         conn.execute_batch(
             "INSERT INTO asset_tags (asset_id, tag, source) VALUES ('a50', 'warm', 'x');
              UPDATE assets SET rating = 4, name = 'renamed' WHERE id = 'a51';",
         )
         .unwrap();
+        let changed = crate::db::changes::since(before, crate::db::library_writes()).unwrap();
+        let row = |id: &str| conn.query_row("SELECT rowid FROM assets WHERE id = ?1", [id], |r| r.get::<_, i64>(0));
+        let (a50, a51) = (row("a50").unwrap(), row("a51").unwrap());
+        assert!(
+            changed.too_much || !(changed.fact_rows.contains(&a50) || changed.fact_rows.contains(&a51)),
+            "kept as it was"
+        );
         check("tags changed");
-        assert!(Arc::ptr_eq(&before, &facts(&conn).unwrap().unwrap()), "kept as it was");
     }
 
     /// The colors under warm and cool, both under colored, and in the index's tags (see [`big_library`]).

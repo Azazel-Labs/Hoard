@@ -7,8 +7,8 @@
 //! so a grid of a skeleton's clips is one character moving many ways: its keys are copied onto that character's
 //! bones, matched by name. A clip that moves none of them is played on its own mesh, when it has one.
 //! The character is posed at each frame by polysmelt and drawn by the thumbnail renderer in a tiled room scaled to it.
-//! A clip that stays put is drawn from one camera, so the character moves and the room holds still. One that travels
-//! (a fall, a run that goes somewhere) is followed, so the character stays big and the tiles stream past.
+//! A clip that stays put is drawn from one camera, so the character moves and the room holds still. One that goes
+//! anywhere (a walk, a run, a fall) is followed close in, so the character stays big and the tiles stream past.
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};

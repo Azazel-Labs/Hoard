@@ -415,9 +415,9 @@ impl Renderer {
         self.render(&bake(&doc, &buffers), &gltf_images(&images), size, THREE_QUARTER)
     }
 
-    /// Render the frames of a clip, each a self-contained GLB of the model posed at one moment. One camera frames the
-    /// model wherever it goes during the clip, so it moves in the picture and the picture doesn't move; but when it
-    /// travels far (a fall, a run that goes somewhere), the camera follows it instead, so it isn't drawn a speck.
+    /// Render the frames of a clip, each a self-contained GLB of the model posed at one moment. A model that stays
+    /// where it is gets one camera, so it moves in the picture and the picture doesn't; one that goes somewhere (a
+    /// walk, a run, a fall) is followed close in, the room it's drawn in going by behind it.
     /// The frames are one model posed, so they share its textures: those are read from the first.
     pub fn render_frames(&self, frames: &[Vec<u8>], size: u32) -> Result<Vec<image::RgbaImage>> {
         let Some((first, rest)) = frames.split_first() else { return Ok(Vec::new()) };
@@ -771,24 +771,22 @@ impl Shot {
     }
 }
 
-/// A clip travels when one camera for all of it would have to stand this much farther back than for its biggest
-/// pose: then the camera follows the character rather than framing everywhere it goes.
-const TRAVELS: f32 = 1.5;
-/// How much farther back than a still thumbnail's a clip's camera stands, so the room shows around the character.
-const ROOMY: f32 = 1.45;
+/// How much farther back than a still thumbnail's a clip's camera stands, so a little of the room shows around the
+/// character: the tiles behind it are what show it moving, so the camera stays close.
+const ROOMY: f32 = 1.2;
 
-/// One camera per frame of a clip: the same one for all of them when the character stays about where it is, so it
-/// moves in a picture that holds still; when it travels (a fall, a run that goes somewhere), one that follows it at
-/// one distance, so it stays as big as it would be standing still.
+/// One camera per frame of a clip: the same one for all of them when the character stays where it is (an idle, a
+/// swing), so it moves in a picture that holds still; when it goes somewhere (a walk, a run, a fall), one that stays
+/// on it at one distance, as big as it would be standing still, with the room going by behind it.
 fn clip_cameras(frames: &[Vec<Draw>], room: &[Draw], dir: Vec3) -> Option<Vec<(Globals, Vec3)>> {
-    let all: Vec<&Draw> = frames.iter().flatten().collect();
-    let whole = Shot::of(&all, dir, None)?;
-    let each: Vec<Shot> =
-        frames.iter().map(|f| Shot::of(&f.iter().collect::<Vec<_>>(), dir, None)).collect::<Option<_>>()?;
-    let biggest = each.iter().map(|s| s.dist).fold(0f32, f32::max);
-    if whole.dist <= biggest * TRAVELS {
+    let (mids, tall) = middles(frames)?;
+    if !goes(&mids, tall) {
+        let all: Vec<&Draw> = frames.iter().flatten().collect();
+        let whole = Shot::of(&all, dir, None)?;
         return Some(vec![whole.behind(room).view(whole.dist * ROOMY); frames.len()]);
     }
+    let each: Vec<Shot> =
+        frames.iter().map(|f| Shot::of(&f.iter().collect::<Vec<_>>(), dir, None)).collect::<Option<_>>()?;
     let aims = steady(&each.iter().map(|s| s.target).collect::<Vec<_>>());
     let follow: Vec<Shot> = frames
         .iter()
@@ -799,32 +797,48 @@ fn clip_cameras(frames: &[Vec<Draw>], room: &[Draw], dir: Vec3) -> Option<Vec<(G
     Some(follow.iter().map(|s| s.behind(room).view(dist * ROOMY)).collect())
 }
 
-/// A following camera's aims: the curve nearest the character's middles over the clip, at most a parabola, so the
-/// camera keeps pace with a fall or a run but a flailing arm doesn't shake it.
+/// A following camera's aims: each middle averaged with its neighbours on both sides (fewer toward the ends, the same
+/// number each side), so the camera keeps pace with a run, a fall or a lap of a circle, but a flailing arm doesn't
+/// shake it. A steady run or fall is followed exactly.
 fn steady(middles: &[Vec3]) -> Vec<Vec3> {
     let n = middles.len();
-    if n < 3 {
-        return middles.to_vec();
-    }
-    let at = |i: usize| i as f32 / (n - 1) as f32;
-    // Least squares for a + b t + c t²: the normal equations, with the three axes solved at once.
-    let (mut m, mut rhs) = ([0f32; 5], [Vec3::ZERO; 3]);
-    for (i, p) in middles.iter().enumerate() {
-        let t = at(i);
-        for (k, s) in m.iter_mut().enumerate() {
-            *s += t.powi(k as i32);
+    let reach = (n / 8).max(1);
+    (0..n)
+        .map(|i| {
+            let h = reach.min(i).min(n - 1 - i);
+            let near = &middles[i - h..=i + h];
+            #[expect(clippy::cast_precision_loss, reason = "a few frames")]
+            let count = near.len() as f32;
+            near.iter().sum::<Vec3>() / count
+        })
+        .collect()
+}
+
+/// The middle of each of a clip's poses (of its bounding box) and the character's height, its tallest pose's.
+fn middles(frames: &[Vec<Draw>]) -> Option<(Vec<Vec3>, f32)> {
+    let mut tall = 0f32;
+    let mut mids = Vec::with_capacity(frames.len());
+    for frame in frames {
+        let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
+        for p in frame.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos)) {
+            lo = lo.min(p);
+            hi = hi.max(p);
         }
-        for (k, r) in rhs.iter_mut().enumerate() {
-            *r += *p * t.powi(k as i32);
+        if !lo.is_finite() {
+            return None;
         }
+        tall = tall.max(hi.y - lo.y);
+        mids.push((lo + hi) / 2.0);
     }
-    let a = Mat3::from_cols_array(&[m[0], m[1], m[2], m[1], m[2], m[3], m[2], m[3], m[4]]);
-    if a.determinant().abs() < 1e-9 {
-        return middles.to_vec();
-    }
-    let inv = a.inverse();
-    let coef: [Vec3; 3] = std::array::from_fn(|r| (0..3).map(|k| rhs[k] * inv.col(k)[r]).sum());
-    (0..n).map(|i| coef[0] + coef[1] * at(i) + coef[2] * at(i).powi(2)).collect()
+    Some((mids, tall))
+}
+
+/// Whether a clip's character goes somewhere: its middle travels [`GOES`] of its height.
+fn goes(mids: &[Vec3], tall: f32) -> bool {
+    let (lo, hi) = mids
+        .iter()
+        .fold((Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY)), |(l, h), p| (l.min(*p), h.max(*p)));
+    mids.len() >= 2 && (hi - lo).length() >= tall.max(1e-6) * GOES
 }
 
 /// The room an animation plays in: a tiled floor under the lowest the character gets, and the two walls behind it
@@ -924,36 +938,20 @@ fn tiles() -> image::RgbaImage {
     })
 }
 
-/// A clip goes somewhere when its middle travels this much of the character's height: then its thumbnail carries a
-/// trail of where.
+/// A clip goes somewhere when its middle travels this much of the character's height: then the camera follows it and
+/// its thumbnail carries a trail of where.
 const GOES: f32 = 0.3;
 
 /// Where a clip's character goes, frame by frame, seen from the side it goes most across: from the side along the way
 /// it heads (a fall, a run, a jump forward), or from above when it wanders around more than it rises and falls (a turn,
 /// a circle). Each point is the middle of its pose, in the plane of that view, y up. None when it stays put.
 fn trail(frames: &[Vec<Draw>]) -> Option<Vec<Vec2>> {
-    let mut tall = 0f32;
-    let mut middles = Vec::with_capacity(frames.len());
-    for frame in frames {
-        let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
-        for p in frame.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos)) {
-            lo = lo.min(p);
-            hi = hi.max(p);
-        }
-        if !lo.is_finite() {
-            return None;
-        }
-        tall = tall.max(hi.y - lo.y);
-        middles.push((lo + hi) / 2.0);
+    let (middles, tall) = middles(frames)?;
+    if !goes(&middles, tall) {
+        return None;
     }
     let n = middles.len() as f32;
     let mean = middles.iter().sum::<Vec3>() / n;
-    let (lo, hi) = middles
-        .iter()
-        .fold((Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY)), |(l, h), p| (l.min(*p), h.max(*p)));
-    if middles.len() < 2 || (hi - lo).length() < tall.max(1e-6) * GOES {
-        return None;
-    }
     // The way it heads across the floor: the long axis of where its middle goes, seen from above.
     let (mut xx, mut xz, mut zz, mut yy) = (0f32, 0f32, 0f32, 0f32);
     for p in middles.iter().map(|p| *p - mean) {
@@ -1329,12 +1327,19 @@ mod tests {
         let cams = clip_cameras(&hop, &[], THREE_QUARTER).unwrap();
         assert!(cams.iter().all(|(g, _)| g.view_proj == cams[0].0.view_proj));
 
-        // A fall of twenty times its height: followed, and drawn as big as standing still, not a speck.
+        // A fall of twenty times its height, a walk of a little over its height and a lap of a circle: each followed,
+        // and drawn nearly as big as standing still rather than framed whole.
         let fall: Vec<Vec<Draw>> = (0..12).map(|k| figure(-40.0 * (k as f32 / 11.0).powi(2))).collect();
-        let cams = clip_cameras(&fall, &[], THREE_QUARTER).unwrap();
-        for (frame, (g, _)) in fall.iter().zip(&cams) {
-            let h = height_on_screen(frame, g);
-            assert!(h > standing * 0.6 && h <= 1.0, "{h} on screen, {standing} standing");
+        let walk: Vec<Vec<Draw>> =
+            (0..12).map(|k| shifted(figure(0.0), Vec3::new(0.25 * k as f32, 0.0, 0.0))).collect();
+        let lap: Vec<Vec<Draw>> = (0..12).map(|k| circle(k as f32 / 11.0)).collect();
+        for (name, clip) in [("fall", fall), ("walk", walk), ("lap", lap)] {
+            let cams = clip_cameras(&clip, &[], THREE_QUARTER).unwrap();
+            assert!(cams.iter().any(|(g, _)| g.view_proj != cams[0].0.view_proj), "{name} isn't followed");
+            for (frame, (g, _)) in clip.iter().zip(&cams) {
+                let h = height_on_screen(frame, g);
+                assert!(h > standing * 0.7 && h <= 1.0, "{name}: {h} on screen, {standing} standing");
+            }
         }
     }
 

@@ -1118,4 +1118,9 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      CREATE INDEX drawn_on_body ON drawn_on (body_id);
      DELETE FROM derivatives WHERE kind IN ('motion', 'still')
        AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
+    // 103: the camera stays on a character that goes anywhere at all (a walk of a step or two, not only a fall or a
+    // long run), close in, instead of standing back to take in its whole way. Its motion thumbnail and still are
+    // drawn again.
+    "DELETE FROM derivatives WHERE kind IN ('motion', 'still')
+       AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
 ];

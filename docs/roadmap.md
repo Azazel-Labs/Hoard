@@ -6,21 +6,38 @@ isn't yet.
 ## Performance in a big library
 
 Measured against a generated library of 300,000 assets in 200 packs (`cargo test -p hoardd --lib big_library --
---ignored --nocapture`, which prints a timing for each step). Quick already: the pack list (30 ms), a pack's card
-(under a millisecond), tag suggestions, Settings → Issues, sorting by name or size (a few milliseconds), and the
-library's numbers, report, near copies and store files no format reads, which are kept, saved for the next start
-and worked out again in the background. Still slow, worst
-first:
+--release --ignored --nocapture`, which prints a timing for each step; last run 2026-11-22). Quick already: the pack
+list (56 ms), a pack's card (under a millisecond), tag suggestions, Settings → Issues, sorting by name or size and a
+search's next pages (a millisecond or two, now that a search keeps what it found in order), and the library's
+numbers, report, near copies and store files no format reads, which are kept, saved for the next start and worked
+out again in the background. Still slow, worst first:
 
-- **The first letter typed in search: 1.6 s**, its next page 0.36 s. Most of it is ranking every match (85,000 for
-  one letter) and counting them for the total. A query's ranked ids could be kept until the library changes, so the
-  next page and the total come from them instead of searching again, and one or two letters could rank a capped
-  number of matches.
-- **The sidebar's tag counts while searching: about 0.8 s.** They no longer hold the tiles up. With no words or
-  filters they are the same as the tags in use, which are already kept, so that case can reuse them; with a query
-  they could be kept with its ranked ids.
-- **Browsing a big pack: 0.63 s** for a pack of 120,000, with its counts beside the grid. Counts by kind are
-  already kept per pack (`pack_kinds`), so the facets with no other filter can come from there.
+- **The first letter typed in search: 1.6 s.** Its next page is quick now, but the first still ranks every match
+  (279,000 for one letter) and counts them for the total. One or two letters could rank a capped number of matches.
+- **The sidebar's tag counts: about 0.75 s browsing everything and 1 s for the first letter typed.** They don't
+  hold the tiles up, but browsing everything takes 1.5 s with them and under a millisecond without. With no words
+  or filters they are the same as the tags in use, which are already kept, so that case can reuse them; with words
+  they come from what the search kept, but counting the tags of a quarter of a million matches still takes a
+  second.
+- **Browsing a big pack: 0.7 s** for a pack of 120,000, with its counts beside the grid; its top folder 0.65 s.
+  Counts by kind are already kept per pack (`pack_kinds`), so the counts with no other filter can come from there.
+- **Words and pictures together: 0.6 s**, 0.4 s without the counts: what looks like a picture is ranked for every
+  match of the words.
+
+## Tags inside tags
+
+A tag can go under broader ones, on its own page or on Settings → Tags, and picking a tag finds everything under it
+too: vehicle finds the cars and the sedans. Still to do:
+
+- **Typed words don't follow the tree.** Picking vehicle in the sidebar finds the sedans, but typing vehicle in the
+  search box only finds what has that word itself, and `-vehicle` leaves out what's tagged vehicle but not the
+  sedans.
+- **The sidebar counts tags one by one.** A broader tag shows there only when something carries it directly, and its
+  count leaves out everything under it.
+- **An asset doesn't show what its tags sit under.** A sedan's tags say sedan, not that it's also a car and a
+  vehicle.
+- **AI tagging and AI apps don't know the tree.** The tagger isn't shown it, so it can't pick the narrowest tag that
+  fits, and MCP's `list_tags` doesn't say what sits under what.
 
 ## What a converted file came from
 
@@ -58,20 +75,6 @@ tagging gets against the plan's weekly cap. Claude is harder:
   allowed, but whether Hoard may then run `claude -p` on the thumbnails for them isn't spelled out, so it waits until
   Anthropic says (<https://www.anthropic.com/contact-sales>). Tagging with an Anthropic API key works now.
   Policy: <https://code.claude.com/docs/en/legal-and-compliance> (checked 2026-11-18)
-
-## Animations as their own thing
-
-Hoard keeps the skeleton and clips of every rigged model (`rigs`: bone names without their `mixamorig:` or
-`Armature|` prefixes, and each clip's name, length and the bones it moves), from glTF, from FBX through polysmelt and
-from the GLB Blender makes of a .blend. Within a pack, a file of clips with no mesh, or a copy of a character saved
-for one clip, becomes an animation linked to the characters it fits nearby, and across the library characters list
-"Animations that fit" and animations "Characters it fits". An animation plays on any character it fits, picked
-under Plays on, and its thumbnail and tile show it halfway through the clip, with its length; a character's viewer
-plays any animation that fits it. An animation downloads with the character it plays on, or as its skeleton and
-clips alone, and a character with its animations. A clip whose root travels plays held in the frame over a ground
-grid that scrolls the other way.
-
-Each take in a file of many is an animation of its own, beside the file as `file@Take.glb`.
 
 ## Spine binary skeletons
 

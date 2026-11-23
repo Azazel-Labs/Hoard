@@ -29,6 +29,9 @@ struct Words {
     without: Option<String>,
     /// What to find without the marks: the words for image and sound search to look for.
     plain: String,
+    /// Every word to find is the start of a word under three letters long: what's typed first. See
+    /// [`FTS_JOIN_AS_FOUND`].
+    short: bool,
 }
 
 /// The columns of the search index that are an asset's own, rather than its pack's.
@@ -53,6 +56,7 @@ fn words_in(q: &str, tree: &Tree) -> Words {
     let mut without = Vec::new();
     let mut plain = Vec::new();
     let (mut either, mut chars) = (false, q.chars().peekable());
+    let mut short = true;
     while let Some(&c) = chars.peek() {
         if c.is_whitespace() || c == '|' {
             either |= c == '|';
@@ -96,6 +100,7 @@ fn words_in(q: &str, tree: &Tree) -> Words {
         if not {
             without.push(t);
         } else {
+            short &= !exact && !pack && under.is_empty() && text.chars().filter(|c| c.is_alphanumeric()).count() < 3;
             if !pack {
                 own.push(t.clone());
                 plain.push(text.trim().to_owned());
@@ -124,6 +129,7 @@ fn words_in(q: &str, tree: &Tree) -> Words {
         find: (!find.is_empty()).then(|| find.join(" AND ")),
         without: (!without.is_empty()).then(|| without.join(" OR ")),
         plain: plain.join(" "),
+        short: short && terms > 0,
     }
 }
 
@@ -136,7 +142,10 @@ struct Filter {
     join: String,
     clauses: Vec<String>,
     params: Vec<SqlValue>,
+    /// Searching by words: found through the search index, each with its rank.
     ranked: bool,
+    /// The words are what's typed first, so what they find goes newest first, unranked (see [`FTS_JOIN_AS_FOUND`]).
+    as_found: bool,
 }
 
 /// Assets ranked by how they look (see `looks`): thumbnail hashes with a score, best first.
@@ -169,6 +178,11 @@ pub(crate) enum Keys {
 /// for each asset, the row being something the index could look up.)
 const FTS_JOIN: &str = "JOIN (SELECT rowid AS row, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0) AS rank
           FROM assets_fts WHERE assets_fts MATCH ?) f ON a.fts_row = +f.row";
+/// [`FTS_JOIN`] unranked, for the first letter or two typed: they find most of a big library (279,000 of 300,000 for
+/// one letter), which ranking took most of a second to put in an order that says little, a word starting with
+/// them being about as good a match as any other. What they find goes newest first, as browsing does.
+const FTS_JOIN_AS_FOUND: &str = "JOIN (SELECT rowid AS row, 0.0 AS rank FROM assets_fts WHERE assets_fts MATCH ?) f
+          ON a.fts_row = +f.row";
 /// The word matches of a search by words and look together, worked out once into `temp.word_rank` (see
 /// [`search_ranked`]): joined as a subquery, SQLite can run the match again for every asset in the library.
 const WORD_RANK: &str = "INSERT INTO temp.word_rank (asset_id, rank)
@@ -236,8 +250,8 @@ fn music_filter(q: &SearchQuery, f: &mut Filter) {
 }
 
 fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>, tree: &Tree) -> Filter {
-    let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
-    let Words { find: fts, without, .. } = q.q.as_deref().map_or_else(Words::default, |t| words_in(t, tree));
+    let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false, as_found: false };
+    let Words { find: fts, without, short, .. } = q.q.as_deref().map_or_else(Words::default, |t| words_in(t, tree));
     match (fts, look) {
         // The word matches are in temp.word_rank already, and with the look's in temp.blend (see search_ranked).
         (Some(_), Some(look)) if look.blend => {
@@ -247,7 +261,8 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>, tr
         }
         (fts, look) => {
             if let Some(fts) = fts {
-                FTS_JOIN.clone_into(&mut f.join);
+                f.as_found = short && look.is_none();
+                (if f.as_found { FTS_JOIN_AS_FOUND } else { FTS_JOIN }).clone_into(&mut f.join);
                 f.params.push(SqlValue::Text(fts));
                 f.ranked = true;
             }
@@ -292,12 +307,16 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>, tr
         f.params.push(SqlValue::Text(ext.trim_start_matches('.').to_lowercase()));
     }
     // A tag finds what has it or any narrower tag under it.
+    // (From the tree in hand: worked out in SQL, the tags under it were worked out again for every asset. What has
+    // them is read from the tags' index once, not looked up for every asset tag by tag; `+` keeps SQLite going through
+    // the library in order and checking each asset against them, rather than putting all of them in order for a page.)
     for tag in &q.tags {
+        let under = tree.narrower(tag);
         f.clauses.push(format!(
-            "EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id AND t.tag IN ({}))",
-            super::TAG_AND_NARROWER
+            "+a.id IN (SELECT t.asset_id FROM asset_tags t WHERE t.tag IN ({}))",
+            vec!["?"; 1 + under.len()].join(", ")
         ));
-        f.params.push(SqlValue::Text(tag.clone()));
+        f.params.extend(std::iter::once(tag).chain(under).map(|t| SqlValue::Text(t.clone())));
     }
     if q.hide_supporting {
         f.clauses.push(format!("NOT {SUPPORTING}"));
@@ -373,7 +392,6 @@ fn count(
     conn: &Connection,
     q: &SearchQuery,
     look: Option<&LookRank>,
-    f: &Filter,
     with_facets: bool,
     tree: &Tree,
 ) -> Result<Counts> {
@@ -389,41 +407,55 @@ fn count(
     };
     let supporting = if q.hide_supporting { SUPPORTING } else { "0" };
     params.extend(w.params.iter().cloned());
+    // Tallied here as they come rather than grouped in SQL, which put every asset found in order first: most of the
+    // time counting a quarter of a million took. Those in the total are what the search finds, whose tags the sidebar
+    // counts, so their rows are kept for that.
     let mut stmt = conn.prepare(&format!(
-        "SELECT kind, supporting, CASE WHEN instr(rest, '/') > 0 THEN substr(rest, 1, instr(rest, '/') - 1) END AS folder,
-                COUNT(*)
-           FROM (SELECT a.kind, {supporting} AS supporting, {rest} AS rest FROM assets a {} {})
-          GROUP BY 1, 2, 3",
+        "SELECT a.kind, {supporting}, {rest}, a.rowid FROM assets a {} {}",
         w.join,
         w.where_sql()
     ))?;
-    let groups = stmt
-        .query_map(params_from_iter(&params), |r| {
-            Ok((r.get::<_, String>(0)?, r.get::<_, bool>(1)?, r.get::<_, Option<String>>(2)?, r.get::<_, i64>(3)?))
-        })?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-
+    let mut rows = stmt.query(params_from_iter(&params))?;
     let asked = q.kind.as_deref().filter(|k| !k.is_empty());
     let (mut total, mut supporting_hidden) = (0, 0);
     let mut kinds = std::collections::HashMap::<String, i64>::new();
     let mut folders = std::collections::BTreeMap::<String, i64>::new();
-    for (kind, supports, folder, n) in groups {
+    let mut found = Vec::new();
+    while let Some(r) = rows.next()? {
+        let kind = r.get_ref(0)?.as_str()?;
         let of_kind = asked.is_none_or(|k| k == kind);
+        let supports = r.get::<_, bool>(1)?;
+        let rest = r.get_ref(2)?.as_str()?;
         // Kinds count every kind; the rest only the kind asked for. Supporting files count only as hidden ones.
-        match folder {
-            None if supports => supporting_hidden += if of_kind { n } else { 0 },
+        match rest.split_once('/') {
+            None if supports => supporting_hidden += i64::from(of_kind),
             None => {
-                total += if of_kind { n } else { 0 };
-                *kinds.entry(kind).or_default() += n;
+                if of_kind {
+                    total += 1;
+                    if with_facets {
+                        found.push(r.get::<_, i64>(3)?);
+                    }
+                }
+                match kinds.get_mut(kind) {
+                    Some(n) => *n += 1,
+                    None => {
+                        kinds.insert(kind.to_owned(), 1);
+                    }
+                }
             }
-            Some(folder) if of_kind && !supports => *folders.entry(folder).or_default() += n,
+            Some((folder, _)) if of_kind && !supports => match folders.get_mut(folder) {
+                Some(n) => *n += 1,
+                None => {
+                    folders.insert(folder.to_owned(), 1);
+                }
+            },
             Some(_) => {}
         }
     }
     let facet = |(value, count): (String, i64)| Facet { value, count: count as u64 };
     let mut folders = folders.into_iter().map(facet).collect::<Vec<_>>();
     folders.sort_by_cached_key(|f| f.value.to_ascii_lowercase());
-    let tags = if with_facets { Some(tags(conn, f, tree)?) } else { None };
+    let tags = if with_facets { Some(tags_of_rows(conn, &found, tree)?) } else { None };
     Ok(Counts { total, supporting_hidden, kinds: kind_facets(kinds), folders, tags })
 }
 
@@ -623,7 +655,7 @@ pub(crate) fn search_ranked(
             "(CASE WHEN f.asset_id IS NULL THEN 0.0 ELSE 0.25 END + COALESCE(lr.score, 0.0)) DESC, f.rank IS NULL, f.rank, a.id"
         }
         _ if look.is_some() => "lr.score DESC, a.id",
-        _ if f.ranked => "f.rank ASC",
+        _ if f.ranked && !f.as_found => "f.rank ASC",
         _ => "a.created_at DESC, a.path ASC",
     };
 
@@ -661,7 +693,7 @@ pub(crate) fn search_ranked(
         (Some(counts), _) => Counts { tags: Some(sidebar_tags()?), ..counts },
         (None, Some(counts)) if with_facets => Counts { tags: Some(sidebar_tags()?), ..counts },
         (None, Some(counts)) => counts,
-        (None, None) => count(conn, q, look, &f, with_facets, &tree)?,
+        (None, None) => count(conn, q, look, with_facets, &tree)?,
     };
     if let Some(key) = key {
         keep_counts(key, writes, &counts);
@@ -722,80 +754,98 @@ struct Counts {
 const SIDEBAR_TAGS: usize = 60;
 
 /// The sidebar's tags: the most common among what the search finds. A tag with tags under it counts what has any of
-/// them, once each (see [`with_broader`]).
+/// them, once each (see [`TagRows`]).
 fn tags(conn: &Connection, f: &Filter, tree: &Tree) -> Result<Vec<Facet>> {
-    let found = format!("SELECT a.id FROM assets a {} {}", f.join, f.where_sql());
-    let direct = conn
-        .prepare(&format!(
-            "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.tag NOT LIKE 'set:%' AND t.asset_id IN ({found})
-             GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT {SIDEBAR_TAGS}"
-        ))?
-        .query_map(params_from_iter(&f.params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+    let rows = conn
+        .prepare(&format!("SELECT a.rowid FROM assets a {} {}", f.join, f.where_sql()))?
+        .query_map(params_from_iter(&f.params), |r| r.get::<_, i64>(0))?
         .collect::<rusqlite::Result<Vec<_>>>()?;
-    with_broader(conn, tree, direct, &found, f.params.iter().cloned())
+    tags_of_rows(conn, &rows, tree)
 }
 
-/// [`tags`] of what a search by words found (see [`rank_and_count`]), by row: what it finds is already worked out,
-/// where [`tags`] matches the words and goes through every filter again for each asset.
+/// [`tags`] of what a search found, by row (see [`rank_and_count`]).
 fn tags_of_rows(conn: &Connection, rows: &[i64], tree: &Tree) -> Result<Vec<Facet>> {
     if rows.is_empty() {
         return Ok(Vec::new());
     }
-    let rows = serde_json::to_string(rows)?;
-    // CROSS JOIN keeps the order: from the rows found to their assets to their tags, never through every tag.
-    let direct = conn
-        .prepare_cached(&format!(
-            "SELECT t.tag, COUNT(*) FROM json_each(?1) j CROSS JOIN assets a ON a.rowid = j.value
-               CROSS JOIN asset_tags t ON t.asset_id = a.id
-              WHERE t.tag NOT LIKE 'set:%'
-              GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT {SIDEBAR_TAGS}"
-        ))?
-        .query_map([&rows], |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    let found = "SELECT a.id FROM json_each(?) j JOIN assets a ON a.rowid = j.value";
-    with_broader(conn, tree, direct, found, [SqlValue::Text(rows)])
-}
-
-/// The sidebar's tags counted one by one, with each tag that has tags under it counting what has any of them, once
-/// each: vehicle counts the cars and the sedans, and shows even when nothing is tagged vehicle itself. `found` is the
-/// SQL for the ids of what the search found, with `params` its parameters.
-fn with_broader(
-    conn: &Connection,
-    tree: &Tree,
-    mut tags: Vec<Facet>,
-    found: &str,
-    params: impl IntoIterator<Item = SqlValue>,
-) -> Result<Vec<Facet>> {
-    if tree.is_empty() {
-        return Ok(tags);
-    }
-    // Each broad tag with itself and every tag under it: (tag, broad tag).
-    let up: Vec<(&str, &str)> = tree
-        .broad()
-        .filter(|(broad, _)| !broad.starts_with("set:"))
-        .flat_map(|(broad, under)| {
-            std::iter::once((broad, broad)).chain(under.iter().map(move |t| (t.as_str(), broad)))
-        })
-        .collect();
-    let mut all = vec![SqlValue::Text(serde_json::to_string(&up)?)];
-    all.extend(params);
-    let broad = conn
-        .prepare(&format!(
-            "WITH up (tag, broad) AS (SELECT value ->> 0, value ->> 1 FROM json_each(?))
-             SELECT up.broad, COUNT(DISTINCT t.asset_id) FROM up JOIN asset_tags t ON t.tag = up.tag
-              WHERE t.asset_id IN ({found}) GROUP BY up.broad"
-        ))?
-        .query_map(params_from_iter(&all), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    for b in broad {
-        match tags.iter_mut().find(|t| t.value == b.value) {
-            Some(t) => t.count = b.count,
-            None => tags.push(b),
+    let kept = tag_rows(conn, tree)?;
+    let mut found = vec![0_u64; rows.iter().max().map_or(0, |&m| usize::try_from(m).unwrap_or(0) / 64 + 1)];
+    for &r in rows {
+        if let Ok(r) = usize::try_from(r) {
+            found[r / 64] |= 1 << (r % 64);
         }
     }
+    let has = |r: u32| found.get(r as usize / 64).is_some_and(|w| w >> (r % 64) & 1 == 1);
+    let mut tags: Vec<Facet> = kept
+        .iter()
+        .filter_map(|(tag, rows)| {
+            let n = rows.iter().filter(|&&r| has(r)).count();
+            (n > 0).then(|| Facet { value: tag.clone(), count: n as u64 })
+        })
+        .collect();
     tags.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
     tags.truncate(SIDEBAR_TAGS);
     Ok(tags)
+}
+
+/// Every tag but `set:` ones, with the rows of the assets that have it, archived or not (a search leaves those out of
+/// what it finds). A tag with tags under it has the rows of every asset with any of them, once each: vehicle has the
+/// cars and the sedans, and is there even when nothing is tagged vehicle itself. (A row is taken as fitting in 32
+/// bits: four billion assets.)
+type TagRows = Vec<(String, Vec<u32>)>;
+
+/// [`TagRows`], kept until the library changes, with its path and how many writes it had had: counting the tags of a
+/// quarter of a million assets in SQL took a second, and going through these for them takes a few milliseconds.
+static TAG_ROWS: std::sync::Mutex<Option<(String, u64, Arc<TagRows>)>> = std::sync::Mutex::new(None);
+
+fn tag_rows(conn: &Connection, tree: &Tree) -> Result<Arc<TagRows>> {
+    // Read before reading the tags, so a write meanwhile leaves them stale. (The tag tree changing is a write.)
+    let writes = super::writes();
+    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
+    let path = conn.path().filter(|p| !p.is_empty());
+    if let Some(path) = path {
+        let kept = TAG_ROWS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some((_, _, rows)) = kept.as_ref().filter(|(p, at, _)| p == path && *at == writes) {
+            return Ok(Arc::clone(rows));
+        }
+    }
+    let mut by_tag: std::collections::HashMap<String, Vec<u32>> = std::collections::HashMap::new();
+    let mut stmt = conn.prepare_cached(
+        "SELECT t.tag, a.rowid FROM assets a JOIN asset_tags t ON t.asset_id = a.id WHERE t.tag NOT LIKE 'set:%'",
+    )?;
+    let mut rows = stmt.query([])?;
+    while let Some(r) = rows.next()? {
+        let Ok(row) = u32::try_from(r.get::<_, i64>(1)?) else { continue };
+        let tag = r.get_ref(0)?.as_str()?;
+        match by_tag.get_mut(tag) {
+            Some(rows) => rows.push(row),
+            None => {
+                by_tag.insert(tag.to_owned(), vec![row]);
+            }
+        }
+    }
+    let broad: Vec<(String, Vec<u32>)> = tree
+        .broad()
+        .filter(|(broad, _)| !broad.starts_with("set:"))
+        .map(|(broad, under)| {
+            let mut rows: Vec<u32> = std::iter::once(broad)
+                .chain(under.iter().map(String::as_str))
+                .filter_map(|t| by_tag.get(t))
+                .flatten()
+                .copied()
+                .collect();
+            rows.sort_unstable();
+            rows.dedup();
+            (broad.to_owned(), rows)
+        })
+        .collect();
+    by_tag.extend(broad);
+    let all = Arc::new(by_tag.into_iter().collect::<TagRows>());
+    if let Some(path) = path {
+        *TAG_ROWS.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
+            Some((path.to_owned(), writes, Arc::clone(&all)));
+    }
+    Ok(all)
 }
 
 /// How many recent searches' counts are kept.
@@ -1209,6 +1259,38 @@ mod tests {
     }
 
     #[test]
+    fn the_first_letters_typed_find_newest_first_and_more_are_ranked() {
+        for (q, short) in [("t", true), ("tr", true), ("T r", true), ("t or r", true), ("t -tree", true)] {
+            assert_eq!(words(q).short, short, "{q}");
+        }
+        for q in ["tre", "t tree", r#""t""#, "pack:t", "-t", ""] {
+            assert!(!words(q).short, "{q}");
+        }
+
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('old', 'p1', 'h', 'a.png', 'rock', 'png', 'texture', '2026-01-01', 'x'),
+               ('mid', 'p1', 'h', 'b.png', 'rocky ridge of rocks', 'png', 'texture', '2026-02-01', 'x'),
+               ('new', 'p1', 'h', 'c.png', 'river rock wall', 'png', 'texture', '2026-03-01', 'x');",
+        )
+        .unwrap();
+        for id in ["old", "mid", "new"] {
+            crate::db::reindex_asset(&conn, id).unwrap();
+        }
+        let found = |t: &str| {
+            let q = SearchQuery { q: Some(t.into()), ..Default::default() };
+            search(&conn, &q, false).unwrap().items.into_iter().map(|a| a.id).collect::<Vec<_>>().join(",")
+        };
+        assert_eq!(found("r"), "new,mid,old");
+        assert_eq!(found("ro"), "new,mid,old");
+        // Ranked: the name with two words starting with it first.
+        assert_eq!(found("roc").split(',').next(), Some("mid"));
+    }
+
+    #[test]
     fn assets_are_found_by_their_own_fields_and_by_how_well_they_are_rated() {
         let conn = test_library();
         conn.execute_batch(
@@ -1544,32 +1626,7 @@ mod tests {
         let conn = pool.get().unwrap();
         let n = 300_000;
         let started = std::time::Instant::now();
-        conn.execute_batch(&format!(
-            "BEGIN;
-             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 199)
-             INSERT INTO packs (id, name, status, created_at) SELECT 'p' || i, 'Pack ' || i, 'ready', 'x' FROM k;
-             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
-             INSERT INTO blobs (hash, size, created_at) SELECT 'b' || i, i, 'x' FROM k;
-             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
-             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, thumb_hash, created_at, updated_at)
-             SELECT 'a' || i, CASE WHEN i % 5 < 2 THEN 'p0' ELSE 'p' || (i % 200) END, 'b' || i,
-                    'Dir' || (i % 9) || '/Sub' || (i % 160) || '/file' || i || '.png',
-                    CASE i % 50 WHEN 0 THEN 'rock wall ' || i ELSE 'thing ' || i END, 'png',
-                    CASE i % 4 WHEN 0 THEN 'texture' WHEN 1 THEN 'model' WHEN 2 THEN 'material' ELSE 'audio' END,
-                    'dir file', 't' || i, printf('2026-01-01T00:%06d', i), 'x' FROM k;
-             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'kind:' || kind, 'x' FROM assets;
-             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'color:' || (rowid % 12), 'x' FROM assets;
-             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'set:' || (rowid % 9000), 'x' FROM assets;
-             INSERT INTO asset_links (from_id, to_id, rel) SELECT 'a' || (rowid - 1), id, 'texture' FROM assets
-               WHERE kind = 'texture' AND rowid % 3 = 0;
-             INSERT INTO material_maps (material_id, texture_id, role) SELECT 'a' || (rowid - 2), id, 'albedo' FROM assets
-               WHERE kind = 'texture' AND rowid % 5 = 0;
-             INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, words, '' FROM assets;
-             UPDATE assets SET fts_row = rowid;
-             COMMIT;
-             ANALYZE;"
-        ))
-        .unwrap();
+        make_big_library(&conn, n);
         println!("made {n} assets in {:.1?}", started.elapsed());
         let pictures: Vec<(String, f32)> = (0..300).map(|i| (format!("t{}", i * 997), 0.4)).collect();
         let look = LookRank { scores: pictures, exclude: None, blend: true, keys: Keys::Thumbs };
@@ -1582,7 +1639,7 @@ mod tests {
             let tree = Tree::load(&conn).unwrap();
             let f = build_filter(&q, true, None, &tree);
             let started = std::time::Instant::now();
-            let counts = count(&conn, &q, None, &f, false, &tree).unwrap();
+            let counts = count(&conn, &q, None, false, &tree).unwrap();
             let counted = started.elapsed();
             let started = std::time::Instant::now();
             let tags = tags(&conn, &f, &tree).unwrap();
@@ -1609,6 +1666,35 @@ mod tests {
                 .count();
             println!("{label}: {n} in order in {:.1?}", started.elapsed());
         };
+        // A search by words in pieces: the index's matches alone, ranked, joined to the library and put in order, and
+        // the sidebar's tags of what it found.
+        let pieces = |label: &str, typed: &str| {
+            let q = SearchQuery { q: Some(typed.into()), hide_supporting: true, ..Default::default() };
+            let tree = Tree::load(&conn).unwrap();
+            let fts = words_in(typed, &tree).find.unwrap();
+            let one = |sql: &str| {
+                let started = std::time::Instant::now();
+                let n: i64 = conn.query_row(sql, [&fts], |r| r.get(0)).unwrap();
+                (n, started.elapsed())
+            };
+            let (n, matched) = one("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH ?");
+            let (_, ranked) = one("SELECT count(*) FROM (SELECT rowid FROM assets_fts WHERE assets_fts MATCH ?
+                  ORDER BY bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0, 1.5, 1.0))");
+            let started = std::time::Instant::now();
+            let (found, _) = rank_and_count(&conn, &q, "f.rank ASC", "", &tree).unwrap();
+            let in_order = started.elapsed();
+            let started = std::time::Instant::now();
+            tags_of_rows(&conn, &found, &tree).unwrap();
+            println!(
+                "{label}: {n} matched in {matched:.1?}, ranked in {ranked:.1?}, {} in order and counted in \
+                 {in_order:.1?}, their tags in {:.1?}",
+                found.len(),
+                started.elapsed()
+            );
+        };
+        pieces("the first letter, in pieces", "t");
+        pieces("two letters, in pieces", "th");
+        pieces("words, in pieces", "rock");
         alone("everything, alone", SearchQuery { hide_supporting: true, ..Default::default() });
         alone(
             "the first letter, alone",
@@ -1661,6 +1747,64 @@ mod tests {
             let tags = tag_counts(&conn, prefix, anywhere, 12).unwrap();
             println!("tags like {prefix:?}: {} in {:.1?}", tags.len(), started.elapsed());
         }
+
+        // The same with a tag tree: the colors under warm and cool, both under colored, and in the index's tags.
+        let started = std::time::Instant::now();
+        conn.execute_batch(
+            "BEGIN;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 11)
+             INSERT INTO tag_parents (tag, parent) SELECT 'color:' || i, CASE WHEN i < 6 THEN 'warm' ELSE 'cool' END FROM k;
+             INSERT INTO tag_parents (tag, parent) VALUES ('warm', 'colored'), ('cool', 'colored');
+             UPDATE assets_fts SET tags = 'color:' || (rowid % 12);
+             COMMIT;",
+        )
+        .unwrap();
+        println!("with a tag tree, made in {:.1?}:", started.elapsed());
+        alone("  everything, alone", SearchQuery { hide_supporting: true, ..Default::default() });
+        alone("  the first letter, alone", letter());
+        time("  browse everything", SearchQuery { hide_supporting: true, ..Default::default() }, true, None);
+        time("  the first letter typed", letter(), true, None);
+        time("  words", words(), true, None);
+        let typed = |q: &str| SearchQuery { q: Some(q.into()), hide_supporting: true, ..Default::default() };
+        time("  a broad tag typed", typed("warm"), true, None);
+        time("  a broad tag typed, no facets", typed("warm"), false, None);
+        time("  words but a broad tag", typed("rock -warm"), true, None);
+        let picked = SearchQuery { tags: vec!["warm".into()], hide_supporting: true, ..Default::default() };
+        time("  a broad tag picked", picked.clone(), true, None);
+        time("  a broad tag picked, no facets", picked, false, None);
+    }
+
+    /// A generated library of `n` assets in 200 packs, for timing searches in: two in five in one big pack, one in
+    /// fifty named "rock wall", each name with one of 26,000 words starting with t (about as many as a real library
+    /// has), every asset with a kind, a color and a set tag, and some supporting files.
+    fn make_big_library(conn: &Connection, n: usize) {
+        conn.execute_batch(&format!(
+            "BEGIN;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 199)
+             INSERT INTO packs (id, name, status, created_at) SELECT 'p' || i, 'Pack ' || i, 'ready', 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO blobs (hash, size, created_at) SELECT 'b' || i, i, 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, thumb_hash, created_at, updated_at)
+             SELECT 'a' || i, CASE WHEN i % 5 < 2 THEN 'p0' ELSE 'p' || (i % 200) END, 'b' || i,
+                    'Dir' || (i % 9) || '/Sub' || (i % 160) || '/file' || i || '.png',
+                    CASE i % 50 WHEN 0 THEN 'rock wall ' || i ELSE 'thing ' || i END
+                      || ' t' || char(97 + i % 26) || (i % 997), 'png',
+                    CASE i % 4 WHEN 0 THEN 'texture' WHEN 1 THEN 'model' WHEN 2 THEN 'material' ELSE 'audio' END,
+                    'dir file', 't' || i, printf('2026-01-01T00:%06d', i), 'x' FROM k;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'kind:' || kind, 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'color:' || (rowid % 12), 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'set:' || (rowid % 9000), 'x' FROM assets;
+             INSERT INTO asset_links (from_id, to_id, rel) SELECT 'a' || (rowid - 1), id, 'texture' FROM assets
+               WHERE kind = 'texture' AND rowid % 3 = 0;
+             INSERT INTO material_maps (material_id, texture_id, role) SELECT 'a' || (rowid - 2), id, 'albedo' FROM assets
+               WHERE kind = 'texture' AND rowid % 5 = 0;
+             INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, words, '' FROM assets;
+             UPDATE assets SET fts_row = rowid;
+             COMMIT;
+             ANALYZE;"
+        ))
+        .unwrap();
     }
 
     /// What upkeep buys a big, much-edited library: `cargo test -p hoardd --release --lib upkeep_timing -- --ignored --nocapture`.

@@ -132,7 +132,7 @@ pub(crate) struct TagInfo {
 
 /// The SQL for a tag and every tag under it, however deep, for the tag in place of `?`. A loop ends where it
 /// started.
-pub(crate) const TAG_AND_NARROWER: &str = "WITH RECURSIVE narrower(x) AS (VALUES (?) UNION
+const TAG_AND_NARROWER: &str = "WITH RECURSIVE narrower(x) AS (VALUES (?) UNION
      SELECT p.tag FROM tag_parents p JOIN narrower ON p.parent = narrower.x) SELECT x FROM narrower";
 
 /// Every tag under `tag`, however deep (not `tag` itself).
@@ -204,10 +204,6 @@ impl Tree {
             below: children.keys().map(|&t| (t.to_owned(), reach(t, &children))).collect(),
             above: parents.keys().map(|&t| (t.to_owned(), reach(t, &parents))).collect(),
         }
-    }
-
-    pub(crate) fn is_empty(&self) -> bool {
-        self.below.is_empty()
     }
 
     /// Every tag under `tag`, however deep.
@@ -437,7 +433,7 @@ mod tests {
         assert!(tree.narrower("sedan").is_empty() && tree.broader("vehicle").is_empty());
         // A loop ends where it started.
         assert_eq!((tree.narrower("a"), tree.broader("a")), (&["b".to_owned()][..], &["b".to_owned()][..]));
-        assert!(Tree::of(&[]).is_empty());
+        assert_eq!(Tree::of(&[]).broad().count(), 0);
     }
 
     #[test]

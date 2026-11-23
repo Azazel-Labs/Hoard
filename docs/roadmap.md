@@ -5,24 +5,21 @@ isn't yet.
 
 ## Performance in a big library
 
-Measured against a generated library of 300,000 assets in 200 packs (`cargo test -p hoardd --lib big_library --
---release --ignored --nocapture`, which prints a timing for each step; last run 2026-11-22). Quick already: the pack
-list (56 ms), a pack's card (under a millisecond), tag suggestions, Settings → Issues, sorting by name or size and a
-search's next pages (a millisecond or two, now that a search keeps what it found in order), and the library's
+Measured against a generated library of 300,000 assets in 200 packs, with names drawn from 26,000 words and a tag
+tree over its tags (`cargo test -p hoardd --lib big_library --release -- --ignored --nocapture`, which prints a
+timing for each step; last run 2026-11-22). Quick already: browsing everything with its counts and sidebar (0.14 s),
+a big pack (0.12 s) and its top folder (0.14 s), a search by words (45 ms), a broad tag picked or typed with
+everything under it (0.3 to 0.35 s), the pack list (31 ms), a pack's card (under a millisecond), tag suggestions,
+Settings → Issues, sorting by name or size and a search's next pages (a millisecond or two), and the library's
 numbers, report, near copies and store files no format reads, which are kept, saved for the next start and worked
-out again in the background. Still slow, worst first:
+out again in the background. The sidebar's tags are counted from each tag's assets, kept until the library changes,
+in a few milliseconds. Still slow, worst first:
 
-- **The first letter typed in search: 1.6 s.** Its next page is quick now, but the first still ranks every match
-  (279,000 for one letter) and counts them for the total. One or two letters could rank a capped number of matches.
-- **The sidebar's tag counts: about 0.75 s browsing everything and 1 s for the first letter typed.** They don't
-  hold the tiles up, but browsing everything takes 1.5 s with them and under a millisecond without. With no words
-  or filters they are the same as the tags in use, which are already kept, so that case can reuse them; with words
-  they come from what the search kept, but counting the tags of a quarter of a million matches still takes a
-  second.
-- **Browsing a big pack: 0.7 s** for a pack of 120,000, with its counts beside the grid; its top folder 0.65 s.
-  Counts by kind are already kept per pack (`pack_kinds`), so the counts with no other filter can come from there.
-- **Words and pictures together: 0.6 s**, 0.4 s without the counts: what looks like a picture is ranked for every
-  match of the words.
+- **The first letter typed in search: 0.4 s.** One or two letters are no longer ranked (what they find goes newest
+  first), but every match (285,000 for one letter) is still looked up in the library to count it for the total.
+- **The sidebar's tags just after the library changed: about 0.25 s more**, to read each tag's assets again. During
+  an import that's every time the sidebar asks; the tags of the assets that changed could be put right in place.
+- **Words and pictures together: 0.23 s**: what looks like a picture is ranked for every match of the words.
 
 ## What a converted file came from
 

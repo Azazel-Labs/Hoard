@@ -76,7 +76,8 @@ struct AssetReply {
     tags: Vec<String>,
 }
 
-fn system_prompt() -> String {
+fn system_prompt(tree: &str) -> String {
+    let tree = if tree.is_empty() { String::new() } else { format!("Tag tree (a tag: what it goes under):\n{tree}") };
     format!(
         "You catalog game-development assets (textures, sprites, audio, music, 3D models, fonts, shaders) for a \
          searchable asset library. For each numbered file you get its path inside the pack, its kind, measured \
@@ -84,9 +85,38 @@ fn system_prompt() -> String {
          {{\"pack\": {{\"title\": str, \"description\": str, \"tags\": [str]}} | null,\n \
          \"assets\": [{{\"i\": int, \"name\": str, \"category\": str, \"description\": str, \"tags\": [str]}}]}}\n\
          Rules:\n{}\
-         - Include `pack` only when asked; otherwise null.",
+         - Include `pack` only when asked; otherwise null.\n{tree}",
         tagging_rules()
     )
+}
+
+/// The most tags of the tag tree a tagger is shown.
+const TREE_SHOWN: usize = 300;
+
+/// What goes under what among the library's tags, as `tagging_rules` refers to it: each tag that goes under broader
+/// ones, with them (`sedan` under `car`), at most [`TREE_SHOWN`] of them.
+pub(crate) fn tag_tree_map(pairs: &[(String, String)]) -> std::collections::BTreeMap<String, Vec<String>> {
+    let mut under = std::collections::BTreeMap::<String, Vec<String>>::new();
+    for (tag, parent) in pairs {
+        if under.len() < TREE_SHOWN || under.contains_key(tag) {
+            under.entry(tag.clone()).or_default().push(parent.clone());
+        }
+    }
+    under
+}
+
+/// [`tag_tree_map`] as lines for a prompt: `- sedan: car`.
+fn tag_tree_lines(pairs: &[(String, String)]) -> String {
+    tag_tree_map(pairs).iter().fold(String::new(), |mut out, (tag, parents)| {
+        let _ = writeln!(out, "- {tag}: {}", parents.join(", "));
+        out
+    })
+}
+
+/// Tags taken out of `tags` when a narrower one is there too: with sedan under car, `car, sedan` is `sedan`.
+fn narrowest(tags: &mut Vec<String>, tree: &db::Tree) {
+    let broader: Vec<String> = tags.iter().flat_map(|t| tree.broader(t)).cloned().collect();
+    tags.retain(|t| !broader.contains(t));
 }
 
 /// How to name, categorize, describe and tag an asset: the built-in tagger's rules, also handed to an agent tagging
@@ -101,6 +131,8 @@ pub(crate) fn tagging_rules() -> String {
          - tags: 3-8 lowercase kebab-case tags people would search for. Prefer these namespaces when they fit: \
            style:, theme:, mood:, genre:, material:, subject words (e.g. footsteps, sword, tree). Don't repeat \
            format/resolution facts; those are known.\n\
+         - Some tags go under broader ones (the tag tree, when there is one: sedan under car under vehicle). Use \
+           the narrowest that fits and leave out the ones it goes under; finding a broader tag finds it anyway.\n\
          - Sound effects: add one ucs:<category>/<subcategory> tag from the Universal Category System, lowercase \
            kebab-case, e.g. ucs:footsteps/gravel, ucs:magic/elemental, ucs:user-interface/click. Skip if unsure.\n\
          - A file marked \"+N variants\" stands for a family of near-identical takes; describe the family.\n\
@@ -367,11 +399,12 @@ async fn sheet_png(state: &AppState, batch: &[Entry<'_>]) -> Option<Vec<u8>> {
 pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
     crate::context::fill_store_text(state, pack_id).await;
     let pid = pack_id.to_owned();
-    let (pack, ctx, rows) = db::call(&state.pool, move |c| {
+    let (pack, ctx, rows, tree) = db::call(&state.pool, move |c| {
         let pack = db::get_pack(c, &pid)?.context("pack not found")?;
-        Ok((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?))
+        Ok((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?, db::tag_tree(c)?))
     })
     .await?;
+    let system = system_prompt(&tag_tree_lines(&tree));
     let pack_ctx = context_block(&ctx);
     let entries = entries(&rows);
 
@@ -415,7 +448,7 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
             content.push(json!({ "type": "image_url", "image_url": { "url": url } }));
         }
         let messages = json!([
-            { "role": "system", "content": system_prompt() },
+            { "role": "system", "content": system },
             { "role": "user", "content": content },
         ]);
 
@@ -491,10 +524,10 @@ pub(crate) async fn next_untagged(
             [&pid],
             |r| r.get(0),
         )?;
-        Ok(Some((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?, other_packs)))
+        Ok(Some((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?, other_packs, db::tag_tree(c)?)))
     })
     .await?;
-    let Some((pack, ctx, rows, other_packs)) = found else { return Ok(None) };
+    let Some((pack, ctx, rows, other_packs, tree)) = found else { return Ok(None) };
     let rows: Vec<Row> = rows.into_iter().filter(|r| r.untagged).collect();
     let mut batch = entries(&rows);
     let total = batch.len();
@@ -546,6 +579,9 @@ pub(crate) async fn next_untagged(
     let context = context_block(&ctx);
     if !context.is_empty() {
         out["pack"]["context"] = json!(context);
+    }
+    if !tree.is_empty() {
+        out["tag_tree"] = json!(tag_tree_map(&tree));
     }
     Ok(Some((out, sheet)))
 }
@@ -629,6 +665,7 @@ fn apply_reply(
 ) -> Result<()> {
     let now = db::now();
     let tx = c.transaction()?;
+    let tree = db::Tree::load(&tx)?;
     if let Some((pack_id, p)) = pack {
         let mut tags: Vec<String> = p.tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
         // What the pack's own files said (a Megascans JSON) stays: its tags alongside the AI's, its description
@@ -654,7 +691,8 @@ fn apply_reply(
         let description =
             a.description.map(|d| d.trim().chars().take(800).collect::<String>()).filter(|d| !d.is_empty());
         let name = a.name.map(|n| n.chars().take(120).collect::<String>());
-        let tags: Vec<String> = a.tags.iter().take(12).filter_map(|t| hoard_core::normalize_tag(t)).collect();
+        let mut tags: Vec<String> = a.tags.iter().take(12).filter_map(|t| hoard_core::normalize_tag(t)).collect();
+        narrowest(&mut tags, &tree);
         for (n, (id, human_edited)) in members.iter().enumerate() {
             if !human_edited {
                 tx.execute(
@@ -721,5 +759,23 @@ mod tests {
             .unwrap();
         assert_eq!(r.assets.len(), 1);
         assert_eq!(r.assets[0].tags, ["Grass"]);
+    }
+
+    #[test]
+    fn the_tagger_is_shown_the_tag_tree_and_keeps_the_narrowest_tags() {
+        let pairs: Vec<(String, String)> = [("car", "vehicle"), ("sedan", "car"), ("sedan", "red")]
+            .map(|(t, p)| (t.to_owned(), p.to_owned()))
+            .to_vec();
+        let lines = tag_tree_lines(&pairs);
+        assert_eq!(lines, "- car: vehicle\n- sedan: car, red\n");
+        assert!(
+            system_prompt(&lines)
+                .ends_with("Tag tree (a tag: what it goes under):\n- car: vehicle\n- sedan: car, red\n")
+        );
+        assert!(system_prompt("").ends_with("otherwise null.\n"));
+
+        let mut tags = ["vehicle", "sedan", "blue", "car"].map(str::to_owned).to_vec();
+        narrowest(&mut tags, &db::Tree::of(&pairs));
+        assert_eq!(tags, ["sedan", "blue"]);
     }
 }

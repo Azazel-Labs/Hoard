@@ -340,7 +340,22 @@ async fn call_tool(
         "list_tags" => {
             let prefix = str_arg(&args, "prefix").unwrap_or_default().to_lowercase();
             let limit = args.get("limit").and_then(Value::as_u64).unwrap_or(50).clamp(1, 200) as u32;
-            let tags = db::call(&state.pool, move |c| db::tag_counts(c, &prefix, false, limit)).await?;
+            let (tags, tree) =
+                db::call(&state.pool, move |c| Ok((db::tag_counts(c, &prefix, false, limit)?, db::tag_tree(c)?)))
+                    .await?;
+            // Each with the broader tags it goes under, when it goes under any: searching one finds what's under it.
+            let tags: Vec<Value> = tags
+                .into_iter()
+                .map(|t| {
+                    let under: Vec<&str> =
+                        tree.iter().filter(|(tag, _)| *tag == t.value).map(|(_, p)| p.as_str()).collect();
+                    let mut v = json!({ "value": t.value, "count": t.count });
+                    if !under.is_empty() {
+                        v["under"] = json!(under);
+                    }
+                    v
+                })
+                .collect();
             Ok(json!({ "tags": tags }))
         }
         "tag_asset" | "update_asset" => {

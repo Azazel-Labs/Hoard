@@ -79,7 +79,7 @@ pub(super) fn tool_list(may_change: bool) -> Value {
         {
             "name": "list_tags",
             "title": "List tags",
-            "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching.",
+            "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching. A tag that goes under broader ones lists them in `under`; searching a tag finds everything under it too.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -264,7 +264,7 @@ fn tagging_tools() -> Value {
         {
             "name": "next_to_tag",
             "title": "Next assets to describe",
-            "description": "The next files nothing has described yet (no AI or human tags), up to 16 at a time, from one pack: path, kind, measured facts, the offline tagger's tags, the pack's context (store page, README), and a contact sheet image whose white numbers match each file's `n`. A file with `variants` stands for a family of near-identical takes. Describe them and call save_tags; saved files drop out, so call again for the next batch until `files` is empty.",
+            "description": "The next files nothing has described yet (no AI or human tags), up to 16 at a time, from one pack: path, kind, measured facts, the offline tagger's tags, the pack's context (store page, README), and a contact sheet image whose white numbers match each file's `n`. A file with `variants` stands for a family of near-identical takes. `tag_tree`, when there is one, says which tags go under which: use the narrowest that fits. Describe them and call save_tags; saved files drop out, so call again for the next batch until `files` is empty.",
             "inputSchema": {
                 "type": "object",
                 "properties": {

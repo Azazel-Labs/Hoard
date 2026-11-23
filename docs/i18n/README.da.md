@@ -1,6 +1,6 @@
 <div align="center">
 
-# Hoard
+# <img src="../../web/public/favicon.svg" alt="" height="32" align="absmiddle"> Hoard
 
 [![CI](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)

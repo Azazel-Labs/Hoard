@@ -3250,6 +3250,10 @@ Lisättiin { $count ->
        *[other] { $count } tunnistetta
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Kuuluu myös alle:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Samankaltaisilla on:"

@@ -1844,6 +1844,7 @@ asset-tags-accept-all-title = Conservar como propias todas las etiquetas que sug
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Rechazadas:
 asset-tag-restore-title = Volver a poner { $tag }
+asset-tags-also-under = También dentro de:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Los parecidos tienen:
 asset-tag-suggest-title = Añadir { $tag }

@@ -1975,6 +1975,7 @@ asset-tags-accept-all-title = Оставить как свои все теги, 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Отклонено:
 asset-tag-restore-title = Вернуть { $tag }
+asset-tags-also-under = Также входит в:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = У похожих есть:
 asset-tag-suggest-title = Добавить { $tag }

@@ -3246,6 +3246,10 @@ S'han afegit { $count ->
        *[other] { $count } etiquetes
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "També dins de:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Els semblants tenen:"

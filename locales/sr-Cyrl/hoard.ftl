@@ -1878,6 +1878,7 @@ asset-tags-accept-all-title = Задржи као своје све ознаке
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Одбијене:
 asset-tag-restore-title = Врати { $tag }
+asset-tags-also-under = Спада и под:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Слични имају:
 asset-tag-suggest-title = Додај { $tag }

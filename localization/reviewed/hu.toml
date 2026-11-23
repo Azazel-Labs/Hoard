@@ -3179,6 +3179,10 @@ Hozzáadva: { $count ->
        *[other] { $count } címke
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Ezek alá is tartozik:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "A hasonlókon ezek vannak:"

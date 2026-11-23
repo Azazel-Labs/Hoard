@@ -3311,6 +3311,10 @@ Adăugate: { $count ->
        *[other] { $count } de etichete
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Se încadrează și la:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Cele asemănătoare au:"

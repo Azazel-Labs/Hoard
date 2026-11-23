@@ -3114,6 +3114,10 @@ Added { $count ->
     }"""
 translation = "已添加 { $count } 个标签"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "也属于："
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "相似的有："

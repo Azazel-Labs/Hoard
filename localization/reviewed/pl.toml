@@ -3328,6 +3328,10 @@ Dodano: { $count ->
        *[other] { $count } tagu
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Należy też do:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Podobne mają:"

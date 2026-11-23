@@ -1807,6 +1807,7 @@ asset-tags-accept-all-title = Conserva com a pròpies totes les etiquetes propos
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Rebutjades:
 asset-tag-restore-title = Torna a posar { $tag }
+asset-tags-also-under = També dins de:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Els semblants tenen:
 asset-tag-suggest-title = Afegeix { $tag }

@@ -1680,6 +1680,7 @@ asset-tags-accept-all-title = Kuralların ve yapay zekânın tahmin ettiği her 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Reddedilenler:
 asset-tag-restore-title = { $tag } etiketini geri ekle
+asset-tags-also-under = Şunların da altında:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Benzerlerinde şunlar var:
 asset-tag-suggest-title = { $tag } ekle

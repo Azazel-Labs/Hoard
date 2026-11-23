@@ -3151,6 +3151,10 @@ Added { $count ->
     }"""
 translation = "{ $count } etiket eklendi"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Şunların da altında:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Benzerlerinde şunlar var:"

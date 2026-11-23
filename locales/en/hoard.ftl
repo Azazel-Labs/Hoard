@@ -2015,6 +2015,8 @@ asset-tags-accept-all-title = Keep every tag the rules and the AI guessed as you
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Turned down:
 asset-tag-restore-title = Put { $tag } back
+# Before the broader tags an asset's tags go under, which it doesn't carry itself (a sedan is also under car and vehicle); each can be clicked to show everything under it.
+asset-tags-also-under = Also under:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Similar ones have:
 asset-tag-suggest-title = Add { $tag }

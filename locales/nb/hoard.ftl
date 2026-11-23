@@ -1803,6 +1803,7 @@ asset-tags-accept-all-title = Behold alle taggene reglene og AI gjettet som dine
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Avvist:
 asset-tag-restore-title = Sett { $tag } tilbake
+asset-tags-also-under = Hører også under:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Lignende har:
 asset-tag-suggest-title = Legg til { $tag }

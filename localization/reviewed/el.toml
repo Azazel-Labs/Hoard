@@ -3258,6 +3258,10 @@ translation = """
        *[other] { $count } ετικέτες
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Ανήκει επίσης σε:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Παρόμοια έχουν:"

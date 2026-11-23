@@ -1938,6 +1938,7 @@ asset-tags-accept-all-title = Păstrați ca ale dvs. toate etichetele presupuse 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Respinse:
 asset-tag-restore-title = Puneți { $tag } la loc
+asset-tags-also-under = Se încadrează și la:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Cele asemănătoare au:
 asset-tag-suggest-title = Adaugă { $tag }

@@ -1619,6 +1619,7 @@ asset-tags-accept-all-title = 규칙과 AI가 추측한 태그를 모두 내 태
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 제외한 태그:
 asset-tag-restore-title = { $tag } 태그 되돌리기
+asset-tags-also-under = 상위 태그:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = 비슷한 에셋의 태그:
 asset-tag-suggest-title = { $tag } 추가

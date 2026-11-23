@@ -1640,6 +1640,7 @@ asset-tags-accept-all-title = เก็บทุกแท็กที่กฎ�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = ที่ปฏิเสธไว้:
 asset-tag-restore-title = ใส่ { $tag } กลับ
+asset-tags-also-under = อยู่ภายใต้ด้วย:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = รายการที่คล้ายกันมี:
 asset-tag-suggest-title = เพิ่ม { $tag }

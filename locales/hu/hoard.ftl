@@ -1704,6 +1704,7 @@ asset-tags-accept-all-title = A szabályok és az MI által tippelt összes cím
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Elutasítva:
 asset-tag-restore-title = Visszatétel: { $tag }
+asset-tags-also-under = Ezek alá is tartozik:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = A hasonlókon ezek vannak:
 asset-tag-suggest-title = { $tag } hozzáadása

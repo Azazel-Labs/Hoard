@@ -3246,6 +3246,10 @@ translation = """
        *[other] { $count } etiquetas adicionadas
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Também dentro de:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Os semelhantes têm:"

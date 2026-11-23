@@ -3111,6 +3111,10 @@ Added { $count ->
     }"""
 translation = "태그 { $count }개를 추가했습니다"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "상위 태그:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "비슷한 에셋의 태그:"

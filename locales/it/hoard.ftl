@@ -1815,6 +1815,7 @@ asset-tags-accept-all-title = Tieni come tuoi tutti i tag suggeriti da regole e 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Rifiutati:
 asset-tag-restore-title = Rimetti { $tag }
+asset-tags-also-under = Anche sotto:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Quelli simili hanno:
 asset-tag-suggest-title = Aggiungi { $tag }

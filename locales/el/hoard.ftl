@@ -1851,6 +1851,7 @@ asset-tags-accept-all-title = Διατήρηση ως δικών σας όλων
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Απορρίφθηκαν:
 asset-tag-restore-title = Επαναφορά της { $tag }
+asset-tags-also-under = Ανήκει επίσης σε:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Παρόμοια έχουν:
 asset-tag-suggest-title = Προσθήκη { $tag }

@@ -2013,6 +2013,7 @@ asset-tags-accept-all-title = Залишити як власні всі теги
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Відхилені:
 asset-tag-restore-title = Повернути { $tag }
+asset-tags-also-under = Також входить до:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = У схожих є:
 asset-tag-suggest-title = Додати { $tag }

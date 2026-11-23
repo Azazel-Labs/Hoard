@@ -1640,6 +1640,7 @@ asset-tags-accept-all-title = ルールと AI が推測したタグをすべて�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 却下済み:
 asset-tag-restore-title = { $tag } を戻す
+asset-tags-also-under = 上位のタグ:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = 似たアセットのタグ:
 asset-tag-suggest-title = { $tag } を追加

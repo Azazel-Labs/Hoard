@@ -3246,6 +3246,10 @@ Lade till { $count ->
        *[other] { $count } taggar
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Hör också till:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Liknande har:"

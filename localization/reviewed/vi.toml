@@ -3114,6 +3114,10 @@ Added { $count ->
     }"""
 translation = "Đã thêm { $count } thẻ"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Cũng thuộc:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Những mục giống có:"

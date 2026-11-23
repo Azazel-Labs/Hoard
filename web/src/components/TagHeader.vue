@@ -4,6 +4,7 @@
 // (giving another tag's name merges into that one).
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { api, thumbUrl, type Asset, type TagInfo } from '../api'
+import { setTagParents } from '../tagTree'
 import { formatNumber, t } from '../i18n'
 import { mayEdit } from '../auth'
 import { confirmDialog, showError, showOk } from '../ui'
@@ -147,11 +148,11 @@ async function setParents(parents: string[], toast: string) {
   const tag = props.tag
   const was = info.value?.parents ?? []
   try {
-    const got = await api.setTagParents(tag, parents)
+    const got = await setTagParents(tag, parents)
     if (props.tag === tag) info.value = got
     showOk(toast, {
       label: t('asset-undo'),
-      run: () => void api.setTagParents(tag, was).then((back) => {
+      run: () => void setTagParents(tag, was).then((back) => {
         if (props.tag === tag) info.value = back
         emit('changed')
       }),

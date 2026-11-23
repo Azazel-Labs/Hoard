@@ -3302,6 +3302,10 @@ Přidáno: { $count ->
        *[other] { $count } štítků
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Patří také pod:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Podobné mají:"

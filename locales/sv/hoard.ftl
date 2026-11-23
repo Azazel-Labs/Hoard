@@ -1804,6 +1804,7 @@ asset-tags-accept-all-title = Behåll alla taggar som regler och AI gissade som 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Avvisade:
 asset-tag-restore-title = Sätt tillbaka { $tag }
+asset-tags-also-under = Hör också till:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Liknande har:
 asset-tag-suggest-title = Lägg till { $tag }

@@ -3,6 +3,7 @@
 // (merge it into a new name). The old names are remembered, so the taggers use the new one from then on.
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type Facet } from '../api'
+import { setTagParents } from '../tagTree'
 import { formatNumber, t } from '../i18n'
 import { markSeen } from '../news'
 import { prefs } from '../prefs'
@@ -80,10 +81,10 @@ const nestReady = computed(() => {
 async function setParents(tag: string, parents: string[], note: string) {
   const was = parentsOf(tag)
   try {
-    await api.setTagParents(tag, parents)
+    await setTagParents(tag, parents)
     markSeen('tag-tree')
     await load()
-    showOk(note, { label: t('asset-undo'), run: () => void api.setTagParents(tag, was).then(load).then(() => emit('changed')) })
+    showOk(note, { label: t('asset-undo'), run: () => void setTagParents(tag, was).then(load).then(() => emit('changed')) })
     emit('changed')
   } catch (e) {
     showError(t('tag-page-save-failed', { error: (e as Error).message }))

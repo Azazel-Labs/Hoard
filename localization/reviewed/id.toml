@@ -3145,6 +3145,10 @@ Added { $count ->
     }"""
 translation = "{ $count } tag ditambahkan"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Juga di bawah:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Yang mirip punya:"

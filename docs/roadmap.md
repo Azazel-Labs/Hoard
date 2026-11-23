@@ -24,21 +24,6 @@ out again in the background. Still slow, worst first:
 - **Words and pictures together: 0.6 s**, 0.4 s without the counts: what looks like a picture is ranked for every
   match of the words.
 
-## Tags inside tags
-
-A tag can go under broader ones, on its own page or on Settings → Tags, and picking a tag finds everything under it
-too: vehicle finds the cars and the sedans. Still to do:
-
-- **Typed words don't follow the tree.** Picking vehicle in the sidebar finds the sedans, but typing vehicle in the
-  search box only finds what has that word itself, and `-vehicle` leaves out what's tagged vehicle but not the
-  sedans.
-- **The sidebar counts tags one by one.** A broader tag shows there only when something carries it directly, and its
-  count leaves out everything under it.
-- **An asset doesn't show what its tags sit under.** A sedan's tags say sedan, not that it's also a car and a
-  vehicle.
-- **AI tagging and AI apps don't know the tree.** The tagger isn't shown it, so it can't pick the narrowest tag that
-  fits, and MCP's `list_tags` doesn't say what sits under what.
-
 ## What a converted file came from
 
 A file Hoard converted (an Unreal texture to PNG, a WAV to FLAC) has to say what it came from for good, even once

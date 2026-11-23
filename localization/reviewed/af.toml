@@ -3246,6 +3246,10 @@ translation = """
        *[other] { $count } etikette bygevoeg
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Ook onder:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Soortgelykes het:"

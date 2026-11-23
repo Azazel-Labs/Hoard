@@ -124,4 +124,27 @@ test.describe('settings: tags', () => {
     await expect(page.getByRole('status').filter({ hasText: `e2ecar${u} is no longer under e2evehicle${u}` })).toBeVisible()
     await expect(tree.locator('li').filter({ hasText: `e2ecar${u}` })).toHaveCount(0)
   })
+
+  test('an asset shows the broader tags its own go under, and each finds everything under it', async ({ page, api, seed }) => {
+    const u = unique()
+    const [sedan, truck] = ['Img 141', 'Img 142'].map((n) => seed.assets[`${BIG}/${n}`])
+    await addTags(api, sedan, [`e2esedan${u}`])
+    await addTags(api, truck, [`e2etruck${u}`])
+    const under = async (tag: string, parents: string[]) =>
+      expect((await api.put('/api/tags/parents', { data: { tag, parents } })).ok()).toBe(true)
+    await under(`e2esedan${u}`, [`e2ecar${u}`])
+    await under(`e2ecar${u}`, [`e2evehicle${u}`])
+    await under(`e2etruck${u}`, [`e2evehicle${u}`])
+    try {
+      await page.goto(`/#asset=${sedan}`)
+      const line = page.locator('.under')
+      await expect(line).toContainText('Also under:')
+      await expect(line.getByRole('button')).toHaveText([`e2ecar${u}`, `e2evehicle${u}`])
+      await line.getByRole('button', { name: `e2evehicle${u}` }).click()
+      // Both are under vehicle, though neither is tagged vehicle itself.
+      await expect(page.locator('.grid .tile')).toHaveCount(2)
+    } finally {
+      for (const tag of [`e2esedan${u}`, `e2ecar${u}`, `e2etruck${u}`]) await under(tag, [])
+    }
+  })
 })

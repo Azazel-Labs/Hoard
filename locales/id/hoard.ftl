@@ -1664,6 +1664,7 @@ asset-tags-accept-all-title = Pertahankan semua tag yang ditebak aturan dan AI s
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Ditolak:
 asset-tag-restore-title = Pasang kembali { $tag }
+asset-tags-also-under = Juga di bawah:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Yang mirip punya:
 asset-tag-suggest-title = Tambah { $tag }

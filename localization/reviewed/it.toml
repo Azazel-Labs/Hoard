@@ -3246,6 +3246,10 @@ Aggiunti { $count ->
        *[other] { $count } tag
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Anche sotto:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Quelli simili hanno:"

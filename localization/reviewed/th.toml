@@ -3117,6 +3117,10 @@ Added { $count ->
     }"""
 translation = "เพิ่มแท็กแล้ว { $count } รายการ"
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "อยู่ภายใต้ด้วย:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "รายการที่คล้ายกันมี:"

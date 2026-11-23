@@ -1646,6 +1646,7 @@ asset-tags-accept-all-title = 將規則和 AI 推測的所有標籤保留為你�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 已拒絕：
 asset-tag-restore-title = 恢復 { $tag }
+asset-tags-also-under = 也屬於：
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = 相似的有：
 asset-tag-suggest-title = 新增 { $tag }

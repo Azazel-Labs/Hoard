@@ -1801,6 +1801,7 @@ asset-tags-accept-all-title = Alle von Regeln und KI vorgeschlagenen Tags als ei
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Abgelehnt:
 asset-tag-restore-title = { $tag } wieder setzen
+asset-tags-also-under = Gehört auch zu:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Ähnliche haben:
 asset-tag-suggest-title = { $tag } hinzufügen

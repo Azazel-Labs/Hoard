@@ -27,6 +27,7 @@ import { isSkeletonAsset, isLottieAsset, isModelAsset, isRiveAsset, isTextAsset,
 import { isMaterialAsset } from '../materials'
 import { withThumb } from '../browserThumbs'
 import { animsOf, needsOf } from '../assetLinks'
+import { broaderTags } from '../tagTree'
 import { fileFacts } from '../fileFacts'
 import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
 
@@ -247,6 +248,16 @@ const pixelated = computed(() => props.asset.tags.some((t) => t.tag === 'style:p
 const visibleTags = computed(() =>
   props.asset.tags.filter((t) => !t.tag.startsWith('kind:') && !t.tag.startsWith('format:')),
 )
+
+/** The broader tags the asset's tags go under that it doesn't have itself: a sedan is a car and a vehicle too. */
+const alsoUnder = computed(() => {
+  const have = new Set(props.asset.tags.map((x) => x.tag))
+  const out: string[] = []
+  for (const vt of visibleTags.value) {
+    for (const b of broaderTags(vt.tag)) if (!have.has(b) && !out.includes(b)) out.push(b)
+  }
+  return out
+})
 
 const metaRows = computed(() => fileFacts(props.asset))
 
@@ -676,6 +687,17 @@ onBeforeUnmount(() => unswipe())
           @accept="acceptTags([vt.tag])"
         />
       </TransitionGroup>
+      <p v-if="alsoUnder.length" class="rejected suggest under">
+        <span class="lbl">{{ t('asset-tags-also-under') }}</span>
+        <button
+          v-for="tag in alsoUnder"
+          :key="tag"
+          type="button"
+          class="linkish sug"
+          :title="t('asset-meta-everything-with', { tag })"
+          @click="$emit('tag', tag, $event.altKey)"
+        >{{ tag }}</button>
+      </p>
       <p v-if="editor && rejected.length" class="rejected">
         <span class="lbl">{{ t('asset-tags-rejected') }}</span>
         <button

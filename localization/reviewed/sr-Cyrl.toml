@@ -3281,6 +3281,10 @@ translation = """
        *[other] { $count } ознака
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Спада и под:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Слични имају:"

@@ -3246,6 +3246,10 @@ Tilføjede { $count ->
        *[other] { $count } tags
     }"""
 
+[messages.asset-tags-also-under]
+source = "Also under:"
+translation = "Hører også under:"
+
 [messages.asset-tags-from-similar]
 source = "Similar ones have:"
 translation = "Lignende har:"

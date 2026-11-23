@@ -1931,6 +1931,7 @@ asset-tags-accept-all-title = Ponechat jako vlastní všechny štítky, které p
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Zamítnuté:
 asset-tag-restore-title = Vrátit štítek { $tag }
+asset-tags-also-under = Patří také pod:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Podobné mají:
 asset-tag-suggest-title = Přidat { $tag }

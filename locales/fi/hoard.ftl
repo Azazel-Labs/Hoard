@@ -1851,6 +1851,7 @@ asset-tags-accept-all-title = Säilytä kaikki sääntöjen ja tekoälyn arvaama
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Hylätyt:
 asset-tag-restore-title = Palauta { $tag }
+asset-tags-also-under = Kuuluu myös alle:
 # Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
 asset-tags-from-similar = Samankaltaisilla on:
 asset-tag-suggest-title = Lisää { $tag }

@@ -629,9 +629,15 @@ pub(crate) fn search_ranked(
             "CREATE TEMP TABLE IF NOT EXISTS look_rank (hash TEXT PRIMARY KEY, score REAL NOT NULL) WITHOUT ROWID;
              DELETE FROM temp.look_rank;",
         )?;
+        // In one transaction rather than one each: thousands of rows, and each transaction costs more than its row.
+        let tx = if conn.is_autocommit() { Some(conn.unchecked_transaction()?) } else { None };
         let mut insert = conn.prepare_cached("INSERT OR REPLACE INTO temp.look_rank (hash, score) VALUES (?1, ?2)")?;
         for (hash, score) in &look.scores {
             insert.execute(params![hash, f64::from(*score)])?;
+        }
+        drop(insert);
+        if let Some(tx) = tx {
+            tx.commit()?;
         }
         if look.blend
             && let Some(fts) = q.q.as_deref().and_then(|t| words_in(t, &tree).find)

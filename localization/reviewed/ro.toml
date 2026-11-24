@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
-translation = "4f6898228041f3894236d252b17de57c6eed25d18de7b7cd19085cfe47a6ecd0"
+source = "71ec6d3c5bd4d326bc7bfb729df41e112a812518839fbc26a62fc3bb52ff5a5e"
+translation = "a29e9873542e3e44e9ac77fc3e551fc9bd642342ac9a424652448c4d02deb7fa"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -7523,10 +7523,6 @@ translation = "serverul încă convertește acest model"
 [messages.model-error-converting-desktop]
 source = "Hoard is still converting this model"
 translation = "Hoard încă convertește acest model"
-
-[messages.model-error-empty-collada]
-source = "empty Collada file"
-translation = "fișier Collada gol"
 
 [messages.model-error-no-loader]
 source = "No browser loader for .{ $ext }"

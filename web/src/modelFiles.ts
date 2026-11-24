@@ -77,12 +77,6 @@ export async function loadModel(url: string, ext: string, manager: THREE.Loading
       }
       throw new Error(t('model-error-converting'))
     }
-    case 'dae': {
-      const { ColladaLoader } = await import('three/addons/loaders/ColladaLoader.js')
-      const c = await new ColladaLoader(manager).loadAsync(url)
-      if (!c) throw new Error(t('model-error-empty-collada'))
-      return { object: c.scene, animations: c.scene.animations ?? [] }
-    }
     default:
       throw new Error(t('model-error-no-loader', { ext }))
   }
@@ -90,10 +84,8 @@ export async function loadModel(url: string, ext: string, manager: THREE.Loading
 
 /** Every model is shown from the GLB the server makes of it (`view_glb` in hoardd's meshes.rs): polysmelt reads the
  *  file, decodes any compression and re-encodes the textures as JPEG or PNG, so the browser reads nothing but plain
- *  GLB. A model only Blender reads comes from Blender's GLB of it; a Collada file Blender hasn't converted (it isn't
- *  set up) is read by three.js's own loader. */
-export function sourceFor(a: Asset | AssetLink, packId: string, derivatives: string[] = []): { url: string; ext: string } {
-  if (extOf(a.path) === 'dae' && !derivatives.includes('glb')) return { url: packFileUrl(packId, a.path), ext: 'dae' }
+ *  GLB. A model only Blender reads comes from Blender's GLB of it. */
+export function sourceFor(a: Pick<Asset | AssetLink, 'id'>): { url: string; ext: string } {
   return { url: `/api/assets/${a.id}/as/view?download=0&wait=30`, ext: 'server-glb' }
 }
 

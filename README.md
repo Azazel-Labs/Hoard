@@ -31,8 +31,8 @@ your own computer, and it's yours. Think of it as an asset store with no checkou
 
 ### See everything before you use it
 
-Models open in 3D with their textures, materials and animations. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL and
-voxels are read by Hoard itself, with no 3D app installed; Blender files come in through headless Blender, and
+Models open in 3D with their textures, materials and animations. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM,
+3MF, STL and voxels are read by Hoard itself, with no 3D app installed; Blender files come in through headless Blender, and
 Unreal packages show what the editor saved about them, without Unreal. Thumbnails are drawn on the server, framed
 the same way every time, so a whole pack can be skimmed at a glance.
 
@@ -427,8 +427,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      become the asset's name, and embedded descriptions show as "From the file".
    - Models: glTF/GLB mesh, material, animation and skin counts, vertex/triangle counts; OBJ counts; FBX version
      plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY, 3DS and
-     MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors, and STL is stood up from the Z up
-     of 3D printing). Thumbnails are drawn the way the 3D viewer shows the model: textures from the file, an OBJ's
+     MagicaVoxel `.vox`, Collada, X3D, VRML, OFF, VRM and Gaussian splats, which Hoard reads itself (voxels keep their
+     palette colors, and STL is stood up from the Z up of 3D printing). Thumbnails are drawn the way the 3D viewer shows the model: textures from the file, an OBJ's
      MTL, or found in the pack by name; tone mapping; cut-outs and see-through surfaces, glass included (glTF's
      transmission, where the metal parts of the same material stay solid); framed tightly from the same angle every
      time. glTF and GLB compressed with meshopt
@@ -454,6 +454,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      left out), colors and textures, read natively by polysmelt's port of the MIT-licensed
      [openskp](https://github.com/iamahsanmehmood/openskp) reader, since SketchUp's SDK has no Linux build. Edges without a face, guides, text and dimensions aren't drawn. The thumbnail, the 3D viewer and
      "download as GLB" all use the GLB Hoard makes from it, in meters with Y up.
+   - Collada (`.dae`, and zipped as `.zae`), X3D and VRML (`.x3d`, `.x3dv`, `.wrl` and their gzipped `.x3dz`, `.wrz`),
+     OFF, VRM avatars, and Gaussian splats (`.splat`, `.spz`, drawn as their points): read natively, with their
+     materials, textures, skeletons and clips where the format has them. A Collada file's textures are fetched with
+     it when it's added from a URL. BVH motion capture and VRM animations (`.vrma`) are clips, played on a character
+     they fit. Collada and X3D files Blender converted before keep the GLB it made.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
    - Source files:
      - `.blend`: Blender version, compression, and the preview Blender embeds in the file (read directly, gzip
@@ -579,8 +584,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - **Descriptions.** Each kind is kept apart: a person's own (written in the asset panel or over MCP), the AI's,
      the file's embedded one and the pack's store page. Search covers all of them, and re-running the AI updates
      its description without touching yours.
-7. **Convert (optional).** With Blender switched on (in Settings), the model formats Hoard can't read itself (.blend,
-   Collada, Alembic and X3D) are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
+7. **Convert (optional).** With Blender switched on (in Settings), the model formats Hoard can't read itself (.blend
+   and Alembic) are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads. A file Blender can't convert is listed in Issues with the Blender
    version and the step that failed (opening, importing or exporting) in Blender's own words.
 
@@ -704,10 +709,10 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF, VGM, FSB, FMOD and Wwise banks, WEM | the same audio formats, rendered |
 | glTF, GLB | GLB + textures (zipped) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD, SketchUp | GLB + textures (zipped) |
+| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD, SketchUp, Collada, X3D, VRML, OFF, VRM | GLB + textures (zipped) |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
-| .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB + textures (zipped) |
+| .blend and Alembic, once Blender converted them (Settings → Blender) | GLB + textures (zipped) |
 
 A GLB download keeps its textures out of the GLB: the zip holds `<name>.glb` and a `textures` folder it points at.
 A texture Hoard knows as a map is named by the convention in Settings → Downloads, and any other keeps the name of the
@@ -924,7 +929,7 @@ tools, but some Epic-made content is licensed for Unreal Engine only.
 
 ## Conversion rules
 
-Conversion rules make a library all alike: every OBJ, FBX, 3DS, USD, STL, PLY, SketchUp, glTF, Collada or Blender
+Conversion rules make a library all alike: every OBJ, FBX, 3DS, USD, STL, PLY, SketchUp, glTF, Collada, X3D or Blender
 file converted to GLB, say, and turned upright (Y up, facing +Z) on the way. Set them in Settings → Adding packs → Conversion rules
 (admins only, none by default). Each rule names the formats it converts and what to; a format can be in one rule.
 
@@ -937,7 +942,7 @@ files beside it in the pack, so they're stored once. An OBJ's `.mtl` and a glTF'
 Rules apply to packs added from then on, after analysis. When saving rules that match files already in the
 library, Settings says how many files in how many packs they'd convert, lists them, says what's left alone and why,
 and converts them only on "Save and convert". "Convert files already in the library" asks the same at any time.
-Formats only Blender reads (`.blend`, `.dae`, `.abc`, `.x3d`) wait for Blender's conversion (Settings → Tools).
+Formats only Blender reads (`.blend`, `.abc`) wait for Blender's conversion (Settings → Tools).
 
 The original is kept for 30 days (1 to 365 in Settings). Until then a converted asset's page shows where it came
 from, offers the original for download, and can put it back, after which rules leave that file alone. A file a rule
@@ -1639,8 +1644,8 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 
 | | |
 |---|---|
-| File types recognized | 158 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, DragonBones, Spine (JSON), TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, FMOD banks (FSB, .bank), Wwise WEM and BNK, SFZ, SF2 |
+| File types recognized | 168 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Collada, X3D, VRML, OFF, VRM, BVH, Gaussian splats, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, DragonBones, Spine (JSON), TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, FMOD banks (FSB, .bank), Wwise WEM and BNK, SFZ, SF2 |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

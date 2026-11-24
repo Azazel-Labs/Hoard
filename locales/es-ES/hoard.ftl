@@ -2147,7 +2147,6 @@ model-show-failed = No se ha podido mostrar este modelo: { $error }
 model-preview-failed = No se ha podido previsualizar este modelo: { $error }
 model-error-converting = el servidor todavía está convirtiendo este modelo
 model-error-converting-desktop = Hoard todavía está convirtiendo este modelo
-model-error-empty-collada = archivo Collada vacío
 model-error-no-loader = El navegador no tiene cargador para .{ $ext }
 model-dialog = Ver { $name } en 3D
 model-title-stats =

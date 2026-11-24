@@ -1158,4 +1158,16 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
                          thumb_px = (SELECT px FROM thumb_now), thumb_q = (SELECT q FROM thumb_now)
         WHERE id = new.id;
      END;",
+    // 106: Collada, X3D, VRML, OFF, VRM and Gaussian splats are read by Hoard itself now. Those not converted by
+    // Blender before are analyzed again in the background, for their thumbnails, sizes and kinds (a `.vrm` was data,
+    // and is a model now).
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', a.pack_id, json_object('assets', json_group_array(a.id), 'then_llm', json('false')),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM assets a JOIN packs p ON p.id = a.pack_id
+       WHERE p.status = 'ready' AND p.archived_at IS NULL AND a.archived_at IS NULL
+         AND a.ext IN ('dae', 'zae', 'x3d', 'x3dv', 'x3dz', 'wrl', 'wrz', 'off', 'vrm', 'vrma', 'splat', 'spz')
+         AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'glb')
+       GROUP BY a.pack_id;",
 ];

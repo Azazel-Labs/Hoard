@@ -29,7 +29,7 @@ bediener, of 'n toep op jou eie rekenaar, en dit is joune. Dink daaraan as 'n ba
 
 ### Sien alles voordat jy dit gebruik
 
-Modelle maak in 3D oop met hul teksture, materiale en animasies. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL en voxels word
+Modelle maak in 3D oop met hul teksture, materiale en animasies. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL en voxels word
 deur Hoard self gelees, sonder dat enige 3D-toepassing geïnstalleer hoef te wees; Blender-lêers kom deur 'n koplose
 Blender in, en Unreal-pakke wys wat die redigeerder oor hulle gestoor het, sonder Unreal. Duimnaelskete word op die
 bediener geteken, elke keer op dieselfde manier geraam, sodat jy 'n hele pak in een oogopslag kan deurblaai.

@@ -88,8 +88,9 @@ oxideav-nsf = { version = "0.0.5", default-features = false }
 ymfm-sys = "0.2"
 ww2ogg = "0.1"
 lewton = "0.10"
-# Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, and glTF with Draco) read natively for thumbnails and GLB copies.
-polysmelt = "0.13.2"
+# Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, Collada, X3D, VRML, VRM, splats, and glTF with Draco) read
+# natively for thumbnails and GLB copies.
+polysmelt = "0.14.0"
 # Where a clip's bones stand, to put its moves in the units of the character it's drawn on.
 glam = "0.34"
 ddsfile = "0.6"

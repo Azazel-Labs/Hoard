@@ -31,7 +31,7 @@ tai sovellus omalla tietokoneellasi, ja se on sinun. Ajattele sitä resurssikaup
 ### Näe kaikki ennen kuin käytät sitä
 
 Mallit avautuvat 3D:nä tekstuureineen, materiaaleineen ja animaatioineen. Hoard lukee itse FBX-, glTF-, OBJ-, USD-,
-SketchUp-, 3MF- ja STL-tiedostot sekä vokselit ilman asennettua 3D-ohjelmaa; Blender-tiedostot tuodaan ilman
+SketchUp-, Collada-, X3D-, VRM-, 3MF- ja STL-tiedostot sekä vokselit ilman asennettua 3D-ohjelmaa; Blender-tiedostot tuodaan ilman
 käyttöliittymää ajettavan Blenderin kautta, ja Unreal-paketeista näkyy, mitä editori on tallentanut niistä, ilman
 Unrealia. Pikkukuvat piirretään palvelimella ja rajataan joka kerta samalla tavalla, joten koko paketin voi silmäillä
 yhdellä vilkaisulla.

@@ -30,7 +30,7 @@ sau o aplicație pe propriul calculator și e a dvs. Gândiți-vă la el ca la u
 
 ### Vedeți totul înainte de a-l folosi
 
-Modelele se deschid în 3D cu texturile, materialele și animațiile lor. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL și
+Modelele se deschid în 3D cu texturile, materialele și animațiile lor. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL și
 voxelii sunt citiți chiar de Hoard, fără nicio aplicație 3D instalată; fișierele Blender intră prin Blender rulat
 headless, iar pachetele Unreal arată ce a salvat editorul despre ele, fără Unreal. Miniaturile sunt desenate pe server,
 încadrate de fiecare dată la fel, așa că un pachet întreg poate fi parcurs dintr-o privire.

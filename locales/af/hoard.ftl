@@ -2104,7 +2104,6 @@ model-show-failed = Kon nie hierdie model wys nie: { $error }
 model-preview-failed = Kon nie 'n voorskou van hierdie model wys nie: { $error }
 model-error-converting = die bediener skakel hierdie model nog om
 model-error-converting-desktop = Hoard skakel hierdie model nog om
-model-error-empty-collada = leë Collada-lêer
 model-error-no-loader = Geen blaaierlaaier vir .{ $ext } nie
 model-dialog = Bekyk { $name } in 3D
 model-title-stats =

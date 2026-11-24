@@ -31,7 +31,7 @@ không có quầy thanh toán.
 
 ### Xem mọi thứ trước khi dùng
 
-Mô hình mở ra trong 3D cùng texture, vật liệu và hoạt ảnh của chúng. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL và voxel
+Mô hình mở ra trong 3D cùng texture, vật liệu và hoạt ảnh của chúng. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL và voxel
 được chính Hoard đọc, không cần cài ứng dụng 3D nào; tệp Blender đi qua Blender chạy headless (không giao diện), còn gói
 Unreal hiển thị những gì trình biên tập đã lưu về chúng, mà không cần Unreal. Ảnh thu nhỏ được vẽ trên máy chủ, đóng
 khung giống nhau mọi lần, nên có thể lướt qua cả một gói chỉ trong nháy mắt.

@@ -1983,7 +1983,6 @@ model-show-failed = Nem sikerült megjeleníteni ezt a modellt: { $error }
 model-preview-failed = Nem sikerült előnézetet készíteni ehhez a modellhez: { $error }
 model-error-converting = a szerver még átalakítja ezt a modellt
 model-error-converting-desktop = A Hoard még átalakítja ezt a modellt
-model-error-empty-collada = üres Collada-fájl
 model-error-no-loader = Nincs böngészős betöltő ehhez: .{ $ext }
 model-dialog = 3D-megtekintés: { $name }
 model-title-stats = { $triangles } háromszög · { $meshes } háló · { $materials } anyag

@@ -118,7 +118,7 @@ export class ModelStage {
   private mixer: THREE.AnimationMixer | null = null
   private clips = new Map<string, THREE.AnimationClip>()
   /** Animations that fit the character, by clip name, not loaded until picked. */
-  private fitting = new Map<string, { link: AssetLink; pack: string }>()
+  private fitting = new Map<string, AssetLink>()
   /** The clip last asked for, so one that finishes loading after another is picked doesn't play. */
   private wanted = ''
   private action: THREE.AnimationAction | null = null
@@ -155,8 +155,6 @@ export class ModelStage {
   private counts = { triangles: 0, vertices: 0 }
   private size = new THREE.Vector3()
   private meters = false
-  /** Image top at v = 1 (OBJ, FBX), as three's textures assume; glTF has it at v = 0. */
-  private flipY = true
   playing = true
   private missing: string[] = []
   private stopMaps: (() => void) | null = null
@@ -230,8 +228,8 @@ export class ModelStage {
     controls.addEventListener('change', () => this.redraw(100))
     this.controls = controls
 
-    // Every file a loader asks for passes through here (the server's GLBs carry their textures; a Collada file read
-    // here names its own): textures are matched to the pack's files by name, as they often carry the artist's absolute
+    // Every file a loader asks for passes through here (the server's GLBs carry their textures, so it's a fallback):
+    // textures are matched to the pack's files by name, as they often carry the artist's absolute
     // path, or point at a PSD where the pack ships a PNG.
     let { named, guesses, full } = await textureLinks(asset)
     // An animation plays on a character it fits: the character is what's drawn, and only the animation's clips play.
@@ -265,9 +263,8 @@ export class ModelStage {
               clip: `fit:${f.id}`,
               name: f.pack_id === full.pack_id ? f.name : `${f.name} · ${f.pack_name}`,
               link: { id: f.id, name: f.name, path: f.path, kind: f.kind, rel: 'animation', has_thumb: f.has_thumb } as AssetLink,
-              pack: f.pack_id,
             }))
-    for (const f of fitting) this.fitting.set(f.clip, { link: f.link, pack: f.pack })
+    for (const f of fitting) this.fitting.set(f.clip, f.link)
     const wearer = wearers.find((w) => w.id === opts.on) ?? wearers[0]
     const body = wearer && (wearer.id === source?.id ? source : await api.asset(wearer.id).catch(() => null))
     if (this.disposed) throw new Error('closed')
@@ -335,7 +332,7 @@ export class ModelStage {
       this.checkSettled()
     }
 
-    const src = sourceFor(full, full.pack_id, full.derivatives)
+    const src = sourceFor(full)
     const { object, animations, missing } = await loadModel(src.url, src.ext, manager)
     if (this.disposed) {
       disposeObject(object)
@@ -375,7 +372,6 @@ export class ModelStage {
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
-    this.flipY = src.ext === 'dae'
     const onMaps = () => {
       // A view built from the maps that were there shows the new ones only once built again.
       if (this.views) this.buildViews()
@@ -413,17 +409,17 @@ export class ModelStage {
           if (tint) lit.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
         }
         if (!info.maps.length) continue
-        const applied = applyToModel(info, full.pack_id, this.flipY, wear, onMaps, track)
+        const applied = applyToModel(info, full.pack_id, false, wear, onMaps, track)
         stops.push(applied.stop)
         guessed = Math.max(guessed, applied.count)
       }
       this.stopMaps = () => stops.forEach((stop) => stop())
     } else if (material) {
-      const applied = applyToModel(material, full.pack_id, this.flipY, this.materials, onMaps, track)
+      const applied = applyToModel(material, full.pack_id, false, this.materials, onMaps, track)
       this.stopMaps = applied.stop
       guessed = applied.count
     } else if (!textured.any && guesses.length && !this.colored()) {
-      guessed = this.applyGuesses(guesses, full.pack_id, this.flipY, manager)
+      guessed = this.applyGuesses(guesses, full.pack_id, false, manager)
     }
 
     for (const name of missing ?? []) if (!this.missing.includes(name)) this.missing.push(name)
@@ -447,7 +443,7 @@ export class ModelStage {
     clipManager.setURLModifier((url) => (IMAGE_EXTS.has(extOf(url.split(/[?#]/)[0])) ? BLANK_PNG : url))
     for (const link of clipLinks) {
       try {
-        const s = sourceFor(link, full.pack_id)
+        const s = sourceFor(link)
         const loaded = await loadModel(s.url, s.ext, clipManager)
         const label = link.path.split('/').pop()!.replace(/\.[^.]+$/, '').split('@').pop()!
         // A pose saved beside the clip (Blender's "Targeting Pose") isn't one to play.
@@ -829,7 +825,7 @@ export class ModelStage {
     t.colorSpace = THREE.SRGBColorSpace
     t.wrapS = t.wrapT = THREE.RepeatWrapping
     t.anisotropy = 8
-    t.flipY = this.flipY
+    t.flipY = false
     this.checker = t
     return t
   }
@@ -1003,11 +999,11 @@ export class ModelStage {
 
   /** Load an animation that fits as a clip: its longest take, as a pose saved beside it isn't one to play. */
   private async loadFit(name: string) {
-    const { link, pack } = this.fitting.get(name)!
+    const link = this.fitting.get(name)!
     const manager = new THREE.LoadingManager()
     manager.setURLModifier((url) => (IMAGE_EXTS.has(extOf(url.split(/[?#]/)[0])) ? BLANK_PNG : url))
     try {
-      const s = sourceFor(link, pack)
+      const s = sourceFor(link)
       const loaded = await loadModel(s.url, s.ext, manager)
       disposeObject(loaded.object)
       const longest = loaded.animations.reduce<THREE.AnimationClip | null>((a, c) => (!a || c.duration > a.duration ? c : a), null)

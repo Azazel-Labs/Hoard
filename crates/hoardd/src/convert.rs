@@ -1,7 +1,7 @@
 //! Optional conversion of authoring formats to GLB with headless Blender.
 //!
-//! Hoard reads most model formats itself (polysmelt, see `meshes`), but not .blend, Collada, Alembic or X3D, which
-//! Blender imports and exports with its glTF exporter. So for those formats Hoard materializes the asset plus its linked files
+//! Hoard reads most model formats itself (polysmelt, see `meshes`), but not .blend or Alembic, which Blender imports
+//! and exports with its glTF exporter. So for those formats Hoard materializes the asset plus its linked files
 //! (so textures resolve) in a temp folder, runs `blender -b` with a tiny export script, and stores the GLB
 //! as a *derivative* of the original. The derivative feeds the thumbnail renderer and the browser preview,
 //! and is downloadable for engines that want glTF. The original is never touched.
@@ -15,7 +15,8 @@ use crate::{AppState, analyze, db, issues, jobs};
 
 /// Extensions worth sending through Blender: the model formats Hoard can't read itself. FBX isn't one: Blender's
 /// importer turns a texture with an alpha channel into a see-through material even when the FBX says not to use it.
-pub(crate) const CONVERTIBLE: &[&str] = &["blend", "dae", "abc", "x3d"];
+/// Collada and X3D aren't either, since polysmelt reads them; those Blender converted before keep their GLB.
+pub(crate) const CONVERTIBLE: &[&str] = &["blend", "abc"];
 const TIMEOUT: Duration = Duration::from_secs(180);
 
 /// Blender-side script: import by extension, export everything as one GLB. A step that fails says why on one
@@ -51,9 +52,7 @@ if ext == "blend":
 else:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     importers = {
-        "dae": lambda: bpy.ops.wm.collada_import(filepath=src),
         "abc": lambda: bpy.ops.wm.alembic_import(filepath=src),
-        "x3d": lambda: bpy.ops.import_scene.x3d(filepath=src),
     }
     run("couldn't import it", importers[ext])
 run("couldn't export a GLB",

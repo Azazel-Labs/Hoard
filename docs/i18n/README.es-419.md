@@ -31,7 +31,7 @@ o una aplicación en tu propia computadora, y es tuya. Piénsalo como una tienda
 ### Míralo todo antes de usarlo
 
 Los modelos se abren en 3D con sus texturas, materiales y animaciones. Hoard lee por sí mismo FBX, glTF, OBJ, USD,
-SketchUp, 3MF, STL y vóxeles, sin ninguna aplicación 3D instalada; los archivos de Blender entran mediante un Blender
+SketchUp, Collada, X3D, VRM, 3MF, STL y vóxeles, sin ninguna aplicación 3D instalada; los archivos de Blender entran mediante un Blender
 sin interfaz, y los paquetes de Unreal muestran lo que el editor guardó sobre ellos, sin Unreal. Las miniaturas se
 dibujan en el servidor, encuadradas siempre de la misma manera, para que puedas recorrer un paquete entero de un
 vistazo.

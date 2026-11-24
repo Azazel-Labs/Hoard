@@ -2154,7 +2154,6 @@ model-show-failed = Δεν ήταν δυνατή η εμφάνιση αυτού 
 model-preview-failed = Δεν ήταν δυνατή η προεπισκόπηση αυτού του μοντέλου: { $error }
 model-error-converting = ο διακομιστής μετατρέπει ακόμη αυτό το μοντέλο
 model-error-converting-desktop = το Hoard μετατρέπει ακόμη αυτό το μοντέλο
-model-error-empty-collada = κενό αρχείο Collada
 model-error-no-loader = Δεν υπάρχει φορτωτής προγράμματος περιήγησης για .{ $ext }
 model-dialog = Προβολή του { $name } σε 3D
 model-title-stats =

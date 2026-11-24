@@ -30,7 +30,7 @@ vagy egy alkalmazás a saját számítógépén, és az az Öné. Olyan, mint eg
 
 ### Lásson mindent, mielőtt használja
 
-A modellek 3D-ben nyílnak meg a textúráikkal, anyagaikkal és animációikkal. Az FBX, glTF, OBJ, USD, SketchUp, 3MF és STL
+A modellek 3D-ben nyílnak meg a textúráikkal, anyagaikkal és animációikkal. Az FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF és STL
 fájlokat, valamint a voxeleket maga a Hoard olvassa be, telepített 3D-alkalmazás nélkül; a Blender-fájlok felület nélkül
 futó Blenderen keresztül érkeznek, az Unreal-csomagoknál pedig látszik, mit mentett róluk a szerkesztő, Unreal nélkül. A
 bélyegképeket a szerver rajzolja, mindig ugyanúgy keretezve, így egy teljes csomagot egy pillantással át lehet futni.

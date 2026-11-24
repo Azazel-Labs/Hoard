@@ -2158,7 +2158,6 @@ model-show-failed = Mallia ei voitu näyttää: { $error }
 model-preview-failed = Mallia ei voitu esikatsella: { $error }
 model-error-converting = palvelin muuntaa tätä mallia vielä
 model-error-converting-desktop = Hoard muuntaa tätä mallia vielä
-model-error-empty-collada = tyhjä Collada-tiedosto
 model-error-no-loader = .{ $ext }-tiedostoille ei ole selaimen lataajaa
 model-dialog = Näytä { $name } 3D:nä
 model-title-stats =

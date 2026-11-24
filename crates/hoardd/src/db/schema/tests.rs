@@ -866,3 +866,31 @@ fn search_rows_get_their_packs_words() {
     conn.execute("DELETE FROM assets WHERE id = 'ue'", []).unwrap();
     assert_eq!(words(&conn), w("robot", "Mech Kit", "style hard surface"));
 }
+
+/// Collada and the other formats Hoard reads itself now are analyzed again in the background, apart from those
+/// Blender converted before, which keep their GLB.
+#[test]
+fn models_hoard_reads_now_are_analyzed_again() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let step = MIGRATIONS.iter().position(|m| m.contains("'vrma', 'splat', 'spz'")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..step]).unwrap();
+    conn.execute_batch(
+        "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+           ('ship', 'p1', 'h', 'ship.dae', 'ship', 'dae', 'model', 'x', 'x'),
+           ('converted', 'p1', 'h', 'old.dae', 'old', 'dae', 'model', 'x', 'x'),
+           ('avatar', 'p1', 'h', 'avatar.vrm', 'avatar', 'vrm', 'data', 'x', 'x'),
+           ('rock', 'p1', 'h', 'rock.fbx', 'rock', 'fbx', 'model', 'x', 'x');
+         INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES ('converted', 'glb', 'h', 'x');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+    let payload: String =
+        conn.query_row("SELECT payload FROM jobs WHERE kind = 'retag' AND pack_id = 'p1'", [], |r| r.get(0)).unwrap();
+    let payload: serde_json::Value = serde_json::from_str(&payload).unwrap();
+    let mut assets: Vec<&str> = payload["assets"].as_array().unwrap().iter().filter_map(|a| a.as_str()).collect();
+    assets.sort_unstable();
+    assert_eq!(assets, ["avatar", "ship"]);
+    assert_eq!(payload["then_llm"], serde_json::json!(false));
+}

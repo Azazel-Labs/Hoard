@@ -34,7 +34,7 @@ const SAMPLE: usize = 200;
 
 /// The libraries that make what rules convert to, as `asset_origin.converter` names them. Keep in step with
 /// Cargo.lock (a test checks).
-const POLYSMELT: &str = "polysmelt 0.13.2";
+const POLYSMELT: &str = "polysmelt 0.14.0";
 const FLACENC: &str = "flacenc 0.5.1";
 
 /// The formats rules convert to.
@@ -45,7 +45,6 @@ pub(crate) fn sources(to: &str) -> Vec<&'static str> {
     match to {
         "glb" => polysmelt::formats::EXTENSIONS
             .iter()
-            .chain(&["skp"])
             .chain(crate::convert::CONVERTIBLE)
             .copied()
             .filter(|e| *e != "glb")

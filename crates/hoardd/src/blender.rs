@@ -6,8 +6,8 @@
 //! against the SHA-256 list Blender publishes, read from a different mirror than the build came from. A path uses
 //! that Blender as it is.
 //!
-//! 4.5 LTS rather than the newest release: Blender 5 dropped the Collada (.dae) importer, and the LTS series gets
-//! fixes until 2027.
+//! 4.5 LTS rather than the newest release: the LTS series gets fixes until 2027. (It was also the last with a Collada
+//! importer, which Hoard no longer needs: it reads Collada itself.)
 
 use std::io::{BufReader, Read, Write};
 use std::path::{Component, Path, PathBuf};

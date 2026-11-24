@@ -1906,7 +1906,6 @@ model-show-failed = แสดงโมเดลนี้ไม่ได้: { $e
 model-preview-failed = แสดงตัวอย่างโมเดลนี้ไม่ได้: { $error }
 model-error-converting = เซิร์ฟเวอร์ยังแปลงโมเดลนี้อยู่
 model-error-converting-desktop = Hoard ยังแปลงโมเดลนี้อยู่
-model-error-empty-collada = ไฟล์ Collada ว่างเปล่า
 model-error-no-loader = เบราว์เซอร์ไม่มีตัวโหลดสำหรับ .{ $ext }
 model-dialog = ดู { $name } แบบ 3 มิติ
 model-title-stats = { $triangles } สามเหลี่ยม · { $meshes } เมช · { $materials } แมทีเรียล

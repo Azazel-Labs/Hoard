@@ -105,19 +105,21 @@ pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Op
     thumb_bytes(&drawn, false).map(Some)
 }
 
-/// STL, PLY and `MagicaVoxel`: facts, and a thumbnail rendered from a GLB made on the spot.
+/// A model polysmelt reads other than glTF, OBJ and FBX (STL, Collada, VRM, BVH, splats…): its facts, skeleton and
+/// clips, and a thumbnail rendered from a GLB made on the spot when it draws anything.
 pub(super) fn analyze_mesh(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (mesh, facts) = crate::meshes::load(path, ext, root)?;
-    a.meta.extend(facts);
-    let Some(mesh) = mesh else { return Ok(()) };
+    let model = crate::meshes::load_rigged(path, ext, root)?;
+    a.meta.extend(model.facts);
+    a.rig = model.rig;
+    let Some(mesh) = model.mesh else { return Ok(()) };
     render_mesh(&mesh, path, ext, a)
 }
 
 /// Thumbnail for a model Hoard converts itself (OBJ, FBX), keeping the facts the stats pass found.
 pub(super) fn mesh_thumb(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (mesh, rig) = crate::meshes::load_rigged(path, ext, root)?;
-    a.rig = rig;
-    match mesh {
+    let model = crate::meshes::load_rigged(path, ext, root)?;
+    a.rig = model.rig;
+    match model.mesh {
         Some(m) => render_mesh(&m, path, ext, a),
         None => Ok(()),
     }
@@ -313,7 +315,12 @@ mod tests {
                 p.indices.extend_from_slice(&[i, i + 9, i + 1, i + 1, i + 9, i + 10]);
             }
         }
-        let mesh = Mesh { prims: vec![p], materials: vec![Material::plain("Grey", [0.5; 4])], images: Vec::new() };
+        let mesh = Mesh {
+            prims: vec![p],
+            materials: vec![Material::plain("Grey", [0.5; 4])],
+            images: Vec::new(),
+            skeleton: Vec::new(),
+        };
         let packed = polysmelt::gltf::compress(&polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("grid.glb");
@@ -332,5 +339,34 @@ mod tests {
         let plain = dir.path().join("plain.glb");
         std::fs::write(&plain, polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
         assert_eq!(drawable(&plain).unwrap().path, plain);
+    }
+    /// A Collada file is read by Hoard itself: counted, drawn for its thumbnail, and offered as a GLB.
+    #[test]
+    fn collada_is_counted_and_drawn() {
+        let dae = r##"<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><unit name="meter" meter="1"/><up_axis>Y_UP</up_axis></asset>
+  <library_geometries>
+    <geometry id="tri" name="Tri"><mesh>
+      <source id="tri-pos"><float_array id="tri-pos-a" count="9">0 0 0 1 0 0 0 1 0</float_array>
+        <technique_common><accessor source="#tri-pos-a" count="3" stride="3">
+          <param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/>
+        </accessor></technique_common></source>
+      <vertices id="tri-v"><input semantic="POSITION" source="#tri-pos"/></vertices>
+      <triangles count="1"><input semantic="VERTEX" source="#tri-v" offset="0"/><p>0 1 2</p></triangles>
+    </mesh></geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="s"><node id="n"><instance_geometry url="#tri"/></node></visual_scene>
+  </library_visual_scenes>
+  <scene><instance_visual_scene url="#s"/></scene>
+</COLLADA>"##;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("tri.dae");
+        std::fs::write(&path, dae).unwrap();
+        let a = crate::analyze::analyze(&path, dir.path(), hoard_core::AssetKind::Model, "dae");
+        assert_eq!(a.meta["triangles"], json!(1), "{:?}", a.meta);
+        assert!(a.thumb.is_some(), "no thumbnail");
+        let options = crate::formats::options("dae", &[]);
+        assert!(options.iter().any(|o| o.format == "glb"));
     }
 }

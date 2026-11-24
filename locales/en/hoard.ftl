@@ -2346,7 +2346,6 @@ model-show-failed = Couldn't show this model: { $error }
 model-preview-failed = Couldn't preview this model: { $error }
 model-error-converting = the server is still converting this model
 model-error-converting-desktop = Hoard is still converting this model
-model-error-empty-collada = empty Collada file
 # $ext is a file extension, like "max".
 model-error-no-loader = No browser loader for .{ $ext }
 # The full-screen viewer's dialog name.

@@ -30,7 +30,7 @@ atau sebuah aplikasi di komputer Anda sendiri, dan itu milik Anda. Anggap saja t
 
 ### Lihat semuanya sebelum Anda memakainya
 
-Model terbuka dalam 3D dengan tekstur, material, dan animasinya. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL, dan voxel
+Model terbuka dalam 3D dengan tekstur, material, dan animasinya. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL, dan voxel
 dibaca oleh Hoard sendiri, tanpa aplikasi 3D yang terpasang; berkas Blender masuk melalui Blender headless (tanpa
 antarmuka), dan paket Unreal menampilkan apa yang disimpan editor tentangnya, tanpa Unreal. Thumbnail digambar di
 server, dibingkai dengan cara yang sama setiap kali, sehingga seluruh paket bisa ditelusuri sekilas.

@@ -1882,7 +1882,6 @@ model-show-failed = 이 모델을 표시하지 못했습니다: { $error }
 model-preview-failed = 이 모델을 미리 보지 못했습니다: { $error }
 model-error-converting = 서버에서 아직 이 모델을 변환하는 중입니다
 model-error-converting-desktop = Hoard가 아직 이 모델을 변환하는 중입니다
-model-error-empty-collada = 빈 Collada 파일입니다
 model-error-no-loader = .{ $ext }용 브라우저 로더가 없습니다
 model-dialog = { $name } 3D로 보기
 model-title-stats = 삼각형 { $triangles }개 · 메시 { $meshes }개 · 머티리얼 { $materials }개

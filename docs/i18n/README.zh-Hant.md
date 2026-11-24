@@ -25,7 +25,7 @@ Hoard 是一套自行架設的遊戲素材庫。放入一個 zip、一個 Unity 
 
 ### 使用之前，先看個清楚
 
-模型會連同貼圖、材質與動畫一起在 3D 中開啟。FBX、glTF、OBJ、USD、SketchUp、3MF、STL 與體素由 Hoard 自行讀取，不需安裝任何 3D 應用程式；Blender 檔案透過無介面（headless）的 Blender 匯入，Unreal 套件則不需要 Unreal，就能顯示編輯器為它們儲存的資訊。縮圖在伺服器上繪製，每次都以相同方式取景，整個素材包一眼就能瀏覽完畢。
+模型會連同貼圖、材質與動畫一起在 3D 中開啟。FBX、glTF、OBJ、USD、SketchUp、Collada、X3D、VRM、3MF、STL 與體素由 Hoard 自行讀取，不需安裝任何 3D 應用程式；Blender 檔案透過無介面（headless）的 Blender 匯入，Unreal 套件則不需要 Unreal，就能顯示編輯器為它們儲存的資訊。縮圖在伺服器上繪製，每次都以相同方式取景，整個素材包一眼就能瀏覽完畢。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">

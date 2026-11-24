@@ -2104,7 +2104,6 @@ model-show-failed = Kon dit model niet tonen: { $error }
 model-preview-failed = Kon geen voorbeeld van dit model tonen: { $error }
 model-error-converting = de server is dit model nog aan het converteren
 model-error-converting-desktop = Hoard is dit model nog aan het converteren
-model-error-empty-collada = leeg Collada-bestand
 model-error-no-loader = Geen browserloader voor .{ $ext }
 model-dialog = { $name } in 3D bekijken
 model-title-stats =

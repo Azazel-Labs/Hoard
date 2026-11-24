@@ -95,11 +95,14 @@ impl AssetKind {
             "wav" | "ogg" | "oga" | "mp3" | "flac" | "aif" | "aiff" | "aifc" | "opus" | "m4a" | "aac" | "wma"
             | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "mptm" | "umx" | "nsf" | "nsfe" | "vgm" | "vgz" | "fsb" | "bank" | "wem" | "bnk" | "als"
             | "flp" | "rpp" | "ptx" | "logicx" | "cpr" | "song" | "aup3" | "sfz" | "sf2" => AssetKind::Audio,
-            // Models, including DCC scenes (Blender, Max, Maya, ZBrush, Cinema 4D, Houdini, Modo, SketchUp).
-            "fbx" | "obj" | "gltf" | "glb" | "dae" | "blend" | "3ds" | "stl" | "ply" | "usd" | "usda" | "usdc"
-            | "usdz" | "vox" | "max" | "ma" | "mb" | "ztl" | "zpr" | "c4d" | "hip" | "hiplc" | "hipnc" | "lxo"
-            | "skp" | "abc" | "x3d" | "3mf" => AssetKind::Model,
-            "anim" | "bvh" => AssetKind::Animation,
+            // Models, including DCC scenes (Blender, Max, Maya, ZBrush, Cinema 4D, Houdini, Modo, SketchUp), Collada
+            // (zipped as `.zae` too), X3D and VRML (and their gzipped forms), OFF, VRM avatars and Gaussian splats.
+            "fbx" | "obj" | "gltf" | "glb" | "dae" | "zae" | "blend" | "3ds" | "stl" | "ply" | "usd" | "usda"
+            | "usdc" | "usdz" | "vox" | "max" | "ma" | "mb" | "ztl" | "zpr" | "c4d" | "hip" | "hiplc" | "hipnc"
+            | "lxo" | "skp" | "abc" | "x3d" | "x3dv" | "x3dz" | "wrl" | "wrz" | "off" | "vrm" | "splat" | "spz"
+            | "3mf" => AssetKind::Model,
+            // Clips: Unity's, BVH motion capture and VRM animations.
+            "anim" | "bvh" | "vrma" => AssetKind::Animation,
             "ttf" | "otf" | "ttc" | "otc" | "woff" | "woff2" | "fnt" => AssetKind::Font,
             "glsl" | "hlsl" | "wgsl" | "shader" | "vert" | "frag" | "comp" | "gdshader" | "usf" | "ush" | "metal"
             | "cginc" | "shadergraph" | "shadersubgraph" => AssetKind::Shader,

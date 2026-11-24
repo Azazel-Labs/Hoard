@@ -1906,7 +1906,6 @@ model-show-failed = このモデルを表示できませんでした: { $error }
 model-preview-failed = このモデルをプレビューできませんでした: { $error }
 model-error-converting = サーバーがまだこのモデルを変換中です
 model-error-converting-desktop = Hoard がまだこのモデルを変換中です
-model-error-empty-collada = 空の Collada ファイルです
 model-error-no-loader = .{ $ext } を読み込めるブラウザー用ローダーがありません
 model-dialog = { $name } を 3D で表示
 model-title-stats = { $triangles } 三角形 · { $meshes } メッシュ · { $materials } マテリアル

@@ -2110,7 +2110,6 @@ model-show-failed = No s'ha pogut mostrar aquest model: { $error }
 model-preview-failed = No s'ha pogut previsualitzar aquest model: { $error }
 model-error-converting = el servidor encara està convertint aquest model
 model-error-converting-desktop = Hoard encara està convertint aquest model
-model-error-empty-collada = fitxer Collada buit
 model-error-no-loader = No hi ha cap carregador del navegador per a .{ $ext }
 model-dialog = Mostra { $name } en 3D
 model-title-stats =

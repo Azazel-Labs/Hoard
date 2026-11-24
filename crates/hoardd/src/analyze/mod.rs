@@ -297,8 +297,8 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
                 a.thumb = f.thumb.and_then(|t| thumb_bytes(&t, false).ok());
             })
         }
-        AssetKind::Model
-            if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "skp") =>
+        AssetKind::Model | AssetKind::Animation
+            if crate::meshes::rebuilt_as_glb(ext) && !matches!(ext, "obj" | "fbx") =>
         {
             analyze_mesh(path, root, ext, &mut a)
         }

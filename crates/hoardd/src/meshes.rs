@@ -1,5 +1,6 @@
 //! Models read natively, by [polysmelt]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
-//! FBX (binary and ASCII), 3DS, 3MF, USD and SketchUp `.skp`. Each becomes a GLB, which feeds the thumbnail renderer
+//! FBX (binary and ASCII), 3DS, 3MF, USD, SketchUp `.skp`, Collada (`.dae`, `.zae`), X3D and VRML, OFF, VRM avatars
+//! and their clips, BVH motion capture and Gaussian splats (`.splat`, `.spz`). Each becomes a GLB, which feeds the thumbnail renderer
 //! and "download as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard
 //! can decode. glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
 //! so the thumbnail renderer can draw them; their download GLB is packed from the file as it is. Every one of them
@@ -19,7 +20,7 @@ pub(crate) use polysmelt::mesh::{Image, Material, Mesh, to_glb};
 
 /// Whether Hoard reads models in this format (lowercase, without the dot) itself, without Blender.
 pub(crate) fn reads(ext: &str) -> bool {
-    ext == "skp" || polysmelt::formats::EXTENSIONS.contains(&ext)
+    polysmelt::formats::EXTENSIONS.contains(&ext)
 }
 
 /// Whether a model in this format becomes a GLB by being read into a mesh. A glTF is packed as it is instead,
@@ -90,15 +91,19 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
     Ok((doc.flatten(Pose::Rest)?, doc.facts))
 }
 
-/// A model's rest-pose mesh, as [`load`] gives it, and its skeleton and clips (see [`crate::animations`]).
-pub(crate) fn load_rigged(
-    path: &Path,
-    ext: &str,
-    root: &Path,
-) -> Result<(Option<Mesh>, Option<crate::animations::Rig>)> {
+/// A model as analysis takes it in: its rest-pose mesh and facts, as [`load`] gives them, and its skeleton and clips
+/// (see [`crate::animations`]).
+pub(crate) struct Rigged {
+    pub(crate) mesh: Option<Mesh>,
+    pub(crate) facts: Map<String, Value>,
+    pub(crate) rig: Option<crate::animations::Rig>,
+}
+
+/// A model's mesh, facts, skeleton and clips, read once.
+pub(crate) fn load_rigged(path: &Path, ext: &str, root: &Path) -> Result<Rigged> {
     let doc = open(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
     let rig = crate::animations::rig(&Value::Object(doc.json.clone()));
-    Ok((doc.flatten(Pose::Rest)?, rig))
+    Ok(Rigged { mesh: doc.flatten(Pose::Rest)?, facts: doc.facts, rig })
 }
 
 /// A model's document to pose: its meshes, skins, materials, textures and clips, any compression decoded.
@@ -121,6 +126,8 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         cameras: false,
         lights: false,
         extras: false,
+        // The limits as they are.
+        ..Keep::ALL
     };
     Ok(open(path, ext, &Pack::new(root), nothing)?.facts)
 }
@@ -138,6 +145,8 @@ pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
         cameras: false,
         lights: false,
         extras: false,
+        // The limits as they are.
+        ..Keep::ALL
     };
     let folder = path.parent().unwrap_or(Path::new("."));
     let pack = Pack { guess: false, ..Pack::new(folder) };
@@ -359,6 +368,19 @@ fn image_from_bytes(bytes: &[u8], hint: &Path) -> Option<Image> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every format polysmelt reads is filed as a model or a clip, so each gets a thumbnail and a GLB copy; KMZ is a map
+    /// first and DXF a drawing, which stay as they are.
+    #[test]
+    fn what_polysmelt_reads_is_a_model_or_a_clip() {
+        for ext in polysmelt::formats::EXTENSIONS.iter().filter(|e| !matches!(**e, "kmz" | "dxf")) {
+            let kind = hoard_core::AssetKind::from_ext(ext);
+            assert!(
+                matches!(kind, hoard_core::AssetKind::Model | hoard_core::AssetKind::Animation),
+                "{ext} is filed as {kind:?}"
+            );
+        }
+    }
 
     #[test]
     fn clip_only_keeps_the_skeleton_and_clips() {

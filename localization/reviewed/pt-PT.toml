@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
-translation = "0207e488dd184c77496a92e16753538effea322a12b6a1b1d8cbb5225bd8b624"
+source = "71ec6d3c5bd4d326bc7bfb729df41e112a812518839fbc26a62fc3bb52ff5a5e"
+translation = "0d824244ada3306f81e44d5bbb5e9aafefeb57e13767a4a16b2b7a8605e7fa03"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -7424,10 +7424,6 @@ translation = "o servidor ainda está a converter este modelo"
 [messages.model-error-converting-desktop]
 source = "Hoard is still converting this model"
 translation = "O Hoard ainda está a converter este modelo"
-
-[messages.model-error-empty-collada]
-source = "empty Collada file"
-translation = "ficheiro Collada vazio"
 
 [messages.model-error-no-loader]
 source = "No browser loader for .{ $ext }"

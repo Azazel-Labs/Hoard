@@ -29,7 +29,7 @@ Hoard가 일을 시작합니다. 모델은 텍스처와 함께 3D로 돌아가�
 
 ### 쓰기 전에 모든 것을 확인하세요
 
-모델은 텍스처, 머티리얼, 애니메이션과 함께 3D로 열립니다. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL과 복셀은 3D 앱을
+모델은 텍스처, 머티리얼, 애니메이션과 함께 3D로 열립니다. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL과 복셀은 3D 앱을
 설치하지 않아도 Hoard가 직접 읽습니다. Blender 파일은 헤드리스 Blender를 통해 들어오고, Unreal 패키지는 Unreal 없이도
 에디터가 저장해 둔 정보를 보여 줍니다. 썸네일은 서버에서 매번 같은 구도로 그려지므로 팩 전체를 한눈에 훑어볼 수
 있습니다.

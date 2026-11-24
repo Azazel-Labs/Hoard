@@ -2295,7 +2295,6 @@ model-show-failed = Nie udało się wyświetlić tego modelu: { $error }
 model-preview-failed = Nie udało się pokazać podglądu tego modelu: { $error }
 model-error-converting = serwer nadal konwertuje ten model
 model-error-converting-desktop = Hoard nadal konwertuje ten model
-model-error-empty-collada = pusty plik Collada
 model-error-no-loader = Przeglądarka nie ma modułu wczytującego dla .{ $ext }
 model-dialog = Wyświetl { $name } w 3D
 model-title-stats =

@@ -10,8 +10,8 @@ use rusqlite::{Connection, params};
 
 /// Model formats, best first: the ones Hoard draws itself, the richer before the plainer, then the rest.
 const MODEL: &[&str] = &[
-    "glb", "gltf", "fbx", "obj", "dae", "blend", "skp", "3mf", "usdz", "usd", "usdc", "usda", "3ds", "stl", "ply",
-    "abc", "x3d",
+    "glb", "gltf", "vrm", "fbx", "obj", "dae", "zae", "blend", "skp", "3mf", "usdz", "usd", "usdc", "usda", "x3d",
+    "x3dz", "x3dv", "3ds", "wrl", "wrz", "vox", "stl", "ply", "off", "splat", "spz", "abc",
 ];
 /// Sound formats, lossless before lossy, notes last.
 const AUDIO: &[&str] =

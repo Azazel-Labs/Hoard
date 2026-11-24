@@ -30,7 +30,7 @@ serveru, nebo aplikace na vašem vlastním počítači, a patří vám. Předsta
 
 ### Uvidíte všechno dřív, než to použijete
 
-Modely se otevírají ve 3D se svými texturami, materiály a animacemi. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL a voxely
+Modely se otevírají ve 3D se svými texturami, materiály a animacemi. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL a voxely
 čte Hoard sám, bez nainstalované 3D aplikace; soubory Blenderu přicházejí přes Blender spuštěný bez rozhraní a balíčky z
 Unrealu ukazují, co o nich editor uložil, a to bez Unrealu. Náhledy se kreslí na serveru, pokaždé stejně zarámované,
 takže celý balíček přelétnete jediným pohledem.

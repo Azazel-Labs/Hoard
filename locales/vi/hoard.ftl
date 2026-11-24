@@ -1906,7 +1906,6 @@ model-show-failed = Không thể hiển thị mô hình này: { $error }
 model-preview-failed = Không thể xem trước mô hình này: { $error }
 model-error-converting = máy chủ vẫn đang chuyển đổi mô hình này
 model-error-converting-desktop = Hoard vẫn đang chuyển đổi mô hình này
-model-error-empty-collada = tệp Collada trống
 model-error-no-loader = Trình duyệt không có trình tải cho .{ $ext }
 model-dialog = Xem { $name } ở dạng 3D
 model-title-stats = { $triangles } tam giác · { $meshes } mesh · { $materials } vật liệu

@@ -568,7 +568,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
             let dir = work.join(&r.id);
             let rel = safe_rel_path(&r.rel).with_context(|| format!("unsafe path in pack: {}", r.rel))?;
             let local = dir.join(&rel);
-            if matches!(ext_of(&r.rel).as_str(), "obj" | "fbx" | "gltf") {
+            if matches!(ext_of(&r.rel).as_str(), "obj" | "fbx" | "gltf" | "dae") {
                 fetch_dependencies(state, rt, &r.id, &dir)?;
             }
             if let Some(parent) = local.parent() {

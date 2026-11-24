@@ -93,7 +93,10 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "gltf" | "skp" => {
+        // Splats and clips have no surfaces to export.
+        e if e == "gltf"
+            || (crate::meshes::rebuilt_as_glb(e) && !matches!(e, "splat" | "spz" | "bvh" | "vrma" | "kmz" | "dxf")) =>
+        {
             out.push(opt("glb", GLB_LABEL, false));
         }
         "ttf" | "otf" => {

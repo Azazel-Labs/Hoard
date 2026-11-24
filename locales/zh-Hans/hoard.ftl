@@ -1906,7 +1906,6 @@ model-show-failed = 无法显示此模型：{ $error }
 model-preview-failed = 无法预览此模型：{ $error }
 model-error-converting = 服务器仍在转换此模型
 model-error-converting-desktop = Hoard 仍在转换此模型
-model-error-empty-collada = Collada 文件为空
 model-error-no-loader = 浏览器没有 .{ $ext } 的加载器
 model-dialog = 以 3D 查看 { $name }
 model-title-stats = { $triangles } 个三角面 · { $meshes } 个网格 · { $materials } 个材质

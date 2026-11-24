@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
-translation = "774f04261871146c439d2ff7a6a22f213bf79e9c455f84b99a3551374f7aa646"
+source = "71ec6d3c5bd4d326bc7bfb729df41e112a812518839fbc26a62fc3bb52ff5a5e"
+translation = "01213155d17410c59d29d2174f1a93358a9d85d35fb86c783074cc34248a098c"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -7421,10 +7421,6 @@ translation = "serveren er stadig ved at konvertere denne model"
 [messages.model-error-converting-desktop]
 source = "Hoard is still converting this model"
 translation = "Hoard er stadig ved at konvertere denne model"
-
-[messages.model-error-empty-collada]
-source = "empty Collada file"
-translation = "tom Collada-fil"
 
 [messages.model-error-no-loader]
 source = "No browser loader for .{ $ext }"

@@ -30,7 +30,7 @@ kendi bilgisayarınızda bir uygulama ve tamamen sizin. Onu ödeme adımı olmay
 
 ### Kullanmadan önce her şeyi görün
 
-Modeller dokuları, malzemeleri ve animasyonlarıyla birlikte 3B olarak açılır. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL ve
+Modeller dokuları, malzemeleri ve animasyonlarıyla birlikte 3B olarak açılır. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL ve
 voksel dosyalarını, hiçbir 3B uygulaması kurulu olmadan Hoard’un kendisi okur; Blender dosyaları arayüzsüz (headless)
 Blender aracılığıyla gelir, Unreal paketleri ise Unreal olmadan, düzenleyicinin onlar hakkında kaydettiklerini gösterir.
 Küçük resimler sunucuda, her seferinde aynı şekilde çerçevelenerek çizilir; böylece bir paketin tamamına bir bakışta göz

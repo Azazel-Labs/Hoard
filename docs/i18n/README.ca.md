@@ -32,7 +32,7 @@ pagar.
 ### Vegeu-ho tot abans de fer-ho servir
 
 Els models s'obren en 3D amb les seves textures, materials i animacions. Hoard mateix llegeix FBX, glTF, OBJ, USD,
-SketchUp, 3MF, STL i vòxels, sense cap aplicació 3D instal·lada; els fitxers de Blender entren a través d'un Blender
+SketchUp, Collada, X3D, VRM, 3MF, STL i vòxels, sense cap aplicació 3D instal·lada; els fitxers de Blender entren a través d'un Blender
 sense interfície, i els paquets d'Unreal mostren el que l'editor en va desar, sense Unreal. Les miniatures es dibuixen
 al servidor, enquadrades sempre de la mateixa manera, de manera que es pot repassar tot un paquet d'un cop d'ull.
 

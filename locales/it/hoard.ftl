@@ -2118,7 +2118,6 @@ model-show-failed = Impossibile mostrare questo modello: { $error }
 model-preview-failed = Impossibile visualizzare l'anteprima di questo modello: { $error }
 model-error-converting = il server sta ancora convertendo questo modello
 model-error-converting-desktop = Hoard sta ancora convertendo questo modello
-model-error-empty-collada = file Collada vuoto
 model-error-no-loader = Nessun caricatore del browser per .{ $ext }
 model-dialog = Visualizza { $name } in 3D
 model-title-stats =

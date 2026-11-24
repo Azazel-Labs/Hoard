@@ -30,7 +30,7 @@ app op je eigen computer, en het is van jou. Zie het als een assetstore zonder k
 
 ### Bekijk alles voordat je het gebruikt
 
-Modellen openen in 3D met hun texturen, materialen en animaties. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL en voxels
+Modellen openen in 3D met hun texturen, materialen en animaties. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL en voxels
 leest Hoard zelf, zonder dat er een 3D-programma geïnstalleerd hoeft te zijn; Blender-bestanden komen binnen via
 headless Blender, en Unreal-pakketten laten zien wat de editor erover heeft opgeslagen, zonder Unreal. Miniaturen
 worden op de server getekend, elke keer op dezelfde manier in beeld gebracht, zodat je een heel pakket in één

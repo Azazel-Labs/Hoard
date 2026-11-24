@@ -30,7 +30,7 @@ Docker sul tuo server, o un'app sul tuo computer, ed è tua. Pensalo come uno st
 
 ### Guarda tutto prima di usarlo
 
-I modelli si aprono in 3D con le loro texture, i materiali e le animazioni. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL e i
+I modelli si aprono in 3D con le loro texture, i materiali e le animazioni. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL e i
 voxel vengono letti direttamente da Hoard, senza alcuna applicazione 3D installata; i file Blender passano da Blender in
 modalità headless, e i pacchetti Unreal mostrano ciò che l'editor ha salvato su di loro, senza Unreal. Le miniature
 vengono disegnate sul server, inquadrate sempre allo stesso modo, così un intero pacchetto si scorre con un colpo

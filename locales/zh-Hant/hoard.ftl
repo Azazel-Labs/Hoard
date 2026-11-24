@@ -1912,7 +1912,6 @@ model-show-failed = 無法顯示這個模型：{ $error }
 model-preview-failed = 無法預覽這個模型：{ $error }
 model-error-converting = 伺服器仍在轉換這個模型
 model-error-converting-desktop = Hoard 仍在轉換這個模型
-model-error-empty-collada = 空的 Collada 檔案
 model-error-no-loader = 瀏覽器沒有可載入 .{ $ext } 的載入器
 model-dialog = 以 3D 檢視 { $name }
 model-title-stats = { $triangles } 個三角形 · { $meshes } 個網格 · { $materials } 個材質

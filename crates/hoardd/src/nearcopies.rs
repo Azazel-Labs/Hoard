@@ -260,8 +260,8 @@ fn lossless_sound(ext: &str) -> bool {
 fn model_format(ext: &str) -> i64 {
     match ext {
         "blend" | "max" | "ma" | "mb" | "c4d" => 4,
-        "glb" | "gltf" | "fbx" | "usd" | "usdz" | "usda" | "usdc" => 3,
-        "dae" | "3ds" | "x" => 2,
+        "glb" | "gltf" | "vrm" | "fbx" | "usd" | "usdz" | "usda" | "usdc" => 3,
+        "dae" | "zae" | "x3d" | "x3dv" | "x3dz" | "3ds" | "x" => 2,
         _ => 1,
     }
 }

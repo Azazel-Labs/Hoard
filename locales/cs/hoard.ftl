@@ -2260,7 +2260,6 @@ model-show-failed = Tento model se nepodařilo zobrazit: { $error }
 model-preview-failed = Náhled tohoto modelu se nepodařilo zobrazit: { $error }
 model-error-converting = server tento model ještě převádí
 model-error-converting-desktop = Hoard tento model ještě převádí
-model-error-empty-collada = prázdný soubor Collada
 model-error-no-loader = Prohlížeč nemá zavaděč pro .{ $ext }
 model-dialog = Zobrazit { $name } ve 3D
 model-title-stats =

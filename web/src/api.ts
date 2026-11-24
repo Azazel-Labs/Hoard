@@ -520,5 +520,8 @@ export function joinPath(dir: string, rel: string): string {
 export const packFileUrl = (packId: string, path: string) =>
   `/api/packs/${packId}/files/${path.split('/').map(encodeURIComponent).join('/')}`
 
-/** Asset kinds the browser viewer can open (plus anything the server converted to .glb). */
-export const VIEWABLE_EXTS = new Set(['glb', 'gltf', 'obj', 'fbx', 'stl', 'ply', 'dae', '3ds', '3mf', 'usd', 'usda', 'usdc', 'usdz', 'skp'])
+/** Model and clip formats the browser viewer can open, read on the server (plus anything Blender converted to .glb). */
+export const VIEWABLE_EXTS = new Set([
+  'glb', 'gltf', 'obj', 'fbx', 'stl', 'ply', 'vox', 'dae', 'zae', '3ds', '3mf', 'usd', 'usda', 'usdc', 'usdz', 'skp',
+  'x3d', 'x3dv', 'x3dz', 'wrl', 'wrz', 'off', 'vrm', 'vrma', 'bvh', 'splat', 'spz',
+])

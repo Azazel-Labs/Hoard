@@ -29,7 +29,7 @@ Hoard 是一个自托管的游戏资源库。丢进一个 zip、一个 Unity 包
 
 ### 用之前先看个清楚
 
-模型在 3D 中打开，带有纹理、材质和动画。FBX、glTF、OBJ、USD、SketchUp、3MF、STL 和体素由 Hoard 自己读取，无需安装任何 3D
+模型在 3D 中打开，带有纹理、材质和动画。FBX、glTF、OBJ、USD、SketchUp、Collada、X3D、VRM、3MF、STL 和体素由 Hoard 自己读取，无需安装任何 3D
 软件；Blender 文件通过无界面（headless）的 Blender 导入，Unreal 包则无需 Unreal 就能显示编辑器为它们保存的信息。
 缩略图在服务器上绘制，每次都以同样的方式取景，因此整个资源包一眼就能浏览完。
 

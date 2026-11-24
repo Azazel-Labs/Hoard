@@ -2195,7 +2195,6 @@ model-show-failed = Није могуће приказати овај модел
 model-preview-failed = Није могуће прегледати овај модел: { $error }
 model-error-converting = сервер још претвара овај модел
 model-error-converting-desktop = Hoard још претвара овај модел
-model-error-empty-collada = празна Collada датотека
 model-error-no-loader = Прегледач нема учитавач за .{ $ext }
 model-dialog = Прикажи { $name } у 3D-у
 model-title-stats =

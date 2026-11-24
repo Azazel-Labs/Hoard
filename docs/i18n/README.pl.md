@@ -30,7 +30,7 @@ serwerze albo aplikacja na własnym komputerze, i to na własność. To coś jak
 
 ### Wszystko widać, zanim się tego użyje
 
-Modele otwierają się w 3D z teksturami, materiałami i animacjami. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL i woksele
+Modele otwierają się w 3D z teksturami, materiałami i animacjami. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL i woksele
 Hoard czyta sam, bez instalowania żadnego programu 3D; pliki Blendera przechodzą przez Blendera w trybie headless,
 a paczki Unreal pokazują to, co zapisał o nich edytor, bez Unreala. Miniatury są rysowane na serwerze i za każdym
 razem kadrowane tak samo, więc całą paczkę da się przejrzeć jednym rzutem oka.

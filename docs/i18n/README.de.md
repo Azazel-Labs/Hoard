@@ -30,7 +30,7 @@ oder eine App auf Ihrem eigenen Computer, und es gehört Ihnen. Stellen Sie es s
 
 ### Alles sehen, bevor Sie es verwenden
 
-Modelle öffnen sich in 3D mit ihren Texturen, Materialien und Animationen. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL und
+Modelle öffnen sich in 3D mit ihren Texturen, Materialien und Animationen. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL und
 Voxel liest Hoard selbst, ganz ohne installierte 3D-Software; Blender-Dateien kommen über ein Headless-Blender herein,
 und Unreal-Pakete zeigen, was der Editor über sie gespeichert hat, ohne Unreal. Vorschaubilder werden auf dem Server
 gezeichnet, jedes Mal gleich gerahmt, sodass sich ein ganzes Paket auf einen Blick überfliegen lässt.

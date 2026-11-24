@@ -2304,7 +2304,6 @@ model-show-failed = Не удалось показать эту модель: { 
 model-preview-failed = Не удалось сделать превью этой модели: { $error }
 model-error-converting = сервер ещё преобразует эту модель
 model-error-converting-desktop = Hoard ещё преобразует эту модель
-model-error-empty-collada = пустой файл Collada
 model-error-no-loader = Браузер не умеет загружать .{ $ext }
 model-dialog = Просмотр { $name } в 3D
 model-title-stats =

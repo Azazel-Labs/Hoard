@@ -1938,7 +1938,6 @@ model-show-failed = Tidak dapat menampilkan model ini: { $error }
 model-preview-failed = Tidak dapat menampilkan pratinjau model ini: { $error }
 model-error-converting = server masih mengonversi model ini
 model-error-converting-desktop = Hoard masih mengonversi model ini
-model-error-empty-collada = berkas Collada kosong
 model-error-no-loader = Tidak ada pemuat browser untuk .{ $ext }
 model-dialog = Lihat { $name } dalam 3D
 model-title-stats = { $triangles } segitiga · { $meshes } mesh · { $materials } material

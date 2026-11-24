@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
-translation = "142e9c5d6e3a05dfe6f46bf6dc4f8576520e43eff3c71e14b60a81cbcbd2a025"
+source = "71ec6d3c5bd4d326bc7bfb729df41e112a812518839fbc26a62fc3bb52ff5a5e"
+translation = "43e2f5efbb331bc2e9e1df1bb7eb200d691052144bce1c1d090f1e8626a24955"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -7421,10 +7421,6 @@ translation = "el servidor encara està convertint aquest model"
 [messages.model-error-converting-desktop]
 source = "Hoard is still converting this model"
 translation = "Hoard encara està convertint aquest model"
-
-[messages.model-error-empty-collada]
-source = "empty Collada file"
-translation = "fitxer Collada buit"
 
 [messages.model-error-no-loader]
 source = "No browser loader for .{ $ext }"

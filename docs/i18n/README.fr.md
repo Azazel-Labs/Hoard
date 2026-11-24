@@ -31,7 +31,7 @@ ressources sans passage en caisse.
 
 ### Voyez tout avant de l’utiliser
 
-Les modèles s’ouvrent en 3D avec leurs textures, matériaux et animations. Les formats FBX, glTF, OBJ, USD, SketchUp, 3MF
+Les modèles s’ouvrent en 3D avec leurs textures, matériaux et animations. Les formats FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF
 et STL ainsi que les voxels sont lus par Hoard lui-même, sans aucun logiciel 3D installé ; les fichiers Blender passent
 par Blender sans interface (headless), et les packages Unreal montrent ce que l’éditeur a enregistré à leur sujet, sans
 Unreal. Les miniatures sont dessinées sur le serveur, cadrées de la même façon à chaque fois, si bien qu’un pack entier

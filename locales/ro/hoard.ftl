@@ -2259,7 +2259,6 @@ model-show-failed = Acest model nu a putut fi afișat: { $error }
 model-preview-failed = Acest model nu a putut fi previzualizat: { $error }
 model-error-converting = serverul încă convertește acest model
 model-error-converting-desktop = Hoard încă convertește acest model
-model-error-empty-collada = fișier Collada gol
 model-error-no-loader = Niciun încărcător de browser pentru .{ $ext }
 model-dialog = Vizualizați { $name } în 3D
 model-title-stats =

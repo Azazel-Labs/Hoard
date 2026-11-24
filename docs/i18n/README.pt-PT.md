@@ -30,7 +30,7 @@ ou uma aplicação no seu próprio computador, e é sua. Pense nele como uma loj
 
 ### Veja tudo antes de o usar
 
-Os modelos abrem em 3D com as suas texturas, materiais e animações. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL e voxels
+Os modelos abrem em 3D com as suas texturas, materiais e animações. FBX, glTF, OBJ, USD, SketchUp, Collada, X3D, VRM, 3MF, STL e voxels
 são lidos pelo próprio Hoard, sem nenhuma aplicação 3D instalada; os ficheiros do Blender entram através do Blender em
 modo headless, e os pacotes do Unreal mostram o que o editor guardou sobre eles, sem o Unreal. As miniaturas são
 desenhadas no servidor, enquadradas sempre da mesma forma, para que um pacote inteiro possa ser percorrido num relance.

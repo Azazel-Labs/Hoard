@@ -2107,7 +2107,6 @@ model-show-failed = Kunde inte visa modellen: { $error }
 model-preview-failed = Kunde inte förhandsvisa modellen: { $error }
 model-error-converting = servern konverterar fortfarande modellen
 model-error-converting-desktop = Hoard konverterar fortfarande modellen
-model-error-empty-collada = tom Collada-fil
 model-error-no-loader = Ingen inläsare i webbläsaren för .{ $ext }
 model-dialog = Visa { $name } i 3D
 model-title-stats =

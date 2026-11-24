@@ -1955,7 +1955,6 @@ model-show-failed = Bu model gösterilemedi: { $error }
 model-preview-failed = Bu modelin önizlemesi gösterilemedi: { $error }
 model-error-converting = sunucu bu modeli hâlâ dönüştürüyor
 model-error-converting-desktop = Hoard bu modeli hâlâ dönüştürüyor
-model-error-empty-collada = boş Collada dosyası
 model-error-no-loader = .{ $ext } için tarayıcıda yükleyici yok
 model-dialog = 3B olarak görüntüle: { $name }
 model-title-stats = { $triangles } üçgen · { $meshes } mesh · { $materials } malzeme

@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
-translation = "e676057a8e6d1274af6db0bcb14c60e9c460adffeab81096dfa5b2171c9e5735"
+source = "71ec6d3c5bd4d326bc7bfb729df41e112a812518839fbc26a62fc3bb52ff5a5e"
+translation = "4f54552d69b96ae9184bbb98370eeec5f2ea4bdfaa122517bb799131620328b2"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -7450,10 +7450,6 @@ translation = "ο διακομιστής μετατρέπει ακόμη αυτ�
 [messages.model-error-converting-desktop]
 source = "Hoard is still converting this model"
 translation = "το Hoard μετατρέπει ακόμη αυτό το μοντέλο"
-
-[messages.model-error-empty-collada]
-source = "empty Collada file"
-translation = "κενό αρχείο Collada"
 
 [messages.model-error-no-loader]
 source = "No browser loader for .{ $ext }"

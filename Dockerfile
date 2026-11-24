@@ -78,6 +78,10 @@ ENV NVIDIA_VISIBLE_DEVICES=all \
 # Without a GPU, model thumbnails are drawn by Mesa's lavapipe, which otherwise starts a thread for every core: four
 # draw a thumbnail about as fast and leave the rest of the machine to the server and whatever else runs on it.
 ENV LP_NUM_THREADS=4
+# glibc gives every thread that allocates at once its own heap, up to eight per core, and seldom hands their freed
+# memory back. Hoard's threads (requests, database, analysis, lavapipe) would hold hundreds of MB that way; four heaps
+# keep that down without making the threads wait on each other.
+ENV MALLOC_ARENA_MAX=4
 ENV HOARD_LISTEN=0.0.0.0:4627 \
     HOARD_DATA_DIR=/config \
     HOARD_FILES_DIR=/library \

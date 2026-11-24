@@ -120,15 +120,13 @@ impl Index {
     pub(crate) fn similar(&self, hash: &str) -> Vec<(String, f32)> {
         self.read(|m| {
             let Some(target) = m.get(hash) else { return Vec::new() };
-            let mut hits: Vec<(&String, f32)> = m
+            let hits = m
                 .iter()
                 .filter(|(h, _)| h.as_str() != hash)
                 .map(|(h, d)| (h, similarity(target, d)))
                 .filter(|(_, s)| *s >= SIMILAR_FLOOR)
                 .collect();
-            hits.sort_by(|a, b| b.1.total_cmp(&a.1));
-            hits.truncate(SIMILAR_MAX);
-            hits.into_iter().map(|(h, s)| (h.clone(), s)).collect()
+            crate::embed::best(hits, SIMILAR_MAX)
         })
         .unwrap_or_default()
     }

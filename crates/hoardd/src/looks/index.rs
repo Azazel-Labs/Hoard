@@ -112,14 +112,14 @@ impl Index {
 
     /// Thumbnails that look like `hash`'s, best first. With image search's scores (`meaning`, by what the pictures
     /// show), those count most where a thumbnail has one; colors and grain decide the rest.
-    pub(super) fn similar(&self, hash: &str, meaning: Option<&HashMap<String, f32>>) -> Vec<(String, f32)> {
+    pub(super) fn similar(&self, hash: &str, meaning: Option<crate::embed::Likeness<'_>>) -> Vec<(String, f32)> {
         self.read(|m| {
             let Some(target) = m.get(hash) else { return Vec::new() };
             let scored = m.iter().filter(|(h, _)| h.as_str() != hash).map(|(h, e)| {
                 let look = similarity(target, e);
-                let score = match meaning.and_then(|s| s.get(h)) {
+                let score = match meaning.and_then(|s| s(h)) {
                     // Rescaled so the same floor applies: a close look alone still gets in.
-                    Some(&clip) => {
+                    Some(clip) => {
                         MEANING_WEIGHT * (SIMILAR_FLOOR + (1.0 - SIMILAR_FLOOR) * clip) + (1.0 - MEANING_WEIGHT) * look
                     }
                     None => look,
@@ -187,10 +187,7 @@ impl Index {
 }
 
 fn top<'a>(scored: impl Iterator<Item = (&'a String, f32)>, floor: f32, max: usize) -> Vec<(String, f32)> {
-    let mut hits: Vec<(&String, f32)> = scored.filter(|(_, s)| *s >= floor).collect();
-    hits.sort_by(|a, b| b.1.total_cmp(&a.1));
-    hits.truncate(max);
-    hits.into_iter().map(|(h, s)| (h.clone(), s)).collect()
+    crate::embed::best(scored.filter(|(_, s)| *s >= floor).collect(), max)
 }
 
 /// How alike two thumbnails look, about 0..=1: the descriptor's weighted cosine, plus a bonus for near-identical

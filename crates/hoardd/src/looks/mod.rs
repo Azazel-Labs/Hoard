@@ -280,10 +280,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         }
         state.looks.ensure(state).await?;
         scores = Some(match thumb {
-            Some(h) => {
-                let meaning = crate::clip::similar(state, &h).await;
-                state.looks.similar(&h, meaning.as_ref())
-            }
+            Some(h) => crate::clip::similar(state, &h, |meaning| state.looks.similar(&h, meaning)).await,
             None => Vec::new(),
         });
     }

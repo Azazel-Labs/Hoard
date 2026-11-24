@@ -18,7 +18,6 @@
 //! every thumbnail and every search's words are sent to it. Its embeddings are stored under its own model name, so
 //! switching back and forth keeps what each learned.
 
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError, RwLock};
@@ -454,14 +453,19 @@ fn index(state: &AppState) -> Option<&Index> {
     }
 }
 
-/// How much every thumbnail shows what `hash`'s does, about 0..=1, when image search is on and it has an embedding.
-pub(crate) async fn similar(state: &AppState, hash: &str) -> Option<HashMap<String, f32>> {
-    let index = index(state)?;
+/// Runs `f` with how much a thumbnail shows what `hash`'s does, about 0..=1, when image search is on and `hash` has
+/// an embedding (see [`Index::similar`]); with `None` otherwise.
+pub(crate) async fn similar<R>(
+    state: &AppState,
+    hash: &str,
+    f: impl FnOnce(Option<crate::embed::Likeness<'_>>) -> R,
+) -> R {
+    let Some(index) = index(state) else { return f(None) };
     if let Err(e) = index.ensure(state).await {
         tracing::warn!(error = %format!("{e:#}"), "couldn't load image search's index");
-        return None;
+        return f(None);
     }
-    index.similar(hash)
+    index.similar(hash, f)
 }
 
 /// Thumbnails that match what was typed, best first; empty when image search is off or has nothing yet.
@@ -613,6 +617,7 @@ fn embed_all(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn text_matches_stand_above_the_median() {
@@ -650,9 +655,11 @@ mod tests {
             assert_eq!(hits.iter().map(|h| h.0.as_str()).collect::<Vec<_>>(), ["strong"], "{base}: {hits:?}");
             assert!(hits[0].1 > 0.25);
             // More like this: measured against the typical picture's score for this one.
-            let like = index.similar("t0").unwrap();
-            assert!((like["t0"] - 1.0).abs() < 1e-3);
-            assert!(like["t1"] > 0.5 && like["strong"] < 0.1, "{like:?}");
+            let like = index.similar("t0", |s| ["t0", "t1", "strong", "none"].map(|h| s.unwrap()(h)));
+            let [Some(t0), Some(t1), Some(strong), None] = like else { panic!("{like:?}") };
+            assert!((t0 - 1.0).abs() < 1e-3);
+            assert!(t1 > 0.5 && strong < 0.1, "{like:?}");
+            assert!(index.similar("none", |s| s.is_none()), "no embedding, no scores");
         }
         assert!(std::ptr::eq(hosted_spec("test:model"), hosted_spec("test:model")), "made once per model");
         let index = Index::new(&SPEC);

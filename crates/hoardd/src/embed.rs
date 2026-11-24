@@ -306,6 +306,20 @@ impl Entry {
     }
 }
 
+/// The `max` best scored, best first, with their keys copied: only those are fully sorted.
+pub(crate) fn best(mut hits: Vec<(&String, f32)>, max: usize) -> Vec<(String, f32)> {
+    let by_score = |a: &(&String, f32), b: &(&String, f32)| b.1.total_cmp(&a.1);
+    if hits.len() > max && max > 0 {
+        hits.select_nth_unstable_by(max - 1, by_score);
+    }
+    hits.truncate(max);
+    hits.sort_by(by_score);
+    hits.into_iter().map(|(h, s)| (h.clone(), s)).collect()
+}
+
+/// How much a thumbnail is like another by meaning, about 0..=1, when it has an embedding: see [`Index::similar`].
+pub(crate) type Likeness<'a> = &'a dyn Fn(&str) -> Option<f32>;
+
 /// Where an [`Index`]'s embeddings are kept and how its text matches are judged.
 #[derive(Debug)]
 pub(crate) struct Spec {
@@ -411,25 +425,24 @@ impl Index {
         *self.map.write().unwrap_or_else(PoisonError::into_inner) = None;
     }
 
-    /// How much every thumbnail looks like `hash`'s by meaning, about 0..=1, or `None` when it has no embedding.
-    pub(crate) fn similar(&self, hash: &str) -> Option<HashMap<String, f32>> {
+    /// Runs `f` with how much a thumbnail looks like `hash`'s by meaning, about 0..=1 (`None` for one without an
+    /// embedding), or with `None` when `hash` has none. Each is worked out when asked for, while the index is read, so
+    /// nothing is copied for the thumbnails never asked about.
+    pub(crate) fn similar<R>(&self, hash: &str, f: impl FnOnce(Option<Likeness<'_>>) -> R) -> R {
         let spec = self.spec();
-        self.read(|m| {
-            let target = m.get(hash)?;
-            let cosines: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, target.cosine(e))).collect();
-            let (unrelated, same) = if spec.unrelated.is_nan() {
-                // The typical picture's score against this one is what unrelated looks like.
-                let mut all: Vec<f32> = cosines.iter().map(|c| c.1).collect();
-                let mid = all.len() / 2;
-                let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
-                (typical, typical + HOSTED_SAME * (1.0 - typical))
-            } else {
-                (spec.unrelated, spec.same)
-            };
-            let score = |cosine: f32| ((cosine - unrelated) / (same - unrelated).max(1e-6)).clamp(0.0, 1.0);
-            Some(cosines.into_iter().map(|(h, c)| (h.clone(), score(c))).collect())
-        })
-        .flatten()
+        let guard = self.map.read().unwrap_or_else(PoisonError::into_inner);
+        let Some((m, target)) = guard.as_ref().and_then(|m| Some((m, m.get(hash)?))) else { return f(None) };
+        let (unrelated, same) = if spec.unrelated.is_nan() {
+            // The typical picture's score against this one is what unrelated looks like.
+            let mut all: Vec<f32> = m.values().map(|e| target.cosine(e)).collect();
+            let mid = all.len() / 2;
+            let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
+            (typical, typical + HOSTED_SAME * (1.0 - typical))
+        } else {
+            (spec.unrelated, spec.same)
+        };
+        let span = (same - unrelated).max(1e-6);
+        f(Some(&|h: &str| m.get(h).map(|e| ((target.cosine(e) - unrelated) / span).clamp(0.0, 1.0))))
     }
 
     /// What matches a text embedding, best first, scored about 0..=0.5.
@@ -456,14 +469,12 @@ impl Index {
             }
             let [lift, margin, sure, weak, strong] =
                 [spec.lift, spec.margin, spec.sure, spec.weak, spec.strong].map(|x| x * unit);
-            let best = scored.iter().map(|s| s.1).fold(f32::MIN, f32::max);
-            let floor = (median + lift).max((best - margin).min(median + sure));
-            let mut hits: Vec<(&String, f32)> = scored.into_iter().filter(|s| s.1 >= floor).collect();
-            hits.sort_by(|a, b| b.1.total_cmp(&a.1));
-            hits.truncate(TEXT_MAX);
+            let top = scored.iter().map(|s| s.1).fold(f32::MIN, f32::max);
+            let floor = (median + lift).max((top - margin).min(median + sure));
+            let hits = best(scored.into_iter().filter(|s| s.1 >= floor).collect(), TEXT_MAX);
             // A strong match counts double a word match in the name (0.25), a borderline one well under it.
             let score = |above: f32| ((above - weak) / (strong - weak)).clamp(0.0, 1.0) * 0.5;
-            hits.into_iter().map(|(h, c)| (h.clone(), score(c - median))).collect()
+            hits.into_iter().map(|(h, c)| (h, score(c - median))).collect()
         })
         .unwrap_or_default()
     }
@@ -633,6 +644,16 @@ mod tests {
     use super::*;
 
     const DIMS: usize = 512;
+
+    #[test]
+    fn best_keeps_the_top_scores_in_order() {
+        let keys: Vec<String> = (0..10).map(|i| format!("k{i}")).collect();
+        let scored = |order: &[usize]| order.iter().map(|&i| (&keys[i], i as f32)).collect::<Vec<_>>();
+        let top = best(scored(&[3, 9, 0, 7, 5, 1, 8]), 3);
+        assert_eq!(top, [("k9".to_owned(), 9.0), ("k8".to_owned(), 8.0), ("k7".to_owned(), 7.0)]);
+        assert_eq!(best(scored(&[2, 4]), 3).len(), 2, "fewer than max: all of them");
+        assert_eq!(best(scored(&[2, 4]), 0), []);
+    }
 
     #[test]
     fn quantized_vectors_keep_their_cosine() {

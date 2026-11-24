@@ -45,7 +45,9 @@ fn drawable(path: &Path) -> anyhow::Result<Drawable> {
 /// Thumbnail, plus the multi-view sheet when enabled. A model that crashes the renderer gets a `thumb_error` in
 /// its facts, which Settings → Issues lists.
 pub(super) fn render_model_thumb(path: &Path, a: &mut Analysis) {
-    let Some(r) = renderer() else { return };
+    if !super::can_render() {
+        return;
+    }
     let model = match drawable(path) {
         Ok(model) => model,
         Err(e) => {
@@ -54,7 +56,7 @@ pub(super) fn render_model_thumb(path: &Path, a: &mut Analysis) {
         }
     };
     let file = model.path.as_path();
-    let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let Some(guard) = renderer() else { return };
     // wgpu panics on what it finds invalid; that costs this model its thumbnail, not the whole pack its ingest.
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let img = guard.render_file(file, thumb_size())?;
@@ -78,10 +80,12 @@ pub(super) fn render_model_thumb(path: &Path, a: &mut Analysis) {
 
 /// A thumbnail of a glTF/GLB model as it is; `None` when no renderer is running.
 pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
-    let Some(r) = renderer() else { return Ok(None) };
+    if !super::can_render() {
+        return Ok(None);
+    }
     let model = drawable(path)?;
     let path = model.path.as_path();
-    let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let Some(guard) = renderer() else { return Ok(None) };
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_file(path, thumb_size())))
         .map_err(|_| anyhow::anyhow!("the renderer failed on this model"))??;
     thumb_bytes(&drawn, false).map(Some)
@@ -90,11 +94,13 @@ pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
 /// A thumbnail of a glTF/GLB model wearing `color` (a texture's thumbnail) as its color map, or its own maps when
 /// it has some; `None` when no renderer is running.
 pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Option<Vec<u8>>> {
-    let Some(r) = renderer() else { return Ok(None) };
+    if !super::can_render() {
+        return Ok(None);
+    }
     let color = image::load_from_memory(color)?.to_rgba8();
     let model = drawable(path)?;
     let path = model.path.as_path();
-    let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let Some(guard) = renderer() else { return Ok(None) };
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         match guard.render_file_dressed(path, thumb_size(), color)? {
             Some(img) => Ok(img),

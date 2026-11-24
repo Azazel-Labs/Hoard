@@ -10,6 +10,7 @@ mod sounds;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
+use std::time::{Duration, Instant};
 
 use hoard_core::AssetKind;
 use image::DynamicImage;
@@ -29,7 +30,36 @@ use sounds::{analyze_music, analyze_sound};
 static RENDER_ENABLED: AtomicBool = AtomicBool::new(true);
 /// Also render 2x2 multi-view sheets of models (only worth it when a vision LLM will look at them).
 static VIEWS_ENABLED: AtomicBool = AtomicBool::new(false);
-static RENDERER: OnceLock<Option<Mutex<hoard_render::Renderer>>> = OnceLock::new();
+static RENDERER: Mutex<Slot> = Mutex::new(Slot { renderer: None, used: None, failed: false });
+
+/// The renderer while it's wanted. A GPU device holds hundreds of megabytes (most of what an idle server uses), so
+/// it's let go once nothing has been drawn for [`RENDERER_IDLE`], and made again for the next model.
+struct Slot {
+    renderer: Option<hoard_render::Renderer>,
+    /// When it was last drawn with.
+    used: Option<Instant>,
+    /// No adapter: not tried again.
+    failed: bool,
+}
+
+/// How long the renderer is kept with nothing to draw.
+const RENDERER_IDLE: Duration = Duration::from_secs(180);
+
+/// The renderer, locked for drawing with (one model at a time); let go of the lock to let others draw.
+pub(crate) struct Drawing(std::sync::MutexGuard<'static, Slot>);
+
+impl std::ops::Deref for Drawing {
+    type Target = hoard_render::Renderer;
+    fn deref(&self) -> &hoard_render::Renderer {
+        self.0.renderer.as_ref().expect("a Drawing holds a renderer")
+    }
+}
+
+impl Drop for Drawing {
+    fn drop(&mut self) {
+        self.0.used = Some(Instant::now());
+    }
+}
 
 pub(crate) fn set_render_enabled(on: bool, views: bool) {
     RENDER_ENABLED.store(on, Ordering::Relaxed);
@@ -41,37 +71,80 @@ static RENDERER_STATUS: OnceLock<String> = OnceLock::new();
 /// Why there's no GPU when one seems to be there; set with [`RENDERER_STATUS`].
 static RENDERER_HINT: OnceLock<Option<String>> = OnceLock::new();
 
-/// The shared headless renderer, created on first use. `None` if disabled or no adapter exists.
-pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
+/// Whether models can be drawn: rendering is on and an adapter was found (or hasn't been looked for yet).
+pub(crate) fn can_render() -> bool {
+    RENDER_ENABLED.load(Ordering::Relaxed) && !RENDERER.lock().unwrap_or_else(std::sync::PoisonError::into_inner).failed
+}
+
+/// The shared headless renderer, locked for drawing, made now if it isn't there. `None` if rendering is off or no
+/// adapter exists.
+pub(crate) fn renderer() -> Option<Drawing> {
     if !RENDER_ENABLED.load(Ordering::Relaxed) {
         return None;
     }
-    RENDERER
-        .get_or_init(|| match new_renderer() {
-            Ok(r) => {
-                let kind = if r.is_hardware() { "gpu" } else { "cpu" };
-                tracing::info!(adapter = r.adapter_name(), backend = r.backend(), kind, "model thumbnails enabled");
-                if !r.is_hardware() {
-                    let hint = crate::gpu_hint::why_no_gpu();
-                    if let Some(h) = &hint {
-                        tracing::warn!("a GPU is there but model thumbnails render in software: {h}");
-                    } else {
-                        tracing::info!(
-                            "no GPU visible: model thumbnails render in software (see docs/DEPLOYMENT.md, GPU)"
-                        );
-                    }
-                    let _ = RENDERER_HINT.set(hint);
-                }
-                let _ = RENDERER_STATUS.set(format!("{kind}: {} ({})", r.adapter_name(), r.backend()));
-                Some(Mutex::new(r))
+    let mut slot = RENDERER.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if slot.failed {
+        return None;
+    }
+    if slot.renderer.is_none() {
+        let Ok(made) = make_renderer() else {
+            slot.failed = true;
+            return None;
+        };
+        slot.renderer = Some(made);
+        slot.used = Some(Instant::now());
+        let _ = std::thread::Builder::new().name("renderer-idle".into()).spawn(let_go_when_idle);
+    }
+    Some(Drawing(slot))
+}
+
+/// Drop the renderer once it's been idle for [`RENDERER_IDLE`]; runs while there is one.
+fn let_go_when_idle() {
+    loop {
+        std::thread::sleep(RENDERER_IDLE / 6);
+        // Drawing now is in use: look again later.
+        let Ok(mut slot) = RENDERER.try_lock() else { continue };
+        if slot.renderer.is_none() {
+            return;
+        }
+        if let_go_if_idle(&mut slot, RENDERER_IDLE) {
+            tracing::debug!("the renderer was idle; let go of it until the next model");
+            return;
+        }
+    }
+}
+
+/// Drop the renderer if nothing has been drawn with it for `idle`; whether it did.
+fn let_go_if_idle(slot: &mut Slot, idle: Duration) -> bool {
+    let idle = slot.renderer.is_some() && slot.used.is_some_and(|t| t.elapsed() >= idle);
+    if idle {
+        slot.renderer = None;
+    }
+    idle
+}
+
+/// Make the renderer, noting what it runs on the first time.
+fn make_renderer() -> anyhow::Result<hoard_render::Renderer> {
+    static NOTED: std::sync::Once = std::sync::Once::new();
+    let r = new_renderer().inspect_err(|e| {
+        tracing::warn!(error = %format!("{e:#}"), "model thumbnails disabled: no GPU adapter");
+        let _ = RENDERER_STATUS.set(format!("unavailable: {e:#}"));
+    })?;
+    NOTED.call_once(|| {
+        let kind = if r.is_hardware() { "gpu" } else { "cpu" };
+        tracing::info!(adapter = r.adapter_name(), backend = r.backend(), kind, "model thumbnails enabled");
+        if !r.is_hardware() {
+            let hint = crate::gpu_hint::why_no_gpu();
+            if let Some(h) = &hint {
+                tracing::warn!("a GPU is there but model thumbnails render in software: {h}");
+            } else {
+                tracing::info!("no GPU visible: model thumbnails render in software (see docs/DEPLOYMENT.md, GPU)");
             }
-            Err(e) => {
-                tracing::warn!(error = %format!("{e:#}"), "model thumbnails disabled: no GPU adapter");
-                let _ = RENDERER_STATUS.set(format!("unavailable: {e:#}"));
-                None
-            }
-        })
-        .as_ref()
+            let _ = RENDERER_HINT.set(hint);
+        }
+        let _ = RENDERER_STATUS.set(format!("{kind}: {} ({})", r.adapter_name(), r.backend()));
+    });
+    Ok(r)
 }
 
 /// Make the renderer on a thread of its own at low priority. A software rasterizer (lavapipe, WARP) starts its own
@@ -90,7 +163,7 @@ fn new_renderer() -> anyhow::Result<hoard_render::Renderer> {
 }
 
 /// Create the renderer in the background at startup, so the server page can say whether a GPU is in use before the
-/// first model arrives.
+/// first model arrives. Unused, it's let go again after [`RENDERER_IDLE`].
 pub(crate) fn warm_renderer() {
     if RENDER_ENABLED.load(Ordering::Relaxed) {
         std::thread::spawn(|| {
@@ -349,6 +422,18 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_idle_renderer_is_let_go_and_made_again_when_next_needed() {
+        let Some(drawing) = renderer() else { return }; // no adapter here
+        drop(drawing);
+        let mut slot = RENDERER.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        assert!(!let_go_if_idle(&mut slot, Duration::from_secs(3600)), "just used");
+        assert!(let_go_if_idle(&mut slot, Duration::ZERO));
+        assert!(slot.renderer.is_none());
+        drop(slot);
+        assert!(renderer().is_some(), "made again");
+    }
 
     /// Whether a WebP is lossless (VP8L) rather than lossy (VP8).
     fn lossless(webp: &[u8]) -> bool {

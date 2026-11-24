@@ -418,8 +418,7 @@ fn draw(
     } else {
         (vec![posed(&doc, index, middle(secs, fps))?], 0)
     };
-    let renderer = crate::analyze::renderer().context("model thumbnails are off")?;
-    let guard = renderer.lock().unwrap_or_else(PoisonError::into_inner);
+    let guard = crate::analyze::renderer().context("model thumbnails are off")?;
     // wgpu panics on what it finds invalid; that costs this clip its thumbnail, not the server.
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_frames(&frames, SIZE)))
         .map_err(|_| anyhow!("the renderer crashed"))??;

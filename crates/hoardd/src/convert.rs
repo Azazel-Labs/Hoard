@@ -217,8 +217,7 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
 
 /// A thumbnail drawn from a converted model.
 fn draw_thumb(glb: &[u8]) -> Option<Vec<u8>> {
-    let r = analyze::renderer()?;
-    let img = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner).render_slice(glb, 256).ok()?;
+    let img = analyze::renderer()?.render_slice(glb, 256).ok()?;
     analyze::thumb_bytes(&img, false).ok()
 }
 

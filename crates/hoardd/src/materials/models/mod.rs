@@ -54,7 +54,7 @@ pub(super) fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pac
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
         .collect::<rusqlite::Result<_>>()?;
-    if (todo.is_empty() && slotted.is_empty() && redress.is_empty()) || crate::analyze::renderer().is_none() {
+    if (todo.is_empty() && slotted.is_empty() && redress.is_empty()) || !crate::analyze::can_render() {
         return Ok(0);
     }
     let mut dressed_ids = HashSet::new();
@@ -286,7 +286,7 @@ pub(super) fn redraw_glass(state: &AppState, rt: &Handle, conn: &Connection, pac
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
         .collect::<rusqlite::Result<_>>()?;
-    if todo.is_empty() || crate::analyze::renderer().is_none() {
+    if todo.is_empty() || !crate::analyze::can_render() {
         return Ok(0);
     }
     std::fs::create_dir_all(state.cfg.tmp_dir())?;
@@ -336,7 +336,7 @@ pub(super) fn recolor_stls(state: &AppState, rt: &Handle, conn: &Connection, pac
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
         .collect::<rusqlite::Result<_>>()?;
-    if todo.is_empty() || crate::analyze::renderer().is_none() {
+    if todo.is_empty() || !crate::analyze::can_render() {
         return Ok(0);
     }
     std::fs::create_dir_all(state.cfg.tmp_dir())?;

@@ -31,7 +31,7 @@ const MAX_REQUESTS: usize = 20_000;
 const OWN_ROUTE: &str = "/api/admin/profile";
 
 /// One second of the machine.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, schemars::JsonSchema)]
 pub(crate) struct Sample {
     seq: u64,
     /// Milliseconds since the Unix epoch.
@@ -50,14 +50,14 @@ pub(crate) struct Sample {
     running: Vec<Running>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, schemars::JsonSchema)]
 pub(crate) struct Running {
     kind: &'static str,
     label: String,
 }
 
 /// One request served.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, schemars::JsonSchema)]
 pub(crate) struct Served {
     seq: u64,
     /// When it came in, in milliseconds since the Unix epoch.
@@ -309,7 +309,7 @@ pub(crate) struct Since {
     after: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, schemars::JsonSchema)]
 pub(crate) struct Profile {
     /// Pass back as `after` to get only what's new.
     seq: u64,

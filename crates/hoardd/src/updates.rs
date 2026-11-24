@@ -123,7 +123,7 @@ fn due_jobs(c: &rusqlite::Connection, now: &str) -> Result<i64> {
 }
 
 /// The last call to the update address.
-#[derive(Clone, Debug, serde::Serialize)]
+#[derive(Clone, Debug, serde::Serialize, schemars::JsonSchema)]
 pub(crate) struct HookCall {
     /// The release it was for.
     pub(crate) version: String,

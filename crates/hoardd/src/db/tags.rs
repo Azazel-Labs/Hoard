@@ -111,7 +111,7 @@ pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> 
 }
 
 /// What a tag's page shows: how much has it, what it means and the picture that stands for it, and its old names.
-#[derive(Debug, Default, PartialEq, serde::Serialize)]
+#[derive(Debug, Default, PartialEq, serde::Serialize, schemars::JsonSchema)]
 pub(crate) struct TagInfo {
     pub tag: String,
     /// How many assets have it, as the tag counts say.
@@ -286,7 +286,7 @@ pub(crate) fn tag_aliases(conn: &Connection) -> Result<Vec<(String, String)>> {
 
 /// A tag offered while someone types one: a tag in use, or (with `alias`) the tag an old name they typed was merged
 /// into.
-#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, schemars::JsonSchema)]
 pub(crate) struct TagSuggestion {
     pub tag: String,
     pub count: u64,
@@ -295,7 +295,7 @@ pub(crate) struct TagSuggestion {
 }
 
 /// What to offer for what's typed into a tag box.
-#[derive(Debug, Default, PartialEq, serde::Serialize)]
+#[derive(Debug, Default, PartialEq, serde::Serialize, schemars::JsonSchema)]
 pub(crate) struct TagSuggestions {
     /// Tags that match, the best first: the tag itself, then those starting with it, those whose name after the
     /// namespace does, those with a word starting with it, and those containing it; the more used first within each.

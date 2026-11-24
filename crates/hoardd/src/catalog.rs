@@ -1,8 +1,9 @@
 //! Every operation the HTTP API offers, each declared once: the route the server answers, who may call it, what it
-//! does and what it takes. The router is built from it (`api::router`), MCP offers it to assistants
+//! does, what it takes and what it answers. The router is built from it (`api::router`), MCP offers it to assistants
 //! (`find_operations`, `describe_operation`, `read_operation`, `run_operation`) and `/api/openapi.json` describes it,
-//! so a route can't be added without assistants finding and calling it with the same sign-in, and what it takes is
-//! read off its handler's own types, so the description can't drift from what the handler reads.
+//! so a route can't be added without assistants finding and calling it with the same sign-in, and what it takes and
+//! answers are read off its handler's own types, so the description can't drift from what the handler reads and
+//! writes.
 //!
 //! A module offers its operations from a function beside its handlers, like
 //! `Editor.put("/api/tags/parents", set_tag_parents).named("set_tag_parents", "…")`.
@@ -12,7 +13,7 @@ use std::sync::LazyLock;
 use axum::extract::{Extension, Json, Multipart, Path, Query, Request, State};
 use axum::handler::Handler;
 use axum::routing::{MethodFilter, MethodRouter};
-use http::{HeaderMap, Method};
+use http::{HeaderMap, Method, StatusCode};
 use schemars::generate::SchemaSettings;
 use schemars::{JsonSchema, SchemaGenerator};
 use serde::Serialize;
@@ -45,23 +46,39 @@ impl Access {
         }
     }
 
-    pub(crate) fn get<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(self, path: &'static str, h: H) -> Unnamed {
+    pub(crate) fn get<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
+        self,
+        path: &'static str,
+        h: H,
+    ) -> Unnamed {
         self.on(Method::GET, MethodFilter::GET, path, h)
     }
 
-    pub(crate) fn post<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(self, path: &'static str, h: H) -> Unnamed {
+    pub(crate) fn post<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
+        self,
+        path: &'static str,
+        h: H,
+    ) -> Unnamed {
         self.on(Method::POST, MethodFilter::POST, path, h)
     }
 
-    pub(crate) fn put<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(self, path: &'static str, h: H) -> Unnamed {
+    pub(crate) fn put<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
+        self,
+        path: &'static str,
+        h: H,
+    ) -> Unnamed {
         self.on(Method::PUT, MethodFilter::PUT, path, h)
     }
 
-    pub(crate) fn patch<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(self, path: &'static str, h: H) -> Unnamed {
+    pub(crate) fn patch<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
+        self,
+        path: &'static str,
+        h: H,
+    ) -> Unnamed {
         self.on(Method::PATCH, MethodFilter::PATCH, path, h)
     }
 
-    pub(crate) fn delete<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(
+    pub(crate) fn delete<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
         self,
         path: &'static str,
         h: H,
@@ -69,14 +86,14 @@ impl Access {
         self.on(Method::DELETE, MethodFilter::DELETE, path, h)
     }
 
-    fn on<H: Handler<T, AppState> + Inputs<A>, T: 'static, A>(
+    fn on<H: Handler<T, AppState> + Signature<A>, T: 'static, A>(
         self,
         method: Method,
         filter: MethodFilter,
         path: &'static str,
         h: H,
     ) -> Unnamed {
-        Unnamed { access: self, method, path, input: H::input, route: axum::routing::on(filter, h) }
+        Unnamed { access: self, method, path, input: H::input, output: H::output, route: axum::routing::on(filter, h) }
     }
 }
 
@@ -87,6 +104,7 @@ pub(crate) struct Unnamed {
     method: Method,
     path: &'static str,
     input: fn(&mut SchemaGenerator) -> Input,
+    output: fn(&mut SchemaGenerator) -> Answer,
     route: MethodRouter<AppState>,
 }
 
@@ -101,6 +119,7 @@ impl Unnamed {
             method: self.method,
             path: self.path,
             input: self.input,
+            output: self.output,
             route: self.route,
             limit: Limit::Usual,
             for_people: None,
@@ -131,6 +150,7 @@ pub(crate) struct Operation {
     /// Why assistants aren't offered it, when it's for a person to do themselves.
     pub(crate) for_people: Option<&'static str>,
     input: fn(&mut SchemaGenerator) -> Input,
+    output: fn(&mut SchemaGenerator) -> Answer,
     route: MethodRouter<AppState>,
 }
 
@@ -162,8 +182,9 @@ impl Operation {
         }
     }
 
-    fn describe(&self, generator: &mut SchemaGenerator) -> Described {
-        let input = (self.input)(generator);
+    /// Described, with what it takes as `takes` has it (for deserializing) and what it answers as `answers` does.
+    fn describe(&self, takes: &mut SchemaGenerator, answers: &mut SchemaGenerator) -> Described {
+        let input = (self.input)(takes);
         Described {
             name: self.name,
             summary: self.summary,
@@ -180,6 +201,7 @@ impl Operation {
             path_params: path_params(self.path),
             query: input.query,
             body: input.body,
+            answers: (self.output)(answers),
         }
     }
 }
@@ -202,6 +224,10 @@ pub(crate) struct Described {
     pub(crate) query: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) body: Option<Body>,
+    /// What it answers with when it works. Only in `openapi`: assistants see the answer itself, and an asset's schema
+    /// is longer than most answers.
+    #[serde(skip)]
+    pub(crate) answers: Answer,
 }
 
 impl Described {
@@ -230,6 +256,68 @@ pub(crate) enum Body {
     File,
     /// A multipart form of files.
     Form,
+}
+
+/// What an operation answers with when it works, read off its handler's return type (see [`Reply`]).
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub(crate) enum Answer {
+    /// JSON, as `schema` says, with the status `status` (an `OpenAPI` code or range).
+    Json {
+        schema: Value,
+        #[serde(skip)]
+        status: &'static str,
+    },
+    /// Nothing but its status: 204 when it's done, 202 when it's started and carries on.
+    Nothing {
+        #[serde(skip)]
+        status: &'static str,
+    },
+    /// A file, a page or a redirect.
+    File,
+}
+
+/// What a handler returns, as far as what it answers with goes.
+pub(crate) trait Reply {
+    fn answer(generator: &mut SchemaGenerator) -> Answer;
+}
+
+impl<T: JsonSchema> Reply for Json<T> {
+    fn answer(generator: &mut SchemaGenerator) -> Answer {
+        Answer::Json { schema: generator.subschema_for::<T>().to_value(), status: "200" }
+    }
+}
+
+/// JSON with a status of its own: 201 for something made, 202 for something started.
+impl<T: JsonSchema> Reply for (StatusCode, Json<T>) {
+    fn answer(generator: &mut SchemaGenerator) -> Answer {
+        Answer::Json { schema: generator.subschema_for::<T>().to_value(), status: "2XX" }
+    }
+}
+
+impl Reply for StatusCode {
+    fn answer(_: &mut SchemaGenerator) -> Answer {
+        Answer::Nothing { status: "2XX" }
+    }
+}
+
+impl Reply for () {
+    fn answer(_: &mut SchemaGenerator) -> Answer {
+        Answer::Nothing { status: "200" }
+    }
+}
+
+impl<B> Reply for axum::response::Response<B> {
+    fn answer(_: &mut SchemaGenerator) -> Answer {
+        Answer::File
+    }
+}
+
+/// What went wrong is the same for every operation (see `openapi`).
+impl<R: Reply, E> Reply for Result<R, E> {
+    fn answer(generator: &mut SchemaGenerator) -> Answer {
+        R::answer(generator)
+    }
 }
 
 /// What an operation takes besides its path: read off its handler's arguments (see [`Part`]).
@@ -298,16 +386,19 @@ impl Part for Multipart {
     }
 }
 
-/// A handler whose arguments are all [`Part`]s: what a request to it must carry.
-pub(crate) trait Inputs<A> {
+/// A handler whose arguments are all [`Part`]s and which returns a [`Reply`]: what a request to it must carry, and what
+/// it answers.
+pub(crate) trait Signature<A> {
     fn input(generator: &mut SchemaGenerator) -> Input;
+    fn output(generator: &mut SchemaGenerator) -> Answer;
 }
 
 macro_rules! inputs {
     ($($t:ident),*) => {
-        impl<F, Fut, $($t: Part,)*> Inputs<($($t,)*)> for F
+        impl<F, Fut, $($t: Part,)*> Signature<($($t,)*)> for F
         where
             F: FnOnce($($t),*) -> Fut,
+            Fut: Future<Output: Reply>,
         {
             fn input(generator: &mut SchemaGenerator) -> Input {
                 let parts: &[fn(&mut Input, &mut SchemaGenerator)] = &[$($t::add),*];
@@ -316,6 +407,10 @@ macro_rules! inputs {
                     add(&mut input, generator);
                 }
                 input
+            }
+
+            fn output(generator: &mut SchemaGenerator) -> Answer {
+                <Fut::Output as Reply>::answer(generator)
             }
         }
     };
@@ -336,10 +431,18 @@ fn path_params(path: &'static str) -> Vec<&'static str> {
 }
 
 /// Every operation, described, in the order the API lists them.
-pub(crate) static CATALOG: LazyLock<Vec<Described>> = LazyLock::new(|| {
-    let mut generator =
-        SchemaSettings::draft2020_12().with(|s| s.inline_subschemas = true).for_deserialize().into_generator();
-    crate::api::operations().iter().map(|op| op.describe(&mut generator)).collect()
+pub(crate) static CATALOG: LazyLock<&'static [Described]> = LazyLock::new(|| &DESCRIBED.0);
+
+/// [`CATALOG`], and the schemas of what the operations answer with, which their answers refer to by name (as
+/// `#/components/schemas/<name>`, where `openapi` puts them): the many answering with an asset share one. What
+/// they take is written out in full, as assistants read it.
+static DESCRIBED: LazyLock<(Vec<Described>, serde_json::Map<String, Value>)> = LazyLock::new(|| {
+    let settings = SchemaSettings::draft2020_12();
+    let mut takes = settings.clone().with(|s| s.inline_subschemas = true).for_deserialize().into_generator();
+    let mut answers =
+        settings.with(|s| s.definitions_path = "#/components/schemas/".into()).for_serialize().into_generator();
+    let described = crate::api::operations().iter().map(|op| op.describe(&mut takes, &mut answers)).collect();
+    (described, answers.take_definitions(true))
 });
 
 /// The operation called `name`.
@@ -350,7 +453,7 @@ pub(crate) fn find(name: &str) -> Option<&'static Described> {
 /// The catalog as an `OpenAPI` 3.1 document, for apps and agents that call the HTTP API themselves.
 pub(crate) fn openapi(base: &str) -> Value {
     let mut paths = serde_json::Map::new();
-    for d in CATALOG.iter() {
+    for d in *CATALOG {
         let route = d.path.replace("{*", "{");
         let mut parameters: Vec<Value> = d
             .path_params
@@ -373,8 +476,27 @@ pub(crate) fn openapi(base: &str) -> Value {
             "summary": first_sentence(d.summary),
             "description": d.summary,
             "x-hoard-access": d.access,
-            "responses": { "200": { "description": "Done" }, "default": { "description": "What went wrong, as `{\"error\": \"…\"}`" } },
+            "responses": {
+                "default": {
+                    "description": "What went wrong",
+                    "content": { "application/json": { "schema": {
+                        "type": "object",
+                        "properties": { "error": { "type": "string" } },
+                        "required": ["error"],
+                    } } },
+                },
+            },
         });
+        op["responses"][match &d.answers {
+            Answer::Json { status, .. } | Answer::Nothing { status } => *status,
+            Answer::File => "200",
+        }] = match &d.answers {
+            Answer::Json { schema, .. } => {
+                json!({ "description": "Done", "content": { "application/json": { "schema": schema } } })
+            }
+            Answer::Nothing { .. } => json!({ "description": "Done" }),
+            Answer::File => json!({ "description": "The file, page or redirect", "content": { "*/*": {} } }),
+        };
         if !parameters.is_empty() {
             op["parameters"] = json!(parameters);
         }
@@ -406,7 +528,10 @@ pub(crate) fn openapi(base: &str) -> Value {
                             as `Authorization: Bearer <token>`; what it may call is what its account may do.",
         },
         "servers": [{ "url": base }],
-        "components": { "securitySchemes": { "token": { "type": "http", "scheme": "bearer" } } },
+        "components": {
+            "securitySchemes": { "token": { "type": "http", "scheme": "bearer" } },
+            "schemas": DESCRIBED.1,
+        },
         "security": [{ "token": [] }],
         "paths": paths,
     })
@@ -424,7 +549,7 @@ mod tests {
     #[test]
     fn every_operation_has_a_name_of_its_own_and_says_what_it_does() {
         let mut seen = std::collections::HashSet::new();
-        for d in CATALOG.iter() {
+        for d in *CATALOG {
             assert!(seen.insert(d.name), "two operations are called {}", d.name);
             assert!(
                 !d.name.is_empty() && d.name.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_'),
@@ -436,7 +561,7 @@ mod tests {
             assert!(d.path.starts_with("/api/"), "{} isn't in the API", d.name);
         }
         let mut routes = std::collections::HashSet::new();
-        for d in CATALOG.iter() {
+        for d in *CATALOG {
             assert!(routes.insert((d.method, d.path)), "{} {} is there twice", d.method, d.path);
         }
     }
@@ -451,6 +576,22 @@ mod tests {
         assert!(asset.body.is_none() && !asset.changes());
         let search = find("search_assets").unwrap();
         assert!(search.query.as_ref().unwrap()["properties"].get("q").is_some());
+    }
+
+    /// What an operation answers with is read off what its handler returns.
+    #[test]
+    fn what_an_operation_answers_is_read_off_its_handler() {
+        let named = |schema: &Value| {
+            let name = schema["$ref"].as_str().and_then(|r| r.strip_prefix("#/components/schemas/")).unwrap();
+            DESCRIBED.1[name].clone()
+        };
+        let Answer::Json { schema, status: "200" } = &find("get_asset").unwrap().answers else { panic!() };
+        let tag = named(&named(schema)["properties"]["tags"]["items"]);
+        assert!(tag["properties"].get("source").is_some(), "{tag}");
+        let Answer::Json { schema, status: "2XX" } = &find("create_collection").unwrap().answers else { panic!() };
+        assert!(named(schema)["properties"].get("name").is_some(), "{schema}");
+        assert!(matches!(find("delete_location").unwrap().answers, Answer::Nothing { status: "2XX" }));
+        assert!(matches!(find("get_pack_file").unwrap().answers, Answer::File));
     }
 
     /// Routes are only added through the catalog, apart from signing in and what's open to everyone before then:
@@ -505,5 +646,10 @@ mod tests {
         assert!(put["requestBody"]["content"]["application/json"]["schema"]["properties"]["tag"].is_object());
         let pack_file = &doc["paths"]["/api/packs/{id}/files/{path}"]["get"];
         assert_eq!(pack_file["parameters"][1]["name"], "path");
+        assert!(pack_file["responses"]["200"]["content"].get("*/*").is_some());
+        let asset = &doc["paths"]["/api/assets/{id}"]["get"]["responses"];
+        assert_eq!(asset["200"]["content"]["application/json"]["schema"]["$ref"], "#/components/schemas/Asset");
+        assert!(doc["components"]["schemas"]["Asset"]["properties"]["id"].is_object());
+        assert!(asset["default"]["content"]["application/json"]["schema"]["properties"]["error"].is_object());
     }
 }

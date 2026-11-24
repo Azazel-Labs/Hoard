@@ -42,7 +42,7 @@ impl Mode {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, schemars::JsonSchema)]
 pub(crate) struct Location {
     pub(crate) id: i64,
     pub(crate) name: String,

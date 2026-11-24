@@ -137,7 +137,7 @@ enum Existing {
     Imported(Box<Pack>),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, schemars::JsonSchema)]
 struct FileStatus {
     path: String,
     size: u64,
@@ -147,7 +147,7 @@ struct FileStatus {
     parts: Vec<u64>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, schemars::JsonSchema)]
 struct SessionStatus {
     pack: Pack,
     files: Vec<FileStatus>,

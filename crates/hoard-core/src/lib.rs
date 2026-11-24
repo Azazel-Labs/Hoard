@@ -18,7 +18,7 @@ pub fn user_agent() -> String {
 }
 
 /// Broad bucket an asset falls into. Decided by extension + magic bytes, never by the LLM.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum AssetKind {
     Texture,
@@ -121,7 +121,7 @@ impl AssetKind {
 }
 
 /// Where a tag came from. Human tags always win and are never overwritten by machines.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum TagSource {
     /// Derived from file metadata (dimensions, duration, format). Facts.
@@ -155,14 +155,14 @@ impl TagSource {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Tag {
     pub tag: String,
     pub source: TagSource,
     pub confidence: f32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Asset {
     pub id: String,
     pub pack_id: String,
@@ -290,7 +290,7 @@ pub struct Asset {
 }
 
 /// One color of an asset's palette.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Swatch {
     /// `#rrggbb`.
     pub hex: String,
@@ -299,7 +299,7 @@ pub struct Swatch {
 }
 
 /// A material made from texture maps that share a name (`Rock_BaseColor.png`, `Rock_Normal.png`, …).
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MaterialInfo {
     pub id: String,
     pub name: String,
@@ -325,7 +325,7 @@ pub struct MaterialInfo {
 
 /// How a material read from an engine's file draws its maps, in glTF's terms. Anything unset is as a material
 /// made from maps alone draws it.
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MaterialLook {
     /// Linear RGBA, multiplied into the color map (or the color itself, without one).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -356,7 +356,7 @@ pub struct MaterialLook {
 }
 
 /// One texture of a material and what it's for.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct MaterialMap {
     /// The texture's asset id.
     pub id: String,
@@ -376,7 +376,7 @@ pub struct MaterialMap {
 }
 
 /// A format an asset can be converted to on download.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct FormatOption {
     /// Extension-like id: `png`, `wav`, `glb`, …
     pub format: String,
@@ -386,7 +386,7 @@ pub struct FormatOption {
 }
 
 /// Where a converted asset came from.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AssetOrigin {
     /// Path in the pack before conversion (`Content/Rocks/T_Rock_D.uasset`).
     pub path: String,
@@ -407,7 +407,7 @@ pub struct AssetOrigin {
 }
 
 /// Why an Unreal package hasn't been converted.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UnrealStatus {
     /// `needs_editor`, `unsupported` or `failed`.
     pub status: String,
@@ -416,7 +416,7 @@ pub struct UnrealStatus {
 }
 
 /// Unreal conversion progress for a pack.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UnrealPackStatus {
     pub packages: i64,
     pub converted: i64,
@@ -432,7 +432,7 @@ pub struct UnrealPackStatus {
 }
 
 /// A package waiting for Unreal Editor (`hoard unreal-worker`).
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct PendingPackage {
     pub asset_id: String,
     pub pack_id: String,
@@ -452,7 +452,7 @@ pub struct UnrealConvertRequest {
     pub drop_unsupported: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Family {
     /// Shared base, e.g. `Sounds/whoosh`.
     pub key: String,
@@ -462,7 +462,7 @@ pub struct Family {
     pub members: Vec<AssetLink>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Duplicate {
     pub id: String,
     pub name: String,
@@ -473,7 +473,7 @@ pub struct Duplicate {
 
 /// The same picture, sound or model as an asset, in another file: another size, rate or format. Detail view and the
 /// duplicates page.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, schemars::JsonSchema)]
 pub struct NearCopy {
     pub id: String,
     pub name: String,
@@ -498,7 +498,7 @@ pub struct NearCopy {
 
 /// An animation that plays on a character, or a character an animation plays on: one whose skeleton has the bones
 /// the clip moves. Detail view.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, schemars::JsonSchema)]
 pub struct Fit {
     pub id: String,
     pub name: String,
@@ -515,7 +515,7 @@ pub struct Fit {
 }
 
 /// A set of near copies across the library, the best first.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, schemars::JsonSchema)]
 pub struct CopyGroup {
     /// Bytes taken by the copies that aren't the best.
     pub wasted: i64,
@@ -523,7 +523,7 @@ pub struct CopyGroup {
 }
 
 /// A page of the library's near copies, the most space taken first.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, schemars::JsonSchema)]
 pub struct CopyGroups {
     pub groups: Vec<CopyGroup>,
     /// How many sets there are in all.
@@ -538,7 +538,7 @@ pub struct CopyGroups {
 }
 
 /// A named set of assets put together by hand ("Forest level props"), across packs.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Collection {
     pub id: String,
     pub name: String,
@@ -556,7 +556,7 @@ pub struct Collection {
     pub updated_at: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, schemars::JsonSchema)]
 pub struct CollectionRef {
     pub id: String,
     pub name: String,
@@ -614,7 +614,7 @@ pub struct PackContext {
 
 /// How two assets relate. `Texture`, `Buffer` and `Material` are hard dependencies (the file is broken
 /// without them); `Animation` is a clip made for the model; `Guess` is a name-based hunch.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum LinkRel {
     Texture,
@@ -684,7 +684,7 @@ impl LinkRel {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct AssetLink {
     pub id: String,
     pub name: String,
@@ -697,7 +697,7 @@ pub struct AssetLink {
     pub size: u64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum PackStatus {
     Uploading,
@@ -728,7 +728,7 @@ impl PackStatus {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Pack {
     pub id: String,
     pub name: String,
@@ -890,13 +890,13 @@ pub struct SearchQuery {
     pub favorites_of: Option<i64>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Facet {
     pub value: String,
     pub count: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct SearchResult {
     pub items: Vec<Asset>,
     pub total: u64,
@@ -986,7 +986,7 @@ pub struct CreditsRequest {
     pub selections: Vec<ManifestRequest>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ManifestEntry {
     pub id: String,
     pub hash: String,
@@ -1014,13 +1014,13 @@ pub struct ManifestEntry {
     pub file_name: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Manifest {
     pub generated_at: String,
     pub entries: Vec<ManifestEntry>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct Stats {
     pub assets: u64,
     pub packs: u64,
@@ -1084,7 +1084,7 @@ pub struct Stats {
 }
 
 /// A Hoard release newer than the running server.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct UpdateInfo {
     /// e.g. `0.9.0`.
     pub version: String,

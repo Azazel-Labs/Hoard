@@ -257,7 +257,7 @@ pub(crate) fn known_paths(c: &Connection, pack_id: &str) -> Result<std::collecti
 // Archive
 
 /// What an archive request touched.
-#[derive(Debug, Default, serde::Serialize)]
+#[derive(Debug, Default, serde::Serialize, schemars::JsonSchema)]
 pub(crate) struct ArchiveCount {
     pub(crate) packs: u64,
     pub(crate) assets: u64,

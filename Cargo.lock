@@ -3563,6 +3563,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "getrandom 0.4.3",
+ "glam",
  "h3",
  "h3-quinn",
  "hayro",

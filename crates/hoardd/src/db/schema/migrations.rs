@@ -1123,4 +1123,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // drawn again.
     "DELETE FROM derivatives WHERE kind IN ('motion', 'still')
        AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation');",
+    // 104: what's drawn is kept with which drawing of it it is (see `motion::DRAWN`), so a fix to how animations are
+    // drawn draws them again in the background, each old one showing until its new one is in.
+    "ALTER TABLE derivatives ADD COLUMN rev INTEGER NOT NULL DEFAULT 0;",
 ];

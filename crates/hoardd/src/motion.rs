@@ -29,6 +29,13 @@ const MAX_SECS: f64 = 3.0;
 const SIZE: u32 = 256;
 /// libwebp's lossy quality, 0 to 100.
 const QUALITY: f32 = 70.0;
+/// Which drawing of an animation's still and motion thumbnail this is, kept with each (`derivatives.rev`). One more
+/// whenever a fix changes how they're drawn: those drawn before are drawn again in the background, each showing until
+/// its new one is in.
+///
+/// 1. A clip from a file in other units (an FBX in centimetres) moves the character it's drawn on by as much in its
+///    own units, not 100 times as far.
+pub(crate) const DRAWN: i64 = 1;
 
 /// Whether a fill is running, and whether another was asked for while it ran.
 static BUSY: AtomicBool = AtomicBool::new(false);
@@ -174,21 +181,24 @@ struct Todo {
 async fn fill(state: &AppState) -> Result<()> {
     redraw_moved(state).await?;
     let motion_on = state.settings.get().motion_thumbs;
-    // A thumbnail a browser drew is kept: it drew the clip mid-way too, with every texture.
+    // A thumbnail a browser drew is kept: it drew the clip mid-way too, with every texture. One drawn before the last
+    // fix to drawing is drawn again; those not drawn at all go first.
     let todo: Vec<Todo> = db::call(&state.pool, move |c| {
         let rows = c
             .prepare(
                 "SELECT id, path, pack_id, motion, still FROM (
                    SELECT a.id, a.path, a.pack_id,
-                          ?1 AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion')
-                            AS motion,
+                          ?1 AND NOT EXISTS (SELECT 1 FROM derivatives d
+                                             WHERE d.asset_id = a.id AND d.kind = 'motion' AND d.rev >= ?2) AS motion,
                           a.thumb_source IS NULL
-                            AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'still')
-                            AS still
+                            AND NOT EXISTS (SELECT 1 FROM derivatives d
+                                            WHERE d.asset_id = a.id AND d.kind = 'still' AND d.rev >= ?2) AS still,
+                          EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind IN ('motion', 'still'))
+                            AS drawn
                      FROM assets a WHERE a.kind = 'animation' AND a.archived_at IS NULL)
-                  WHERE motion OR still ORDER BY pack_id, path",
+                  WHERE motion OR still ORDER BY drawn, pack_id, path",
             )?
-            .query_map([motion_on], |r| {
+            .query_map(params![motion_on, DRAWN], |r| {
                 Ok(Todo { id: r.get(0)?, path: r.get(1)?, pack_id: r.get(2)?, motion: r.get(3)?, still: r.get(4)? })
             })?
             .collect::<rusqlite::Result<_>>()?;
@@ -321,23 +331,39 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
                 )?;
             }
             let kinds = motion.iter().map(|m| ("motion", m)).chain([("still", &still)]);
+            // What it replaces (an older drawing of it) goes, unless something still shows it.
+            let mut old: Vec<(String, i64)> = Vec::new();
             for (kind, b) in kinds {
+                old.extend(
+                    tx.query_row(
+                        "SELECT b.hash, b.size FROM derivatives d JOIN blobs b ON b.hash = d.blob_hash
+                         WHERE d.asset_id = ?1 AND d.kind = ?2 AND d.blob_hash <> ?3",
+                        params![id, kind, b.hash],
+                        |r| Ok((r.get(0)?, r.get(1)?)),
+                    )
+                    .optional()?,
+                );
                 tx.execute(
-                    "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, ?2, ?3, ?4)
-                     ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
-                    params![id, kind, b.hash, now],
+                    "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at, rev) VALUES (?1, ?2, ?3, ?4, ?5)
+                     ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash,
+                       created_at = excluded.created_at, rev = excluded.rev",
+                    params![id, kind, b.hash, now, DRAWN],
                 )?;
             }
-            // The rest pose it was drawn in goes, unless something still shows it.
-            let old: Option<(String, i64)> = tx
-                .query_row(
+            // As does the rest pose it was drawn in.
+            old.extend(
+                tx.query_row(
                     "SELECT b.hash, b.size FROM assets a JOIN blobs b ON b.hash = a.thumb_hash
                      WHERE a.id = ?1 AND a.thumb_source IS NULL AND a.thumb_hash <> ?2",
                     params![id, still.hash],
                     |r| Ok((r.get(0)?, r.get(1)?)),
                 )
-                .optional()?;
-            tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL", params![id, still.hash])?;
+                .optional()?,
+            );
+            tx.execute(
+                "UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL",
+                params![id, still.hash],
+            )?;
             match &drawn_on {
                 Some(b) => tx.execute(
                     "INSERT INTO drawn_on (asset_id, body_id) VALUES (?1, ?2)
@@ -350,8 +376,8 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
             Ok(old)
         })
         .await?;
-        if let Some(old) = replaced {
-            crate::jobs::delete_unused(state, vec![old]).await?;
+        if !replaced.is_empty() {
+            crate::jobs::delete_unused(state, replaced).await?;
         }
         Ok(())
     }
@@ -463,6 +489,10 @@ fn encode(frames: &[image::RgbaImage], ms: u32) -> Result<Vec<u8>> {
 /// Copy clip `index` of `from` (a file of clips with no mesh) into `to` (a character), each channel moving the node
 /// of `to` named as the one it moved in `from` (or, failing that, the same bone named another way). Channels moving
 /// nothing `to` has, and morph weights, are left out. Its index in `to`, or `None` when it would move nothing.
+///
+/// Its moves are put in `to`'s units and to its size, as the viewer's are (`bindClip` in modelScene.ts): a step of 10
+/// from an FBX in centimetres, under a node scaled by 0.01, is 10 cm on its own character but would be 10 metres on
+/// one made in metres, and a step that's a fifth of one character's height stays a fifth of a smaller one's.
 fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Result<Option<usize>> {
     let Some(anim) = list(from.json.get("animations")).get(index) else { return Ok(None) };
     let (mut exact, mut loose) = (HashMap::new(), HashMap::new());
@@ -474,31 +504,56 @@ fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Resul
         }
     }
     let nodes = list(from.json.get("nodes"));
-    let target = |c: &Value| -> Option<usize> {
-        let node = nodes.get(usize::try_from(c.get("target")?.get("node")?.as_u64()?).ok()?)?;
-        let name = node.get("name")?.as_str()?;
+    let counterpart = |i: usize| -> Option<usize> {
+        let name = nodes.get(i)?.get("name")?.as_str()?;
         exact.get(name).or_else(|| loose.get(&crate::animations::bone(name)?)).copied()
     };
+    // The bones both skeletons have, each measured in its own file, for how much bigger `to`'s is.
+    let (mut pairs, mut taken) = (Vec::new(), HashSet::new());
+    for i in 0..nodes.len() {
+        if let Some(t) = counterpart(i).filter(|t| taken.insert(*t)) {
+            pairs.push((i, t));
+        }
+    }
+    let (from_world, to_world) = (Skeleton::of(&from.json), Skeleton::of(&to.json));
+    let (from_length, to_length) = (
+        from_world.length(&pairs.iter().map(|p| p.0).collect()),
+        to_world.length(&pairs.iter().map(|p| p.1).collect()),
+    );
+    let ratio = (from_length > 1e-9 && to_length > 1e-9).then(|| to_length / from_length);
     let samplers = list(anim.get("samplers"));
     let mut copy = Copier::new(from, to);
     let (mut new_samplers, mut by_sampler, mut channels) = (Vec::new(), HashMap::new(), Vec::new());
     for c in list(anim.get("channels")) {
-        if c.pointer("/target/path").and_then(Value::as_str) == Some("weights") {
+        let path = c.pointer("/target/path").and_then(Value::as_str);
+        if path == Some("weights") {
             continue;
         }
-        let Some(node) = target(c) else { continue };
+        let Some(source) = c.pointer("/target/node").and_then(Value::as_u64).and_then(|n| usize::try_from(n).ok())
+        else {
+            continue;
+        };
+        let Some(node) = counterpart(source) else { continue };
         let Some(s) = c.get("sampler").and_then(Value::as_u64).and_then(|s| usize::try_from(s).ok()) else { continue };
         let Some(sampler) = samplers.get(s) else { continue };
-        let at = if let Some(&at) = by_sampler.get(&s) {
+        // How much a move grows going across: the size ratio, from the clip's units to `to`'s.
+        let grow = match ratio {
+            Some(r) if path == Some("translation") => {
+                let k = r * from_world.unit(source) / to_world.unit(node);
+                if k.is_finite() && (k - 1.0).abs() >= 1e-3 { k } else { 1.0 }
+            }
+            _ => 1.0,
+        };
+        let at = if let Some(&at) = by_sampler.get(&(s, grow.to_bits())) {
             at
         } else {
             let mut ns = sampler.clone();
-            for k in ["input", "output"] {
-                let a = sampler.get(k).and_then(Value::as_u64).and_then(|a| usize::try_from(a).ok());
-                ns[k] = json!(copy.accessor(a.with_context(|| format!("a sampler without an {k}"))?)?);
-            }
+            let input = sampler.get("input").and_then(Value::as_u64).and_then(|a| usize::try_from(a).ok());
+            ns["input"] = json!(copy.accessor(input.context("a sampler without an input")?)?);
+            let output = sampler.get("output").and_then(Value::as_u64).and_then(|a| usize::try_from(a).ok());
+            ns["output"] = json!(copy.scaled(output.context("a sampler without an output")?, grow)?);
             new_samplers.push(ns);
-            by_sampler.insert(s, new_samplers.len() - 1);
+            by_sampler.insert((s, grow.to_bits()), new_samplers.len() - 1);
             new_samplers.len() - 1
         };
         let mut nc = c.clone();
@@ -521,6 +576,92 @@ fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Resul
     let animations = array(&mut to.json, "animations");
     animations.push(json!({ "name": name, "samplers": new_samplers, "channels": channels }));
     Ok(Some(animations.len() - 1))
+}
+
+/// Where a document's nodes stand at rest: each one's parent, and its place in the world (its own transform under its
+/// parents').
+struct Skeleton {
+    parent: Vec<Option<usize>>,
+    world: Vec<glam::Mat4>,
+}
+
+impl Skeleton {
+    fn of(json: &Map<String, Value>) -> Self {
+        let nodes = list(json.get("nodes"));
+        let mut parent = vec![None; nodes.len()];
+        for (i, n) in nodes.iter().enumerate() {
+            for c in list(n.get("children")).iter().filter_map(Value::as_u64).filter_map(|c| usize::try_from(c).ok()) {
+                if let Some(p) = parent.get_mut(c).filter(|p| p.is_none()) {
+                    *p = Some(i);
+                }
+            }
+        }
+        let mut world = vec![None; nodes.len()];
+        for i in 0..nodes.len() {
+            place(i, nodes, &parent, &mut world, 0);
+        }
+        Self { parent, world: world.into_iter().map(|m| m.unwrap_or(glam::Mat4::IDENTITY)).collect() }
+    }
+
+    /// How long the bones between these nodes are, end to end: each node's distance from its parent, when that's one
+    /// of them too.
+    fn length(&self, nodes: &HashSet<usize>) -> f32 {
+        let at = |i: usize| self.world[i].w_axis.truncate();
+        nodes.iter().filter_map(|&i| self.parent[i].filter(|p| nodes.contains(p)).map(|p| at(i).distance(at(p)))).sum()
+    }
+
+    /// How big one unit of a node's translation is in the world: its parent's scale.
+    fn unit(&self, i: usize) -> f32 {
+        let Some(p) = self.parent[i] else { return 1.0 };
+        let m = self.world[p];
+        (m.x_axis.truncate().length() + m.y_axis.truncate().length() + m.z_axis.truncate().length()) / 3.0
+    }
+}
+
+/// Node `i`'s place in the world, worked out once each: its parents' first. A loop of parents stops at its first turn.
+fn place(
+    i: usize,
+    nodes: &[Value],
+    parent: &[Option<usize>],
+    world: &mut [Option<glam::Mat4>],
+    depth: usize,
+) -> glam::Mat4 {
+    if let Some(m) = world[i] {
+        return m;
+    }
+    let up = match parent[i] {
+        Some(p) if depth < nodes.len() => place(p, nodes, parent, world, depth + 1),
+        _ => glam::Mat4::IDENTITY,
+    };
+    let m = up * local(&nodes[i]);
+    world[i] = Some(m);
+    m
+}
+
+/// A node's own transform: its matrix, or its translation, rotation and scale.
+fn local(node: &Value) -> glam::Mat4 {
+    if let Some(m) = floats::<16>(node.get("matrix")) {
+        return glam::Mat4::from_cols_array(&m);
+    }
+    let t = floats::<3>(node.get("translation")).map_or(glam::Vec3::ZERO, glam::Vec3::from_array);
+    let r = floats::<4>(node.get("rotation")).map_or(glam::Quat::IDENTITY, |q| glam::Quat::from_array(q).normalize());
+    let s = floats::<3>(node.get("scale")).map_or(glam::Vec3::ONE, glam::Vec3::from_array);
+    glam::Mat4::from_scale_rotation_translation(s, r, t)
+}
+
+/// A JSON array of exactly `N` numbers.
+fn floats<const N: usize>(v: Option<&Value>) -> Option<[f32; N]> {
+    let a = v?.as_array()?;
+    if a.len() != N {
+        return None;
+    }
+    let mut out = [0f32; N];
+    for (o, x) in out.iter_mut().zip(a) {
+        #[expect(clippy::cast_possible_truncation, reason = "glTF stores these as 32-bit floats")]
+        let x = x.as_f64()? as f32;
+        *o = x;
+    }
+    Some(out)
 }
 
 fn list(v: Option<&Value>) -> &[Value] {
@@ -579,6 +720,61 @@ impl<'d> Copier<'d> {
         let at = self.base.0 + self.accessors.len() - 1;
         self.accessor_at.insert(i, at);
         Ok(at)
+    }
+
+    /// Accessor `i` copied with every value times `k`, as a new accessor of its own: or as it is when `k` is 1, or it
+    /// isn't plain floats (a sparse one, say) to scale.
+    fn scaled(&mut self, i: usize, k: f32) -> Result<usize> {
+        #[expect(clippy::float_cmp, reason = "exactly 1 is what's left alone")]
+        if k == 1.0 {
+            return self.accessor(i);
+        }
+        let a = list(self.from.json.get("accessors")).get(i).with_context(|| format!("no accessor {i}"))?.clone();
+        let index = |v: Option<&Value>| v.and_then(Value::as_u64).and_then(|v| usize::try_from(v).ok());
+        let width = match a.get("type").and_then(Value::as_str) {
+            Some("SCALAR") => 1,
+            Some("VEC2") => 2,
+            Some("VEC3") => 3,
+            Some("VEC4") => 4,
+            _ => 0,
+        };
+        let (Some(v), Some(count)) = (index(a.get("bufferView")), index(a.get("count"))) else {
+            return self.accessor(i);
+        };
+        if width == 0 || a.get("sparse").is_some() || index(a.get("componentType")) != Some(5126) {
+            return self.accessor(i);
+        }
+        let view = list(self.from.json.get("bufferViews")).get(v).with_context(|| format!("no buffer view {v}"))?;
+        let buffer = index(view.get("buffer")).with_context(|| format!("buffer view {v} names no buffer"))?;
+        let start = index(view.get("byteOffset")).unwrap_or(0) + index(a.get("byteOffset")).unwrap_or(0);
+        let stride = index(view.get("byteStride")).unwrap_or(width * 4);
+        let bytes = self.from.buffer(buffer)?;
+        let mut out = Vec::with_capacity(count * width * 4);
+        for element in 0..count {
+            for component in 0..width {
+                let at = start + element * stride + component * 4;
+                let four = bytes.get(at..at + 4).with_context(|| format!("accessor {i} runs past its buffer"))?;
+                out.extend_from_slice(&(f32::from_le_bytes(four.try_into()?) * k).to_le_bytes());
+            }
+        }
+        let len = out.len();
+        self.buffers.push(out);
+        self.views.push(json!({ "buffer": self.base.2 + self.buffers.len() - 1, "byteLength": len }));
+        let mut copy = a;
+        copy["bufferView"] = json!(self.base.1 + self.views.len() - 1);
+        if let Some(o) = copy.as_object_mut() {
+            o.remove("byteOffset");
+            for bound in ["min", "max"] {
+                if let Some(Value::Array(xs)) = o.get_mut(bound) {
+                    // `k` is a ratio of lengths, so more than nothing: the least stays the least.
+                    for x in xs.iter_mut() {
+                        *x = json!(x.as_f64().unwrap_or(0.0) * f64::from(k));
+                    }
+                }
+            }
+        }
+        self.accessors.push(copy);
+        Ok(self.base.0 + self.accessors.len() - 1)
     }
 
     fn view(&mut self, i: usize) -> Result<usize> {
@@ -670,6 +866,49 @@ mod tests {
         assert!((x_at(&body, at, 0.5) - 2.5).abs() < 1e-4);
         let (frames, ms) = frames(&body, at, secs, 12.0).unwrap();
         assert_eq!((frames.len(), ms), (12, 83));
+    }
+
+    /// A clip from an FBX in centimetres, its bones under a node scaled by 0.01, moving its hips 5 metres (500) along
+    /// x over a second, played on a character made in metres with a spine as far above its hips: it moves 5 metres
+    /// there too, not 500.
+    #[test]
+    fn a_clip_in_other_units_moves_the_character_as_far_in_its_own() {
+        let data = "AAAAAAAAgD8AAAAAAADIQgAAAAAAAPpDAADIQgAAAAA=";
+        let from = doc(&format!(
+            r#"{{"asset":{{"version":"2.0"}},"scene":0,"scenes":[{{"nodes":[0]}}],
+            "nodes":[{{"name":"RootNode","scale":[0.01,0.01,0.01],"children":[1]}},
+                     {{"name":"Hips","translation":[0,100,0],"children":[2]}},
+                     {{"name":"Spine","translation":[0,50,0]}}],
+            "animations":[{{"name":"Run","samplers":[{{"input":0,"output":1}}],
+                "channels":[{{"sampler":0,"target":{{"node":1,"path":"translation"}}}}]}}],
+            "accessors":[
+                {{"bufferView":0,"componentType":5126,"count":2,"type":"SCALAR","min":[0],"max":[1]}},
+                {{"bufferView":1,"componentType":5126,"count":2,"type":"VEC3","min":[0,100,0],"max":[500,100,0]}}],
+            "bufferViews":[{{"buffer":0,"byteLength":8}},{{"buffer":0,"byteOffset":8,"byteLength":24}}],
+            "buffers":[{{"byteLength":32,"uri":"data:application/octet-stream;base64,{data}"}}]}}"#
+        ));
+        let tri = "AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA";
+        let mut body = doc(&format!(
+            r#"{{"asset":{{"version":"2.0"}},"scene":0,"scenes":[{{"nodes":[0]}}],
+            "nodes":[{{"name":"Root","children":[1]}},{{"name":"Hips","translation":[0,1,0],"mesh":0,"children":[2]}},
+                     {{"name":"Spine","translation":[0,0.5,0]}}],
+            "meshes":[{{"primitives":[{{"attributes":{{"POSITION":0}}}}]}}],
+            "accessors":[{{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3",
+                "min":[0,0,0],"max":[1,1,0]}}],
+            "bufferViews":[{{"buffer":0,"byteLength":36}}],
+            "buffers":[{{"byteLength":36,"uri":"data:application/octet-stream;base64,{tri}"}}]}}"#
+        ));
+        let at = transplant(&from, 0, &mut body).unwrap().unwrap();
+        assert!(x_at(&body, at, 0.0).abs() < 1e-4);
+        let x = x_at(&body, at, 0.5);
+        assert!((x - 2.5).abs() < 1e-3, "half way it's {x} along, not 2.5");
+        let max = &body.json["accessors"]
+            [body.json["animations"][at]["samplers"][0]["output"].as_u64().unwrap() as usize]["max"];
+        let max: Vec<f64> = max.as_array().unwrap().iter().map(|v| v.as_f64().unwrap()).collect();
+        assert!(
+            max.iter().zip([5.0, 1.0, 0.0]).all(|(a, b)| (a - b).abs() < 1e-4),
+            "its bounds are scaled with it, not {max:?}"
+        );
     }
 
     #[test]

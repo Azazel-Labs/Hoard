@@ -36,10 +36,7 @@ pub(crate) fn operations() -> Vec<Operation> {
         ),
         Admin
             .put("/api/admin/https", put_change)
-            .named(
-                "change_https",
-                "Change how Hoard serves HTTPS. The new setup is tried before it's switched to.",
-            )
+            .named("change_https", "Change how Hoard serves HTTPS. The new setup is tried before it's switched to.")
             .for_people("a wrong change can cut off every device, the one asking included"),
         Admin.post("/api/admin/https/check", check).named(
             "check_certificate",

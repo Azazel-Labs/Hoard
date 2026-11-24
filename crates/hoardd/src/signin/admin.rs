@@ -1,14 +1,6 @@
 //! Settings → Authentication's routes: the settings read and saved (secrets kept, never shown back), an LDAP server
 //! tried with them, and an OAuth provider's addresses discovered.
 
-use std::sync::Arc;
-use std::time::Duration;
-use anyhow::Result;
-use axum::extract::State;
-use axum::http::{HeaderMap, header};
-use axum::Json;
-use serde::Deserialize;
-use serde_json::{Value, json};
 use super::oauth::callback_url;
 use super::{AuthConfig, Decision, Ldap, decide, http_url};
 use crate::AppState;
@@ -17,6 +9,14 @@ use crate::db;
 use crate::directory;
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
+use anyhow::Result;
+use axum::Json;
+use axum::extract::State;
+use axum::http::{HeaderMap, header};
+use serde::Deserialize;
+use serde_json::{Value, json};
+use std::sync::Arc;
+use std::time::Duration;
 
 /// Settings → Sign-in.
 pub(crate) fn operations() -> Vec<Operation> {

@@ -1,12 +1,6 @@
 //! Accounts and access tokens: changing one's own password, an admin's list of accounts (made, given a role, removed),
 //! and the tokens scripts and agents sign in with.
 
-use axum::extract::{Path, State};
-use axum::http::{HeaderMap, StatusCode};
-use axum::{Extension, Json};
-use rusqlite::{OptionalExtension, params};
-use serde::Deserialize;
-use serde_json::{Value, json};
 use super::{
     Role, Who, check_name, check_new, check_password, digest, hash_password, owner_filter, password_matches,
     random_bytes, session_token, sign_out_everywhere,
@@ -17,6 +11,12 @@ use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use crate::signin::Source;
 use crate::{db, tools};
+use axum::extract::{Path, State};
+use axum::http::{HeaderMap, StatusCode};
+use axum::{Extension, Json};
+use rusqlite::{OptionalExtension, params};
+use serde::Deserialize;
+use serde_json::{Value, json};
 
 /// Everyone's own password and tokens (an admin sees and can revoke everyone's tokens), and an admin's accounts.
 pub(crate) fn operations() -> Vec<Operation> {
@@ -38,10 +38,9 @@ pub(crate) fn operations() -> Vec<Operation> {
                 "A new access token. The token itself is in this answer and nowhere else: only its hash is kept.",
             )
             .for_people(ACCESS),
-        SignedIn.delete("/api/admin/tokens/{id}", delete_token).named(
-            "revoke_token",
-            "Revoke an access token: whatever uses it is refused from its next request.",
-        ),
+        SignedIn
+            .delete("/api/admin/tokens/{id}", delete_token)
+            .named("revoke_token", "Revoke an access token: whatever uses it is refused from its next request."),
         SignedIn
             .patch("/api/admin/tokens/{id}", patch_token)
             .named(
@@ -49,10 +48,9 @@ pub(crate) fn operations() -> Vec<Operation> {
                 "Let an access token do more or less, from its next request. Never more than you can do.",
             )
             .for_people(ACCESS),
-        Admin.get("/api/admin/users", list_users).named(
-            "list_accounts",
-            "Every account: name, role, where it signs in from, and when it last did.",
-        ),
+        Admin
+            .get("/api/admin/users", list_users)
+            .named("list_accounts", "Every account: name, role, where it signs in from, and when it last did."),
         Admin
             .post("/api/admin/users", create_user)
             .named("create_account", "Make an account with a name, a password and a role.")

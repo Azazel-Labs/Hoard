@@ -5,19 +5,19 @@
 //! A project is known by its name (`project` in `hoard.toml`, or its folder's name): everyone syncing the same name
 //! reports into the same project, and each report replaces what it had.
 
+use crate::AppState;
+use crate::auth::Who;
+use crate::catalog::{Access, Operation};
+use crate::db;
+use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
-use std::collections::BTreeMap;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::{Extension, Json};
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use crate::AppState;
-use crate::auth::Who;
-use crate::catalog::{Access, Operation};
-use crate::db;
-use crate::error::{ApiResult, AppError};
+use std::collections::BTreeMap;
 
 /// Projects (games using the library through `hoard sync`) and what they use. Reporting a sync needs only to be
 /// signed in, since it changes nothing in the library.

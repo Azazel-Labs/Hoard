@@ -2,6 +2,11 @@
 //! their dragon hoard (how much of the library they've collected), and which of what's new in Hoard they've seen. Looking is enough for all of them, since none
 //! changes the library. An access token or connected app acts for the account that made it.
 
+use crate::AppState;
+use crate::auth::Who;
+use crate::catalog::{Access, Operation};
+use crate::db;
+use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -10,11 +15,6 @@ use rusqlite::{Connection, OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
-use crate::AppState;
-use crate::auth::Who;
-use crate::catalog::{Access, Operation};
-use crate::db;
-use crate::error::{ApiResult, AppError};
 
 /// What's the signed-in person's own.
 pub(crate) fn operations() -> Vec<Operation> {
@@ -55,10 +55,9 @@ pub(crate) fn operations() -> Vec<Operation> {
             "get_news_seen",
             "What you've seen of what's new in Hoard, or `null` before anything's been recorded.",
         ),
-        SignedIn.put("/api/me/news", set_news).named(
-            "set_news_seen",
-            "Record what you've seen of what's new in Hoard, replacing what was recorded.",
-        ),
+        SignedIn
+            .put("/api/me/news", set_news)
+            .named("set_news_seen", "Record what you've seen of what's new in Hoard, replacing what was recorded."),
     ]
 }
 

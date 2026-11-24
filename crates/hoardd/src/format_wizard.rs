@@ -6,25 +6,25 @@
 //! Which files no format reads takes reading files from the store, slow when they aren't in the disk's cache, so it's
 //! kept as last worked out and answered at once, worked out again once the library or the formats change.
 
+use crate::catalog::{Access, Operation};
+use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
-use std::collections::HashMap;
-use std::io::Write as _;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{Arc, Mutex, PoisonError};
+use crate::sidecar::{self, SIDECAR_BYTES, Sidecar};
+use crate::store_formats::{self, Format};
+use crate::{AppState, db, jobs};
+use axum::Json;
 use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
-use axum::Json;
 use futures_util::StreamExt as _;
 use rusqlite::params_from_iter;
 use rusqlite::types::Value as Sql;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use crate::catalog::{Access, Operation};
-use crate::error::{ApiResult, AppError};
-use crate::sidecar::{self, SIDECAR_BYTES, Sidecar};
-use crate::store_formats::{self, Format};
-use crate::{AppState, db, jobs};
+use std::collections::HashMap;
+use std::io::Write as _;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex, PoisonError};
 
 /// Files of these types may be a store's description of what's beside them.
 const TEXT_EXTS: &[&str] = &["json", "txt", "xml", "ini", "yaml", "yml", "cfg", "nfo", "toml", "meta"];

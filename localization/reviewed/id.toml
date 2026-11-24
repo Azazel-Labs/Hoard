@@ -11969,6 +11969,10 @@ translation = "Pertahankan tag { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Pertahankan tebakan ini sebagai tag Anda sendiri"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Lupakan nama lama { $alias }: pemberi tag boleh memberikannya lagi alih-alih { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11978,6 +11982,17 @@ source = """
 translation = """
 { $count ->
        *[other] Nama lama: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] Nama lama:
     }"""
 
 [messages.tag-page-count]
@@ -12179,6 +12194,26 @@ translation = "Tidak dapat memuat tag: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Memuat…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Berbeda"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } dan { $b } berarti hal berbeda: berhenti menawarkan untuk menggabungkannya"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Tag yang mirip"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Gabungkan { $other } ke { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Bentuk jamak, kata yang sama disambung, atau beda satu huruf. Menggabungkan mempertahankan nama yang lebih sering dipakai, dan pemberi tag memakainya sejak itu."
 
 [messages.tags-merge]
 source = "Merge"

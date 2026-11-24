@@ -2732,6 +2732,12 @@ tags-browse = Открыть
 tags-merged-heading = Объединённые теги
 tags-merged-what = Когда разметчики придумывают одно из этих старых названий, ассет получает тег, с которым оно было объединено.
 tags-allow-old = Снова разрешить старое название
+tags-lookalike-heading = Похожие теги
+tags-lookalike-what = Множественное число, те же слова слитно или одна буква не та. При объединении остаётся более частое название, и дальше теги ставятся с ним.
+tags-lookalike-merge-title = Объединить { $other } с { $keep }
+tags-lookalike-apart = Разные
+tags-lookalike-apart-title = { $a } и { $b } означают разное: больше не предлагать их объединить
+tag-page-alias-remove = Забыть старое название { $alias }: его снова могут ставить вместо { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2747,6 +2753,13 @@ tag-page-aliases =
         [few] Старые названия: { $names }
         [many] Старые названия: { $names }
        *[other] Старые названия: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Старое название:
+        [few] Старые названия:
+        [many] Старые названия:
+       *[other] Старые названия:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } объединён с { $into }.

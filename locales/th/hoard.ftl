@@ -2254,12 +2254,22 @@ tags-browse = เรียกดู
 tags-merged-heading = แท็กที่รวมแล้ว
 tags-merged-what = เมื่อตัวติดแท็กเสนอชื่อเก่าเหล่านี้ แอสเซ็ตจะได้แท็กที่ชื่อนั้นถูกรวมเข้าไปแทน
 tags-allow-old = อนุญาตชื่อเก่าอีกครั้ง
+tags-lookalike-heading = แท็กที่ดูคล้ายกัน
+tags-lookalike-what = รูปพหูพจน์ คำเดียวกันที่เขียนติดกัน หรือต่างกันหนึ่งตัวอักษร การรวมจะเก็บชื่อที่ใช้มากกว่าไว้ และการติดแท็กจะใช้ชื่อนั้นต่อจากนี้
+tags-lookalike-merge-title = รวม { $other } เข้ากับ { $keep }
+tags-lookalike-apart = คนละแท็ก
+tags-lookalike-apart-title = { $a } และ { $b } มีความหมายต่างกัน: เลิกเสนอให้รวม
+tag-page-alias-remove = ลืมชื่อเดิม { $alias }: การติดแท็กอาจใส่ชื่อนี้อีกแทน { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } แอสเซ็ต
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] ชื่อเดิม: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] ชื่อเดิม:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } ถูกรวมเข้ากับ { $into } แล้ว

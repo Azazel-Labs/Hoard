@@ -2483,6 +2483,12 @@ tags-browse = Bläddra
 tags-merged-heading = Sammanslagna taggar
 tags-merged-what = När taggningen kommer på något av de här gamla namnen får resursen taggen som det slogs ihop till.
 tags-allow-old = Tillåt det gamla namnet igen
+tags-lookalike-heading = Taggar som liknar varandra
+tags-lookalike-what = En pluralform, samma ord ihopskrivna eller en bokstav fel. Sammanslagning behåller det mest använda namnet, och taggarna använder det från och med då.
+tags-lookalike-merge-title = Slå ihop { $other } med { $keep }
+tags-lookalike-apart = Olika
+tags-lookalike-apart-title = { $a } och { $b } betyder olika saker: sluta föreslå att slå ihop dem
+tag-page-alias-remove = Glöm det gamla namnet { $alias }: taggarna kan ge det igen i stället för { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2494,6 +2500,11 @@ tag-page-aliases =
     { $count ->
         [one] Gammalt namn: { $names }
        *[other] Gamla namn: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Gammalt namn:
+       *[other] Gamla namn:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } slogs ihop med { $into }.

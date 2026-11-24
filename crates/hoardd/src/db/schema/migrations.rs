@@ -1170,4 +1170,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
          AND a.ext IN ('dae', 'zae', 'x3d', 'x3dv', 'x3dz', 'wrl', 'wrz', 'off', 'vrm', 'vrma', 'splat', 'spz')
          AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'glb')
        GROUP BY a.pack_id;",
+    // 107: Tags that look alike but someone said are different, so they aren't offered for merging again (the first
+    // A to Z in `a`).
+    "CREATE TABLE tags_apart (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b)) WITHOUT ROWID;",
 ];

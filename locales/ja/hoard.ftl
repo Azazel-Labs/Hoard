@@ -2251,12 +2251,22 @@ tags-browse = 閲覧
 tags-merged-heading = 統合したタグ
 tags-merged-what = タグ付けでこれらの古い名前が出てきたときは、統合先のタグがアセットに付きます。
 tags-allow-old = 古い名前を再び許可
+tags-lookalike-heading = 似ているタグ
+tags-lookalike-what = 複数形、同じ語の続け書き、1 文字違いなど。統合すると使用数の多い名前が残り、以降はタグ付けでその名前が使われます。
+tags-lookalike-merge-title = { $other } を { $keep } に統合
+tags-lookalike-apart = 別のタグ
+tags-lookalike-apart-title = { $a } と { $b } は意味が違います：統合の提案をやめる
+tag-page-alias-remove = 旧名 { $alias } を忘れる：タグ付けで { $tag } の代わりに再び付くことがあります
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } 件のアセット
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] 旧名: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] 旧名:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } は { $into } に統合されました。

@@ -11937,6 +11937,10 @@ translation = "Giữ thẻ { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Giữ phỏng đoán này làm thẻ của riêng bạn"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Quên tên cũ { $alias }: việc gắn thẻ có thể lại dùng tên này thay cho { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11946,6 +11950,17 @@ source = """
 translation = """
 { $count ->
        *[other] Tên cũ: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] Tên cũ:
     }"""
 
 [messages.tag-page-count]
@@ -12147,6 +12162,26 @@ translation = "Không thể tải các thẻ: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Đang tải…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Khác nhau"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } và { $b } mang nghĩa khác nhau: thôi đề xuất gộp chúng"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Thẻ trông giống nhau"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Gộp { $other } vào { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Dạng số nhiều, cùng các từ viết liền, hoặc lệch một chữ cái. Gộp sẽ giữ tên được dùng nhiều hơn, và từ đó việc gắn thẻ dùng tên ấy."
 
 [messages.tags-merge]
 source = "Merge"

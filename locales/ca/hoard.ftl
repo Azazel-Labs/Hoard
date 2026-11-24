@@ -2486,6 +2486,12 @@ tags-browse = Explora
 tags-merged-heading = Etiquetes fusionades
 tags-merged-what = Quan els etiquetadors proposen un d'aquests noms antics, el recurs rep l'etiqueta a la qual es va fusionar.
 tags-allow-old = Torna a permetre el nom antic
+tags-lookalike-heading = Etiquetes que s’assemblen
+tags-lookalike-what = Un plural, les mateixes paraules juntes o una lletra de diferència. En fusionar-les es manté el nom més utilitzat, i els etiquetadors el fan servir a partir d’aleshores.
+tags-lookalike-merge-title = Fusiona { $other } amb { $keep }
+tags-lookalike-apart = Diferents
+tags-lookalike-apart-title = { $a } i { $b } volen dir coses diferents: deixa d’oferir fusionar-les
+tag-page-alias-remove = Oblida el nom antic { $alias }: els etiquetadors el poden tornar a posar en lloc de { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2497,6 +2503,11 @@ tag-page-aliases =
     { $count ->
         [one] Nom antic: { $names }
        *[other] Noms antics: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Nom antic:
+       *[other] Noms antics:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } s'ha fusionat amb { $into }.

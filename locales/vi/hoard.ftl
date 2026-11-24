@@ -2251,12 +2251,22 @@ tags-browse = Duyệt
 tags-merged-heading = Thẻ đã gộp
 tags-merged-what = Khi các bộ gắn thẻ đưa ra một trong những tên cũ này, tài nguyên sẽ nhận thẻ mà tên đó đã được gộp vào.
 tags-allow-old = Cho phép lại tên cũ
+tags-lookalike-heading = Thẻ trông giống nhau
+tags-lookalike-what = Dạng số nhiều, cùng các từ viết liền, hoặc lệch một chữ cái. Gộp sẽ giữ tên được dùng nhiều hơn, và từ đó việc gắn thẻ dùng tên ấy.
+tags-lookalike-merge-title = Gộp { $other } vào { $keep }
+tags-lookalike-apart = Khác nhau
+tags-lookalike-apart-title = { $a } và { $b } mang nghĩa khác nhau: thôi đề xuất gộp chúng
+tag-page-alias-remove = Quên tên cũ { $alias }: việc gắn thẻ có thể lại dùng tên này thay cho { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } tài nguyên
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] Tên cũ: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] Tên cũ:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } đã được gộp vào { $into }.

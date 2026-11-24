@@ -2494,6 +2494,12 @@ tags-browse = Sfoglia
 tags-merged-heading = Tag uniti
 tags-merged-what = Quando i tagger propongono uno di questi vecchi nomi, l'asset riceve il tag in cui è stato unito.
 tags-allow-old = Consenti di nuovo il vecchio nome
+tags-lookalike-heading = Tag che si somigliano
+tags-lookalike-what = Un plurale, le stesse parole attaccate o una lettera di differenza. L’unione tiene il nome più usato, e chi assegna i tag lo usa da quel momento.
+tags-lookalike-merge-title = Unisci { $other } a { $keep }
+tags-lookalike-apart = Diversi
+tags-lookalike-apart-title = { $a } e { $b } significano cose diverse: smetti di proporre di unirli
+tag-page-alias-remove = Dimentica il vecchio nome { $alias }: chi assegna i tag potrà di nuovo usarlo invece di { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2505,6 +2511,11 @@ tag-page-aliases =
     { $count ->
         [one] Vecchio nome: { $names }
        *[other] Vecchi nomi: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Vecchio nome:
+       *[other] Vecchi nomi:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } è stato unito a { $into }.

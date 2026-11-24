@@ -2774,6 +2774,16 @@ tags-browse = Browse
 tags-merged-heading = Merged tags
 tags-merged-what = When the taggers come up with one of these old names, the asset gets the tag it was merged into.
 tags-allow-old = Allow the old name again
+# Settings → Tags: pairs of tags in use that are probably one, the less used offered for merging into the more.
+tags-lookalike-heading = Tags that look alike
+tags-lookalike-what = A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on.
+# $other is the less used tag, $keep the one it would merge into.
+tags-lookalike-merge-title = Merge { $other } into { $keep }
+tags-lookalike-apart = Different
+# $a and $b are the two tags.
+tags-lookalike-apart-title = { $a } and { $b } mean different things: stop offering to merge them
+# On a tag's page: $alias is an old name merged into $tag.
+tag-page-alias-remove = Forget the old name { $alias }: the taggers may give it again instead of { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2785,6 +2795,12 @@ tag-page-aliases =
     { $count ->
         [one] Old name: { $names }
        *[other] Old names: { $names }
+    }
+# Before an editor's list of a tag's old names, each with a button to forget it.
+tag-page-aliases-label =
+    { $count ->
+        [one] Old name:
+       *[other] Old names:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } was merged into { $into }.

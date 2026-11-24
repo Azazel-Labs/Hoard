@@ -2541,6 +2541,12 @@ tags-browse = Selaa
 tags-merged-heading = Yhdistetyt tunnisteet
 tags-merged-what = Kun tunnistelijat ehdottavat jotakin näistä vanhoista nimistä, resurssi saa tunnisteen, johon se yhdistettiin.
 tags-allow-old = Salli vanha nimi uudelleen
+tags-lookalike-heading = Samannäköiset tunnisteet
+tags-lookalike-what = Monikko, samat sanat yhteen kirjoitettuina tai yksi kirjain väärin. Yhdistäminen säilyttää käytetymmän nimen, ja tunnistajat käyttävät sitä siitä lähtien.
+tags-lookalike-merge-title = Yhdistä { $other } tunnisteeseen { $keep }
+tags-lookalike-apart = Eri asia
+tags-lookalike-apart-title = { $a } ja { $b } tarkoittavat eri asioita: älä enää ehdota niiden yhdistämistä
+tag-page-alias-remove = Unohda vanha nimi { $alias }: tunnistajat voivat taas antaa sen tunnisteen { $tag } sijaan
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2552,6 +2558,11 @@ tag-page-aliases =
     { $count ->
         [one] Vanha nimi: { $names }
        *[other] Vanhat nimet: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Vanha nimi:
+       *[other] Vanhat nimet:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } yhdistettiin tunnisteeseen { $into }.

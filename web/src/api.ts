@@ -245,6 +245,10 @@ export const api = {
   /** Every tag that goes under another. */
   tagTree: () => request<{ tag: string; parent: string }[]>('/api/tags/tree'),
   tagAliases: () => request<{ tag: string; into: string }[]>('/api/tags/aliases'),
+  /** Tags in use that look like each other: each `other` would merge into its `keep`, the more used. */
+  tagLookalikes: () =>
+    request<{ keep: string; keep_count: number; other: string; other_count: number }[]>('/api/tags/lookalikes'),
+  keepTagsApart: (a: string, b: string) => post<void>('/api/tags/apart', { a, b }),
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   /** What's going on, and how many AI tagging jobs are waiting or running (past the ones listed). */
   activity: () => request<{ items: ActivityItem[]; ai_tagging: number }>('/api/activity'),

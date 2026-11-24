@@ -12408,6 +12408,10 @@ translation = "Păstrați eticheta { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Păstrați această presupunere ca etichetă proprie"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Uită vechiul nume { $alias }: etichetatorii îl pot da din nou în locul lui { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12419,6 +12423,19 @@ translation = """
         [one] Nume vechi: { $names }
         [few] Nume vechi: { $names }
        *[other] Nume vechi: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Nume vechi:
+        [few] Nume vechi:
+       *[other] Nume vechi:
     }"""
 
 [messages.tag-page-count]
@@ -12635,6 +12652,26 @@ translation = "Etichetele nu au putut fi încărcate: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Se încarcă…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Diferite"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } și { $b } înseamnă lucruri diferite: nu mai propune combinarea lor"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Etichete care seamănă"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Combină { $other } în { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Un plural, aceleași cuvinte scrise legat sau o literă diferită. Combinarea păstrează numele folosit mai des, iar etichetatorii îl folosesc de atunci încolo."
 
 [messages.tags-merge]
 source = "Merge"

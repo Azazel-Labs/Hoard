@@ -2678,6 +2678,12 @@ tags-browse = Răsfoiți
 tags-merged-heading = Etichete unite
 tags-merged-what = Când etichetatorii propun unul dintre aceste nume vechi, resursa primește eticheta în care a fost unit.
 tags-allow-old = Permiteți din nou numele vechi
+tags-lookalike-heading = Etichete care seamănă
+tags-lookalike-what = Un plural, aceleași cuvinte scrise legat sau o literă diferită. Combinarea păstrează numele folosit mai des, iar etichetatorii îl folosesc de atunci încolo.
+tags-lookalike-merge-title = Combină { $other } în { $keep }
+tags-lookalike-apart = Diferite
+tags-lookalike-apart-title = { $a } și { $b } înseamnă lucruri diferite: nu mai propune combinarea lor
+tag-page-alias-remove = Uită vechiul nume { $alias }: etichetatorii îl pot da din nou în locul lui { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2691,6 +2697,12 @@ tag-page-aliases =
         [one] Nume vechi: { $names }
         [few] Nume vechi: { $names }
        *[other] Nume vechi: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Nume vechi:
+        [few] Nume vechi:
+       *[other] Nume vechi:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } a fost unită cu { $into }.

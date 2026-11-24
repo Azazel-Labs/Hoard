@@ -255,6 +255,14 @@ pub(crate) fn operations() -> Vec<Operation> {
             "Merge tags (`from`) into one (`into`), or rename one. The old names are kept as aliases, so taggers give \
              the new one instead.",
         ),
+        Editor.get("/api/tags/lookalikes", assets::lookalike_tags).named(
+            "list_lookalike_tags",
+            "Tags in use that look like each other (a plural, the same words run together, a typo), the most used pairs              first: each `other` would merge into its `keep`, the more used. Pairs said to be different are left out.",
+        ),
+        Editor.post("/api/tags/apart", assets::keep_tags_apart).named(
+            "keep_tags_apart",
+            "Say two tags that look alike (`a` and `b`) are different, so they aren't offered for merging again.",
+        ),
         Editor
             .get("/api/tags/aliases", assets::tag_aliases)
             .named("list_tag_aliases", "The old names of merged tags, and what each became."),

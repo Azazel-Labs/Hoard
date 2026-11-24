@@ -2775,6 +2775,12 @@ tags-browse = Переглянути
 tags-merged-heading = Об’єднані теги
 tags-merged-what = Коли тегувальники пропонують одну з цих старих назв, ресурс отримує тег, у який її об’єднано.
 tags-allow-old = Знову дозволити стару назву
+tags-lookalike-heading = Схожі теги
+tags-lookalike-what = Множина, ті самі слова разом або одна літера не та. Під час об’єднання лишається частіше вживана назва, і надалі теги ставляться з нею.
+tags-lookalike-merge-title = Об’єднати { $other } з { $keep }
+tags-lookalike-apart = Різні
+tags-lookalike-apart-title = { $a } і { $b } означають різне: більше не пропонувати їх об’єднати
+tag-page-alias-remove = Забути стару назву { $alias }: її знову можуть ставити замість { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2790,6 +2796,13 @@ tag-page-aliases =
         [few] Старі назви: { $names }
         [many] Старі назви: { $names }
        *[other] Старі назви: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Стара назва:
+        [few] Старі назви:
+        [many] Старі назви:
+       *[other] Старі назви:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } об’єднано з { $into }.

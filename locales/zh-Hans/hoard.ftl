@@ -2251,12 +2251,22 @@ tags-browse = 浏览
 tags-merged-heading = 已合并的标签
 tags-merged-what = 当标注器给出这些旧名称之一时，资源会得到它被合并到的那个标签。
 tags-allow-old = 重新允许旧名称
+tags-lookalike-heading = 看起来相似的标签
+tags-lookalike-what = 复数形式、连写的相同词语，或相差一个字母。合并会保留用得更多的名称，之后打标签都会用它。
+tags-lookalike-merge-title = 将 { $other } 合并到 { $keep }
+tags-lookalike-apart = 不同
+tags-lookalike-apart-title = { $a } 和 { $b } 意思不同：不再建议合并
+tag-page-alias-remove = 忘记旧名称 { $alias }：打标签时可能又会用它代替 { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } 个资源
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] 旧名称：{ $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] 旧名称：
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } 已合并为 { $into }。

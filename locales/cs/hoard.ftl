@@ -2670,6 +2670,12 @@ tags-browse = Procházet
 tags-merged-heading = Sloučené štítky
 tags-merged-what = Když štítkovače přijdou s některým z těchto starých názvů, asset dostane štítek, do kterého byl sloučen.
 tags-allow-old = Znovu povolit starý název
+tags-lookalike-heading = Podobné štítky
+tags-lookalike-what = Množné číslo, stejná slova dohromady nebo jedno písmeno vedle. Sloučení ponechá častěji používaný název a štítkovače ho pak budou používat.
+tags-lookalike-merge-title = Sloučit { $other } do { $keep }
+tags-lookalike-apart = Odlišné
+tags-lookalike-apart-title = { $a } a { $b } znamenají různé věci: přestat nabízet jejich sloučení
+tag-page-alias-remove = Zapomenout starý název { $alias }: štítkovače ho mohou znovu dávat místo { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2685,6 +2691,13 @@ tag-page-aliases =
         [few] Staré názvy: { $names }
         [many] Staré názvy: { $names }
        *[other] Staré názvy: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Starý název:
+        [few] Staré názvy:
+        [many] Staré názvy:
+       *[other] Staré názvy:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = Štítek { $tag } byl sloučen do { $into }.

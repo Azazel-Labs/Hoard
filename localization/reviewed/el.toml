@@ -12276,6 +12276,10 @@ translation = "Διατήρηση ετικέτας { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Διατήρηση αυτής της εικασίας ως δική σας ετικέτα"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Ξέχασε το παλιό όνομα { $alias }: οι επισημαντές μπορεί να το δίνουν ξανά αντί για { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12286,6 +12290,18 @@ translation = """
 { $count ->
         [one] Παλιό όνομα: { $names }
        *[other] Παλιά ονόματα: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Παλιό όνομα:
+       *[other] Παλιά ονόματα:
     }"""
 
 [messages.tag-page-count]
@@ -12495,6 +12511,26 @@ translation = "Δεν ήταν δυνατή η φόρτωση των ετικε�
 [messages.tags-loading]
 source = "Loading…"
 translation = "Φόρτωση…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Διαφορετικές"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "Οι { $a } και { $b } σημαίνουν διαφορετικά πράγματα: να μην προτείνεται πια η συγχώνευσή τους"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Ετικέτες που μοιάζουν"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Συγχώνευση της { $other } στην { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Ένας πληθυντικός, οι ίδιες λέξεις κολλητά ή ένα γράμμα διαφορά. Η συγχώνευση κρατά το πιο χρησιμοποιημένο όνομα, και οι επισημαντές το χρησιμοποιούν από εκεί και πέρα."
 
 [messages.tags-merge]
 source = "Merge"

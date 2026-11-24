@@ -12349,6 +12349,10 @@ translation = "Задржи ознаку { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Задржи ову претпоставку као своју ознаку"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Заборави старо име { $alias }: аутоматско означавање може поново да га даје уместо { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12360,6 +12364,19 @@ translation = """
         [one] Старо име: { $names }
         [few] Стара имена: { $names }
        *[other] Стара имена: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Старо име:
+        [few] Стара имена:
+       *[other] Стара имена:
     }"""
 
 [messages.tag-page-count]
@@ -12571,6 +12588,26 @@ translation = "Није могуће учитати ознаке: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Учитавање…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Различите"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } и { $b } значе различите ствари: престани да предлажеш њихово спајање"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Ознаке које личе једна на другу"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Споји { $other } у { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Множина, исте речи написане спојено или једно слово разлике. Спајање задржава чешће коришћено име, и аутоматско означавање га од тада користи."
 
 [messages.tags-merge]
 source = "Merge"

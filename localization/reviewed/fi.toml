@@ -12270,6 +12270,10 @@ translation = "Säilytä tunniste { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Säilytä tämä arvaus omana tunnisteenasi"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Unohda vanha nimi { $alias }: tunnistajat voivat taas antaa sen tunnisteen { $tag } sijaan"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12280,6 +12284,18 @@ translation = """
 { $count ->
         [one] Vanha nimi: { $names }
        *[other] Vanhat nimet: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Vanha nimi:
+       *[other] Vanhat nimet:
     }"""
 
 [messages.tag-page-count]
@@ -12489,6 +12505,26 @@ translation = "Tunnisteiden lataus epäonnistui: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Ladataan…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Eri asia"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } ja { $b } tarkoittavat eri asioita: älä enää ehdota niiden yhdistämistä"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Samannäköiset tunnisteet"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Yhdistä { $other } tunnisteeseen { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Monikko, samat sanat yhteen kirjoitettuina tai yksi kirjain väärin. Yhdistäminen säilyttää käytetymmän nimen, ja tunnistajat käyttävät sitä siitä lähtien."
 
 [messages.tags-merge]
 source = "Merge"

@@ -12003,6 +12003,10 @@ translation = "{ $tag } etiketini tut"
 source = "Keep this guess as your own tag"
 translation = "Bu tahmini kendi etiketiniz olarak tutun"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Eski ad { $alias } unutulsun: etiketleyiciler { $tag } yerine onu yeniden verebilir"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12012,6 +12016,17 @@ source = """
 translation = """
 { $count ->
        *[other] Eski ad: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] Eski ad:
     }"""
 
 [messages.tag-page-count]
@@ -12213,6 +12228,26 @@ translation = "Etiketler yüklenemedi: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Yükleniyor…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Farklı"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } ve { $b } farklı şeyler anlatıyor: birleştirmeyi önermeyi bırak"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Birbirine benzeyen etiketler"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "{ $other } etiketini { $keep } ile birleştir"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Bir çoğul, bitişik yazılmış aynı sözcükler ya da bir harf farkı. Birleştirme daha çok kullanılan adı tutar ve etiketleyiciler bundan sonra onu kullanır."
 
 [messages.tags-merge]
 source = "Merge"

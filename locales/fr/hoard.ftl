@@ -2514,6 +2514,12 @@ tags-browse = Parcourir
 tags-merged-heading = Étiquettes fusionnées
 tags-merged-what = Quand les étiqueteurs proposent l’un de ces anciens noms, la ressource reçoit l’étiquette dans laquelle il a été fusionné.
 tags-allow-old = Autoriser de nouveau l’ancien nom
+tags-lookalike-heading = Tags qui se ressemblent
+tags-lookalike-what = Un pluriel, les mêmes mots attachés ou une lettre d’écart. La fusion garde le nom le plus utilisé, et les taggeurs l’utilisent désormais.
+tags-lookalike-merge-title = Fusionner { $other } dans { $keep }
+tags-lookalike-apart = Différents
+tags-lookalike-apart-title = { $a } et { $b } veulent dire des choses différentes : ne plus proposer de les fusionner
+tag-page-alias-remove = Oublier l’ancien nom { $alias } : les taggeurs pourront de nouveau le donner au lieu de { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2525,6 +2531,11 @@ tag-page-aliases =
     { $count ->
         [one] Ancien nom : { $names }
        *[other] Anciens noms : { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Ancien nom :
+       *[other] Anciens noms :
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } a été fusionnée en { $into }.

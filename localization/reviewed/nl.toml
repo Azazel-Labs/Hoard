@@ -12199,6 +12199,10 @@ translation = "Tag { $tag } behouden"
 source = "Keep this guess as your own tag"
 translation = "Deze suggestie als je eigen tag behouden"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Oude naam { $alias } vergeten: de taggers mogen die weer geven in plaats van { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12209,6 +12213,18 @@ translation = """
 { $count ->
         [one] Oude naam: { $names }
        *[other] Oude namen: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Oude naam:
+       *[other] Oude namen:
     }"""
 
 [messages.tag-page-count]
@@ -12418,6 +12434,26 @@ translation = "Kon de tags niet laden: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Laden…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Verschillend"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } en { $b } betekenen iets anders: niet meer voorstellen om ze samen te voegen"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Tags die op elkaar lijken"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "{ $other } samenvoegen met { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Een meervoud, dezelfde woorden aan elkaar of één letter anders. Samenvoegen houdt de vaker gebruikte naam, en de taggers gebruiken die voortaan."
 
 [messages.tags-merge]
 source = "Merge"

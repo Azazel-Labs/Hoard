@@ -2480,6 +2480,12 @@ tags-browse = Bekijken
 tags-merged-heading = Samengevoegde tags
 tags-merged-what = Als de taggers met een van deze oude namen komen, krijgt de asset de tag waarin die is samengevoegd.
 tags-allow-old = De oude naam weer toestaan
+tags-lookalike-heading = Tags die op elkaar lijken
+tags-lookalike-what = Een meervoud, dezelfde woorden aan elkaar of één letter anders. Samenvoegen houdt de vaker gebruikte naam, en de taggers gebruiken die voortaan.
+tags-lookalike-merge-title = { $other } samenvoegen met { $keep }
+tags-lookalike-apart = Verschillend
+tags-lookalike-apart-title = { $a } en { $b } betekenen iets anders: niet meer voorstellen om ze samen te voegen
+tag-page-alias-remove = Oude naam { $alias } vergeten: de taggers mogen die weer geven in plaats van { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2491,6 +2497,11 @@ tag-page-aliases =
     { $count ->
         [one] Oude naam: { $names }
        *[other] Oude namen: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Oude naam:
+       *[other] Oude namen:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } is samengevoegd met { $into }.

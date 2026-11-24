@@ -90,6 +90,18 @@ function away(e: PointerEvent) {
 document.addEventListener('pointerdown', away)
 onBeforeUnmount(() => document.removeEventListener('pointerdown', away))
 
+// An old name merged into this tag: forgetting it lets the taggers give it again.
+async function dropAlias(alias: string) {
+  const tag = props.tag
+  try {
+    await api.dropTagAlias(alias)
+    if (props.tag === tag && info.value) info.value = { ...info.value, aliases: info.value.aliases.filter((a) => a !== alias) }
+    emit('changed')
+  } catch (e) {
+    showError(t('tags-forget-failed', { error: (e as Error).message }))
+  }
+}
+
 // Renaming: to a name in use, it merges into that tag.
 const renaming = ref(false)
 const newName = ref('')
@@ -305,7 +317,20 @@ const shown = computed(() => {
             {{ c.value }}<span class="n">{{ formatNumber(c.count) }}</span>
           </button>
         </p>
-        <p v-if="info.aliases.length" class="aliases">{{ t('tag-page-aliases', { names: info.aliases.join(', '), count: info.aliases.length }) }}</p>
+        <p v-if="info.aliases.length && editor" class="aliases crumbs">
+          <span>{{ t('tag-page-aliases-label', { count: info.aliases.length }) }}</span>
+          <span v-for="a in info.aliases" :key="a" class="crumb">
+            <span class="mono">{{ a }}</span>
+            <button
+              type="button"
+              class="x"
+              :title="t('tag-page-alias-remove', { alias: a, tag: info.tag })"
+              :aria-label="t('tag-page-alias-remove', { alias: a, tag: info.tag })"
+              @click="dropAlias(a)"
+            >×</button>
+          </span>
+        </p>
+        <p v-else-if="info.aliases.length" class="aliases">{{ t('tag-page-aliases', { names: info.aliases.join(', '), count: info.aliases.length }) }}</p>
       </div>
     </template>
   </header>

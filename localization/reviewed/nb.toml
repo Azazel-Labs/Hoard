@@ -12203,6 +12203,10 @@ translation = "Behold taggen { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Behold dette gjettet som din egen tagg"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Glem det gamle navnet { $alias }: merkerne kan gi det igjen i stedet for { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12213,6 +12217,18 @@ translation = """
 { $count ->
         [one] Gammelt navn: { $names }
        *[other] Gamle navn: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Gammelt navn:
+       *[other] Gamle navn:
     }"""
 
 [messages.tag-page-count]
@@ -12422,6 +12438,26 @@ translation = "Kunne ikke laste taggene: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Laster …"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Forskjellige"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } og { $b } betyr forskjellige ting: slutt å foreslå å slå dem sammen"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Etiketter som ligner hverandre"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Slå sammen { $other } med { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "En flertallsform, de samme ordene skrevet sammen eller én bokstav feil. Sammenslåing beholder det mest brukte navnet, og merkerne bruker det fra da av."
 
 [messages.tags-merge]
 source = "Merge"

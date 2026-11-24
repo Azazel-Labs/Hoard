@@ -11940,6 +11940,10 @@ translation = "เก็บแท็ก { $tag } ไว้"
 source = "Keep this guess as your own tag"
 translation = "เก็บแท็กที่เดามานี้ไว้เป็นแท็กของคุณเอง"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "ลืมชื่อเดิม { $alias }: การติดแท็กอาจใส่ชื่อนี้อีกแทน { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11949,6 +11953,17 @@ source = """
 translation = """
 { $count ->
        *[other] ชื่อเดิม: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] ชื่อเดิม:
     }"""
 
 [messages.tag-page-count]
@@ -12150,6 +12165,26 @@ translation = "โหลดแท็กไม่ได้: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "กำลังโหลด…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "คนละแท็ก"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } และ { $b } มีความหมายต่างกัน: เลิกเสนอให้รวม"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "แท็กที่ดูคล้ายกัน"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "รวม { $other } เข้ากับ { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "รูปพหูพจน์ คำเดียวกันที่เขียนติดกัน หรือต่างกันหนึ่งตัวอักษร การรวมจะเก็บชื่อที่ใช้มากกว่าไว้ และการติดแท็กจะใช้ชื่อนั้นต่อจากนี้"
 
 [messages.tags-merge]
 source = "Merge"

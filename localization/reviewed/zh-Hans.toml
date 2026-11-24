@@ -11951,6 +11951,10 @@ translation = "保留标签 { $tag }"
 source = "Keep this guess as your own tag"
 translation = "将此推测保留为你自己的标签"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "忘记旧名称 { $alias }：打标签时可能又会用它代替 { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11960,6 +11964,17 @@ source = """
 translation = """
 { $count ->
        *[other] 旧名称：{ $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] 旧名称：
     }"""
 
 [messages.tag-page-count]
@@ -12161,6 +12176,26 @@ translation = "无法加载标签：{ $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "正在加载…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "不同"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } 和 { $b } 意思不同：不再建议合并"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "看起来相似的标签"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "将 { $other } 合并到 { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "复数形式、连写的相同词语，或相差一个字母。合并会保留用得更多的名称，之后打标签都会用它。"
 
 [messages.tags-merge]
 source = "Merge"

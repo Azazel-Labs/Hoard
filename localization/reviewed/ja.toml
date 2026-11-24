@@ -11951,6 +11951,10 @@ translation = "タグ { $tag } を残す"
 source = "Keep this guess as your own tag"
 translation = "この推測を自分のタグとして残す"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "旧名 { $alias } を忘れる：タグ付けで { $tag } の代わりに再び付くことがあります"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11960,6 +11964,17 @@ source = """
 translation = """
 { $count ->
        *[other] 旧名: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] 旧名:
     }"""
 
 [messages.tag-page-count]
@@ -12161,6 +12176,26 @@ translation = "タグを読み込めませんでした: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "読み込み中…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "別のタグ"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } と { $b } は意味が違います：統合の提案をやめる"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "似ているタグ"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "{ $other } を { $keep } に統合"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "複数形、同じ語の続け書き、1 文字違いなど。統合すると使用数の多い名前が残り、以降はタグ付けでその名前が使われます。"
 
 [messages.tags-merge]
 source = "Merge"

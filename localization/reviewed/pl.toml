@@ -12474,6 +12474,10 @@ translation = "Zachowaj tag { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Zachowaj tę podpowiedź jako własny tag"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Zapomnij starą nazwę { $alias }: tagujący mogą znów nadawać ją zamiast { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12486,6 +12490,20 @@ translation = """
         [few] Dawne nazwy: { $names }
         [many] Dawne nazwy: { $names }
        *[other] Dawne nazwy: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Dawna nazwa:
+        [few] Dawne nazwy:
+        [many] Dawne nazwy:
+       *[other] Dawne nazwy:
     }"""
 
 [messages.tag-page-count]
@@ -12699,6 +12717,26 @@ translation = "Nie udało się załadować tagów: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Ładowanie…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Różne"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } i { $b } znaczą co innego: przestań proponować ich scalenie"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Podobne tagi"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Scal { $other } z { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Liczba mnoga, te same słowa pisane razem albo jedna litera różnicy. Scalenie zostawia częściej używaną nazwę i od tej pory tagujący jej używają."
 
 [messages.tags-merge]
 source = "Merge"

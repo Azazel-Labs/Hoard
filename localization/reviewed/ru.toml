@@ -12497,6 +12497,10 @@ translation = "Оставить тег { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Оставить эту догадку как свой тег"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Забыть старое название { $alias }: его снова могут ставить вместо { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12509,6 +12513,20 @@ translation = """
         [few] Старые названия: { $names }
         [many] Старые названия: { $names }
        *[other] Старые названия: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Старое название:
+        [few] Старые названия:
+        [many] Старые названия:
+       *[other] Старые названия:
     }"""
 
 [messages.tag-page-count]
@@ -12722,6 +12740,26 @@ translation = "Не удалось загрузить теги: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Загрузка…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Разные"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } и { $b } означают разное: больше не предлагать их объединить"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Похожие теги"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Объединить { $other } с { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Множественное число, те же слова слитно или одна буква не та. При объединении остаётся более частое название, и дальше теги ставятся с ним."
 
 [messages.tags-merge]
 source = "Merge"

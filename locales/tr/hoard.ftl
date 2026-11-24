@@ -2300,12 +2300,22 @@ tags-browse = Göz at
 tags-merged-heading = Birleştirilen etiketler
 tags-merged-what = Etiketleyiciler bu eski adlardan birini bulduğunda varlık, bu adın birleştirildiği etiketi alır.
 tags-allow-old = Eski ada yeniden izin ver
+tags-lookalike-heading = Birbirine benzeyen etiketler
+tags-lookalike-what = Bir çoğul, bitişik yazılmış aynı sözcükler ya da bir harf farkı. Birleştirme daha çok kullanılan adı tutar ve etiketleyiciler bundan sonra onu kullanır.
+tags-lookalike-merge-title = { $other } etiketini { $keep } ile birleştir
+tags-lookalike-apart = Farklı
+tags-lookalike-apart-title = { $a } ve { $b } farklı şeyler anlatıyor: birleştirmeyi önermeyi bırak
+tag-page-alias-remove = Eski ad { $alias } unutulsun: etiketleyiciler { $tag } yerine onu yeniden verebilir
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } varlık
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] Eski ad: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] Eski ad:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag }, { $into } ile birleştirildi.

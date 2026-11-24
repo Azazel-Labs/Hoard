@@ -2257,12 +2257,22 @@ tags-browse = 瀏覽
 tags-merged-heading = 已合併的標籤
 tags-merged-what = 當標記器產生這些舊名稱之一時，素材會改為加上它被合併到的標籤。
 tags-allow-old = 再次允許使用舊名稱
+tags-lookalike-heading = 看起來相似的標籤
+tags-lookalike-what = 複數形式、連寫的相同詞語，或相差一個字母。合併會保留用得較多的名稱，之後加標籤都會用它。
+tags-lookalike-merge-title = 將 { $other } 合併到 { $keep }
+tags-lookalike-apart = 不同
+tags-lookalike-apart-title = { $a } 和 { $b } 意思不同：不再建議合併
+tag-page-alias-remove = 忘記舊名稱 { $alias }：加標籤時可能又會用它代替 { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } 個素材
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] 舊名稱：{ $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] 舊名稱：
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } 已合併為 { $into }。

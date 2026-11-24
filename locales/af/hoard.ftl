@@ -2480,6 +2480,12 @@ tags-browse = Blaai
 tags-merged-heading = Saamgevoegde etikette
 tags-merged-what = Wanneer die etiketteerders met een van hierdie ou name vorendag kom, kry die bate die etiket waarin dit saamgevoeg is.
 tags-allow-old = Laat die ou naam weer toe
+tags-lookalike-heading = Etikette wat eenders lyk
+tags-lookalike-what = n Meervoud, dieselfde woorde aanmekaar, of een letter verkeerd. Saamsmelt hou die naam wat meer gebruik word, en die etiketteerders gebruik dit voortaan.
+tags-lookalike-merge-title = Smelt { $other } saam met { $keep }
+tags-lookalike-apart = Verskillend
+tags-lookalike-apart-title = { $a } en { $b } beteken verskillende dinge: hou op om voor te stel dat hulle saamgesmelt word
+tag-page-alias-remove = Vergeet die ou naam { $alias }: die etiketteerders mag dit weer gee in plaas van { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2491,6 +2497,11 @@ tag-page-aliases =
     { $count ->
         [one] Ou naam: { $names }
        *[other] Ou name: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Ou naam:
+       *[other] Ou name:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } is saamgevoeg met { $into }.

@@ -12439,6 +12439,10 @@ translation = "Ponechat štítek { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Ponechat tento odhad jako vlastní štítek"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Zapomenout starý název { $alias }: štítkovače ho mohou znovu dávat místo { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12451,6 +12455,20 @@ translation = """
         [few] Staré názvy: { $names }
         [many] Staré názvy: { $names }
        *[other] Staré názvy: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Starý název:
+        [few] Staré názvy:
+        [many] Staré názvy:
+       *[other] Staré názvy:
     }"""
 
 [messages.tag-page-count]
@@ -12663,6 +12681,26 @@ translation = "Štítky se nepodařilo načíst: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Načítám…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Odlišné"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } a { $b } znamenají různé věci: přestat nabízet jejich sloučení"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Podobné štítky"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Sloučit { $other } do { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Množné číslo, stejná slova dohromady nebo jedno písmeno vedle. Sloučení ponechá častěji používaný název a štítkovače ho pak budou používat."
 
 [messages.tags-merge]
 source = "Merge"

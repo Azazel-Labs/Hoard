@@ -505,6 +505,34 @@ pub(super) async fn tag_aliases(State(state): State<AppState>) -> ApiResult<Json
 }
 
 #[derive(Deserialize, schemars::JsonSchema)]
+pub(super) struct LookAlikeParams {
+    /// At most this many pairs (100 when left out).
+    limit: Option<usize>,
+}
+
+/// Tags in use that look like each other, each with the one the other would merge into.
+pub(super) async fn lookalike_tags(
+    State(state): State<AppState>,
+    Query(p): Query<LookAlikeParams>,
+) -> ApiResult<Json<Vec<db::LookAlike>>> {
+    let limit = p.limit.unwrap_or(100).min(1000);
+    Ok(Json(db::call(&state.pool, move |c| db::lookalike_tags(c, limit)).await?))
+}
+
+#[derive(Deserialize, schemars::JsonSchema)]
+pub(super) struct TagsApart {
+    a: String,
+    b: String,
+}
+
+/// Say two tags that look alike are different.
+pub(super) async fn keep_tags_apart(State(state): State<AppState>, Json(p): Json<TagsApart>) -> ApiResult<StatusCode> {
+    let (a, b) = (a_tag(&p.a)?, a_tag(&p.b)?);
+    db::call(&state.pool, move |c| db::keep_tags_apart(c, &a, &b)).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[derive(Deserialize, schemars::JsonSchema)]
 pub(super) struct AliasParams {
     tag: String,
 }

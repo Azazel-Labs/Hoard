@@ -373,21 +373,32 @@ fn rank(tag: &str, q: &str) -> Option<u8> {
 }
 
 /// Whether `tag` is probably what someone meant by `q`, a tag not in use: the same once its separators are taken out
-/// (`stonewall`, `stone-wall`), one a plural of the other, or one letter off for a word long enough to say.
+/// (`stonewall`, `stone-wall`), one a plural of the other, or one letter off for a word long enough to say (but not a
+/// number off: `lod-1` isn't `lod-2`).
 fn looks_like(tag: &str, q: &str) -> bool {
     if tag == q {
         return false;
     }
-    let squash = |s: &str| s.chars().filter(|c| c.is_alphanumeric() || *c == ':').collect::<String>();
     let (t, q) = (squash(tag), squash(q));
-    if t == q {
+    if t == q || singulars(&t).contains(&q) || singulars(&q).contains(&t) {
         return true;
     }
-    let single = |s: &str| s.strip_suffix("es").or_else(|| s.strip_suffix('s')).map(str::to_owned);
-    if single(&t).as_deref() == Some(q.as_str()) || single(&q).as_deref() == Some(t.as_str()) {
-        return true;
-    }
-    q.chars().count() >= 5 && one_edit_apart(&t, &q)
+    let digits = |s: &str| s.chars().filter(char::is_ascii_digit).collect::<String>();
+    q.chars().count() >= 5 && digits(&t) == digits(&q) && one_edit_apart(&t, &q)
+}
+
+/// A tag with only its letters, digits and namespace colon: `stone-wall` and `stonewall` are the same.
+fn squash(tag: &str) -> String {
+    tag.chars().filter(|c| c.is_alphanumeric() || *c == ':').collect()
+}
+
+/// What a word might be the plural of: `tiles` a `tile`, `boxes` a `box`, `bodies` a `body`.
+fn singulars(word: &str) -> Vec<String> {
+    let mut one: Vec<String> =
+        [word.strip_suffix('s'), word.strip_suffix("es")].into_iter().flatten().map(str::to_owned).collect();
+    one.extend(word.strip_suffix("ies").map(|w| format!("{w}y")));
+    one.retain(|w| !w.is_empty() && !w.ends_with(':'));
+    one
 }
 
 /// Whether two words differ by one letter added, dropped or changed, or two side by side swapped.
@@ -410,6 +421,91 @@ fn one_edit_apart(a: &str, b: &str) -> bool {
     } else {
         short[head..] == long[head + 1..]
     }
+}
+
+/// Two tags in use that are probably one: `other` would merge into `keep`, the more used.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, schemars::JsonSchema)]
+pub(crate) struct LookAlike {
+    pub keep: String,
+    pub keep_count: u64,
+    pub other: String,
+    pub other_count: u64,
+}
+
+/// Tags in use that look like each other (as [`looks_like`] has it, both ways round), the most used pairs first,
+/// leaving out those someone said are different ([`keep_tags_apart`]).
+pub(crate) fn lookalike_tags(conn: &Connection, limit: usize) -> Result<Vec<LookAlike>> {
+    use std::collections::{BTreeSet, HashMap, HashSet};
+    let all = super::tag_counts(conn, "", false, u32::MAX)?;
+    // Tags that could look alike share a key: their squashed name, what it's a plural of, or either with a letter
+    // dropped. Only tags sharing one are compared, rather than every tag with every other.
+    let mut by_key: HashMap<String, Vec<usize>> = HashMap::new();
+    for (i, f) in all.iter().enumerate() {
+        let squashed = squash(&f.value);
+        let mut keys = singulars(&squashed);
+        let chars: Vec<char> = squashed.chars().collect();
+        if chars.len() >= 5 {
+            keys.extend((0..chars.len()).map(|j| chars[..j].iter().chain(&chars[j + 1..]).collect::<String>()));
+        }
+        keys.push(squashed);
+        keys.sort_unstable();
+        keys.dedup();
+        for k in keys {
+            by_key.entry(k).or_default().push(i);
+        }
+    }
+    let apart: HashSet<(String, String)> = {
+        let mut stmt = conn.prepare("SELECT a, b FROM tags_apart")?;
+        stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+    };
+    let mut pairs = BTreeSet::new();
+    for ids in by_key.values().filter(|ids| ids.len() > 1) {
+        for (n, &i) in ids.iter().enumerate() {
+            for &j in &ids[n + 1..] {
+                let (a, b) = (&all[i].value, &all[j].value);
+                if looks_like(a, b) && looks_like(b, a) && !apart.contains(&ordered(a, b)) {
+                    pairs.insert((i.min(j), i.max(j)));
+                }
+            }
+        }
+    }
+    // The more used stays; of two as used, the shorter (the singular), the one with its words apart, then the first
+    // A to Z.
+    let rank = |f: &hoard_core::Facet| {
+        (std::cmp::Reverse(f.count), squash(&f.value).len(), std::cmp::Reverse(f.value.len()), f.value.clone())
+    };
+    let mut found: Vec<LookAlike> = pairs
+        .into_iter()
+        .map(|(i, j)| {
+            let (keep, other) = if rank(&all[i]) <= rank(&all[j]) { (&all[i], &all[j]) } else { (&all[j], &all[i]) };
+            LookAlike {
+                keep: keep.value.clone(),
+                keep_count: keep.count,
+                other: other.value.clone(),
+                other_count: other.count,
+            }
+        })
+        .collect();
+    found.sort_by(|x, y| {
+        (y.keep_count + y.other_count)
+            .cmp(&(x.keep_count + x.other_count))
+            .then_with(|| x.keep.cmp(&y.keep))
+            .then_with(|| x.other.cmp(&y.other))
+    });
+    found.truncate(limit);
+    Ok(found)
+}
+
+/// Two tags, the first A to Z first, as `tags_apart` keeps them.
+fn ordered(a: &str, b: &str) -> (String, String) {
+    if a <= b { (a.to_owned(), b.to_owned()) } else { (b.to_owned(), a.to_owned()) }
+}
+
+/// Say two tags that look alike are different, so they aren't offered for merging again.
+pub(crate) fn keep_tags_apart(conn: &Connection, a: &str, b: &str) -> Result<()> {
+    let (a, b) = ordered(a, b);
+    conn.execute("INSERT INTO tags_apart (a, b) VALUES (?1, ?2) ON CONFLICT DO NOTHING", params![a, b])?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -599,5 +695,44 @@ mod tests {
         assert_eq!(near("wal"), Vec::<String>::new(), "too short to guess at");
 
         assert_eq!(suggest_tags(&conn, "", 2).unwrap().matches.len(), 2, "nothing typed offers the most used");
+    }
+
+    /// Tags in use that look like each other are offered for merging, the less used into the more, until someone
+    /// merges them or says they're different.
+    #[test]
+    fn tags_that_look_alike_are_offered_for_merging() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let mut conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x'), ('h2', 1, 'x'), ('h3', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Crypt', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.png', 'a1', 'png', 'texture', 'x', 'x'),
+               ('a2', 'p1', 'h2', 'a2.png', 'a2', 'png', 'texture', 'x', 'x'),
+               ('a3', 'p1', 'h3', 'a3.png', 'a3', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('a1', 'tile', 'human', 1.0), ('a2', 'tile', 'human', 1.0), ('a3', 'tiles', 'ai', 0.7),
+               ('a1', 'stone-wall', 'human', 1.0), ('a2', 'stonewall', 'human', 1.0),
+               ('a1', 'cobblestone', 'rule', 0.8), ('a3', 'cobblestone', 'rule', 0.8), ('a2', 'cobbelstone', 'ai', 0.6),
+               ('a1', 'body', 'human', 1.0), ('a2', 'bodies', 'ai', 0.6),
+               ('a1', 'lod-1', 'meta', 1.0), ('a2', 'lod-2', 'meta', 1.0),
+               ('a1', 'metal', 'human', 1.0), ('a2', 'meta', 'human', 1.0),
+               ('a3', 'cat', 'human', 1.0), ('a1', 'car', 'human', 1.0);",
+        )
+        .unwrap();
+        let pairs = |conn: &Connection| {
+            let found = lookalike_tags(conn, 50).unwrap();
+            found.into_iter().map(|p| format!("{} > {}", p.other, p.keep)).collect::<Vec<_>>()
+        };
+        assert_eq!(
+            pairs(&conn),
+            ["cobbelstone > cobblestone", "tiles > tile", "bodies > body", "stonewall > stone-wall"],
+            "plurals, separators and typos; not numbers, nor short words a letter apart"
+        );
+        keep_tags_apart(&conn, "tiles", "tile").unwrap();
+        merge_tags(&mut conn, &["bodies".to_owned()], "body").unwrap();
+        assert_eq!(pairs(&conn), ["cobbelstone > cobblestone", "stonewall > stone-wall"]);
+        assert_eq!(lookalike_tags(&conn, 1).unwrap().len(), 1);
     }
 }

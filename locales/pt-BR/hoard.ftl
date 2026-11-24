@@ -2486,6 +2486,12 @@ tags-browse = Explorar
 tags-merged-heading = Tags mescladas
 tags-merged-what = Quando os geradores de tags chegam a um destes nomes antigos, o asset recebe a tag em que ele foi mesclado.
 tags-allow-old = Permitir o nome antigo de novo
+tags-lookalike-heading = Tags parecidas
+tags-lookalike-what = Um plural, as mesmas palavras juntas ou uma letra de diferença. Mesclar mantém o nome mais usado, e os marcadores passam a usá-lo.
+tags-lookalike-merge-title = Mesclar { $other } em { $keep }
+tags-lookalike-apart = Diferentes
+tags-lookalike-apart-title = { $a } e { $b } significam coisas diferentes: parar de sugerir mesclá-las
+tag-page-alias-remove = Esquecer o nome antigo { $alias }: os marcadores podem voltar a usá-lo em vez de { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2497,6 +2503,11 @@ tag-page-aliases =
     { $count ->
         [one] Nome antigo: { $names }
        *[other] Nomes antigos: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Nome antigo:
+       *[other] Nomes antigos:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = A tag { $tag } foi mesclada em { $into }.

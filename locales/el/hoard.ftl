@@ -2546,6 +2546,12 @@ tags-browse = Περιήγηση
 tags-merged-heading = Συγχωνευμένες ετικέτες
 tags-merged-what = Όταν οι μηχανισμοί ετικετών προτείνουν ένα από αυτά τα παλιά ονόματα, το στοιχείο παίρνει την ετικέτα στην οποία συγχωνεύτηκε.
 tags-allow-old = Να επιτραπεί ξανά το παλιό όνομα
+tags-lookalike-heading = Ετικέτες που μοιάζουν
+tags-lookalike-what = Ένας πληθυντικός, οι ίδιες λέξεις κολλητά ή ένα γράμμα διαφορά. Η συγχώνευση κρατά το πιο χρησιμοποιημένο όνομα, και οι επισημαντές το χρησιμοποιούν από εκεί και πέρα.
+tags-lookalike-merge-title = Συγχώνευση της { $other } στην { $keep }
+tags-lookalike-apart = Διαφορετικές
+tags-lookalike-apart-title = Οι { $a } και { $b } σημαίνουν διαφορετικά πράγματα: να μην προτείνεται πια η συγχώνευσή τους
+tag-page-alias-remove = Ξέχασε το παλιό όνομα { $alias }: οι επισημαντές μπορεί να το δίνουν ξανά αντί για { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2557,6 +2563,11 @@ tag-page-aliases =
     { $count ->
         [one] Παλιό όνομα: { $names }
        *[other] Παλιά ονόματα: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Παλιό όνομα:
+       *[other] Παλιά ονόματα:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = Η ετικέτα { $tag } συγχωνεύθηκε στην { $into }.

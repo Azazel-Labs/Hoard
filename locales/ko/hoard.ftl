@@ -2227,12 +2227,22 @@ tags-browse = 둘러보기
 tags-merged-heading = 병합된 태그
 tags-merged-what = 태거가 이 옛 이름 중 하나를 내놓으면, 에셋에는 병합된 태그가 붙습니다.
 tags-allow-old = 옛 이름 다시 허용
+tags-lookalike-heading = 비슷해 보이는 태그
+tags-lookalike-what = 복수형, 같은 단어를 붙여 쓴 것, 한 글자 차이 등입니다. 병합하면 더 많이 쓰인 이름이 남고, 이후 태그 지정에 그 이름이 쓰입니다.
+tags-lookalike-merge-title = { $other }을(를) { $keep }(으)로 병합
+tags-lookalike-apart = 다름
+tags-lookalike-apart-title = { $a }와(과) { $b }은(는) 뜻이 다릅니다: 병합 제안 그만하기
+tag-page-alias-remove = 예전 이름 { $alias } 잊기: 태그 지정에서 { $tag } 대신 다시 붙을 수 있습니다
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = 에셋 { $count }개
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] 이전 이름: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] 이전 이름:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag }이(가) { $into }에 병합되었습니다.

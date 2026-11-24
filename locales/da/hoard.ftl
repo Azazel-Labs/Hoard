@@ -2482,6 +2482,12 @@ tags-browse = Gennemse
 tags-merged-heading = Flettede tags
 tags-merged-what = Når taggerne finder på et af disse gamle navne, får assettet det tag, det blev flettet ind i.
 tags-allow-old = Tillad det gamle navn igen
+tags-lookalike-heading = Mærker, der ligner hinanden
+tags-lookalike-what = En flertalsform, de samme ord skrevet sammen eller ét bogstav forkert. Ved sammenlægning beholdes det mest brugte navn, og mærkerne bruger det fremover.
+tags-lookalike-merge-title = Læg { $other } sammen med { $keep }
+tags-lookalike-apart = Forskellige
+tags-lookalike-apart-title = { $a } og { $b } betyder forskellige ting: hold op med at foreslå at lægge dem sammen
+tag-page-alias-remove = Glem det gamle navn { $alias }: mærkerne kan give det igen i stedet for { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2493,6 +2499,11 @@ tag-page-aliases =
     { $count ->
         [one] Gammelt navn: { $names }
        *[other] Gamle navne: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Gammelt navn:
+       *[other] Gamle navne:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } blev flettet ind i { $into }.

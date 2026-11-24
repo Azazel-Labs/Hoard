@@ -2328,12 +2328,22 @@ tags-browse = Böngészés
 tags-merged-heading = Összevont címkék
 tags-merged-what = Ha a címkézők valamelyik régi nevet adnák, az asset azt a címkét kapja, amelybe összevonták.
 tags-allow-old = A régi név újbóli engedélyezése
+tags-lookalike-heading = Hasonló címkék
+tags-lookalike-what = Többes szám, ugyanazok a szavak egybeírva vagy egy betű eltérés. Az összevonás a gyakrabban használt nevet tartja meg, és a címkézők ezentúl azt használják.
+tags-lookalike-merge-title = { $other } összevonása ebbe: { $keep }
+tags-lookalike-apart = Különbözők
+tags-lookalike-apart-title = A(z) { $a } és a(z) { $b } mást jelent: ne ajánlja fel többé az összevonásukat
+tag-page-alias-remove = A régi név ({ $alias }) elfelejtése: a címkézők újra adhatják { $tag } helyett
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } asset
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] Régi név: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] Régi név:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = A(z) { $tag } összevonásra került ide: { $into }.

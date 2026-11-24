@@ -2480,6 +2480,12 @@ tags-browse = Durchsuchen
 tags-merged-heading = Zusammengeführte Tags
 tags-merged-what = Wenn die Tagger auf einen dieser alten Namen kommen, bekommt das Asset das Tag, in das er zusammengeführt wurde.
 tags-allow-old = Alten Namen wieder zulassen
+tags-lookalike-heading = Ähnliche Tags
+tags-lookalike-what = Eine Mehrzahl, dieselben Wörter zusammengeschrieben oder ein Buchstabe daneben. Beim Zusammenführen bleibt der häufiger verwendete Name, und die Tagger verwenden ihn von da an.
+tags-lookalike-merge-title = { $other } in { $keep } zusammenführen
+tags-lookalike-apart = Verschieden
+tags-lookalike-apart-title = { $a } und { $b } bedeuten Verschiedenes: nicht mehr zum Zusammenführen vorschlagen
+tag-page-alias-remove = Alten Namen { $alias } vergessen: Die Tagger dürfen ihn wieder statt { $tag } vergeben
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2491,6 +2497,11 @@ tag-page-aliases =
     { $count ->
         [one] Alter Name: { $names }
        *[other] Alte Namen: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Alter Name:
+       *[other] Alte Namen:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } wurde mit { $into } zusammengeführt.

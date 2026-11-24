@@ -12238,6 +12238,10 @@ translation = "Garder l’étiquette { $tag }"
 source = "Keep this guess as your own tag"
 translation = "Garder cette suggestion comme étiquette personnelle"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "Oublier l’ancien nom { $alias } : les taggeurs pourront de nouveau le donner au lieu de { $tag }"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -12248,6 +12252,18 @@ translation = """
 { $count ->
         [one] Ancien nom : { $names }
        *[other] Anciens noms : { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+        [one] Ancien nom :
+       *[other] Anciens noms :
     }"""
 
 [messages.tag-page-count]
@@ -12457,6 +12473,26 @@ translation = "Impossible de charger les étiquettes : { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "Chargement…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "Différents"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a } et { $b } veulent dire des choses différentes : ne plus proposer de les fusionner"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "Tags qui se ressemblent"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "Fusionner { $other } dans { $keep }"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "Un pluriel, les mêmes mots attachés ou une lettre d’écart. La fusion garde le nom le plus utilisé, et les taggeurs l’utilisent désormais."
 
 [messages.tags-merge]
 source = "Merge"

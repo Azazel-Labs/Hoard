@@ -2283,12 +2283,22 @@ tags-browse = Telusuri
 tags-merged-heading = Tag yang digabungkan
 tags-merged-what = Saat pemberi tag menghasilkan salah satu nama lama ini, aset mendapat tag tujuan penggabungannya.
 tags-allow-old = Izinkan nama lama lagi
+tags-lookalike-heading = Tag yang mirip
+tags-lookalike-what = Bentuk jamak, kata yang sama disambung, atau beda satu huruf. Menggabungkan mempertahankan nama yang lebih sering dipakai, dan pemberi tag memakainya sejak itu.
+tags-lookalike-merge-title = Gabungkan { $other } ke { $keep }
+tags-lookalike-apart = Berbeda
+tags-lookalike-apart-title = { $a } dan { $b } berarti hal berbeda: berhenti menawarkan untuk menggabungkannya
+tag-page-alias-remove = Lupakan nama lama { $alias }: pemberi tag boleh memberikannya lagi alih-alih { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count = { $count } aset
 # Old names merged into the tag ($names, separated by commas).
 tag-page-aliases =
     { $count ->
        *[other] Nama lama: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+       *[other] Nama lama:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = { $tag } digabungkan ke { $into }.

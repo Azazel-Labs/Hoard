@@ -2693,6 +2693,12 @@ tags-browse = Przeglądaj
 tags-merged-heading = Scalone tagi
 tags-merged-what = Gdy tagowanie wymyśli jedną z tych starych nazw, zasób dostanie tag, w który ją scalono.
 tags-allow-old = Zezwól znów na starą nazwę
+tags-lookalike-heading = Podobne tagi
+tags-lookalike-what = Liczba mnoga, te same słowa pisane razem albo jedna litera różnicy. Scalenie zostawia częściej używaną nazwę i od tej pory tagujący jej używają.
+tags-lookalike-merge-title = Scal { $other } z { $keep }
+tags-lookalike-apart = Różne
+tags-lookalike-apart-title = { $a } i { $b } znaczą co innego: przestań proponować ich scalenie
+tag-page-alias-remove = Zapomnij starą nazwę { $alias }: tagujący mogą znów nadawać ją zamiast { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2708,6 +2714,13 @@ tag-page-aliases =
         [few] Dawne nazwy: { $names }
         [many] Dawne nazwy: { $names }
        *[other] Dawne nazwy: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Dawna nazwa:
+        [few] Dawne nazwy:
+        [many] Dawne nazwy:
+       *[other] Dawne nazwy:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = Tag { $tag } został scalony z { $into }.

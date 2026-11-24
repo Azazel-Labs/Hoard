@@ -13,7 +13,7 @@ test.describe('settings: tags', () => {
 
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`e2em${u}`)
-    const list = page.locator('.tags .list:not(.tree)').first()
+    const list = page.locator('.tags .list.every').first()
     await expect(list.getByRole('checkbox')).toHaveCount(2)
     await list.getByLabel(`e2em${u}-alpha`).check()
     await list.getByLabel(`e2em${u}-beta`).check()
@@ -51,7 +51,7 @@ test.describe('settings: tags', () => {
 
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`e2eold${u}`)
-    const list = page.locator('.tags .list:not(.tree)').first()
+    const list = page.locator('.tags .list.every').first()
     await list.getByLabel(`set:e2eold${u}`).check()
     const name = page.getByLabel('New name')
     await expect(name).toHaveValue(`set:e2eold${u}`)
@@ -83,7 +83,7 @@ test.describe('settings: tags', () => {
     // Renaming one shows the name as the server will keep it, marks and all.
     await page.goto('/#settings/tags')
     await page.getByLabel('Find tags').fill(`संगीत${u}`)
-    await page.locator('.tags .list:not(.tree)').first().getByLabel(`संगीत${u}:क्षेत्र`).check()
+    await page.locator('.tags .list.every').first().getByLabel(`संगीत${u}:क्षेत्र`).check()
     await page.getByLabel('New name').fill(`संगीत${u}: ताल वाद्य`)
     await expect(page.getByText(`Saved as संगीत${u}:ताल-वाद्य`)).toBeVisible()
   })
@@ -103,6 +103,38 @@ test.describe('settings: tags', () => {
     expect(asset).toContain(`e2ekeep${u}`)
     await page.getByRole('button', { name: 'Cancel' }).click()
     await expect(page.getByLabel('New name')).toHaveCount(0)
+  })
+
+  test('offers tags that look alike for merging, and an old name can be forgotten on the tag page', async ({ page, api, seed }) => {
+    const u = unique()
+    const [a, b, c] = ['Img 103', 'Img 104', 'Img 105'].map((n) => seed.assets[`${BIG}/${n}`])
+    const [tile, tiles, plate, plates] = [`e2elook${u}-tile`, `e2elook${u}-tiles`, `e2elook${u}-plate`, `e2elook${u}-plates`]
+    await addTags(api, a, [tile, plate])
+    await addTags(api, b, [tile, plates])
+    await addTags(api, c, [tiles])
+
+    await page.goto('/#settings/tags')
+    // The less used is offered for merging into the more used.
+    await page.getByRole('button', { name: `Merge ${tiles} into ${tile}` }).click()
+    await page.getByRole('dialog', { name: 'Merge 2 tags?' }).getByRole('button', { name: 'Merge', exact: true }).click()
+    await expect(page.getByRole('status').filter({ hasText: `1 asset now tagged ${tile}` })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Merge ${tiles} into ${tile}` })).toHaveCount(0)
+    expect(await tagsOf(api, c)).toContain(tile)
+
+    // Two that only look alike are left alone from then on. Of two as used, the singular is the one kept.
+    await page.getByRole('button', { name: `${plates} and ${plate} mean different things: stop offering to merge them` }).click()
+    await expect(page.getByRole('button', { name: `Merge ${plates} into ${plate}` })).toHaveCount(0)
+    const alike = (await (await api.get('/api/tags/lookalikes?limit=1000')).json()) as { keep: string; other: string }[]
+    expect(alike.filter((p) => p.keep.startsWith(`e2elook${u}`))).toEqual([])
+
+    // The merged name shows on the kept tag's page, where an editor can forget it.
+    await page.getByLabel('Find tags').fill(tile)
+    await page.locator('.tags .list.every li').filter({ hasText: tile }).getByRole('button', { name: 'Browse' }).click()
+    await expect(page.getByText('Old name:')).toBeVisible()
+    await page.getByRole('button', { name: `Forget the old name ${tiles}: the taggers may give it again instead of ${tile}` }).click()
+    await expect(page.getByText('Old name:')).toHaveCount(0)
+    const aliases = (await (await api.get('/api/tags/aliases')).json()) as { tag: string }[]
+    expect(aliases.map((x) => x.tag)).not.toContain(tiles)
   })
 
   test('puts a tag under a broader one right on the page, and takes it out again', async ({ page, api, seed }) => {

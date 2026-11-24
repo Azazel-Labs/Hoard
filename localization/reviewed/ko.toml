@@ -11904,6 +11904,10 @@ translation = "{ $tag } 태그 유지"
 source = "Keep this guess as your own tag"
 translation = "이 추측을 내 태그로 유지"
 
+[messages.tag-page-alias-remove]
+source = "Forget the old name { $alias }: the taggers may give it again instead of { $tag }"
+translation = "예전 이름 { $alias } 잊기: 태그 지정에서 { $tag } 대신 다시 붙을 수 있습니다"
+
 [messages.tag-page-aliases]
 source = """
 { $count ->
@@ -11913,6 +11917,17 @@ source = """
 translation = """
 { $count ->
        *[other] 이전 이름: { $names }
+    }"""
+
+[messages.tag-page-aliases-label]
+source = """
+{ $count ->
+        [one] Old name:
+       *[other] Old names:
+    }"""
+translation = """
+{ $count ->
+       *[other] 이전 이름:
     }"""
 
 [messages.tag-page-count]
@@ -12114,6 +12129,26 @@ translation = "태그를 불러오지 못했습니다: { $error }"
 [messages.tags-loading]
 source = "Loading…"
 translation = "불러오는 중…"
+
+[messages.tags-lookalike-apart]
+source = "Different"
+translation = "다름"
+
+[messages.tags-lookalike-apart-title]
+source = "{ $a } and { $b } mean different things: stop offering to merge them"
+translation = "{ $a }와(과) { $b }은(는) 뜻이 다릅니다: 병합 제안 그만하기"
+
+[messages.tags-lookalike-heading]
+source = "Tags that look alike"
+translation = "비슷해 보이는 태그"
+
+[messages.tags-lookalike-merge-title]
+source = "Merge { $other } into { $keep }"
+translation = "{ $other }을(를) { $keep }(으)로 병합"
+
+[messages.tags-lookalike-what]
+source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
+translation = "복수형, 같은 단어를 붙여 쓴 것, 한 글자 차이 등입니다. 병합하면 더 많이 쓰인 이름이 남고, 이후 태그 지정에 그 이름이 쓰입니다."
 
 [messages.tags-merge]
 source = "Merge"

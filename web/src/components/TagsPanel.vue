@@ -16,6 +16,8 @@ const emit = defineEmits<{ tag: [string]; changed: [] }>()
 const q = ref('')
 const tags = ref<Facet[] | null>(null)
 const aliases = ref<{ tag: string; into: string }[]>([])
+/** Pairs of tags that look like each other, offered for merging. */
+const lookalikes = ref<{ keep: string; keep_count: number; other: string; other_count: number }[]>([])
 const picked = ref<string[]>([])
 const into = ref('')
 const busy = ref(false)
@@ -24,9 +26,15 @@ const limit = ref(200)
 
 async function load() {
   try {
-    const [all, a, tree] = await Promise.all([api.allTags(q.value.trim().toLowerCase()), api.tagAliases(), api.tagTree()])
+    const [all, a, tree, alike] = await Promise.all([
+      api.allTags(q.value.trim().toLowerCase()),
+      api.tagAliases(),
+      api.tagTree(),
+      api.tagLookalikes(),
+    ])
     tags.value = all
     aliases.value = a
+    lookalikes.value = alike
     edges.value = tree
     if (!q.value.trim()) everyCount.value = new Map(all.map((x) => [x.value, x.count]))
   } catch (e) {
@@ -166,6 +174,32 @@ async function merge() {
   }
 }
 
+// A pair that looks alike: merge the less used into the more used, or say they're different.
+async function mergeAlike(p: { keep: string; other: string; other_count: number }) {
+  const ok = await confirmDialog({
+    title: t('tags-merge-title', { count: 2 }),
+    body: t('tags-merge-body', { tags: p.other, into: p.keep, count: p.other_count }),
+    confirm: t('tags-merge'),
+  })
+  if (!ok) return
+  try {
+    const r = await api.mergeTags([p.other], p.keep)
+    showOk(t('tags-merged', { count: r.assets, into: r.into }))
+    await load()
+    emit('changed')
+  } catch (e) {
+    showError(t('tags-merge-failed', { error: (e as Error).message }))
+  }
+}
+async function keepApart(p: { keep: string; other: string }) {
+  try {
+    await api.keepTagsApart(p.keep, p.other)
+    lookalikes.value = lookalikes.value.filter((x) => x !== p)
+  } catch (e) {
+    showError(t('tags-forget-failed', { error: (e as Error).message }))
+  }
+}
+
 async function forget(a: { tag: string; into: string }) {
   try {
     await api.dropTagAlias(a.tag)
@@ -222,6 +256,24 @@ watch(moreEl, (el) => {
       </ul>
     </section>
 
+    <section v-if="lookalikes.length">
+      <div class="sh"><h3>{{ t('tags-lookalike-heading') }}</h3></div>
+      <p class="what">{{ t('tags-lookalike-what') }}</p>
+      <ul class="list">
+        <li v-for="p in lookalikes" :key="`${p.other}>${p.keep}`">
+          <span class="grow alike">
+            <button type="button" class="linkbtn mono" :title="t('tags-browse-title', { tag: p.other })" @click="emit('tag', p.other)">{{ p.other }}</button>
+            <span class="n">{{ formatNumber(p.other_count) }}</span>
+            <span class="faint" aria-hidden="true">→</span>
+            <button type="button" class="linkbtn mono" :title="t('tags-browse-title', { tag: p.keep })" @click="emit('tag', p.keep)">{{ p.keep }}</button>
+            <span class="n">{{ formatNumber(p.keep_count) }}</span>
+          </span>
+          <button type="button" class="btn small" :title="t('tags-lookalike-merge-title', { other: p.other, keep: p.keep })" :aria-label="t('tags-lookalike-merge-title', { other: p.other, keep: p.keep })" @click="mergeAlike(p)">{{ t('tags-merge') }}</button>
+          <button type="button" class="btn ghost small" :title="t('tags-lookalike-apart-title', { a: p.other, b: p.keep })" :aria-label="t('tags-lookalike-apart-title', { a: p.other, b: p.keep })" @click="keepApart(p)">{{ t('tags-lookalike-apart') }}</button>
+        </li>
+      </ul>
+    </section>
+
     <section>
       <div class="find">
         <label class="visually-hidden" for="tags-q">{{ t('tags-find') }}</label>
@@ -253,7 +305,7 @@ watch(moreEl, (el) => {
 
       <p v-if="!tags" class="what">{{ t('tags-loading') }}</p>
       <p v-else-if="!tags.length" class="what none">{{ q ? t('tags-none-containing', { text: q.trim() }) : t('tags-none') }}</p>
-      <ul v-else class="list">
+      <ul v-else class="list every">
         <li v-for="tag in sorted.slice(0, limit)" :key="tag.value" :class="{ on: picked.includes(tag.value) }">
           <label class="pick">
             <input type="checkbox" :checked="picked.includes(tag.value)" @change="toggle(tag.value)" />
@@ -319,7 +371,9 @@ section { display: grid; gap: 0.6rem; }
 .more { height: 1px; }
 .tree li { gap: 0.4rem; }
 .tree .linkbtn { padding-inline: 0; text-align: start; justify-content: flex-start; }
-.branch { color: var(--faint); }
+.branch, .faint { color: var(--faint); }
+.alike { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.5rem; }
+.alike .linkbtn { padding-inline: 0; }
 .nest { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .nest .field { flex: 1 1 10rem; min-width: 0; max-width: 16rem; }
 .under { color: var(--muted); white-space: nowrap; }

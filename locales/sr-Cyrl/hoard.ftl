@@ -2583,6 +2583,12 @@ tags-browse = Прегледај
 tags-merged-heading = Спојене ознаке
 tags-merged-what = Када означивачи предложе неки од ових старих назива, ресурс добија ознаку у коју је стари назив спојен.
 tags-allow-old = Поново дозволи стари назив
+tags-lookalike-heading = Ознаке које личе једна на другу
+tags-lookalike-what = Множина, исте речи написане спојено или једно слово разлике. Спајање задржава чешће коришћено име, и аутоматско означавање га од тада користи.
+tags-lookalike-merge-title = Споји { $other } у { $keep }
+tags-lookalike-apart = Различите
+tags-lookalike-apart-title = { $a } и { $b } значе различите ствари: престани да предлажеш њихово спајање
+tag-page-alias-remove = Заборави старо име { $alias }: аутоматско означавање може поново да га даје уместо { $tag }
 # A tag's own page, above the results while that one tag is browsed. How many assets have it.
 tag-page-count =
     { $count ->
@@ -2596,6 +2602,12 @@ tag-page-aliases =
         [one] Старо име: { $names }
         [few] Стара имена: { $names }
        *[other] Стара имена: { $names }
+    }
+tag-page-aliases-label =
+    { $count ->
+        [one] Старо име:
+        [few] Стара имена:
+       *[other] Стара имена:
     }
 # Browsing a tag that was merged into another.
 tag-page-merged = Ознака { $tag } је спојена у { $into }.

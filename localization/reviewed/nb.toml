@@ -12456,8 +12456,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Slå sammen { $other } med { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "En flertallsform, de samme ordene skrevet sammen eller én bokstav feil. Sammenslåing beholder det mest brukte navnet, og merkerne bruker det fra da av."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "En flertallsform, de samme ordene skrevet sammen, én bokstav feil eller et ord som også er en etikett med navnerom (red og color:red). Sammenslåing beholder det mest brukte navnet eller det med navnerom, og merkerne bruker det fra da av."
 
 [messages.tags-merge]
 source = "Merge"

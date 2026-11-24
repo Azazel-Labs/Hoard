@@ -12147,8 +12147,8 @@ source = "Merge { $other } into { $keep }"
 translation = "{ $other }을(를) { $keep }(으)로 병합"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "복수형, 같은 단어를 붙여 쓴 것, 한 글자 차이 등입니다. 병합하면 더 많이 쓰인 이름이 남고, 이후 태그 지정에 그 이름이 쓰입니다."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "복수형, 같은 단어를 붙여 쓴 것, 한 글자 차이, 또는 네임스페이스가 붙은 태그로도 있는 단어(red와 color:red) 등입니다. 병합하면 더 많이 쓰인 이름이나 네임스페이스가 붙은 이름이 남고, 이후 태그 지정에 그 이름이 쓰입니다."
 
 [messages.tags-merge]
 source = "Merge"

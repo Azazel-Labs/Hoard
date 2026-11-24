@@ -12529,8 +12529,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Συγχώνευση της { $other } στην { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Ένας πληθυντικός, οι ίδιες λέξεις κολλητά ή ένα γράμμα διαφορά. Η συγχώνευση κρατά το πιο χρησιμοποιημένο όνομα, και οι επισημαντές το χρησιμοποιούν από εκεί και πέρα."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Ένας πληθυντικός, οι ίδιες λέξεις κολλητά, ένα γράμμα διαφορά ή μια λέξη που είναι και ετικέτα με χώρο ονομάτων (red και color:red). Η συγχώνευση κρατά το πιο χρησιμοποιημένο όνομα ή αυτό με χώρο ονομάτων, και οι επισημαντές το χρησιμοποιούν από εκεί και πέρα."
 
 [messages.tags-merge]
 source = "Merge"

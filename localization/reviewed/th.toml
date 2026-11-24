@@ -12183,8 +12183,8 @@ source = "Merge { $other } into { $keep }"
 translation = "รวม { $other } เข้ากับ { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "รูปพหูพจน์ คำเดียวกันที่เขียนติดกัน หรือต่างกันหนึ่งตัวอักษร การรวมจะเก็บชื่อที่ใช้มากกว่าไว้ และการติดแท็กจะใช้ชื่อนั้นต่อจากนี้"
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "รูปพหูพจน์ คำเดียวกันที่เขียนติดกัน ต่างกันหนึ่งตัวอักษร หรือคำที่เป็นแท็กแบบมีเนมสเปซด้วย (red กับ color:red) การรวมจะเก็บชื่อที่ใช้มากกว่าหรือชื่อที่มีเนมสเปซไว้ และการติดแท็กจะใช้ชื่อนั้นต่อจากนี้"
 
 [messages.tags-merge]
 source = "Merge"

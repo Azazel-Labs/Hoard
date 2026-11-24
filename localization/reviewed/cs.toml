@@ -12699,8 +12699,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Sloučit { $other } do { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Množné číslo, stejná slova dohromady nebo jedno písmeno vedle. Sloučení ponechá častěji používaný název a štítkovače ho pak budou používat."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Množné číslo, stejná slova dohromady, jedno písmeno vedle nebo slovo, které je i štítkem s jmenným prostorem (red a color:red). Sloučení ponechá častěji používaný název nebo ten s jmenným prostorem a štítkovače ho pak budou používat."
 
 [messages.tags-merge]
 source = "Merge"

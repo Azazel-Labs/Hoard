@@ -12246,8 +12246,8 @@ source = "Merge { $other } into { $keep }"
 translation = "{ $other } etiketini { $keep } ile birleştir"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Bir çoğul, bitişik yazılmış aynı sözcükler ya da bir harf farkı. Birleştirme daha çok kullanılan adı tutar ve etiketleyiciler bundan sonra onu kullanır."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Bir çoğul, bitişik yazılmış aynı sözcükler, bir harf farkı ya da ad alanlı bir etiket olarak da bulunan bir sözcük (red ve color:red). Birleştirme daha çok kullanılan adı ya da ad alanlı olanı tutar ve etiketleyiciler bundan sonra onu kullanır."
 
 [messages.tags-merge]
 source = "Merge"

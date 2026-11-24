@@ -12212,8 +12212,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Gabungkan { $other } ke { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Bentuk jamak, kata yang sama disambung, atau beda satu huruf. Menggabungkan mempertahankan nama yang lebih sering dipakai, dan pemberi tag memakainya sejak itu."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Bentuk jamak, kata yang sama disambung, beda satu huruf, atau kata yang juga ada sebagai tag dengan namespace (red dan color:red). Menggabungkan mempertahankan nama yang lebih sering dipakai, atau yang ber-namespace, dan pemberi tag memakainya sejak itu."
 
 [messages.tags-merge]
 source = "Merge"

@@ -12453,8 +12453,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Læg { $other } sammen med { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "En flertalsform, de samme ord skrevet sammen eller ét bogstav forkert. Ved sammenlægning beholdes det mest brugte navn, og mærkerne bruger det fremover."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "En flertalsform, de samme ord skrevet sammen, ét bogstav forkert eller et ord, der også er et mærke med et navnerum (red og color:red). Ved sammenlægning beholdes det mest brugte navn eller det med navnerum, og mærkerne bruger det fremover."
 
 [messages.tags-merge]
 source = "Merge"

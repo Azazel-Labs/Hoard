@@ -12180,8 +12180,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Gộp { $other } vào { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Dạng số nhiều, cùng các từ viết liền, hoặc lệch một chữ cái. Gộp sẽ giữ tên được dùng nhiều hơn, và từ đó việc gắn thẻ dùng tên ấy."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Dạng số nhiều, cùng các từ viết liền, lệch một chữ cái, hoặc một từ cũng là thẻ có không gian tên (red và color:red). Gộp sẽ giữ tên được dùng nhiều hơn, hoặc tên có không gian tên, và từ đó việc gắn thẻ dùng tên ấy."
 
 [messages.tags-merge]
 source = "Merge"

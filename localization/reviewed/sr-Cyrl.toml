@@ -12606,8 +12606,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Споји { $other } у { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Множина, исте речи написане спојено или једно слово разлике. Спајање задржава чешће коришћено име, и аутоматско означавање га од тада користи."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Множина, исте речи написане спојено, једно слово разлике или реч која је и ознака са именским простором (red и color:red). Спајање задржава чешће коришћено име или оно са именским простором, и аутоматско означавање га од тада користи."
 
 [messages.tags-merge]
 source = "Merge"

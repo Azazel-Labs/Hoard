@@ -12194,8 +12194,8 @@ source = "Merge { $other } into { $keep }"
 translation = "将 { $other } 合并到 { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "复数形式、连写的相同词语，或相差一个字母。合并会保留用得更多的名称，之后打标签都会用它。"
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "复数形式、连写的相同词语、相差一个字母，或同时也是带命名空间标签的词（red 和 color:red）。合并会保留用得更多的名称或带命名空间的名称，之后打标签都会用它。"
 
 [messages.tags-merge]
 source = "Merge"

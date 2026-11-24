@@ -12447,8 +12447,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Smelt { $other } saam met { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "n Meervoud, dieselfde woorde aanmekaar, of een letter verkeerd. Saamsmelt hou die naam wat meer gebruik word, en die etiketteerders gebruik dit voortaan."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "'n Meervoud, dieselfde woorde aanmekaar, een letter verkeerd, of 'n woord wat ook 'n etiket met 'n naamruimte is (red en color:red). Saamsmelt hou die naam wat meer gebruik word, of die een met die naamruimte, en die etiketteerders gebruik dit voortaan."
 
 [messages.tags-merge]
 source = "Merge"

@@ -12523,8 +12523,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Yhdistä { $other } tunnisteeseen { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Monikko, samat sanat yhteen kirjoitettuina tai yksi kirjain väärin. Yhdistäminen säilyttää käytetymmän nimen, ja tunnistajat käyttävät sitä siitä lähtien."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Monikko, samat sanat yhteen kirjoitettuina, yksi kirjain väärin tai sana, joka on myös nimiavaruudellinen tunniste (red ja color:red). Yhdistäminen säilyttää käytetymmän nimen tai nimiavaruudellisen, ja tunnistajat käyttävät sitä siitä lähtien."
 
 [messages.tags-merge]
 source = "Merge"

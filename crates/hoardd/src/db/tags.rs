@@ -432,8 +432,9 @@ pub(crate) struct LookAlike {
     pub other_count: u64,
 }
 
-/// Tags in use that look like each other (as [`looks_like`] has it, both ways round), the most used pairs first,
-/// leaving out those someone said are different ([`keep_tags_apart`]).
+/// Tags in use that look like each other (as [`looks_like`] has it, both ways round), and bare words that are also a
+/// tag with a namespace ([`namespaced_twins`]), the most used pairs first, leaving out those someone said are different
+/// ([`keep_tags_apart`]).
 pub(crate) fn lookalike_tags(conn: &Connection, limit: usize) -> Result<Vec<LookAlike>> {
     use std::collections::{BTreeSet, HashMap, HashSet};
     let all = super::tag_counts(conn, "", false, u32::MAX)?;
@@ -486,6 +487,17 @@ pub(crate) fn lookalike_tags(conn: &Connection, limit: usize) -> Result<Vec<Look
             }
         })
         .collect();
+    found.extend(
+        namespaced_twins(&all)
+            .into_iter()
+            .filter(|(bare, named)| !apart.contains(&ordered(&bare.value, &named.value)))
+            .map(|(bare, named)| LookAlike {
+                keep: named.value.clone(),
+                keep_count: named.count,
+                other: bare.value.clone(),
+                other_count: bare.count,
+            }),
+    );
     found.sort_by(|x, y| {
         (y.keep_count + y.other_count)
             .cmp(&(x.keep_count + x.other_count))
@@ -494,6 +506,37 @@ pub(crate) fn lookalike_tags(conn: &Connection, limit: usize) -> Result<Vec<Look
     });
     found.truncate(limit);
     Ok(found)
+}
+
+/// Namespaces whose tags Hoard sets itself, from what a file is, which no tag merges into.
+const OWN_NAMESPACES: [&str; 2] = ["kind", "format"];
+
+/// Each bare tag paired with a tag that's the same word (or its plural) in a namespace: `red` with `color:red`,
+/// `footsteps` with `ucs:footstep`. The namespaced one says what kind of word it is, so it's the one to keep, however
+/// much less it's used.
+fn namespaced_twins(all: &[hoard_core::Facet]) -> Vec<(&hoard_core::Facet, &hoard_core::Facet)> {
+    use std::collections::HashMap;
+    let mut by_word: HashMap<String, Vec<&hoard_core::Facet>> = HashMap::new();
+    for f in all {
+        let Some((ns, word)) = f.value.split_once(':') else { continue };
+        if OWN_NAMESPACES.contains(&ns) || word.contains(':') {
+            continue;
+        }
+        let word = squash(word);
+        for key in singulars(&word).into_iter().chain([word]) {
+            by_word.entry(key).or_default().push(f);
+        }
+    }
+    let mut twins = Vec::new();
+    for bare in all.iter().filter(|f| !f.value.contains(':')) {
+        let word = squash(&bare.value);
+        let mut named: Vec<&hoard_core::Facet> =
+            singulars(&word).into_iter().chain([word]).filter_map(|k| by_word.get(&k)).flatten().copied().collect();
+        named.sort_by(|a, b| a.value.cmp(&b.value));
+        named.dedup_by(|a, b| a.value == b.value);
+        twins.extend(named.into_iter().map(|n| (bare, n)));
+    }
+    twins
 }
 
 /// Two tags, the first A to Z first, as `tags_apart` keeps them.
@@ -734,5 +777,32 @@ mod tests {
         merge_tags(&mut conn, &["bodies".to_owned()], "body").unwrap();
         assert_eq!(pairs(&conn), ["cobbelstone > cobblestone", "stonewall > stone-wall"]);
         assert_eq!(lookalike_tags(&conn, 1).unwrap().len(), 1);
+    }
+
+    /// A bare word that's also a tag in a namespace is offered for merging into it, however much more it's used, but
+    /// never into a namespace Hoard sets itself.
+    #[test]
+    fn a_bare_word_is_offered_for_merging_into_its_namespaced_twin() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x'), ('h2', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Crypt', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.png', 'a1', 'png', 'texture', 'x', 'x'),
+               ('a2', 'p1', 'h2', 'a2.png', 'a2', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('a1', 'red', 'human', 1.0), ('a2', 'red', 'human', 1.0), ('a1', 'color:red', 'ai', 0.7),
+               ('a1', 'footsteps', 'human', 1.0), ('a2', 'ucs:footstep', 'meta', 1.0),
+               ('a1', 'texture', 'human', 1.0), ('a2', 'kind:texture', 'rule', 1.0),
+               ('a1', 'wood', 'human', 1.0), ('a2', 'material:wood', 'ai', 0.6);",
+        )
+        .unwrap();
+        keep_tags_apart(&conn, "wood", "material:wood").unwrap();
+        let found = lookalike_tags(&conn, 50).unwrap();
+        let pairs: Vec<_> = found.iter().map(|p| format!("{} > {}", p.other, p.keep)).collect();
+        assert_eq!(pairs, ["red > color:red", "footsteps > ucs:footstep"]);
+        assert_eq!((found[0].other_count, found[0].keep_count), (2, 1));
     }
 }

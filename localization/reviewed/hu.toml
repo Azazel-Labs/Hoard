@@ -12274,8 +12274,8 @@ source = "Merge { $other } into { $keep }"
 translation = "{ $other } összevonása ebbe: { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Többes szám, ugyanazok a szavak egybeírva vagy egy betű eltérés. Az összevonás a gyakrabban használt nevet tartja meg, és a címkézők ezentúl azt használják."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Többes szám, ugyanazok a szavak egybeírva, egy betű eltérés, vagy egy szó, amely névtérrel ellátott címkeként is létezik (red és color:red). Az összevonás a gyakrabban használt nevet vagy a névtereset tartja meg, és a címkézők ezentúl azt használják."
 
 [messages.tags-merge]
 source = "Merge"

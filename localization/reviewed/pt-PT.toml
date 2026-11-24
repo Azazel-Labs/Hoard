@@ -12463,8 +12463,8 @@ source = "Merge { $other } into { $keep }"
 translation = "Unir { $other } a { $keep }"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Um plural, as mesmas palavras juntas ou uma letra de diferença. Unir mantém o nome mais usado, e os etiquetadores passam a usá-lo."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Um plural, as mesmas palavras juntas, uma letra de diferença ou uma palavra que também é uma etiqueta com espaço de nomes (red e color:red). Unir mantém o nome mais usado, ou o que tem espaço de nomes, e os etiquetadores passam a usá-lo."
 
 [messages.tags-merge]
 source = "Merge"

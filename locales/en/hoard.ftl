@@ -2776,7 +2776,7 @@ tags-merged-what = When the taggers come up with one of these old names, the ass
 tags-allow-old = Allow the old name again
 # Settings → Tags: pairs of tags in use that are probably one, the less used offered for merging into the more.
 tags-lookalike-heading = Tags that look alike
-tags-lookalike-what = A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on.
+tags-lookalike-what = A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on.
 # $other is the less used tag, $keep the one it would merge into.
 tags-lookalike-merge-title = Merge { $other } into { $keep }
 tags-lookalike-apart = Different

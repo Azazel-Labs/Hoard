@@ -12449,8 +12449,8 @@ source = "Merge { $other } into { $keep }"
 translation = "{ $other } in { $keep } zusammenführen"
 
 [messages.tags-lookalike-what]
-source = "A plural, the same words run together, or one letter off. Merging keeps the more used name, and the taggers use it from then on."
-translation = "Eine Mehrzahl, dieselben Wörter zusammengeschrieben oder ein Buchstabe daneben. Beim Zusammenführen bleibt der häufiger verwendete Name, und die Tagger verwenden ihn von da an."
+source = "A plural, the same words run together, one letter off, or a word that's also a tag with a namespace (red and color:red). Merging keeps the more used name, or the namespaced one, and the taggers use it from then on."
+translation = "Eine Mehrzahl, dieselben Wörter zusammengeschrieben, ein Buchstabe daneben oder ein Wort, das auch ein Tag mit Namensraum ist (red und color:red). Beim Zusammenführen bleibt der häufiger verwendete Name oder der mit Namensraum, und die Tagger verwenden ihn von da an."
 
 [messages.tags-merge]
 source = "Merge"

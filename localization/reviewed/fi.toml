@@ -13534,6 +13534,10 @@ translation = "Pienennä"
 source = "network error"
 translation = "verkkovirhe"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "ei vastausta { $seconds } s:iin"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nämä eivät ole samat tiedostot, joten mitään ei jatkettu."
@@ -13589,6 +13593,10 @@ translation = "jatkettu, { $size } oli jo perillä"
 [messages.upload-retry]
 source = "Retry"
 translation = "Yritä uudelleen"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Yritetään uudelleen: { $what } ({ $attempt }/{ $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

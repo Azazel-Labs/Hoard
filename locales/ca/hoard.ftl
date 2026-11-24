@@ -1284,6 +1284,8 @@ projects-usage-body = Es fa servir a { $list }: el proper hoard sync de cadascun
 ## uploader.ts
 
 upload-network-error = error de xarxa
+upload-no-reply = cap resposta en { $seconds } s
+upload-retrying = Es torna a provar { $what } ({ $attempt } de { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } després de { $attempts } intents
 upload-failed-plain = ha fallat
 upload-already-imported = ja s'havia importat

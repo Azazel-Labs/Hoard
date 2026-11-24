@@ -1284,6 +1284,8 @@ projects-usage-body = Usado em { $list }: o próximo hoard sync de cada um o tir
 ## uploader.ts
 
 upload-network-error = erro de rede
+upload-no-reply = sem resposta por { $seconds } s
+upload-retrying = Tentando de novo { $what } ({ $attempt } de { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } depois de { $attempts } tentativas
 upload-failed-plain = falhou
 upload-already-imported = já importado

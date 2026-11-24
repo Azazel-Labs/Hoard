@@ -13536,6 +13536,10 @@ translation = "Ελαχιστοποίηση"
 source = "network error"
 translation = "σφάλμα δικτύου"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "καμία απάντηση για { $seconds } δ"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Δεν είναι τα ίδια αρχεία, οπότε δεν συνεχίστηκε τίποτα."
@@ -13591,6 +13595,10 @@ translation = "συνέχιση, { $size } υπήρχαν ήδη"
 [messages.upload-retry]
 source = "Retry"
 translation = "Επανάληψη"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Νέα προσπάθεια για { $what } ({ $attempt } από { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

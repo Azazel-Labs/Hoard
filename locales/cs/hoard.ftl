@@ -1358,6 +1358,8 @@ projects-usage-body = Používá se v projektech { $list }: příští hoard syn
 ## uploader.ts
 
 upload-network-error = chyba sítě
+upload-no-reply = žádná odpověď po dobu { $seconds } s
+upload-retrying = Nový pokus: { $what } ({ $attempt } z { $attempts }): { $error }
 upload-gave-up =
     { $what }: { $error } po { $attempts ->
         [one] { $attempts } pokusu

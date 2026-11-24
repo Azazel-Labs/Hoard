@@ -1170,6 +1170,8 @@ projects-usage-body = { $list } で使われています。それぞれ次の ho
 ## uploader.ts
 
 upload-network-error = ネットワークエラー
+upload-no-reply = { $seconds } 秒間応答なし
+upload-retrying = { $what } を再試行中（{ $attempt }/{ $attempts }）: { $error }
 upload-gave-up = { $what }: { $attempts } 回試しましたが失敗しました（{ $error }）
 upload-failed-plain = 失敗しました
 upload-already-imported = インポート済み

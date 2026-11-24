@@ -1408,6 +1408,8 @@ projects-usage-body = Використовується в { $list }: насту�
 ## uploader.ts
 
 upload-network-error = помилка мережі
+upload-no-reply = немає відповіді { $seconds } с
+upload-retrying = Повторна спроба: { $what } ({ $attempt } з { $attempts }): { $error }
 upload-gave-up =
     { $what }: { $error } після { $attempts ->
         [one] { $attempts } спроби

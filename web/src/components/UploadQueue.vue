@@ -8,7 +8,7 @@ import { ApiError, type Pack } from '../api'
 import { filesFromHandle, groupsFromPicked, signature, type Group, type UploadFile } from '../drop'
 import { humanBytes } from '../format'
 import { prefs } from '../prefs'
-import { abandonUpload, AlreadyImported, splitPerSubfolder, uploadPackResumable } from '../uploader'
+import { abandonUpload, AlreadyImported, splitPerSubfolder, uploadPackResumable, type Retrying } from '../uploader'
 import { forget, loadSaved, newKey, save, type Saved } from '../uploadStore'
 import { formatNumber, t } from '../i18n'
 
@@ -32,6 +32,8 @@ interface Job {
   resumed: number
   rate: number
   error?: string
+  /** A request that failed being sent again, while one is. */
+  retrying?: Retrying
   controller?: AbortController
   sessionId?: string
   claim?: string
@@ -149,6 +151,7 @@ async function pump() {
   const id = next.id
   next.state = 'uploading'
   next.error = undefined
+  next.retrying = undefined
   next.controller = new AbortController()
   // Speed: exponentially smoothed bytes/second.
   let lastT = performance.now()
@@ -170,7 +173,7 @@ async function pump() {
           lastT = now
           lastSent = p.sent
         }
-        Object.assign(j, { sent: p.sent, total: p.total, filesDone: p.filesDone, filesTotal: p.filesTotal, resumed: p.resumedBytes })
+        Object.assign(j, { sent: p.sent, total: p.total, filesDone: p.filesDone, filesTotal: p.filesTotal, resumed: p.resumedBytes, retrying: p.retrying })
         if (!lastSent) lastSent = p.resumedBytes
         if (now - lastSaved > 5000) {
           lastSaved = now
@@ -437,6 +440,9 @@ const pillText = computed(() => {
           <span>{{ eta(j) }}</span>
           <span v-if="j.resumed" class="ok">{{ t('upload-resumed', { size: humanBytes(j.resumed) }) }}</span>
         </div>
+        <p v-if="j.state === 'uploading' && j.retrying" class="msg hint">
+          {{ t('upload-retrying', { what: j.retrying.what, attempt: j.retrying.attempt, attempts: j.retrying.attempts, error: j.retrying.error }) }}
+        </p>
         <p v-if="j.state === 'uploading' && j.into" class="msg hint">{{ t('upload-into', { name: j.into }) }}</p>
         <div v-if="j.state === 'interrupted'" class="sub">
           <span class="mono">{{ t('upload-bytes-of', { sent: humanBytes(j.sent), total: humanBytes(j.total) }) }}</span>

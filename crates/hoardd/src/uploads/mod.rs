@@ -23,6 +23,11 @@
 //! added and the ones that changed are replaced; `copy` makes a pack of its own instead.
 //! What's on disk is the source of truth for progress, so a server restart mid-upload loses nothing.
 
+mod watch;
+
+pub(crate) use watch::watch_loop;
+use watch::{Phase, Watched};
+
 use crate::catalog::{Access, Operation};
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
@@ -31,7 +36,7 @@ use crate::{AppState, db, jobs};
 use anyhow::Context;
 use axum::Json;
 use axum::extract::{Multipart, Path, Query, Request, State};
-use axum::http::StatusCode;
+use axum::http::{HeaderMap, StatusCode, Version};
 use axum::response::{IntoResponse, Response};
 use futures_util::StreamExt;
 use hoard_core::Pack;
@@ -459,6 +464,7 @@ async fn chunk(
     req: Request,
 ) -> ApiResult<Response> {
     let path = safe_rel_path(&p.path).ok_or_else(|| AppError::bad_request(tr!("error-bad-path")))?;
+    let watch = Watched::start(format!("{id} {path} @{}", p.offset), req.version(), req.headers());
     let (size, received) = expected(&state, &id, &path).await?;
     if p.offset % PART_BYTES != 0 || p.offset >= size {
         return Err(AppError::bad_request(tr!("error-upload-part-offset", offset = p.offset, path = path)));
@@ -481,15 +487,21 @@ async fn chunk(
         // Read what the client is sending anyway: answering before the body is in breaks its connection mid-write.
         let mut body = req.into_body().into_data_stream();
         let mut skipped = 0u64;
+        watch.phase(Phase::Receiving);
         while skipped <= len {
             match tokio::time::timeout(BODY_IDLE, body.next()).await {
-                Ok(Some(Ok(bytes))) => skipped += bytes.len() as u64,
+                Ok(Some(Ok(bytes))) => {
+                    watch.got(bytes.len());
+                    skipped += bytes.len() as u64;
+                }
                 _ => break,
             }
         }
+        watch.finished();
         return Ok(Json(json!({ "received": received, "size": size })).into_response());
     }
     let dest = staging(&state, &id).join(&path);
+    watch.phase(Phase::Saving);
     if let Some(parent) = dest.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
@@ -500,15 +512,18 @@ async fn chunk(
     let mut written = 0u64;
     let mut body = req.into_body().into_data_stream();
     loop {
+        watch.phase(Phase::Receiving);
         let Ok(next) = tokio::time::timeout(BODY_IDLE, body.next()).await else { return Err(stalled(&path)) };
         let Some(bytes) = next else { break };
         // A part that didn't all arrive isn't counted: the client sends it again.
         let bytes =
             bytes.map_err(|e| AppError::bad_request(tr!("error-upload-interrupted", reason = e.to_string())))?;
+        watch.got(bytes.len());
         written += bytes.len() as u64;
         if written > len {
             return Err(AppError::bad_request(tr!("error-upload-part-long", part = part, path = path, len = len)));
         }
+        watch.phase(Phase::Saving);
         out.write_all(&bytes).await?;
     }
     if written != len {
@@ -520,10 +535,13 @@ async fn chunk(
             len = len
         )));
     }
+    watch.phase(Phase::Saving);
     out.flush().await?;
     // On disk before it's counted, so a crash can't leave a part that's recorded but missing.
     out.get_ref().sync_data().await?;
+    watch.phase(Phase::Database);
     let received = record(&state, &id, &path, Some(part), len, size).await?;
+    watch.finished();
     Ok(Json(json!({ "received": received, "size": size })).into_response())
 }
 
@@ -531,12 +549,19 @@ async fn chunk(
 async fn batch(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    version: Version,
+    headers: HeaderMap,
     mut multipart: Multipart,
 ) -> ApiResult<Json<serde_json::Value>> {
+    let watch = Watched::start(format!("{id} batch"), version, &headers);
     let root = staging(&state, &id);
     let mut done = Vec::new();
     let mut pending_rel: Option<String> = None;
-    while let Some(mut field) = multipart.next_field().await.map_err(|e| AppError::bad_request(format!("{e}")))? {
+    loop {
+        watch.phase(Phase::Receiving);
+        let Some(mut field) = multipart.next_field().await.map_err(|e| AppError::bad_request(format!("{e}")))? else {
+            break;
+        };
         let field_name = field.name().map(str::to_owned);
         let file_name = field.file_name().map(str::to_owned);
         match (field_name.as_deref(), file_name) {
@@ -546,8 +571,10 @@ async fn batch(
             (_, Some(file_name)) => {
                 let raw = pending_rel.take().unwrap_or(file_name);
                 let path = safe_rel_path(&raw).ok_or_else(|| AppError::bad_request(tr!("error-bad-path")))?;
+                watch.phase(Phase::Database);
                 let (size, _) = expected(&state, &id, &path).await?;
                 let _guard = InFlight::claim(&state, &id, &path, None)?;
+                watch.phase(Phase::Saving);
                 let dest = root.join(&path);
                 if let Some(parent) = dest.parent() {
                     tokio::fs::create_dir_all(parent).await?;
@@ -555,17 +582,24 @@ async fn batch(
                 // Batches always carry whole files, so (re)write from scratch.
                 let mut out = tokio::io::BufWriter::new(tokio::fs::File::create(&dest).await?);
                 let mut written = 0u64;
-                while let Some(bytes) = tokio::time::timeout(BODY_IDLE, field.chunk())
-                    .await
-                    .map_err(|_| stalled(&path))?
-                    .map_err(|e| AppError::bad_request(format!("{e}")))?
-                {
+                loop {
+                    watch.phase(Phase::Receiving);
+                    let Some(bytes) = tokio::time::timeout(BODY_IDLE, field.chunk())
+                        .await
+                        .map_err(|_| stalled(&path))?
+                        .map_err(|e| AppError::bad_request(format!("{e}")))?
+                    else {
+                        break;
+                    };
+                    watch.got(bytes.len());
                     written += bytes.len() as u64;
                     if written > size {
                         return Err(AppError::bad_request(tr!("error-upload-file-long", path = path)));
                     }
+                    watch.phase(Phase::Saving);
                     out.write_all(&bytes).await?;
                 }
+                watch.phase(Phase::Saving);
                 out.flush().await?;
                 if written != size {
                     return Err(AppError::bad_request(tr!(
@@ -575,12 +609,14 @@ async fn batch(
                         len = size
                     )));
                 }
+                watch.phase(Phase::Database);
                 record(&state, &id, &path, None, written, size).await?;
                 done.push(path);
             }
             _ => {}
         }
     }
+    watch.finished();
     Ok(Json(json!({ "received": done })))
 }
 

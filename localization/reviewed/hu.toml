@@ -13249,6 +13249,10 @@ translation = "Kis méret"
 source = "network error"
 translation = "hálózati hiba"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "nincs válasz { $seconds } mp óta"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Ezek nem ugyanazok a fájlok, így semmi sem folytatódott."
@@ -13304,6 +13308,10 @@ translation = "folytatva, { $size } már megvolt"
 [messages.upload-retry]
 source = "Retry"
 translation = "Újra"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Újrapróbálás: { $what } ({ $attempt }/{ $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

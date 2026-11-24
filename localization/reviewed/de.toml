@@ -13444,6 +13444,10 @@ translation = "Minimieren"
 source = "network error"
 translation = "Netzwerkfehler"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "keine Antwort seit { $seconds } s"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Das sind nicht dieselben Dateien, daher wurde nichts fortgesetzt."
@@ -13499,6 +13503,10 @@ translation = "fortgesetzt, { $size } waren schon da"
 [messages.upload-retry]
 source = "Retry"
 translation = "Erneut versuchen"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Neuer Versuch für { $what } ({ $attempt } von { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

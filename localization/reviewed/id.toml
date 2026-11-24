@@ -13187,6 +13187,10 @@ translation = "Kecilkan"
 source = "network error"
 translation = "galat jaringan"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "tidak ada balasan selama { $seconds } dtk"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Itu bukan file yang sama, jadi tidak ada yang dilanjutkan."
@@ -13242,6 +13246,10 @@ translation = "dilanjutkan, { $size } sudah ada"
 [messages.upload-retry]
 source = "Retry"
 translation = "Coba lagi"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Mencoba lagi { $what } ({ $attempt } dari { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

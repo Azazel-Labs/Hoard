@@ -13453,6 +13453,10 @@ translation = "Minimitza"
 source = "network error"
 translation = "error de xarxa"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "cap resposta en { $seconds } s"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "No són els mateixos fitxers, així que no s’ha reprès res."
@@ -13508,6 +13512,10 @@ translation = "represa, { $size } ja hi eren"
 [messages.upload-retry]
 source = "Retry"
 translation = "Torna-ho a provar"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Es torna a provar { $what } ({ $attempt } de { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

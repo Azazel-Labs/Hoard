@@ -1330,6 +1330,8 @@ projects-usage-body = Користи се у: { $list }. Следећи hoard sy
 ## uploader.ts
 
 upload-network-error = грешка мреже
+upload-no-reply = нема одговора { $seconds } с
+upload-retrying = Поновни покушај: { $what } ({ $attempt } од { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } после { $attempts } покушаја
 upload-failed-plain = није успело
 upload-already-imported = већ увезено

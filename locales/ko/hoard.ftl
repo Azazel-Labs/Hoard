@@ -1170,6 +1170,8 @@ projects-usage-body = { $list }에서 사용 중입니다. 각 프로젝트의 �
 ## uploader.ts
 
 upload-network-error = 네트워크 오류
+upload-no-reply = { $seconds }초 동안 응답 없음
+upload-retrying = { $what } 다시 시도 중 ({ $attempt }/{ $attempts }): { $error }
 upload-gave-up = { $what }: { $attempts }회 시도 후 { $error }
 upload-failed-plain = 실패
 upload-already-imported = 이미 가져옴

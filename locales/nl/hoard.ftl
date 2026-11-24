@@ -1284,6 +1284,8 @@ projects-usage-body = Gebruikt in { $list }: bij elk ervan haalt de volgende hoa
 ## uploader.ts
 
 upload-network-error = netwerkfout
+upload-no-reply = geen antwoord gedurende { $seconds } s
+upload-retrying = { $what } opnieuw proberen ({ $attempt } van { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } na { $attempts } pogingen
 upload-failed-plain = mislukt
 upload-already-imported = al geïmporteerd

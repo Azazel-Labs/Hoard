@@ -1176,6 +1176,8 @@ projects-usage-body = Được dùng trong { $list }: lần hoard sync tiếp th
 ## Tải lên
 
 upload-network-error = lỗi mạng
+upload-no-reply = không có phản hồi trong { $seconds } giây
+upload-retrying = Đang thử lại { $what } ({ $attempt }/{ $attempts }): { $error }
 upload-gave-up = { $what }: { $error } sau { $attempts } lần thử
 upload-failed-plain = thất bại
 upload-already-imported = đã nhập rồi

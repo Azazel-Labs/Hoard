@@ -1221,6 +1221,8 @@ projects-usage-body = Használják: { $list }. Mindegyiknél a következő hoard
 ## Feltöltő
 
 upload-network-error = hálózati hiba
+upload-no-reply = nincs válasz { $seconds } mp óta
+upload-retrying = Újrapróbálás: { $what } ({ $attempt }/{ $attempts }): { $error }
 upload-gave-up = { $what }: { $error }, { $attempts } próbálkozás után
 upload-failed-plain = sikertelen
 upload-already-imported = már importálva

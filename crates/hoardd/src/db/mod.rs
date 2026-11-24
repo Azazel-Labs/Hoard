@@ -84,11 +84,11 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         c.wal_hook(Some(move |wal: &mut rusqlite::hooks::Wal, pages| {
             changes::committed(&mut committed.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
             WRITES.fetch_add(1, Ordering::AcqRel);
-            turn_over();
             if pages >= 1000 {
                 // As SQLite's own: a checkpoint that can't finish now is done by a later one.
                 wal.checkpoint().ok();
             }
+            finished();
             Ok(())
         }))
     });
@@ -122,12 +122,53 @@ fn set_up(c: &mut Connection) -> rusqlite::Result<()> {
 /// How long a write waits for the one before it to finish before giving up with "database is locked".
 const WAIT_FOR_WRITE: Duration = Duration::from_secs(30);
 
-/// Writes since the server started (bumped as each finishes), and a signal for the writers waiting their turn.
-static TURN: (Mutex<u64>, Condvar) = (Mutex::new(0), Condvar::new());
+/// How often a waiting write looks again, should nobody wake it.
+const LOOK_AGAIN: Duration = Duration::from_millis(20);
+
+/// Whose turn it is to write.
+struct Turn {
+    /// Writes since the server started, bumped as each finishes.
+    writes: u64,
+    /// When a write last waited for another to finish: one still waiting looks again at least every [`LOOK_AGAIN`].
+    waited: Option<Instant>,
+    /// The write under way, once it has changed the library.
+    holder: Option<Holder>,
+}
+
+/// A write under way: since it first changed the library, and what it's for (its request's or job's span), so a write
+/// kept waiting can say what it waits for, and one held long says so (see [`SLOW`]). (Since its first change, not its
+/// beginning: work done in a transaction before it changes anything isn't counted.)
+struct Holder {
+    since: Instant,
+    span: tracing::Span,
+}
+
+/// A write began changing the library.
+pub(crate) fn began_writing() {
+    turn().holder = Some(Holder { since: Instant::now(), span: tracing::Span::current() });
+}
+
+/// The write under way ended: one that held the database long says so, in the log of whatever it was for.
+fn let_go(holder: Option<Holder>) {
+    if let Some(h) = holder
+        && h.since.elapsed() >= SLOW
+    {
+        tracing::warn!(parent: &h.span, secs = h.since.elapsed().as_secs_f32(), "held the database for writing");
+    }
+}
+
+/// [`Turn`], and a signal for the writers waiting theirs.
+static TURN: (Mutex<Turn>, Condvar) = (Mutex::new(Turn { writes: 0, waited: None, holder: None }), Condvar::new());
+
+fn turn() -> std::sync::MutexGuard<'static, Turn> {
+    TURN.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+}
 
 thread_local! {
     /// When the write this thread is trying to start began waiting.
     static WAITING_SINCE: Cell<Option<Instant>> = const { Cell::new(None) };
+    /// Whether the write this thread is trying to start has said in the log that it's been kept waiting.
+    static SAID_WAITING: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Waiting for another connection's write to finish (SQLite's busy handler; `tries` counts from 0 per write). A
@@ -138,25 +179,66 @@ fn wait_turn(tries: i32) -> bool {
     let since = WAITING_SINCE.with(|w| {
         if tries == 0 || w.get().is_none() {
             w.set(Some(now));
+            SAID_WAITING.set(false);
         }
         w.get().unwrap_or(now)
     });
-    if now - since >= WAIT_FOR_WRITE {
+    let waited = now - since;
+    let gave_up = waited >= WAIT_FOR_WRITE;
+    let mut turn = turn();
+    if gave_up || (waited >= SLOW && !SAID_WAITING.replace(true)) {
+        say_waiting(&turn, waited, gave_up);
+    }
+    if gave_up {
         return false;
     }
-    let (writes, freed) = &TURN;
-    let seen = writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    turn.waited = Some(now);
     // A write that finished just before this began waiting, or one by another process, wakes nobody: look again
     // soon regardless.
-    drop(freed.wait_timeout(seen, Duration::from_millis(20)));
+    drop(TURN.1.wait_timeout(turn, LOOK_AGAIN));
     true
 }
 
-/// A write finished (or was undone): whoever's waiting can go.
+/// A write kept waiting long: in its own log (the request's or job's), and in the log of the write it waits for.
+fn say_waiting(turn: &Turn, waited: Duration, gave_up: bool) {
+    let secs = waited.as_secs_f32();
+    if let Some(h) = &turn.holder {
+        let held = h.since.elapsed().as_secs_f32();
+        tracing::warn!(secs, gave_up, held_secs = held, "a write waits for the database, which another holds");
+        tracing::warn!(parent: &h.span, secs = held, waiting_secs = secs, "holding the database while a write waits");
+    } else {
+        // Held by a write that hasn't changed anything yet, or another program.
+        tracing::warn!(secs, gave_up, "a write waits for the database");
+    }
+}
+
+/// A write was undone: whoever's waiting can go.
 fn turn_over() {
-    let (writes, freed) = &TURN;
-    *writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner) += 1;
-    freed.notify_all();
+    let mut turn = turn();
+    turn.writes += 1;
+    let holder = turn.holder.take();
+    drop(turn);
+    TURN.1.notify_all();
+    let_go(holder);
+}
+
+/// A write finished, and if another is waiting, it goes next. Woken, a waiter still has to be given a core before it
+/// can begin, while the writer that just finished is running already and usually begins its next first: on a busy
+/// machine, writers going one after another (an import's) kept a tag edit waiting until it gave up. So this one
+/// steps aside until another write finishes, or a waiter has had time to look again. Whether one is waiting is told
+/// by when one last looked, which can't be left behind by a write that ended some way no hook sees.
+fn finished() {
+    let mut turn = turn();
+    turn.writes += 1;
+    let holder = turn.holder.take();
+    TURN.1.notify_all();
+    if turn.waited.is_some_and(|at| at.elapsed() < 2 * LOOK_AGAIN) {
+        let at = turn.writes;
+        drop(TURN.1.wait_timeout_while(turn, LOOK_AGAIN, |t| t.writes == at));
+    } else {
+        drop(turn);
+    }
+    let_go(holder);
 }
 
 /// How long one slice of a long run of writes holds the database (see [`Slices`]).
@@ -194,10 +276,9 @@ impl<'c> Slices<'c> {
         tx.commit()?;
         // The commit woke the waiters (see `turn_over`), but this thread would usually begin again before they look:
         // wait for one of them to finish, or a few milliseconds if nobody's waiting.
-        let (writes, freed) = &TURN;
-        let seen = writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        let at = *seen;
-        drop(freed.wait_timeout_while(seen, Duration::from_millis(5), |n| *n == at));
+        let seen = turn();
+        let at = seen.writes;
+        drop(TURN.1.wait_timeout_while(seen, Duration::from_millis(5), |t| t.writes == at));
         Ok(())
     }
 
@@ -232,16 +313,39 @@ where
     // Logs from here carry the request that asked, and work that holds the database for seconds says where it's
     // from (its closure's name is its caller's), so a "database is locked" can be traced to whoever held the lock.
     let span = tracing::Span::current();
+    let asked = Instant::now();
     crate::profiler::db(tokio::task::spawn_blocking(move || {
         span.in_scope(|| {
             crate::i18n::blocking(language, || {
-                let mut conn = pool.get()?;
+                let mut conn = connection(&pool, asked)?;
                 timed(&mut conn, f)
             })
         })
     }))
     .await?
 }
+
+/// A connection from the pool, warning in the log when the work asking for it (at `asked`) waited long for a thread to
+/// run on or a connection to run with: then the server has more to do than it has room for, and everything waits.
+fn connection(pool: &Pool, asked: Instant) -> Result<Conn> {
+    let began = Instant::now();
+    let conn = pool.get();
+    let (thread, connection) = (began - asked, began.elapsed());
+    if thread + connection >= WAITED {
+        let state = pool.state();
+        tracing::warn!(
+            thread_secs = thread.as_secs_f32(),
+            connection_secs = connection.as_secs_f32(),
+            connections = state.connections,
+            idle = state.idle_connections,
+            "database work waited to begin"
+        );
+    }
+    Ok(conn?)
+}
+
+/// See [`connection`].
+const WAITED: Duration = Duration::from_secs(2);
 
 /// Run `f`, warning in the log when it held the database for [`SLOW`] or more.
 fn timed<T, F: FnOnce(&mut Conn) -> Result<T>>(conn: &mut Conn, f: F) -> Result<T> {
@@ -274,10 +378,11 @@ where
     let span = tracing::Span::current();
     let mut walked = Walked(Arc::new(Watch::default()), false);
     let watch = Arc::clone(&walked.0);
+    let asked = Instant::now();
     let out = crate::profiler::db(tokio::task::spawn_blocking(move || {
         span.in_scope(|| {
             crate::i18n::blocking(language, || {
-                let mut conn = pool.get()?;
+                let mut conn = connection(&pool, asked)?;
                 *watch.handle.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
                     Some(conn.get_interrupt_handle());
                 // Gone before the handle was there to stop it with: don't start.

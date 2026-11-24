@@ -1176,6 +1176,8 @@ projects-usage-body = 使用於 { $list }：各專案下次執行 hoard sync 時
 ## 上傳
 
 upload-network-error = 網路錯誤
+upload-no-reply = { $seconds } 秒無回應
+upload-retrying = 正在重試 { $what }（第 { $attempt } 次，共 { $attempts } 次）：{ $error }
 upload-gave-up = { $what }：嘗試 { $attempts } 次後仍失敗：{ $error }
 upload-failed-plain = 失敗
 upload-already-imported = 已匯入

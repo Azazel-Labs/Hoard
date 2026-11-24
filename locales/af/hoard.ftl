@@ -1284,6 +1284,8 @@ projects-usage-body = Gebruik in { $list }: elkeen se volgende hoard sync haal h
 ## uploader.ts
 
 upload-network-error = netwerkfout
+upload-no-reply = geen antwoord ná { $seconds } s nie
+upload-retrying = Probeer { $what } weer ({ $attempt } van { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } ná { $attempts } pogings
 upload-failed-plain = misluk
 upload-already-imported = reeds ingevoer

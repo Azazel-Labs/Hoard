@@ -267,6 +267,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     achievements::start(&state).await;
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     tokio::spawn(uploads::sweep_loop(Arc::clone(&state)));
+    tokio::spawn(uploads::watch_loop());
     tokio::spawn(api::keep_reports(Arc::clone(&state)));
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     clip::start(&state, effective.clip, effective.clip_hosted.clone());

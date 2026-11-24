@@ -1316,6 +1316,8 @@ projects-usage-body = Käytössä projekteissa { $list }: kunkin seuraava hoard 
 ## Lähettäjä
 
 upload-network-error = verkkovirhe
+upload-no-reply = ei vastausta { $seconds } s:iin
+upload-retrying = Yritetään uudelleen: { $what } ({ $attempt }/{ $attempts }): { $error }
 upload-gave-up = { $what }: { $error } ({ $attempts } yrityksen jälkeen)
 upload-failed-plain = epäonnistui
 upload-already-imported = tuotu jo

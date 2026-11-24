@@ -1170,6 +1170,8 @@ projects-usage-body = ใช้อยู่ใน { $list }: hoard sync คร�
 ## uploader.ts
 
 upload-network-error = ข้อผิดพลาดของเครือข่าย
+upload-no-reply = ไม่มีการตอบกลับเป็นเวลา { $seconds } วินาที
+upload-retrying = กำลังลอง { $what } อีกครั้ง ({ $attempt } จาก { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } หลังจากลอง { $attempts } ครั้ง
 upload-failed-plain = ล้มเหลว
 upload-already-imported = นำเข้าแล้ว

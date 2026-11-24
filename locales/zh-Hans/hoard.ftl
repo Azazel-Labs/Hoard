@@ -1176,6 +1176,8 @@ projects-usage-body = 在 { $list } 中使用：每个项目下次 hoard sync �
 ## uploader.ts
 
 upload-network-error = 网络错误
+upload-no-reply = { $seconds } 秒无响应
+upload-retrying = 正在重试 { $what }（第 { $attempt } 次，共 { $attempts } 次）：{ $error }
 upload-gave-up = { $what }：尝试 { $attempts } 次后仍失败：{ $error }
 upload-failed-plain = 失败
 upload-already-imported = 已导入

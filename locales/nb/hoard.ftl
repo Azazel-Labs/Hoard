@@ -1284,6 +1284,8 @@ projects-usage-body = Brukes i { $list }: neste hoard sync i hvert av dem fjerne
 ## uploader.ts
 
 upload-network-error = nettverksfeil
+upload-no-reply = ikke noe svar på { $seconds } s
+upload-retrying = Prøver { $what } på nytt ({ $attempt } av { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } etter { $attempts } forsøk
 upload-failed-plain = mislyktes
 upload-already-imported = allerede importert

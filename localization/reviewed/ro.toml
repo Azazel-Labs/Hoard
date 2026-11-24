@@ -13705,6 +13705,10 @@ translation = "Minimizează"
 source = "network error"
 translation = "eroare de rețea"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "niciun răspuns timp de { $seconds } s"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nu sunt aceleași fișiere, așa că nu s-a reluat nimic."
@@ -13760,6 +13764,10 @@ translation = "reluat, { $size } erau deja acolo"
 [messages.upload-retry]
 source = "Retry"
 translation = "Reîncercați"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Se reîncearcă { $what } ({ $attempt } din { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

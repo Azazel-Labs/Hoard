@@ -13172,6 +13172,10 @@ translation = "最小化"
 source = "network error"
 translation = "ネットワークエラー"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "{ $seconds } 秒間応答なし"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "同じファイルではないため、何も再開されませんでした。"
@@ -13227,6 +13231,10 @@ translation = "再開しました。{ $size } はすでに送信済みでした"
 [messages.upload-retry]
 source = "Retry"
 translation = "再試行"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "{ $what } を再試行中（{ $attempt }/{ $attempts }）: { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

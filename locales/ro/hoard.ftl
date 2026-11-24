@@ -1355,6 +1355,8 @@ projects-usage-body = Folosit în { $list }: următorul hoard sync al fiecăruia
 ## uploader.ts
 
 upload-network-error = eroare de rețea
+upload-no-reply = niciun răspuns timp de { $seconds } s
+upload-retrying = Se reîncearcă { $what } ({ $attempt } din { $attempts }): { $error }
 upload-gave-up =
     { $attempts ->
         [one] { $what }: { $error } după { $attempts } încercare

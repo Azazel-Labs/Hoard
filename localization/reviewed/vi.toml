@@ -13155,6 +13155,10 @@ translation = "Thu nhỏ"
 source = "network error"
 translation = "lỗi mạng"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "không có phản hồi trong { $seconds } giây"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Đó không phải là cùng các tệp, nên không có gì được tiếp tục."
@@ -13210,6 +13214,10 @@ translation = "đã tiếp tục, { $size } đã có sẵn"
 [messages.upload-retry]
 source = "Retry"
 translation = "Thử lại"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Đang thử lại { $what } ({ $attempt }/{ $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

@@ -53,7 +53,10 @@ where
     F: FnOnce() -> T + Send + 'static,
 {
     let (tx, rx) = tokio::sync::oneshot::channel();
+    // Its logs carry what it's for (a job's span, say), as they would on the thread that asked.
+    let span = tracing::Span::current();
     std::thread::Builder::new().name(format!("hoard-{name}")).spawn(move || {
+        let _in = span.enter();
         lower_priority();
         tx.send(std::panic::catch_unwind(std::panic::AssertUnwindSafe(f))).ok();
     })?;
@@ -82,7 +85,9 @@ pub(crate) fn spawn<F>(name: &str, f: F) -> Result<()>
 where
     F: FnOnce() + Send + 'static,
 {
+    let span = tracing::Span::current();
     std::thread::Builder::new().name(format!("hoard-{name}")).spawn(move || {
+        let _in = span.enter();
         lower_priority();
         f();
     })?;

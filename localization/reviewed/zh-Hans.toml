@@ -13172,6 +13172,10 @@ translation = "最小化"
 source = "network error"
 translation = "网络错误"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "{ $seconds } 秒无响应"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "这些不是相同的文件，因此没有继续任何导入。"
@@ -13227,6 +13231,10 @@ translation = "已续传，{ $size } 已存在"
 [messages.upload-retry]
 source = "Retry"
 translation = "重试"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "正在重试 { $what }（第 { $attempt } 次，共 { $attempts } 次）：{ $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

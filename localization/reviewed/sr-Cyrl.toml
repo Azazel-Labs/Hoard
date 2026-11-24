@@ -13611,6 +13611,10 @@ translation = "Умањи"
 source = "network error"
 translation = "грешка мреже"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "нема одговора { $seconds } с"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "То нису исте датотеке, па ништа није настављено."
@@ -13666,6 +13670,10 @@ translation = "настављено, { $size } је већ било ту"
 [messages.upload-retry]
 source = "Retry"
 translation = "Покушај поново"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Поновни покушај: { $what } ({ $attempt } од { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

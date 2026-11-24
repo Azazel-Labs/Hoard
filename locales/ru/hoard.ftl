@@ -1382,6 +1382,8 @@ projects-usage-body = Используется в { $list }: при следую
 ## uploader.ts
 
 upload-network-error = ошибка сети
+upload-no-reply = нет ответа { $seconds } с
+upload-retrying = Повторная попытка: { $what } ({ $attempt } из { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } (попыток: { $attempts })
 upload-failed-plain = не удалось
 upload-already-imported = уже импортировано

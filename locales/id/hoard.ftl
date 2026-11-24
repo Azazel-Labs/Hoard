@@ -1186,6 +1186,8 @@ projects-usage-body = Dipakai di { $list }: hoard sync berikutnya di masing-masi
 ## uploader.ts
 
 upload-network-error = galat jaringan
+upload-no-reply = tidak ada balasan selama { $seconds } dtk
+upload-retrying = Mencoba lagi { $what } ({ $attempt } dari { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } setelah { $attempts } percobaan
 upload-failed-plain = gagal
 upload-already-imported = sudah diimpor

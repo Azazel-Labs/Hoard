@@ -1430,6 +1430,11 @@ projects-usage-body = Used in { $list }: each one’s next hoard sync takes them
 ## uploader.ts
 
 upload-network-error = network error
+# Why an upload request was given up on and sent again: it sent and heard nothing for $seconds.
+upload-no-reply = no reply for { $seconds } s
+# A failed upload request being sent again: $what as in upload-gave-up, $attempt the attempt being made of
+# $attempts, $error why the last one failed.
+upload-retrying = Retrying { $what } ({ $attempt } of { $attempts }): { $error }
 # An upload error after every retry failed: $what is the part that failed (a file's path, upload-batch or
 # upload-finish), $error the last reason.
 upload-gave-up = { $what }: { $error } after { $attempts } attempts

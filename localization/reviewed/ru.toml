@@ -13793,6 +13793,10 @@ translation = "Свернуть"
 source = "network error"
 translation = "ошибка сети"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "нет ответа { $seconds } с"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Это не те же файлы, поэтому ничего не продолжено."
@@ -13848,6 +13852,10 @@ translation = "докачка, { $size } уже было на месте"
 [messages.upload-retry]
 source = "Retry"
 translation = "Повторить"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Повторная попытка: { $what } ({ $attempt } из { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

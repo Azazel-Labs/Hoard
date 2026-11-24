@@ -1209,6 +1209,8 @@ projects-usage-body = Şuralarda kullanılıyor: { $list }. Her birinin bir sonr
 ## uploader.ts
 
 upload-network-error = ağ hatası
+upload-no-reply = { $seconds } sn boyunca yanıt yok
+upload-retrying = { $what } yeniden deneniyor ({ $attempt }/{ $attempts }): { $error }
 upload-gave-up = { $what }: { $error } ({ $attempts } denemeden sonra)
 upload-failed-plain = başarısız oldu
 upload-already-imported = zaten içe aktarılmış

@@ -1312,6 +1312,8 @@ projects-usage-body = Χρησιμοποιείται στα { $list }: το επ
 ## uploader.ts
 
 upload-network-error = σφάλμα δικτύου
+upload-no-reply = καμία απάντηση για { $seconds } δ
+upload-retrying = Νέα προσπάθεια για { $what } ({ $attempt } από { $attempts }): { $error }
 upload-gave-up = { $what }: { $error } μετά από { $attempts } προσπάθειες
 upload-failed-plain = απέτυχε
 upload-already-imported = έχει ήδη εισαχθεί

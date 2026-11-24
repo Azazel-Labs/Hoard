@@ -13832,6 +13832,10 @@ translation = "Згорнути"
 source = "network error"
 translation = "помилка мережі"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "немає відповіді { $seconds } с"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Це не ті самі файли, тож нічого не продовжено."
@@ -13887,6 +13891,10 @@ translation = "продовжено, { $size } уже було на сервер
 [messages.upload-retry]
 source = "Retry"
 translation = "Повторити"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Повторна спроба: { $what } ({ $attempt } з { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

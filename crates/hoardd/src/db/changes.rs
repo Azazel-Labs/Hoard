@@ -193,12 +193,20 @@ const FACT_TRIGGERS: &str = "
 ";
 
 /// A row of a table with rowids was added, changed or removed (SQLite's update hook).
+/// A row of the library changed: the first in a transaction is its write beginning (see `super::began_writing`).
+fn seen(pending: &mut Pending) {
+    if !pending.seen {
+        pending.seen = true;
+        super::began_writing();
+    }
+}
+
 fn row_changed(pending: &mut Pending, db: &str, table: &str, row: i64) {
     // Temporary tables (a search's own, see `search_ranked`) aren't the library.
     if db != "main" {
         return;
     }
-    pending.seen = true;
+    seen(pending);
     if NOT_SEARCHED.contains(&table) {
         return;
     }
@@ -216,7 +224,7 @@ fn row_changed(pending: &mut Pending, db: &str, table: &str, row: i64) {
 /// A row of a table without rowids was added, changed or removed (one of [`watch`]'s triggers), with the asset's id
 /// for an asset's tags.
 fn noted(pending: &mut Pending, table: &str, asset: Option<String>) {
-    pending.seen = true;
+    seen(pending);
     if NOT_SEARCHED.contains(&table) {
         return;
     }
@@ -242,7 +250,7 @@ fn noted(pending: &mut Pending, table: &str, asset: Option<String>) {
 /// What a search keeps of an asset may have changed (one of [`FACT_TRIGGERS`]): of the one at `row`, `placed` if it
 /// was added, removed or moved, and of the one with `id` and those it owns.
 fn fact_noted(pending: &mut Pending, row: Option<i64>, placed: bool, id: Option<String>) {
-    pending.seen = true;
+    seen(pending);
     pending.library = true;
     let changed = &mut pending.changed;
     if changed.too_much {

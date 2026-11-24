@@ -13,7 +13,7 @@ use std::sync::LazyLock;
 use axum::extract::{Extension, Json, Multipart, Path, Query, Request, State};
 use axum::handler::Handler;
 use axum::routing::{MethodFilter, MethodRouter};
-use http::{HeaderMap, Method, StatusCode};
+use http::{HeaderMap, Method, StatusCode, Version};
 use schemars::generate::SchemaSettings;
 use schemars::{JsonSchema, SchemaGenerator};
 use serde::Serialize;
@@ -337,6 +337,7 @@ impl<T> Part for Path<T> {}
 impl<T> Part for Extension<T> {}
 impl Part for HeaderMap {}
 impl Part for Method {}
+impl Part for Version {}
 
 impl<T: JsonSchema> Part for Query<T> {
     fn add(input: &mut Input, generator: &mut SchemaGenerator) {

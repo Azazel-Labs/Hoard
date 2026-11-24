@@ -13221,6 +13221,10 @@ translation = "Küçült"
 source = "network error"
 translation = "ağ hatası"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "{ $seconds } sn boyunca yanıt yok"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Bunlar aynı dosyalar değil, bu yüzden hiçbir şey sürdürülmedi."
@@ -13276,6 +13280,10 @@ translation = "devam edildi, { $size } zaten oradaydı"
 [messages.upload-retry]
 source = "Retry"
 translation = "Yeniden dene"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "{ $what } yeniden deneniyor ({ $attempt }/{ $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

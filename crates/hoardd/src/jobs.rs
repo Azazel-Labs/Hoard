@@ -9,6 +9,7 @@ use anyhow::Result;
 use futures_util::{FutureExt, StreamExt, stream};
 use hoard_core::PackStatus;
 use rusqlite::params;
+use tracing::Instrument;
 
 use crate::AppState;
 use crate::error::{ApiResult, AppError};
@@ -69,7 +70,12 @@ pub(crate) fn spawn_workers(state: &AppState) {
                     continue;
                 }
                 match next_job(&state).await {
-                    Ok(Some(job)) => run(&state, job).await,
+                    Ok(Some(job)) => {
+                        // Everything the job logs says which it is, its database writes included (see
+                        // `db::began_writing`).
+                        let span = tracing::info_span!("job", id = job.id, kind = %job.kind, pack = job.pack_id.as_deref().unwrap_or(""));
+                        run(&state, job).instrument(span).await;
+                    }
                     Ok(None) => {
                         tokio::select! {
                             () = state.wake.notified() => {}

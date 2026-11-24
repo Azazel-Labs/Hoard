@@ -13729,6 +13729,10 @@ translation = "Minimalizovat"
 source = "network error"
 translation = "chyba sítě"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "žádná odpověď po dobu { $seconds } s"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nejsou to stejné soubory, takže se nic neobnovilo."
@@ -13784,6 +13788,10 @@ translation = "obnoveno, { $size } už bylo na serveru"
 [messages.upload-retry]
 source = "Retry"
 translation = "Zkusit znovu"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "Nový pokus: { $what } ({ $attempt } z { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

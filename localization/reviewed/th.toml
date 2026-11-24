@@ -13158,6 +13158,10 @@ translation = "ย่อ"
 source = "network error"
 translation = "ข้อผิดพลาดของเครือข่าย"
 
+[messages.upload-no-reply]
+source = "no reply for { $seconds } s"
+translation = "ไม่มีการตอบกลับเป็นเวลา { $seconds } วินาที"
+
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "ไม่ใช่ไฟล์ชุดเดิม จึงไม่มีอะไรทำต่อ"
@@ -13213,6 +13217,10 @@ translation = "อัปโหลดต่อ มีอยู่แล้ว { $
 [messages.upload-retry]
 source = "Retry"
 translation = "ลองใหม่"
+
+[messages.upload-retrying]
+source = "Retrying { $what } ({ $attempt } of { $attempts }): { $error }"
+translation = "กำลังลอง { $what } อีกครั้ง ({ $attempt } จาก { $attempts }): { $error }"
 
 [messages.upload-skipped]
 source = "These exact files were already imported as “{ $name }”, so they were skipped."

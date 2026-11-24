@@ -57,8 +57,16 @@ async fn h3_connection(incoming: quinn::Incoming, app: Router) {
                 tokio::spawn(async move {
                     match resolver.resolve_request().await {
                         Ok((req, stream)) => {
+                            // Most failures are a browser going away mid-request, which it does all the time; an
+                            // upload's are what to look at when uploads stall.
+                            let upload = req.uri().path().starts_with("/api/uploads").then(|| req.uri().clone());
                             if let Err(e) = handle_h3(app, req, stream, remote).await {
-                                tracing::debug!(error = %format!("{e:#}"), "HTTP/3 request failed");
+                                let error = format!("{e:#}");
+                                if let Some(uri) = upload {
+                                    tracing::warn!(%remote, %uri, %error, "an HTTP/3 upload request failed");
+                                } else {
+                                    tracing::debug!(%error, "HTTP/3 request failed");
+                                }
                             }
                         }
                         Err(e) => tracing::debug!(error = %e, "bad HTTP/3 request"),
@@ -111,7 +119,11 @@ where
         Body::from_stream(futures_util::stream::unfold(rx, |mut rx| async move { rx.recv().await.map(|v| (v, rx)) }));
     let resp = handle(app, req.map(|()| body), remote, true).await;
     let (parts, body) = resp.into_parts();
-    send.send_response(Response::from_parts(parts, ())).await?;
+    let status = parts.status;
+    // Failing here, the work was done but the browser never hears so: its request just stops.
+    send.send_response(Response::from_parts(parts, ()))
+        .await
+        .with_context(|| format!("sending the {status} response"))?;
     let mut data = body.into_data_stream();
     while let Some(chunk) = data.next().await {
         send.send_data(chunk?).await?;

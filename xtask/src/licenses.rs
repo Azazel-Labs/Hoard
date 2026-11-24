@@ -92,7 +92,7 @@ fn is_license(path: &Path) -> bool {
     let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("").to_ascii_uppercase();
     let stem = name.split('.').next().unwrap_or("");
     let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-    ["LICENSE", "LICENCE", "COPYING", "NOTICE", "UNLICENSE"].iter().any(|k| stem.starts_with(k))
+    ["LICENSE", "LICENCE", "COPYING", "NOTICE", "UNLICENSE"].iter().any(|k| stem.starts_with(k)) // spelling: allow (file names written that way)
         && !matches!(ext.as_str(), "rs" | "js" | "html")
 }
 

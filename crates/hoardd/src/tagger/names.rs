@@ -10,12 +10,12 @@ use super::match_set;
 const MAP_SUFFIXES: &[(&str, &str, bool)] = &[
     ("albedo", "albedo", true),
     ("basecolor", "albedo", true),
-    ("basecolour", "albedo", true),
+    ("basecolour", "albedo", true), // spelling: allow (file names written that way)
     ("diffuse", "albedo", true),
     ("diff", "albedo", true),
     ("alb", "albedo", true),
     ("color", "albedo", false),
-    ("colour", "albedo", false),
+    ("colour", "albedo", false), // spelling: allow (file names written that way)
     ("col", "albedo", false),
     ("d", "albedo", false),
     ("normal", "normal", true),

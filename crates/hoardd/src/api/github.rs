@@ -215,7 +215,7 @@ pub(super) async fn poll(State(state): State<AppState>) -> ApiResult<Json<Value>
     {
         let mut p = pending();
         if !still(&p) {
-            // Cancelled or started again meanwhile: this token isn't wanted.
+            // Canceled or started again meanwhile: this token isn't wanted.
             return Ok(Json(json!({ "state": "expired" })));
         }
         *p = None;

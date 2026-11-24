@@ -7,11 +7,13 @@
 //! cargo xtask ci                          # what CI runs: fmt, clippy, tests, web build
 //! cargo xtask translations check          # the catalogs in locales/ against each other and the code
 //! cargo xtask licenses                    # what Hoard ships and their licenses, for Settings → About
+//! cargo xtask spelling                    # no British spellings: Hoard is written in American English
 //! ```
 #![expect(clippy::print_stdout, reason = "a CLI tool: printing is the point")]
 
 mod licenses;
 mod llm;
+mod spelling;
 mod translations;
 
 use std::path::{Path, PathBuf};
@@ -71,6 +73,12 @@ enum Cmd {
         /// Only say whether it's current.
         #[arg(long)]
         check: bool,
+    },
+    /// Fail on British spellings in every tracked English file: Hoard is written in American English.
+    Spelling {
+        /// Check this commit message instead (what `.githooks/commit-msg` does).
+        #[arg(long, value_name = "FILE")]
+        message: Option<PathBuf>,
     },
 }
 
@@ -152,6 +160,7 @@ then pick a model in Settings → AI tagging → Local model. Ctrl-C to stop."
         Cmd::Web => web(),
         Cmd::Sample { upload } => sample(upload),
         Cmd::UnrealExport(args) => unreal_export(&args),
+        Cmd::Spelling { message } => spelling::run(&root(), message.as_deref()),
         Cmd::Translations(action) => translations::run(&root(), action).map_err(|e| anyhow::anyhow!("{e}")),
     }
 }

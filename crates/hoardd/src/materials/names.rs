@@ -94,9 +94,9 @@ pub(crate) const ALL_ROLES: [Role; 17] = [
 /// as likely to mean something else.
 const ROLE_WORDS: &[(&str, Role, bool)] = &[
     ("base color", Role::BaseColor, false),
-    ("base colour", Role::BaseColor, false),
+    ("base colour", Role::BaseColor, false), // spelling: allow (file names written that way)
     ("basecolor", Role::BaseColor, false),
-    ("basecolour", Role::BaseColor, false),
+    ("basecolour", Role::BaseColor, false), // spelling: allow (file names written that way)
     ("base map", Role::BaseColor, false),
     ("albedo transparency", Role::BaseColor, false),
     ("albedo", Role::BaseColor, false),
@@ -105,7 +105,7 @@ const ROLE_WORDS: &[(&str, Role, bool)] = &[
     ("diff", Role::BaseColor, false),
     ("dif", Role::BaseColor, false),
     ("color", Role::BaseColor, false),
-    ("colour", Role::BaseColor, false),
+    ("colour", Role::BaseColor, false), // spelling: allow (file names written that way)
     ("col", Role::BaseColor, true),
     ("bc", Role::BaseColor, true),
     ("d", Role::BaseColor, true),

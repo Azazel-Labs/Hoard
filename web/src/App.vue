@@ -1886,7 +1886,7 @@ const commands = computed<Command[]>(() => {
 .search { position: relative; flex: 1; max-width: 640px; isolation: isolate; }
 .search .field { background: var(--bg); padding: 0.55em 4.2em 0.55em 2.1em; }
 /* The search text marked up, underneath the box: what's left out, `or`, a pack's name, a tag the library has. Gently,
-   in colour and lines only, so every letter stays exactly under the one typed. */
+   in color and lines only, so every letter stays exactly under the one typed. */
 .search input.field { background: transparent; }
 .search input.field.marked { color: transparent; caret-color: var(--text); }
 .search input.field.marked::selection { color: transparent; }

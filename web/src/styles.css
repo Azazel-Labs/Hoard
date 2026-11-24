@@ -249,7 +249,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .chip.src-human { background: var(--raised); border-color: var(--muted); }
 .chip.src-ai { border-style: dashed; }
 /* The AI's voice: whatever it wrote (a description, a tag it guessed) is set in Recursive's cursive italic rather than
-   labelled. The words for it go in a tooltip and in hidden text for screen readers. */
+   labeled. The words for it go in a tooltip and in hidden text for screen readers. */
 .ai-voice, .chip.src-ai .ns, .chip.src-ai .value { font-variation-settings: 'slnt' -15, 'CRSV' 1, 'CASL' 0, 'MONO' 0; }
 .chip.src-meta { color: var(--muted); }
 

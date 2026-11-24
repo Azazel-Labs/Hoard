@@ -8,7 +8,7 @@ use std::collections::BTreeSet;
 use anyhow::Result;
 use hoard_core::AssetKind;
 use hoard_unreal::convert::{self, Outcome};
-use hoard_unreal::package::{recolour_png, written_here};
+use hoard_unreal::package::{recolor_png, written_here};
 use rusqlite::params;
 use serde_json::json;
 
@@ -28,25 +28,25 @@ struct Todo {
 }
 
 pub(crate) async fn run(state: AppState) {
-    match recolour(&state).await {
+    match recolor(&state).await {
         Ok(0) => {}
         Ok(n) => tracing::info!(textures = n, "put red and blue right in textures converted from Unreal packages"),
-        Err(e) => tracing::warn!(error = %format!("{e:#}"), "couldn't put right the colours of old Unreal textures"),
+        Err(e) => tracing::warn!(error = %format!("{e:#}"), "couldn't put right the colors of old Unreal textures"),
     }
 }
 
-async fn recolour(state: &AppState) -> Result<usize> {
+async fn recolor(state: &AppState) -> Result<usize> {
     let todo = db::call(&state.pool, |c| {
         // One whose asset has since gone or changed has nothing left to put right.
         c.execute(
-            "DELETE FROM unreal_recolour WHERE NOT EXISTS (
+            "DELETE FROM unreal_recolor WHERE NOT EXISTS (
                SELECT 1 FROM assets a JOIN asset_origin o ON o.asset_id = a.id
-                WHERE a.id = unreal_recolour.asset_id AND a.blob_hash = unreal_recolour.blob_hash)",
+                WHERE a.id = unreal_recolor.asset_id AND a.blob_hash = unreal_recolor.blob_hash)",
             [],
         )?;
         let mut stmt = c.prepare(
             "SELECT r.asset_id, r.blob_hash, o.blob_hash, COALESCE(o.notes, ''), a.pack_id
-               FROM unreal_recolour r JOIN assets a ON a.id = r.asset_id JOIN asset_origin o ON o.asset_id = a.id",
+               FROM unreal_recolor r JOIN assets a ON a.id = r.asset_id JOIN asset_origin o ON o.asset_id = a.id",
         )?;
         let rows = stmt
             .query_map([], |r| {
@@ -63,7 +63,7 @@ async fn recolour(state: &AppState) -> Result<usize> {
         let (bytes, converter) = match fix(state, &t).await {
             Ok(r) => r,
             Err(e) => {
-                tracing::warn!(asset = %t.asset, error = %format!("{e:#}"), "couldn't check an old Unreal texture's colours");
+                tracing::warn!(asset = %t.asset, error = %format!("{e:#}"), "couldn't check an old Unreal texture's colors");
                 continue;
             }
         };
@@ -97,7 +97,7 @@ async fn recolour(state: &AppState) -> Result<usize> {
                 }
                 tx.execute("UPDATE asset_origin SET converter = ?2 WHERE asset_id = ?1", params![asset, converter])?;
             }
-            tx.execute("DELETE FROM unreal_recolour WHERE asset_id = ?1", [&asset])?;
+            tx.execute("DELETE FROM unreal_recolor WHERE asset_id = ?1", [&asset])?;
             tx.commit()?;
             Ok(still && blob.is_some())
         })
@@ -154,11 +154,11 @@ fn decide(png: &[u8], original: Option<&[u8]>, notes: &str) -> Result<(Option<Ve
     }
     let now = convert::REVISION;
     if !unreal_wrote(notes, png) {
-        return Ok((None, format!("{BEFORE}: raw source pixels (r{now} found its colours right)")));
+        return Ok((None, format!("{BEFORE}: raw source pixels (r{now} found its colors right)")));
     }
-    Ok(match recolour_png(png)? {
+    Ok(match recolor_png(png)? {
         Some(fixed) => (Some(fixed), format!("{BEFORE}: PNG source as stored; then r{now}: red and blue put right")),
-        None => (None, format!("{BEFORE}: PNG source as stored (16-bit or grey)")),
+        None => (None, format!("{BEFORE}: PNG source as stored (16-bit or gray)")),
     })
 }
 
@@ -232,12 +232,12 @@ mod tests {
         for notes in ["16x16 TSF_BGRA8", "16x16 TSF_BGRA8 TSCF_None", "16x16 TSF_BGRA8 0"] {
             let (fixed, by) = decide(&ours, None, notes).unwrap();
             assert!(fixed.is_none(), "{notes}");
-            assert!(by.contains("found its colours right"), "{by}");
+            assert!(by.contains("found its colors right"), "{by}");
         }
         // Formats Unreal didn't swap.
         assert!(decide(&theirs, None, "16x16 TSF_RGBA8_DEPRECATED").unwrap().0.is_none());
-        let grey = png(&image::DynamicImage::ImageLuma8(image::GrayImage::new(16, 16)));
-        assert!(decide(&grey, None, "16x16 TSF_G8 TSCF_PNG").unwrap().0.is_none());
+        let gray = png(&image::DynamicImage::ImageLuma8(image::GrayImage::new(16, 16)));
+        assert!(decide(&gray, None, "16x16 TSF_G8 TSCF_PNG").unwrap().0.is_none());
         // UE4 never compressed a source this small, so it's Hoard's.
         let tiny = unreals(&image::RgbaImage::from_pixel(4, 4, image::Rgba([0, 0, 255, 255])));
         assert!(decide(&tiny, None, "4x4 TSF_BGRA8").unwrap().0.is_none());

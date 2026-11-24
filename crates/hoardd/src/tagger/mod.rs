@@ -263,7 +263,7 @@ pub(crate) fn detect_license(text: &str) -> Option<&'static str> {
 
 pub(crate) fn is_license_file(rel_path: &str) -> bool {
     let file = rel_path.rsplit('/').next().unwrap_or(rel_path).to_lowercase();
-    ["license", "licence", "copying", "readme", "credits", "terms", "eula"].iter().any(|p| file.starts_with(p))
+    ["license", "licence", "copying", "readme", "credits", "terms", "eula"].iter().any(|p| file.starts_with(p)) // spelling: allow (file names written that way)
 }
 
 #[cfg(test)]

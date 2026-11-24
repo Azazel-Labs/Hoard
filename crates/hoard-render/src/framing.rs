@@ -128,7 +128,7 @@ pub(super) fn clip_cameras(frames: &[Vec<Draw>], room: &[Draw], dir: Vec3) -> Op
     Some(follow.iter().map(|s| s.behind(room).view(dist * ROOMY)).collect())
 }
 
-/// A following camera's aims: each middle averaged with its neighbours on both sides (fewer toward the ends, the same
+/// A following camera's aims: each middle averaged with its neighbors on both sides (fewer toward the ends, the same
 /// number each side), so the camera keeps pace with a run, a fall or a lap of a circle, but a flailing arm doesn't
 /// shake it. A steady run or fall is followed exactly.
 fn steady(middles: &[Vec3]) -> Vec<Vec3> {

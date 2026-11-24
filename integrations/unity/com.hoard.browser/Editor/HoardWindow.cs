@@ -38,7 +38,7 @@ namespace Hoard
         string status = "";
         double searchAt = -1;
         Vector2 scroll;
-        /// <summary>What Send to Hoard would send, shown until it's sent or cancelled.</summary>
+        /// <summary>What Send to Hoard would send, shown until it's sent or canceled.</summary>
         HoardExport pending;
         string packName = "";
         string sentLink;
@@ -433,7 +433,7 @@ namespace Hoard
         }
 
         static GUIStyle centeredStyle;
-        static GUIStyle Centered => centeredStyle ??= new GUIStyle(EditorStyles.centeredGreyMiniLabel) { wordWrap = true };
+        static GUIStyle Centered => centeredStyle ??= new GUIStyle(EditorStyles.centeredGreyMiniLabel) { wordWrap = true }; // spelling: allow (Unity's name)
 
         static GUIStyle nameStyle;
         static GUIStyle NameStyle => nameStyle ??= new GUIStyle(EditorStyles.miniLabel)

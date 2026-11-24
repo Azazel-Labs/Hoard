@@ -11300,7 +11300,7 @@ source = "Connected as { $user }; trying the download again"
 translation = "Yhdistetty käyttäjänä { $user }; latausta yritetään uudelleen"
 
 [messages.settings-unreal-github-denied]
-source = "The sign-in was cancelled at GitHub."
+source = "The sign-in was canceled at GitHub."
 translation = "Kirjautuminen peruttiin GitHubissa."
 
 [messages.settings-unreal-github-enter-code]

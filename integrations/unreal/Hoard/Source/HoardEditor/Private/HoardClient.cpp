@@ -61,7 +61,7 @@ static FString Unreachable(EHttpFailureReason Reason)
 	{
 	case EHttpFailureReason::ConnectionError: return TEXT("couldn't connect");
 	case EHttpFailureReason::TimedOut: return TEXT("it took too long");
-	case EHttpFailureReason::Cancelled: return TEXT("cancelled");
+	case EHttpFailureReason::Cancelled: return TEXT("canceled"); // spelling: allow (Unreal's name)
 	default: return TEXT("no answer");
 	}
 }

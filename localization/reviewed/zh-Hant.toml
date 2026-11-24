@@ -11001,7 +11001,7 @@ source = "Connected as { $user }; trying the download again"
 translation = "已以 { $user } 身分連結；正在重試下載"
 
 [messages.settings-unreal-github-denied]
-source = "The sign-in was cancelled at GitHub."
+source = "The sign-in was canceled at GitHub."
 translation = "已在 GitHub 上取消登入。"
 
 [messages.settings-unreal-github-enter-code]

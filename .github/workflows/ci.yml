@@ -28,6 +28,8 @@ jobs:
       # Every message the server and portal use is in English with the same variables, every translation's review
       # record is current, and the catalogs are formatted (see docs/translations.md).
       - run: cargo xtask translations check
+      # Hoard is written in American English, in prose and in identifiers alike (see xtask/src/spelling.rs).
+      - run: cargo xtask spelling
       # What e2e builds (the server, and the CLI the engine plugins are checked against), so the cache has it (a test
       # build can leave dependencies with other features).
       - run: cargo build -p hoardd -p hoard --locked

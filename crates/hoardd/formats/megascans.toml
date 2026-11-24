@@ -1,5 +1,5 @@
 # Quixel Megascans assets, from Fab or Bridge, carry `<id>.json`. It has the listing's exact title, its tags, its
-# colour, where it was scanned, its real-world size, its texture maps by kind and its levels of detail. Today's files
+# color, where it was scanned, its real-world size, its texture maps by kind and its levels of detail. Today's files
 # name the listing under `semanticTags`; older ones, in the shape of Quixel's published asset spec, have `id`, `name`
 # and a `meta` list of `{key, value}`.
 name = "Megascans"

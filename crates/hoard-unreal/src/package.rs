@@ -139,7 +139,7 @@ impl Package {
     pub(crate) fn custom_version(&self, guid: [u8; 16]) -> Option<i32> {
         self.custom_versions.iter().find(|(g, _)| *g == guid).map(|(_, v)| *v)
     }
-    /// The editor thumbnail, decoded, in its true colours. Unreal compresses the thumbnail's BGRA pixels as though
+    /// The editor thumbnail, decoded, in its true colors. Unreal compresses the thumbnail's BGRA pixels as though
     /// they were RGBA, so the PNG or JPEG in the file has red and blue swapped (a red jar is stored blue); the editor
     /// swaps them back as it reads. Every version does it, 4.x through 5.x, PNG and JPEG alike.
     pub fn thumbnail_image(&self) -> Option<image::DynamicImage> {
@@ -633,13 +633,13 @@ pub fn carve_source(data: &[u8], class: &str, header_size: usize) -> Option<Embe
                 }
             }
             let png = best.filter(|b| b.len() > 1024)?;
-            Some(Embedded { ext: "png", bytes: recolour_png(png).ok().flatten().unwrap_or_else(|| png.to_vec()) })
+            Some(Embedded { ext: "png", bytes: recolor_png(png).ok().flatten().unwrap_or_else(|| png.to_vec()) })
         }
         _ => None,
     }
 }
 
-/// Swap red and blue in place, in 8-bit colour images (the only kind Unreal stores BGRA).
+/// Swap red and blue in place, in 8-bit color images (the only kind Unreal stores BGRA).
 fn swap_red_blue(img: &mut image::DynamicImage) {
     match img {
         image::DynamicImage::ImageRgba8(px) => px.pixels_mut().for_each(|p| p.0.swap(0, 2)),
@@ -648,10 +648,10 @@ fn swap_red_blue(img: &mut image::DynamicImage) {
     }
 }
 
-/// A texture source Unreal stored as PNG, in its true colours. A `TSF_BGRA8` source (any 8-bit colour one) is
+/// A texture source Unreal stored as PNG, in its true colors. A `TSF_BGRA8` source (any 8-bit color one) is
 /// compressed from BGRA pixels as though they were RGBA, as thumbnails are, so red and blue come out swapped and are
-/// put back here. A 16-bit (`TSF_RGBA16`) or grey source is in order: `None`, to keep as it is.
-pub fn recolour_png(png: &[u8]) -> Result<Option<Vec<u8>>> {
+/// put back here. A 16-bit (`TSF_RGBA16`) or gray source is in order: `None`, to keep as it is.
+pub fn recolor_png(png: &[u8]) -> Result<Option<Vec<u8>>> {
     let mut img = image::load_from_memory_with_format(png, image::ImageFormat::Png)?;
     if !matches!(img, image::DynamicImage::ImageRgba8(_) | image::DynamicImage::ImageRgb8(_)) {
         return Ok(None);
@@ -831,7 +831,7 @@ pub(crate) mod tests {
 
     /// The editor stores its thumbnails' BGRA pixels as though RGBA: a red jar is a blue one in the file.
     #[test]
-    fn thumbnails_come_out_in_their_true_colours() {
+    fn thumbnails_come_out_in_their_true_colors() {
         for format in [image::ImageFormat::Png, image::ImageFormat::Jpeg] {
             let stored = image::RgbImage::from_pixel(8, 8, image::Rgb([0, 0, 255]));
             let mut bytes = Vec::new();

@@ -157,7 +157,7 @@ struct SessionStatus {
     part_bytes: u64,
     /// True when this call picked up an existing session instead of starting one.
     resumed: bool,
-    /// This registration's hold on the session, for cancelling it (see `abort`); only in the answer to registering.
+    /// This registration's hold on the session, for canceling it (see `abort`); only in the answer to registering.
     #[serde(skip_serializing_if = "Option::is_none")]
     claim: Option<String>,
     /// The pack the upload goes into once it's complete, when the library has it already.
@@ -667,7 +667,7 @@ fn hand_over(tx: &rusqlite::Transaction<'_>, upload: &str, target: &str) -> anyh
 #[derive(Deserialize, schemars::JsonSchema)]
 struct AbortParams {
     /// The claim registering the upload gave. If the same files were registered again since (dropped again to retry),
-    /// the upload is the later registration's, and cancelling the earlier one leaves it be. Without one, it's cancelled
+    /// the upload is the later registration's, and canceling the earlier one leaves it be. Without one, it's canceled
     /// whoever registered it.
     claim: Option<String>,
 }
@@ -713,7 +713,7 @@ async fn abort(
         Abort::Removed => {}
         Abort::NotOpen => return Err(AppError::not_found(tr!("error-open-upload-not-found", id = id))),
         Abort::TakenOver => {
-            tracing::info!(id, "kept an upload cancelled by an earlier registration of it");
+            tracing::info!(id, "kept an upload canceled by an earlier registration of it");
             return Ok(StatusCode::NO_CONTENT);
         }
     }

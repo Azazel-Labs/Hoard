@@ -56,7 +56,7 @@ test.describe('resumable uploads', () => {
     expect(createHash('sha256').update(back).digest('hex')).toBe(createHash('sha256').update(text).digest('hex'))
   })
 
-  test('cancelling an upload the same files were dropped again for leaves it to the new one', async ({ api }) => {
+  test('canceling an upload the same files were dropped again for leaves it to the new one', async ({ api }) => {
     // A failed upload, retried by dropping the same files again: the server picks the same session back up.
     const stem = `retried-${unique()}`
     const files = [`${stem}/a.txt`, `${stem}/b.txt`].map((path) => ({ path, data: Buffer.from(`${path}
@@ -73,7 +73,7 @@ test.describe('resumable uploads', () => {
     expect(second.claim).toBeTruthy()
     expect(second.claim).not.toBe(first.claim)
 
-    // The first one's cancelled, as a person tidying up the failed row would: the second carries on regardless.
+    // The first one's canceled, as a person tidying up the failed row would: the second carries on regardless.
     expect((await api.delete(base, { params: { claim: first.claim! } })).status()).toBe(204)
     const status = (await (await api.get(base)).json()) as Session
     expect(status.files.map((f) => f.received)).toEqual([files[0].data.length, 0])

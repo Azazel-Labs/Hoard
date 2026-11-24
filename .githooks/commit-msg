@@ -1,0 +1,3 @@
+#!/bin/sh
+# Hoard is written in American English, commit messages too. Turn on with: git config core.hooksPath .githooks
+exec cargo xtask spelling --message "$1"

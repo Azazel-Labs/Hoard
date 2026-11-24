@@ -137,7 +137,7 @@ namespace Hoard::Transport
         {
             if (In.Cancel && In.Cancel->load())
             {
-                Out.Error = "cancelled";
+                Out.Error = "canceled";
                 return;
             }
             DWORD Got = 0;
@@ -280,7 +280,7 @@ namespace Hoard::Transport
         case CURLE_COULDNT_CONNECT:
         case CURLE_COULDNT_RESOLVE_HOST: Out.Error = "couldn't connect"; return;
         case CURLE_OPERATION_TIMEDOUT: Out.Error = "it took too long"; return;
-        case CURLE_ABORTED_BY_CALLBACK: Out.Error = "cancelled"; return;
+        case CURLE_ABORTED_BY_CALLBACK: Out.Error = "canceled"; return;
         case CURLE_URL_MALFORMAT:
         case CURLE_UNSUPPORTED_PROTOCOL: Out.Error = "that isn't a web address"; return;
         case CURLE_PEER_FAILED_VERIFICATION: Out.Error = "its certificate wasn't trusted"; return;

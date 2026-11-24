@@ -111,7 +111,7 @@ h2 { margin: 0; font-size: var(--step-1); font-variation-settings: 'CASL' 0.5; }
 .card strong { font-size: var(--step-0); }
 .card small { color: var(--muted); font-size: var(--step--1); line-height: 1.45; }
 /* The art's own background, which the sync badge's ring matches to stand clear of the folder. On light themes it's
-   a grey a step darker than the card, not white, for the white sheets of paper to show on. */
+   a gray a step darker than the card, not white, for the white sheets of paper to show on. */
 .art {
   --art-bg: light-dark(var(--l-check-a), var(--d-raised)); --paper: light-dark(#ffffff, #e4e4e8);
   width: 100%; height: auto; margin-bottom: 0.4rem; border-radius: calc(var(--r-tile) - 3px); background: var(--art-bg);

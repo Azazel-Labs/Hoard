@@ -3,7 +3,7 @@
 ## Visual output needs a human look before it's done
 
 When a change makes Hoard produce a picture it hasn't produced before (a new thumbnail source, a new viewer, an
-animation player, a colour conversion, a converted texture), passing tests and good-looking numbers do not mean
+animation player, a color conversion, a converted texture), passing tests and good-looking numbers do not mean
 it's right. Before calling the work finished:
 
 - Build a before/after page (an artifact or a contact sheet) showing real files from each affected path. Include

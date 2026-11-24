@@ -479,7 +479,7 @@ class Armature {
   }
 }
 
-/** Where an image display's piece goes in the slot's space: centred on its pivot, its trimmed edges put back. */
+/** Where an image display's piece goes in the slot's space: centered on its pivot, its trimmed edges put back. */
 function imageRect(d: Display, r: Region): [number, number, number, number] {
   const fw = r.frame ? r.frame.w : r.w
   const fh = r.frame ? r.frame.h : r.h
@@ -510,7 +510,7 @@ function drawMesh(ctx: CanvasRenderingContext2D, r: Region, mesh: Mesh, points: 
     const c = (du1 * dx2 - du2 * dx1) / det
     const b = (dy1 * dv2 - dy2 * dv1) / det
     const d = (du1 * dy2 - du2 * dy1) / det
-    // Grown half a pixel about its middle, so neighbours meet without a hairline between them.
+    // Grown half a pixel about its middle, so neighbors meet without a hairline between them.
     const [mx, my] = [(x0 + x1 + x2) / 3, (y0 + y1 + y2) / 3]
     const grow = (x: number, y: number): [number, number] => {
       const len = Math.hypot(x - mx, y - my) || 1

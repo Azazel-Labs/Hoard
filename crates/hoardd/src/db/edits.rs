@@ -233,7 +233,7 @@ impl Log<'_> {
         self.record(id, col, old.as_deref(), new)
     }
 
-    /// Reviewing an asset also keeps the automatic passes from renaming or recategorising it.
+    /// Reviewing an asset also keeps the automatic passes from renaming or recategorizing it.
     fn set_reviewed(&mut self, id: &str, on: bool) -> Result<()> {
         let old: Option<String> =
             self.tx.query_row("SELECT reviewed_at FROM assets WHERE id = ?1", [id], |r| r.get(0))?;

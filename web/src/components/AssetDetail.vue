@@ -446,7 +446,7 @@ watch(
             if (!x.tag.startsWith('kind:') && !x.tag.startsWith('format:')) counts.set(x.tag, (counts.get(x.tag) ?? 0) + 1)
           }
         }
-        // Shared by a quarter of them at least, so one odd neighbour doesn't suggest anything.
+        // Shared by a quarter of them at least, so one odd neighbor doesn't suggest anything.
         const least = Math.max(2, Math.ceil(near.length / 4))
         fromSimilar.value = [...counts].filter(([, n]) => n >= least).sort((x, y) => y[1] - x[1]).map(([tag]) => tag)
       })

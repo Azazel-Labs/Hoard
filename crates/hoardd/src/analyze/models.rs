@@ -323,7 +323,7 @@ mod tests {
         }
         let mesh = Mesh {
             prims: vec![p],
-            materials: vec![Material::plain("Grey", [0.5; 4])],
+            materials: vec![Material::plain("Gray", [0.5; 4])],
             images: Vec::new(),
             skeleton: Vec::new(),
         };

@@ -233,7 +233,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material');",
-    // 27: the server's own thumbnails of models that wear a material are drawn again with its colour map on
+    // 27: the server's own thumbnails of models that wear a material are drawn again with its color map on
     // (`materials::dress_models`, run with each pack's materials).
     "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
        SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
@@ -242,7 +242,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material');",
     // 28: browser drawings of models that wear a material, by name or through its maps beside them, may be all white
     // (taken before the maps arrived; 26 caught only the first kind). A browser draws them afresh the next time the
-    // model is opened, and FBX and OBJ ones go back to being the server's, which draws them again with the colour map.
+    // model is opened, and FBX and OBJ ones go back to being the server's, which draws them again with the color map.
     "UPDATE assets SET thumb_source = CASE WHEN ext IN ('fbx', 'obj') THEN NULL ELSE 'browser-partial' END
        WHERE thumb_source IN ('browser', 'browser-partial') AND kind = 'model'
          AND EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = assets.id
@@ -253,7 +253,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
-    // 29: the server draws glTF, GLB, STL and PLY models with the colour map of the material they wear too, so their
+    // 29: the server draws glTF, GLB, STL and PLY models with the color map of the material they wear too, so their
     // browser drawings that may be all white go back to being the server's (as 28 did for FBX and OBJ).
     "UPDATE assets SET thumb_source = NULL
        WHERE thumb_source IN ('browser', 'browser-partial') AND kind = 'model' AND ext IN ('glb', 'gltf', 'stl', 'ply')
@@ -265,7 +265,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
-    // 30: STL files can colour their facets, which the server now draws (`materials::recolor_stls`, run with each
+    // 30: STL files can color their facets, which the server now draws (`materials::recolor_stls`, run with each
     // pack's materials). Browser drawings of them go back to the server, and a browser draws them afresh when opened.
     "UPDATE assets SET meta = json_set(meta, '$.recolor', 1), thumb_source = NULL
        WHERE kind = 'model' AND ext = 'stl' AND thumb_hash IS NOT NULL;
@@ -334,7 +334,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // 36: roles (see `auth::Role`). Everyone could do everything before, so existing accounts and tokens are admins.
     "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));
      ALTER TABLE access_tokens ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));",
-    // 37: each person's favourite assets and saved searches (see `me`).
+    // 37: each person's favorite assets and saved searches (see `me`).
     "CREATE TABLE favourites (
        user_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
        asset_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
@@ -815,7 +815,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // page, so text someone typed or changed stays.
     "ALTER TABLE pack_context ADD COLUMN store_text_read INTEGER;
      UPDATE pack_context SET store_text_read = 0 WHERE store_text IS NOT NULL AND store_url IS NOT NULL;",
-    // 79: who registered an upload last (see `uploads::abort`): cancelling an older registration of it leaves it be.
+    // 79: who registered an upload last (see `uploads::abort`): canceling an older registration of it leaves it be.
     "ALTER TABLE upload_meta ADD COLUMN claim TEXT;",
     // 80: each asset's row in the search index, by number (see `reindex_asset`). Its asset_id column can't be looked
     // up, so finding the row by that read the whole index, once per asset written. Rows of assets that are gone, or
@@ -1173,4 +1173,6 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // 107: Tags that look alike but someone said are different, so they aren't offered for merging again (the first
     // A to Z in `a`).
     "CREATE TABLE tags_apart (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b)) WITHOUT ROWID;",
+    // 108: step 91's table is spelled the American way.
+    "ALTER TABLE unreal_recolour RENAME TO unreal_recolor;",
 ];

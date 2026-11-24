@@ -1468,12 +1468,12 @@ class Dragon {
     const hopAt = (d: number): number => (leaving || d <= this.trackTip || d >= this.trackExtent ? 0 : Math.sin(Math.PI * ((d - this.trackTip) / hopSpan)));
 
     const along = clamp01(away) * (leaving ? this.leaveLength : this.trackExtent);
-    const travelled = leaving === this.lastLeaving ? Math.abs(along - this.lastShift) : 0;
+    const traveled = leaving === this.lastLeaving ? Math.abs(along - this.lastShift) : 0;
     this.lastShift = along;
     this.lastLeaving = leaving;
-    const moveGoal = dt > 0 ? clamp01(travelled / dt / (1.2 * s)) : 0;
+    const moveGoal = dt > 0 ? clamp01(traveled / dt / (1.2 * s)) : 0;
     this.move += (moveGoal - this.move) * (1 - Math.exp(-dt * 6));
-    this.gait += (travelled / (0.75 * s)) * Math.PI;
+    this.gait += (traveled / (0.75 * s)) * Math.PI;
     const move = this.move;
 
     // ── spine control points ────────────────────────────────────────────────
@@ -1974,11 +1974,11 @@ function buildDomainGeometry(tier: number, seed: number): { rock: THREE.BufferGe
     lip.push(polar(a, rr * 0.93, -0.07 - rnd() * 0.03));
     low.push(polar(a, rr * 0.5, -0.2 - rnd() * 0.08));
   }
-  const centre = V(0, 0, 0), bottom = V(0, -0.34, 0);
+  const center = V(0, 0, 0), bottom = V(0, -0.34, 0);
   for (let k = 0; k < segs; k++) {
     const k1 = (k + 1) % segs;
     const shade = 0.88 + 0.12 * rnd();
-    b.tri(centre, inner[k1], inner[k], top, shade);
+    b.tri(center, inner[k1], inner[k], top, shade);
     b.tri(inner[k], inner[k1], rim[k1], top, shade * 0.97);
     b.tri(inner[k], rim[k1], rim[k], top, shade * 1.03);
     b.tri(rim[k], rim[k1], lip[k1], side, shade);
@@ -2030,7 +2030,7 @@ function buildDomainGeometry(tier: number, seed: number): { rock: THREE.BufferGe
     g.prism(V(foot.x, 0.095, foot.z), V(foot.x + 0.004, 0.2, foot.z), 0.04, 0, 5, flame, 1.5);
     g.prism(V(foot.x, 0.1, foot.z), V(foot.x - 0.003, 0.165, foot.z), 0.024, 0, 4, ember, 1.6);
   }
-  if (g.count === 0) g.tri(centre, centre, centre, glow); // keep the mesh valid when a tier has nothing lit
+  if (g.count === 0) g.tri(center, center, center, glow); // keep the mesh valid when a tier has nothing lit
   return { rock: b.toGeometry(), glow: g.toGeometry() };
 }
 
@@ -2097,14 +2097,14 @@ class Portal {
     this.swirlB.geometry = pinwheel(11, 0.7, accent, this.bright, deep);
   }
 
-  update(time: number, dt: number, goal: number, radius: number, centre: THREE.Vector3): void {
+  update(time: number, dt: number, goal: number, radius: number, center: THREE.Vector3): void {
     this.open += (goal - this.open) * (1 - Math.exp(-dt * (goal > this.open ? 3.2 : 4.5)));
     if (this.open < 0.004 && goal === 0) this.open = 0;
     const o = this.open;
     this.group.visible = o > 0;
     if (!this.group.visible) { this.light.intensity = 0; return; }
     const overshoot = 1 + 0.18 * Math.sin(Math.min(1, o) * Math.PI); // swell as it tears open
-    this.group.position.copy(centre);
+    this.group.position.copy(center);
     this.group.scale.setScalar(Math.max(1e-3, radius * o * overshoot));
     this.ring.rotation.y = time * 0.35;
     this.swirlA.rotation.y = -time * 1.4;
@@ -2191,7 +2191,7 @@ export class DragonHoard extends THREE.Group {
   private ceremonial = false;
   private switched = false;
   private away = 0;
-  private leaving = false; // which way the dragon is travelling between throne and ring
+  private leaving = false; // which way the dragon is traveling between throne and ring
   private portalGoal = 0;
   private portalR = 1;
   private readonly portalPos = new THREE.Vector3(0, 5, 0);
@@ -3018,7 +3018,7 @@ export interface MountOptions extends DragonHoardOptions {
   followPointer?: boolean;
   /** Clicking makes the dragon roar. Default true. */
   roarOnClick?: boolean;
-  /** Scroll or pinch to zoom in on the centre of the hoard. Default true. */
+  /** Scroll or pinch to zoom in on the center of the hoard. Default true. */
   zoom?: boolean;
   /** Show the scene as if on an arcade cabinet's tube. Pass options to tune the look. Default false. */
   retro?: boolean | RetroOptions;
@@ -3031,7 +3031,7 @@ export interface MountOptions extends DragonHoardOptions {
   fov?: number;
   /** Skip WebGPU and use the WebGL2 backend. */
   forceWebGL?: boolean;
-  /** Honour prefers-reduced-motion by stilling the camera. Default true. */
+  /** Honor prefers-reduced-motion by stilling the camera. Default true. */
   respectReducedMotion?: boolean;
   /** Text alternative for the canvas. Defaults to a description built from the stats. */
   label?: string | ((stats: HoardStats) => string);
@@ -3171,7 +3171,7 @@ export function mountDragonHoard(container: HTMLElement, options: MountOptions =
       goalFocus = b.focus;
     };
 
-    // Zoom: 1 frames the hoard; smaller moves in along the same line. The camera always orbits the centre.
+    // Zoom: 1 frames the hoard; smaller moves in along the same line. The camera always orbits the center.
     let zoom = 1;
     const pointer = new THREE.Vector2();
     const touches = new Map<number, { x: number; y: number }>();

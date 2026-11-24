@@ -49,7 +49,7 @@ type Ctx = {
 
 const list = (v: J): J[] => (Array.isArray(v) ? v : [])
 const entries = (v: J): [string, J][] => (v && typeof v === 'object' && !Array.isArray(v) ? Object.entries(v) : [])
-/** A colour's alpha, from `rrggbbaa`. */
+/** A color's alpha, from `rrggbbaa`. */
 const alphaOf = (hex: unknown): number => (typeof hex === 'string' && hex.length >= 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1)
 const channelsOf = (hex: unknown): number[] =>
   typeof hex === 'string' ? [0, 2, 4, 6].map((i) => (hex.length >= i + 2 ? parseInt(hex.slice(i, i + 2), 16) / 255 : 1)) : [1, 1, 1, 1]
@@ -464,7 +464,7 @@ export function parseAtlas(text: string): AtlasPage[] {
   return pages
 }
 
-/** A page whose colours are multiplied by their alpha, put back the way the canvas draws them. */
+/** A page whose colors are multiplied by their alpha, put back the way the canvas draws them. */
 function unpremultiply(img: HTMLImageElement): CanvasImageSource {
   const c = document.createElement('canvas')
   ;[c.width, c.height] = [img.naturalWidth, img.naturalHeight]

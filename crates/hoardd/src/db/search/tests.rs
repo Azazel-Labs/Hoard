@@ -400,9 +400,9 @@ fn a_search_by_words_counts_the_tags_of_what_it_found() {
     )
     .unwrap();
     for (id, name, kind, tags) in [
-        ("r1", "rock one", "texture", "mossy,grey,set:a"),
-        ("r2", "rock two", "model", "grey,set:a"),
-        ("r3", "rock three", "texture", "grey,dark"),
+        ("r1", "rock one", "texture", "mossy,gray,set:a"),
+        ("r2", "rock two", "model", "gray,set:a"),
+        ("r3", "rock three", "texture", "gray,dark"),
         ("r4", "rock four", "texture", "mossy"),
         ("m", "moss", "texture", "mossy,green"),
     ] {
@@ -436,9 +436,9 @@ fn a_search_by_words_counts_the_tags_of_what_it_found() {
         );
         found
     };
-    assert_eq!(shown(&rock), ["grey 2", "mossy 2"]);
-    assert_eq!(shown(&SearchQuery { kind: Some("texture".into()), ..rock.clone() }), ["mossy 2", "grey 1"]);
-    assert_eq!(shown(&SearchQuery { hide_supporting: false, ..rock.clone() }), ["grey 3", "mossy 2", "dark 1"]);
+    assert_eq!(shown(&rock), ["gray 2", "mossy 2"]);
+    assert_eq!(shown(&SearchQuery { kind: Some("texture".into()), ..rock.clone() }), ["mossy 2", "gray 1"]);
+    assert_eq!(shown(&SearchQuery { hide_supporting: false, ..rock.clone() }), ["gray 3", "mossy 2", "dark 1"]);
     assert_eq!(shown(&SearchQuery { q: Some("nothing".into()), ..rock }), Vec::<String>::new());
 }
 
@@ -454,9 +454,9 @@ fn typed_words_and_the_sidebar_follow_the_tag_tree() {
     for (id, name, tags) in [
         ("s", "blue one", "sedan,blue"),
         ("c", "red one", "car,sedan,red"),
-        ("h", "grey one", "hard surface"),
+        ("h", "gray one", "hard surface"),
         ("v", "old one", "vehicle"),
-        ("r", "rock", "grey"),
+        ("r", "rock", "gray"),
     ] {
         conn.execute(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
@@ -505,7 +505,7 @@ fn typed_words_and_the_sidebar_follow_the_tag_tree() {
     // Each counted once: the red car is a car and a sedan.
     assert_eq!(
         shown(SearchQuery::default()),
-        ["vehicle 4", "car 3", "sedan 2", "blue 1", "grey 1", "hard surface 1", "red 1"]
+        ["vehicle 4", "car 3", "sedan 2", "blue 1", "gray 1", "hard surface 1", "red 1"]
     );
     // From what a search by words found: vehicle shows though nothing found is tagged vehicle itself.
     assert_eq!(

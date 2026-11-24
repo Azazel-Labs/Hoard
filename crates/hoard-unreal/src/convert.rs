@@ -234,9 +234,9 @@ fn texture(data: &[u8], pkg: &Package) -> Converted {
         } else if carved {
             (payload, "PNG source carved from bulk data")
         } else {
-            match crate::package::recolour_png(&payload)? {
+            match crate::package::recolor_png(&payload)? {
                 Some(fixed) => (fixed, "PNG source, red and blue put right"),
-                None => (payload, "PNG source as stored (16-bit or grey)"),
+                None => (payload, "PNG source as stored (16-bit or gray)"),
             }
         };
         return Ok((OutFile { ext: "png", bytes, how }, notes));
@@ -439,6 +439,9 @@ fn export_class<'a>(pkg: &'a Package, e: &crate::package::Export) -> &'a str {
         .map_or("", |imp| imp.object_name.as_str())
 }
 
+/// Words in a texture's name that make it the base color, as names are written (British ones too).
+const BASE_COLOR_WORDS: [&str; 5] = ["base", "albedo", "diffuse", "color", "colour"]; // spelling: allow
+
 fn pbr_slot(name: &str) -> Option<&'static str> {
     let n = name.to_lowercase();
     let has = |k: &[&str]| k.iter().any(|w| n.contains(w));
@@ -458,7 +461,7 @@ fn pbr_slot(name: &str) -> Option<&'static str> {
         "opacity"
     } else if has(&["height", "disp", "bump"]) || n.ends_with("_h") {
         "height"
-    } else if has(&["base", "albedo", "diffuse", "color", "colour"]) || n.ends_with("_d") {
+    } else if has(&BASE_COLOR_WORDS) || n.ends_with("_d") {
         "base_color"
     } else {
         return None;
@@ -587,7 +590,7 @@ mod tests {
     /// Unreal compresses a BGRA8 source as though it were RGBA: a red texel is stored blue in the PNG. Checked
     /// against the engine's own `RGBTable16x1` (red ramps along each tile), whose PNG source reads blue there.
     #[test]
-    fn bgra8_png_source_comes_out_in_its_true_colours() {
+    fn bgra8_png_source_comes_out_in_its_true_colors() {
         let mut png = Vec::new();
         image::RgbaImage::from_pixel(3, 3, image::Rgba([1, 2, 3, 4]))
             .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)

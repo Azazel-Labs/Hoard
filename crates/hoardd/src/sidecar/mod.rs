@@ -103,7 +103,7 @@ fn file_name(uri: &str) -> Option<String> {
 /// A length's unit in meters; `None` for one that isn't a length.
 fn unit_meters(unit: &str) -> Option<f32> {
     match unit {
-        "m" | "meter" | "meters" | "metre" | "metres" => Some(1.0),
+        "m" | "meter" | "meters" | "metre" | "metres" => Some(1.0), // spelling: allow (units written that way)
         "dm" => Some(0.1),
         "cm" => Some(0.01),
         "mm" => Some(0.001),

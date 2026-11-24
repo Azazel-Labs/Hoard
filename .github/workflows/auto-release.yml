@@ -17,7 +17,7 @@ on:
     types: [completed]
     branches: [main]
 
-# One at a time, never cancelled mid-push. A newer push's run waits and then sees the newer main.
+# One at a time, never canceled mid-push. A newer push's run waits and then sees the newer main.
 concurrency:
   group: auto-release
   cancel-in-progress: false

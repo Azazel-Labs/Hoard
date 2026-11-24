@@ -167,7 +167,7 @@ pub(crate) fn fit(note: &Note, name: &str, size: [u32; 2]) -> Option<Grid> {
     })
 }
 
-/// A cell with nothing in it: all transparent, or all the sheet's background (magenta, or the colour between tiles).
+/// A cell with nothing in it: all transparent, or all the sheet's background (magenta, or the color between tiles).
 pub(crate) fn empty(img: &RgbaImage, [x0, y0, w, h]: [u32; 4], background: Option<Rgba<u8>>) -> bool {
     let first = *img.get_pixel(x0, y0);
     let mut flat = true;
@@ -232,7 +232,7 @@ pub(crate) fn candidate(note: &Note, note_path: &str, rel: &str) -> bool {
     note.cells.is_some() || kit_dir(note_path) != note_path.rsplit_once('/').map_or("", |(d, _)| d) || sheetish(rel)
 }
 
-/// A small picture of an image to find copies of it quickly: the mean of each channel, with colour weighted by how
+/// A small picture of an image to find copies of it quickly: the mean of each channel, with color weighted by how
 /// opaque it is, in each of 4 × 4 blocks.
 pub(crate) fn signature(img: &RgbaImage) -> [u8; 64] {
     let (w, h) = img.dimensions();
@@ -338,7 +338,7 @@ mod tests {
 
     #[test]
     fn empty_cells_are_left_out_and_the_rest_named_by_cell() {
-        // Two by two of 4 px tiles, 1 px apart on a grey background: the second cell is empty, the fourth transparent.
+        // Two by two of 4 px tiles, 1 px apart on a gray background: the second cell is empty, the fourth transparent.
         let mut img = RgbaImage::from_pixel(9, 9, Rgba([90, 90, 90, 255]));
         for (x, y) in [(0, 0), (0, 5)] {
             for yy in y..y + 4 {

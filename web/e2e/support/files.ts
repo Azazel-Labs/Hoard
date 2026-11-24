@@ -326,7 +326,7 @@ export function paintedCube3mf(): Buffer {
     { path: '_rels/.rels', data: Buffer.from(rels) },
     { path: '3D/3dmodel.model', data: Buffer.from(model) },
     { path: 'Metadata/model_settings.config', data: Buffer.from(settings) },
-    { path: 'Metadata/project_settings.config', data: Buffer.from(JSON.stringify({ filament_colour: ['#FFFFFF', '#FF0000'] })) },
+    { path: 'Metadata/project_settings.config', data: Buffer.from(JSON.stringify({ filament_colour: ['#FFFFFF', '#FF0000'] })) }, // spelling: allow (the slicer's key)
   ])
 }
 

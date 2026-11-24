@@ -110,7 +110,7 @@ mod thumbs;
 mod tools;
 mod unitymat;
 mod unreal_editor;
-mod unreal_recolour;
+mod unreal_recolor;
 mod updates;
 mod uploads;
 mod webglb;
@@ -281,7 +281,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     thumbs::kick(&state);
     let st = Arc::clone(&state);
     tokio::spawn(async move { takes::backfill(&st).await });
-    tokio::spawn(unreal_recolour::run(Arc::clone(&state)));
+    tokio::spawn(unreal_recolor::run(Arc::clone(&state)));
     let st = Arc::clone(&state);
     tokio::spawn(async move { looks::schedule(&st).await });
     {

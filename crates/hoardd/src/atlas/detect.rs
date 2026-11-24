@@ -55,7 +55,7 @@ pub(super) fn drop_empty(atlas: &mut Atlas, imgs: &[Option<RgbaImage>]) {
             moved.push((0..p.sprites.len()).map(Some).collect());
             continue;
         };
-        // The colour between tiles, when there's space between them.
+        // The color between tiles, when there's space between them.
         let background = match (p.sprites.first(), p.sprites.get(1)) {
             (Some(a), Some(b)) if b.rect[1] == a.rect[1] && b.rect[0] > a.rect[0] + a.rect[2] => {
                 let (x, y) = (a.rect[0] + a.rect[2], a.rect[1]);
@@ -484,7 +484,7 @@ fn path_words(path: &str) -> HashSet<String> {
 }
 
 /// How many pixels a sprite and a loose image differ in, when they're the same picture: at most one in a hundred,
-/// each channel within [`CHANNEL_SLACK`] (colour only where both are mostly opaque, as saving again changes what
+/// each channel within [`CHANNEL_SLACK`] (color only where both are mostly opaque, as saving again changes what
 /// hides under transparency). One with a transparent margin the other hasn't is compared without it.
 fn difference(a: &RgbaImage, b: &RgbaImage) -> Option<usize> {
     if a.dimensions() != b.dimensions() {

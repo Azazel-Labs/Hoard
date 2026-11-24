@@ -80,7 +80,7 @@ onMounted(() => dlg.value?.showModal())
 @media (prefers-reduced-motion: reduce) { .tray[open], .tray::backdrop { animation: none; } }
 header { flex: none; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
 h2 { margin: 0; font-size: var(--step-1); font-variation-settings: 'CASL' 0.5; }
-/* Gold leaning toward the text colour: brighter on dark themes, deeper on light ones, readable on both. */
+/* Gold leaning toward the text color: brighter on dark themes, deeper on light ones, readable on both. */
 .count { color: color-mix(in srgb, #f2c55c 65%, var(--text)); font-size: var(--step--1); font-weight: 600; }
 .x { margin-left: auto; padding: 0.35em 0.45em; }
 .body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -0.4rem; padding: 0 0.4rem; }

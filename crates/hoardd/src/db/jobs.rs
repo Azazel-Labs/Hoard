@@ -127,7 +127,7 @@ pub(crate) fn finish_job(conn: &Connection, id: i64, error: Option<&str>, retry_
 }
 
 /// Packs left being read or tagged with no job left to finish them (`pack`, or every one) are ready: a job that failed
-/// partway (an Unreal conversion, say) used to leave its pack "LLM is tagging" for good, with its menu greyed out.
+/// partway (an Unreal conversion, say) used to leave its pack "LLM is tagging" for good, with its menu grayed out.
 /// What's done of it is usable, and it can be read or tagged again from there; `note` says why, when there's a reason.
 /// A watched folder's scan reads its packs itself, so none is touched while a scan or a move is waiting or running.
 pub(crate) fn settle_packs(conn: &Connection, pack: Option<&str>, note: Option<&str>) -> Result<usize> {

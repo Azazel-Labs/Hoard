@@ -1,7 +1,7 @@
 //! The in-memory index "more like this", near copies and color search rank against: each thumbnail's descriptor,
 //! hash and palette.
 
-use crate::resident::Resident;
+use crate::resident::{Key, Map, Resident};
 use std::collections::HashMap;
 
 use anyhow::Result;
@@ -49,15 +49,15 @@ impl Index {
     #[cfg(test)]
     pub(crate) fn loaded() -> Self {
         let index = Self::default();
-        index.0.set(HashMap::new());
+        index.0.set(Map::new());
         index
     }
 
-    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
+    fn read<R>(&self, f: impl FnOnce(&Map<Entry>) -> R) -> Option<R> {
         self.0.read(f)
     }
 
-    fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
+    fn write(&self, f: impl FnOnce(&mut Map<Entry>)) {
         self.0.write(f);
     }
 
@@ -77,7 +77,7 @@ impl Index {
                         phash: phash as u64,
                         print: Vec::new(),
                     })?;
-                    Some((hash, entry))
+                    Some((Key::from(hash), entry))
                 })
                 .collect();
             Ok(rows)
@@ -88,7 +88,7 @@ impl Index {
     pub(crate) fn insert(&self, hash: String, features: Features) {
         if let Some(entry) = Entry::from(features) {
             self.write(|m| {
-                m.insert(hash, entry);
+                m.insert(hash.into(), entry);
             });
         }
     }
@@ -96,7 +96,7 @@ impl Index {
     pub(super) fn remove(&self, hashes: &[String]) {
         self.write(|m| {
             for h in hashes {
-                m.remove(h);
+                m.remove(&Key::new(h));
             }
         });
     }
@@ -105,8 +105,9 @@ impl Index {
     /// show), those count most where a thumbnail has one; colors and grain decide the rest.
     pub(super) fn similar(&self, hash: &str, meaning: Option<crate::embed::Likeness<'_>>) -> Vec<(String, f32)> {
         self.read(|m| {
-            let Some(target) = m.get(hash) else { return Vec::new() };
-            let scored = m.iter().filter(|(h, _)| h.as_str() != hash).map(|(h, e)| {
+            let key = Key::new(hash);
+            let Some(target) = m.get(&key) else { return Vec::new() };
+            let scored = m.iter().filter(|(h, _)| **h != key).map(|(h, e)| {
                 let look = similarity(target, e);
                 let score = match meaning.and_then(|s| s(h)) {
                     // Rescaled so the same floor applies: a close look alone still gets in.
@@ -126,11 +127,9 @@ impl Index {
     /// descriptors at least `look` alike. Their prints decide (see [`same_print`]).
     pub(crate) fn near(&self, hash: &str, bits: u32, look: f32) -> Vec<String> {
         self.read(|m| {
-            let Some(target) = m.get(hash) else { return Vec::new() };
-            m.iter()
-                .filter(|(h, e)| h.as_str() != hash && close(target, e, bits, look))
-                .map(|(h, _)| h.clone())
-                .collect()
+            let key = Key::new(hash);
+            let Some(target) = m.get(&key) else { return Vec::new() };
+            m.iter().filter(|(h, e)| **h != key && close(target, e, bits, look)).map(|(h, _)| h.to_string()).collect()
         })
         .unwrap_or_default()
     }
@@ -139,7 +138,7 @@ impl Index {
     /// `bits + 1` pieces: two at most `bits` apart have one piece the same, so only those sharing a piece are compared.
     pub(crate) fn near_pairs(&self, bits: u32, look: f32) -> Vec<(String, String)> {
         self.read(|m| {
-            let entries: Vec<(&String, &Entry)> = m.iter().filter(|(_, e)| !e.palette.is_empty()).collect();
+            let entries: Vec<(&Key, &Entry)> = m.iter().filter(|(_, e)| !e.palette.is_empty()).collect();
             let pieces = bits as usize + 1;
             let mut pairs = std::collections::HashSet::new();
             for piece in 0..pieces {
@@ -160,14 +159,17 @@ impl Index {
                     }
                 }
             }
-            pairs.into_iter().map(|(a, b)| (entries[a].0.clone(), entries[b].0.clone())).collect()
+            pairs.into_iter().map(|(a, b)| (entries[a].0.to_string(), entries[b].0.to_string())).collect()
         })
         .unwrap_or_default()
     }
 
     /// Whether two thumbnails could be the same picture (see [`Index::near`]).
     pub(crate) fn close(&self, a: &str, b: &str, bits: u32, look: f32) -> bool {
-        a == b || self.read(|m| m.get(a).zip(m.get(b)).is_some_and(|(x, y)| close(x, y, bits, look))).unwrap_or(false)
+        a == b
+            || self
+                .read(|m| m.get(&Key::new(a)).zip(m.get(&Key::new(b))).is_some_and(|(x, y)| close(x, y, bits, look)))
+                .unwrap_or(false)
     }
 
     /// Thumbnails with much of `lab` in them, most first.
@@ -177,7 +179,7 @@ impl Index {
     }
 }
 
-fn top<'a>(scored: impl Iterator<Item = (&'a String, f32)>, floor: f32, max: usize) -> Vec<(String, f32)> {
+fn top<'a>(scored: impl Iterator<Item = (&'a Key, f32)>, floor: f32, max: usize) -> Vec<(String, f32)> {
     crate::embed::best(scored.filter(|(_, s)| *s >= floor).collect(), max)
 }
 

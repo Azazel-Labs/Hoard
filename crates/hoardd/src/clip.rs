@@ -532,7 +532,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     for index in [&state.pictures, &state.clip] {
         index.write(|m| {
             for h in &gone {
-                m.remove(h);
+                m.remove(&crate::resident::Key::new(h));
             }
         });
     }
@@ -593,7 +593,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             state.pictures.write(|m| {
                 for (hash, v) in computed {
                     if let Some(e) = v.and_then(Entry::new) {
-                        m.insert(hash, e);
+                        m.insert(hash.into(), e);
                     }
                 }
             });
@@ -617,7 +617,7 @@ fn embed_all(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
+    use crate::resident::Map;
 
     #[test]
     fn text_matches_stand_above_the_median() {
@@ -630,7 +630,7 @@ mod tests {
             .unwrap()
         };
         let q = normalized([1.0f32, 0.0].into_iter().chain([0.0; CLIP_DIMS - 2]).collect());
-        let mut m: HashMap<String, Entry> = (0..20).map(|i| (format!("t{i}"), entry(0.3))).collect();
+        let mut m: Map<Entry> = (0..20).map(|i| (format!("t{i}").into(), entry(0.3))).collect();
         m.insert("strong".into(), entry(0.6));
         m.insert("faint".into(), entry(0.32));
         index.set(m);
@@ -647,15 +647,15 @@ mod tests {
         // Whatever level a model's scores sit at, what stands far above the rest is a match and the rest isn't.
         for base in [0.2f32, 0.5] {
             let index = Index::new(hosted_spec("test:model"));
-            let mut m: HashMap<String, Entry> =
-                (0..60).map(|i| (format!("t{i}"), entry(base + (i % 10) as f32 * 0.004))).collect();
+            let mut m: Map<Entry> =
+                (0..60).map(|i| (format!("t{i}").into(), entry(base + (i % 10) as f32 * 0.004))).collect();
             m.insert("strong".into(), entry(base + 0.2));
             index.set(m);
             let hits = index.matching(&q);
             assert_eq!(hits.iter().map(|h| h.0.as_str()).collect::<Vec<_>>(), ["strong"], "{base}: {hits:?}");
             assert!(hits[0].1 > 0.25);
             // More like this: measured against the typical picture's score for this one.
-            let like = index.similar("t0", |s| ["t0", "t1", "strong", "none"].map(|h| s.unwrap()(h)));
+            let like = index.similar("t0", |s| ["t0", "t1", "strong", "none"].map(|h| s.unwrap()(&h.into())));
             let [Some(t0), Some(t1), Some(strong), None] = like else { panic!("{like:?}") };
             assert!((t0 - 1.0).abs() < 1e-3);
             assert!(t1 > 0.5 && strong < 0.1, "{like:?}");

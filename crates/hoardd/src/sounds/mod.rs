@@ -19,8 +19,8 @@
 mod likeness;
 mod listening;
 
-use crate::resident::Resident;
-use std::collections::{HashMap, HashSet};
+use crate::resident::{Key, Resident};
+use std::collections::HashSet;
 
 use anyhow::Result;
 use rusqlite::params;
@@ -51,7 +51,7 @@ impl Index {
     #[cfg(test)]
     pub(crate) fn loaded() -> Self {
         let index = Self::default();
-        index.0.set(HashMap::new());
+        index.0.set(crate::resident::Map::new());
         index
     }
 
@@ -59,15 +59,15 @@ impl Index {
     #[cfg(test)]
     pub(crate) fn insert(&self, hash: &str, descriptor: Vec<i8>) {
         self.write(|m| {
-            m.insert(hash.to_owned(), descriptor.into_boxed_slice());
+            m.insert(Key::new(hash), descriptor.into_boxed_slice());
         });
     }
 
-    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Box<[i8]>>) -> R) -> Option<R> {
+    fn read<R>(&self, f: impl FnOnce(&crate::resident::Map<Box<[i8]>>) -> R) -> Option<R> {
         self.0.read(f)
     }
 
-    fn write(&self, f: impl FnOnce(&mut HashMap<String, Box<[i8]>>)) {
+    fn write(&self, f: impl FnOnce(&mut crate::resident::Map<Box<[i8]>>)) {
         self.0.write(f);
     }
 
@@ -79,7 +79,7 @@ impl Index {
                 .query_map([VERSION], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
                 .filter_map(|row| {
                     let (hash, d) = row.ok()?;
-                    (d.len() == DIMS).then(|| (hash, d.into_iter().map(|b| b as i8).collect()))
+                    (d.len() == DIMS).then(|| (Key::from(hash), d.into_iter().map(|b| b as i8).collect()))
                 })
                 .collect();
             Ok(rows)
@@ -90,10 +90,11 @@ impl Index {
     /// Files that could be the same sound as `hash`'s, by their descriptors; their prints decide (see [`same_print`]).
     pub(crate) fn near(&self, hash: &str) -> Vec<String> {
         self.read(|m| {
-            let Some(target) = m.get(hash) else { return Vec::new() };
+            let key = Key::new(hash);
+            let Some(target) = m.get(&key) else { return Vec::new() };
             m.iter()
-                .filter(|(h, d)| h.as_str() != hash && similarity(target, d) >= NEAR_FLOOR)
-                .map(|(h, _)| h.clone())
+                .filter(|(h, d)| **h != key && similarity(target, d) >= NEAR_FLOOR)
+                .map(|(h, _)| h.to_string())
                 .collect()
         })
         .unwrap_or_default()
@@ -103,17 +104,20 @@ impl Index {
     pub(crate) fn close(&self, a: &str, b: &str) -> bool {
         a == b
             || self
-                .read(|m| m.get(a).zip(m.get(b)).is_some_and(|(x, y)| similarity(x, y) >= NEAR_FLOOR))
+                .read(|m| {
+                    m.get(&Key::new(a)).zip(m.get(&Key::new(b))).is_some_and(|(x, y)| similarity(x, y) >= NEAR_FLOOR)
+                })
                 .unwrap_or(false)
     }
 
     /// Files that sound like `hash`'s, best first.
     pub(crate) fn similar(&self, hash: &str) -> Vec<(String, f32)> {
         self.read(|m| {
-            let Some(target) = m.get(hash) else { return Vec::new() };
+            let key = Key::new(hash);
+            let Some(target) = m.get(&key) else { return Vec::new() };
             let hits = m
                 .iter()
-                .filter(|(h, _)| h.as_str() != hash)
+                .filter(|(h, _)| **h != key)
                 .map(|(h, d)| (h, similarity(target, d)))
                 .filter(|(_, s)| *s >= SIMILAR_FLOOR)
                 .collect();
@@ -176,7 +180,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     .await?;
     state.sounds.write(|m| {
         for h in &gone {
-            m.remove(h);
+            m.remove(&Key::new(h));
         }
     });
 
@@ -217,7 +221,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             state.sounds.write(|m| {
                 for (hash, heard) in computed {
                     if let Some(h) = heard {
-                        m.insert(hash, h.descriptor.into_boxed_slice());
+                        m.insert(hash.into(), h.descriptor.into_boxed_slice());
                     }
                 }
             });

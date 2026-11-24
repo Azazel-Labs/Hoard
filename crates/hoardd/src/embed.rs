@@ -13,7 +13,7 @@ use candle_core::{Device, Tensor};
 use rusqlite::params;
 use serde::Deserialize;
 
-use crate::resident::Resident;
+use crate::resident::{Key, Map, Resident};
 use crate::tools::{self, Slot, Status};
 use crate::{AppState, db};
 
@@ -308,18 +308,18 @@ impl Entry {
 }
 
 /// The `max` best scored, best first, with their keys copied: only those are fully sorted.
-pub(crate) fn best(mut hits: Vec<(&String, f32)>, max: usize) -> Vec<(String, f32)> {
-    let by_score = |a: &(&String, f32), b: &(&String, f32)| b.1.total_cmp(&a.1);
+pub(crate) fn best<K: std::fmt::Display>(mut hits: Vec<(&K, f32)>, max: usize) -> Vec<(String, f32)> {
+    let by_score = |a: &(&K, f32), b: &(&K, f32)| b.1.total_cmp(&a.1);
     if hits.len() > max && max > 0 {
         hits.select_nth_unstable_by(max - 1, by_score);
     }
     hits.truncate(max);
     hits.sort_by(by_score);
-    hits.into_iter().map(|(h, s)| (h.clone(), s)).collect()
+    hits.into_iter().map(|(h, s)| (h.to_string(), s)).collect()
 }
 
 /// How much a thumbnail is like another by meaning, about 0..=1, when it has an embedding: see [`Index::similar`].
-pub(crate) type Likeness<'a> = &'a dyn Fn(&str) -> Option<f32>;
+pub(crate) type Likeness<'a> = &'a dyn Fn(&Key) -> Option<f32>;
 
 /// Where an [`Index`]'s embeddings are kept and how its text matches are judged.
 #[derive(Debug)]
@@ -375,11 +375,11 @@ impl Index {
         }
     }
 
-    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
+    fn read<R>(&self, f: impl FnOnce(&Map<Entry>) -> R) -> Option<R> {
         self.map.read(f)
     }
 
-    pub(crate) fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
+    pub(crate) fn write(&self, f: impl FnOnce(&mut Map<Entry>)) {
         self.map.write(f);
     }
 
@@ -392,7 +392,7 @@ impl Index {
                 .filter_map(|row| {
                     let (hash, v) = row.ok()?;
                     (spec.dims == 0 || v.len() == spec.dims).then_some(())?;
-                    Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
+                    Some((Key::from(hash), Entry::new(v.into_iter().map(|b| b as i8).collect())?))
                 })
                 .collect();
             Ok(rows)
@@ -402,7 +402,7 @@ impl Index {
     }
 
     #[cfg(test)]
-    pub(crate) fn set(&self, m: HashMap<String, Entry>) {
+    pub(crate) fn set(&self, m: Map<Entry>) {
         self.map.set(m);
     }
 
@@ -421,7 +421,7 @@ impl Index {
     pub(crate) fn similar<R>(&self, hash: &str, f: impl FnOnce(Option<Likeness<'_>>) -> R) -> R {
         let spec = self.spec();
         self.map.with(|m| {
-            let Some((m, target)) = m.and_then(|m| Some((m, m.get(hash)?))) else { return f(None) };
+            let Some((m, target)) = m.and_then(|m| Some((m, m.get(&Key::new(hash))?))) else { return f(None) };
             let (unrelated, same) = if spec.unrelated.is_nan() {
                 // The typical picture's score against this one is what unrelated looks like.
                 let mut all: Vec<f32> = m.values().map(|e| target.cosine(e)).collect();
@@ -432,7 +432,7 @@ impl Index {
                 (spec.unrelated, spec.same)
             };
             let span = (same - unrelated).max(1e-6);
-            f(Some(&|h: &str| m.get(h).map(|e| ((target.cosine(e) - unrelated) / span).clamp(0.0, 1.0))))
+            f(Some(&|h: &Key| m.get(h).map(|e| ((target.cosine(e) - unrelated) / span).clamp(0.0, 1.0))))
         })
     }
 
@@ -440,7 +440,7 @@ impl Index {
     pub(crate) fn matching(&self, q: &[f32]) -> Vec<(String, f32)> {
         let spec = self.spec();
         self.read(|m| {
-            let scored: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, e.cosine_f32(q))).collect();
+            let scored: Vec<(&Key, f32)> = m.iter().map(|(h, e)| (h, e.cosine_f32(q))).collect();
             if scored.is_empty() {
                 return Vec::new();
             }

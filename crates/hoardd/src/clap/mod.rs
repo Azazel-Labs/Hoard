@@ -146,7 +146,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     let gone = TABLE.forget_orphans(state).await?;
     state.clap.write(|m| {
         for h in &gone {
-            m.remove(h);
+            m.remove(&crate::resident::Key::new(h));
         }
     });
 
@@ -201,7 +201,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             state.clap.write(|m| {
                 for (hash, v) in computed {
                     if let Some(e) = v.and_then(Entry::new) {
-                        m.insert(hash, e);
+                        m.insert(hash.into(), e);
                     }
                 }
             });

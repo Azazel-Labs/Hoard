@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "21e61ce3f2c23c35d7accde2d1d7bd7850f617d20f70a725acd004ec5f768531"
 
 [messages.about-blender]
@@ -5043,6 +5043,10 @@ translation = "请为{ $map }贴图指定后缀"
 source = "those assets not found"
 translation = "未找到这些资源"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "缩略图的尺寸只能是 128 或 256 像素"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "只有模型可以使用由浏览器绘制的缩略图"
@@ -9348,14 +9352,6 @@ translation = "正在查找商店页面"
 source = "Converting Unreal packages in { $pack }"
 translation = "正在转换 { $pack } 中的 Unreal 包"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "将缩略图转换为 AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "缩略图以 AVIF 发送时，立即转换所有缩略图，而不是在每张第一次显示时才转换。"
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "备份数据库"
@@ -9395,14 +9391,6 @@ translation = "检查文件是否损坏"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "读回每个存储的文件并与其指纹比对，以发现磁盘或 NAS 上已损坏或丢失的文件。资源库较大时需要一段时间。"
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "压缩缩略图"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "按照“设置 → 性能 → 缩略图”的要求重新存储以 PNG 保存的缩略图和模型视图，通常能让它们缩小好几倍。带透明度的图片和像素画仍保持 PNG。"
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10764,18 +10752,6 @@ translation = "主题"
 source = "Thumbnails"
 translation = "缩略图"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "正在转换…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "立即全部转换"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF 通常只有一半大小。每张缩略图在第一次显示时转换。"
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "均衡"
@@ -10783,18 +10759,6 @@ translation = "均衡"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "在缩略图尺寸下很难与原图区分。"
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "格式"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "无损"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG，与生成时完全一致。大好几倍。从不以 AVIF 发送。"
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10812,6 +10776,14 @@ translation = "更清晰"
 source = "About twice the size of Balanced."
 translation = "大小约为“均衡”的两倍。"
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "尺寸"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "更小"
@@ -10821,8 +10793,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "在网格中没问题；近看稍有模糊。"
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "适用于新的缩略图和模型视图。透明图片和像素画保持 PNG。“维护”中的“压缩缩略图”会重新生成已有的缩略图。"
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "以 WebP 保存，有损压缩或无损，取较小者。原图本身更小的小图片直接用作自己的缩略图。更改此处会在后台重新生成已有的缩略图。"
 
 [messages.settings-title]
 source = "Settings"

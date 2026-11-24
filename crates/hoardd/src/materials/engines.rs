@@ -9,8 +9,9 @@ use rusqlite::Connection;
 use tokio::runtime::Handle;
 
 use super::names::{Found, Role, dir_of, material_name, resolution_label, stem_of, words};
-use super::{THUMB_SIZE, Texture, replace_thumb, sphere};
+use super::{Texture, replace_thumb, sphere};
 use crate::AppState;
+use crate::analyze::thumb_size;
 
 /// The pack's Unity materials (`.mat`), each with the textures it points at through their `.meta` GUIDs and the
 /// look it gives them. A file that isn't a material Hoard can read is left as it is.
@@ -166,20 +167,21 @@ pub(super) fn draw_mtls(
             2..=4 => 2,
             _ => 3,
         };
-        let cell = THUMB_SIZE / cols;
+        let size = thumb_size();
+        let cell = size / cols;
         let rows = found.len().div_ceil(cols as usize) as u32;
-        let mut sheet = image::RgbaImage::new(THUMB_SIZE, THUMB_SIZE);
-        let top = (THUMB_SIZE - rows * cell) / 2;
+        let mut sheet = image::RgbaImage::new(size, size);
+        let top = (size - rows * cell) / 2;
         for (n, f) in found.iter().enumerate() {
             let Some(img) = sphere(state, rt, textures, f, cell)? else { continue };
             let (c, r) = (n as u32 % cols, n as u32 / cols);
             // A last row that's short is centered.
             let in_row = if r + 1 == rows { found.len() as u32 - r * cols } else { cols };
-            let left = (THUMB_SIZE - in_row * cell) / 2;
+            let left = (size - in_row * cell) / 2;
             image::imageops::overlay(&mut sheet, &img, i64::from(left + c * cell), i64::from(top + r * cell));
         }
-        let png = crate::analyze::png_bytes(sheet)?;
-        if let Err(e) = replace_thumb(state, rt, conn, &id, png, "meta") {
+        let thumb = crate::analyze::thumb_bytes(&sheet, false)?;
+        if let Err(e) = replace_thumb(state, rt, conn, &id, thumb, "meta") {
             tracing::debug!(file = %path, error = %format!("{e:#}"), "could not draw an MTL file");
         }
     }

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "e676057a8e6d1274af6db0bcb14c60e9c460adffeab81096dfa5b2171c9e5735"
 
 [messages.about-blender]
@@ -5196,6 +5196,10 @@ translation = "Δώστε επίθημα στους χάρτες { $map }"
 source = "those assets not found"
 translation = "αυτά τα στοιχεία δεν βρέθηκαν"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "οι μικρογραφίες έχουν πλάτος 128 ή 256 pixel"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "μόνο τα μοντέλα δέχονται μικρογραφία σχεδιασμένη από πρόγραμμα περιήγησης"
@@ -9631,14 +9635,6 @@ translation = "Αναζήτηση σελίδας καταστήματος"
 source = "Converting Unreal packages in { $pack }"
 translation = "Μετατροπή πακέτων Unreal: { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Μετατροπή μικρογραφιών σε AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Μετατρέπει τώρα όλες τις μικρογραφίες, αντί για την καθεμία όταν πρωτοεμφανίζεται, όταν οι μικρογραφίες στέλνονται ως AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Αντίγραφο ασφαλείας της βάσης δεδομένων"
@@ -9678,14 +9674,6 @@ translation = "Έλεγχος αρχείων για φθορές"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Διαβάζει ξανά κάθε αποθηκευμένο αρχείο και το ελέγχει με το αποτύπωμά του, για να εντοπίσει αρχεία που φθάρηκαν ή χάθηκαν από έναν δίσκο ή NAS. Διαρκεί αρκετά σε μεγάλη βιβλιοθήκη."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Σμίκρυνση μικρογραφιών"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Αποθηκεύει τις μικρογραφίες και τις όψεις μοντέλων που φυλάσσονται ως PNG όπως ορίζουν οι Ρυθμίσεις → Επιδόσεις → Μικρογραφίες, κάτι που συνήθως τις κάνει αρκετές φορές μικρότερες. Όσες έχουν διαφάνεια και η pixel art μένουν PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11065,18 +11053,6 @@ translation = "Θέματα"
 source = "Thumbnails"
 translation = "Μικρογραφίες"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Μετατροπή…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Μετατροπή όλων τώρα"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "Το AVIF είναι συχνά το μισό σε μέγεθος. Κάθε μικρογραφία μετατρέπεται την πρώτη φορά που εμφανίζεται."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Ισορροπημένες"
@@ -11084,18 +11060,6 @@ translation = "Ισορροπημένες"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Δύσκολα ξεχωρίζουν από το πρωτότυπο σε μέγεθος μικρογραφίας."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Μορφή"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Χωρίς απώλειες"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, ακριβώς όπως δημιουργήθηκαν. Αρκετές φορές μεγαλύτερες. Δεν στέλνονται ποτέ ως AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11113,6 +11077,14 @@ translation = "Πιο ευκρινείς"
 source = "About twice the size of Balanced."
 translation = "Περίπου διπλάσιο μέγεθος από τις Ισορροπημένες."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Μέγεθος"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Μικρότερες"
@@ -11122,8 +11094,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Καλές στο πλέγμα· λίγο θολές από κοντά."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Για νέες μικρογραφίες και όψεις μοντέλων. Όσες έχουν διαφάνεια και το pixel art μένουν PNG. Η «Σμίκρυνση μικρογραφιών» στη Συντήρηση ξαναφτιάχνει όσες έχετε."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Αποθηκεύονται ως WebP, συμπιεσμένες ή ακριβείς, όποιο βγαίνει μικρότερο. Μια μικρή εικόνα που είναι ήδη μικρότερη όπως είναι γίνεται η ίδια η μικρογραφία της. Μια αλλαγή εδώ ξαναφτιάχνει όσες μικρογραφίες έχετε, στο παρασκήνιο."
 
 [messages.settings-title]
 source = "Settings"

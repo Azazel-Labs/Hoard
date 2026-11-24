@@ -28,6 +28,20 @@ pub(crate) fn lower_priority() {
     }
 }
 
+/// Lower the calling thread's CPU priority as far as it goes, for work that can wait for an idle core.
+fn lowest_priority() {
+    #[cfg(target_os = "linux")]
+    {
+        let tid = rustix::thread::gettid();
+        rustix::process::setpriority_process(Some(tid), 19).ok();
+    }
+    #[cfg(windows)]
+    {
+        use thread_priority::{ThreadPriority, WinAPIThreadPriority, set_current_thread_priority};
+        set_current_thread_priority(ThreadPriority::Os(WinAPIThreadPriority::Lowest.into())).ok();
+    }
+}
+
 /// Windows' `BELOW_NORMAL_PRIORITY_CLASS`, for programs started from heavy work.
 #[cfg(windows)]
 const BELOW_NORMAL_PRIORITY_CLASS: u32 = 0x0000_4000;
@@ -48,6 +62,19 @@ where
         Ok(Err(_)) => bail!("{name} work panicked"),
         Err(_) => bail!("{name} thread ended without a result"),
     }
+}
+
+/// Run `f` like [`run`], below heavy work too, so it gets only the cores nothing else wants.
+pub(crate) async fn run_idle<T, F>(name: &str, f: F) -> Result<T>
+where
+    T: Send + 'static,
+    F: FnOnce() -> T + Send + 'static,
+{
+    run(name, move || {
+        lowest_priority();
+        f()
+    })
+    .await
 }
 
 /// Start `f` on a new low-priority thread without waiting for it.

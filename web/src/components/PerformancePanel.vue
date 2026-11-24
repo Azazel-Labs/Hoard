@@ -9,7 +9,6 @@ import { formatMiB } from '../sizes'
 import ProfilerPanel from './ProfilerPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
-import { showError } from '../ui'
 import { onOff, useSettings } from './settingsContext'
 
 const props = defineProps<{ stats: Stats | null }>()
@@ -27,44 +26,18 @@ const gpuNote = computed(() => {
 /** The frame rates moving thumbnails can be made at (the server's `MOTION_FPS`). */
 const MOTION_FPS = [12, 24, 30]
 
-// Labels and hints are getters, so they're in the language of the moment. `jpeg` and `avif` are the qualities
-// thumbnails are stored and sent at (`ThumbQuality` in crates/hoardd/src/settings.rs); Lossless is PNG, sent as it is.
-const THUMBS: { value: ThumbQuality; jpeg?: number; avif?: number; readonly label: string; readonly hint: string }[] = [
-  { value: 'small', jpeg: 70, avif: 55, get label() { return t('settings-thumbs-small') }, get hint() { return t('settings-thumbs-small-hint') } },
-  { value: 'balanced', jpeg: 82, avif: 68, get label() { return t('settings-thumbs-balanced') }, get hint() { return t('settings-thumbs-balanced-hint') } },
-  { value: 'sharp', jpeg: 92, avif: 80, get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
-  { value: 'lossless', get label() { return t('settings-thumbs-lossless') }, get hint() { return t('settings-thumbs-lossless-hint') } },
+// Labels and hints are getters, so they're in the language of the moment. `webp` is the lossy quality thumbnails are
+// made at (`ThumbQuality::webp_quality` in crates/hoardd/src/settings.rs); one is exact instead where that's smaller.
+const THUMBS: { value: ThumbQuality; webp: number; readonly label: string; readonly hint: string }[] = [
+  { value: 'small', webp: 60, get label() { return t('settings-thumbs-small') }, get hint() { return t('settings-thumbs-small-hint') } },
+  { value: 'balanced', webp: 75, get label() { return t('settings-thumbs-balanced') }, get hint() { return t('settings-thumbs-balanced-hint') } },
+  { value: 'sharp', webp: 88, get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
 ]
-/** The quality browsers get with a choice, in the format picked above them. Nothing for Lossless, whose hint says. */
-function qualityOf(q: (typeof THUMBS)[number]): string {
-  const quality = s.value?.options.thumb_avif.value ? q.avif : q.jpeg
-  return quality === undefined ? '' : t('settings-thumbs-quality', { quality })
-}
-// Converting every thumbnail to AVIF now rather than as each is shown: a Maintenance task, followed while it runs.
-const converting = ref(false)
-let convertTimer: ReturnType<typeof setTimeout> | undefined
-async function followConvert() {
-  clearTimeout(convertTimer)
-  try {
-    converting.value = !!(await api.maintenance()).tasks.find((t) => t.id === 'avif_thumbs')?.running
-  } catch {
-    converting.value = false
-  }
-  if (converting.value) convertTimer = setTimeout(followConvert, 3000)
-}
-async function convertAll() {
-  try {
-    await api.runMaintenance('avif_thumbs')
-  } catch (e) {
-    showError((e as Error).message)
-  }
-  await followConvert()
-}
-onMounted(followConvert)
-onUnmounted(() => clearTimeout(convertTimer))
+/** How many pixels across thumbnails can be made (the server's `THUMB_SIZES`). */
+const THUMB_SIZES = [128, 256]
 // How much the server keeps around for previews and conversions, fetched when the Performance page opens. The server
 // answers with the sizes it last worked out and works out new ones behind that when the library has changed (after
-// Shrink thumbnails, say), so it's asked again until they're current. Only a few times: a busy library is never quite.
+// thumbnails are made again, say), so it's asked again until they're current. Only a few times: a busy library is never quite.
 const usage = ref<Stats | null>(null)
 let usageTimer: ReturnType<typeof setTimeout> | undefined
 async function loadUsage(again = 6) {
@@ -120,19 +93,24 @@ watch(
       <span v-if="usage?.preview_bytes !== undefined" class="size">{{ t('settings-previews-size', { size: humanBytes(usage.preview_bytes) }) }}</span>
     </p>
     <div class="opt-row format">
-      <span id="thumbs-format">{{ t('settings-thumbs-format') }}</span>
-      <div class="modes" role="radiogroup" aria-labelledby="thumbs-format">
-        <label v-for="f in ['JPEG', 'AVIF']" :key="f">
+      <span id="thumbs-size">{{ t('settings-thumbs-size') }}</span>
+      <div class="modes" role="radiogroup" aria-labelledby="thumbs-size">
+        <label v-for="px in THUMB_SIZES" :key="px">
           <input
             type="radio"
-            name="thumbs-format"
-            :checked="s.options.thumb_avif.value === (f === 'AVIF')"
+            name="thumbs-size"
+            :checked="s.options.thumb_size.value === px"
             :disabled="busy"
-            @change="save({ thumb_avif: f === 'AVIF' })"
-          />{{ f }}
+            @change="save({ thumb_size: px })"
+          />{{ t('settings-thumbs-size-option', { px }) }}
         </label>
       </div>
-      <ResetButton v-if="changed('thumb_avif')" :to="s.options.thumb_avif.default ? 'AVIF' : 'JPEG'" :disabled="busy" @reset="resetOpt('thumb_avif')" />
+      <ResetButton
+        v-if="changed('thumb_size')"
+        :to="t('settings-thumbs-size-option', { px: s.options.thumb_size.default })"
+        :disabled="busy"
+        @reset="resetOpt('thumb_size')"
+      />
     </div>
     <div class="choices" role="radiogroup" :aria-label="t('settings-thumbs')">
       <label v-for="q in THUMBS" :key="q.value" :class="{ on: s.options.thumb_quality.value === q.value }">
@@ -143,14 +121,8 @@ watch(
           :disabled="busy"
           @change="save({ thumb_quality: q.value }, t('settings-thumbs-saved', { quality: q.label }))"
         />
-        <span><strong>{{ q.label }}</strong><small>{{ qualityOf(q) }} {{ q.hint }}</small></span>
+        <span><strong>{{ q.label }}</strong><small>{{ t('settings-thumbs-quality', { quality: q.webp }) }} {{ q.hint }}</small></span>
       </label>
-    </div>
-    <div class="avif">
-      <p class="what">{{ t('settings-thumbs-avif-what') }}</p>
-      <button v-if="s.options.thumb_avif.value" class="btn" :disabled="busy || converting" @click="convertAll">
-        {{ converting ? t('settings-thumbs-avif-converting') : t('settings-thumbs-avif-now') }}
-      </button>
     </div>
     <div class="switches motion">
       <div class="opt-row">
@@ -241,9 +213,6 @@ watch(
 <style scoped>
 .switches.motion { margin: 0.9rem 0 0.2rem; }
 .format { margin-bottom: 0.5rem; font-size: var(--step--1); color: var(--muted); }
-.avif { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.6rem; }
-.avif .what { margin: 0; }
-.avif .btn { flex: none; }
 /* How much space previews take, set apart from the text so it catches the eye. */
 .size {
   display: inline-block; margin-left: 0.3em; padding: 0.05em 0.45em;

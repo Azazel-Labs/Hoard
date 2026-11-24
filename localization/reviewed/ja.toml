@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "c45f16e50723b3fd14f553efefd0930e50529e74b4909a7b36954960d281a53a"
 
 [messages.about-blender]
@@ -5046,6 +5046,10 @@ translation = "{ $map } マップにサフィックスを指定してくださ�
 source = "those assets not found"
 translation = "それらのアセットが見つかりません"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "サムネイルのサイズは 128 または 256 ピクセルです"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "ブラウザーで描いたサムネイルを使えるのはモデルだけです"
@@ -9348,14 +9352,6 @@ translation = "ストアページを検索中"
 source = "Converting Unreal packages in { $pack }"
 translation = "{ $pack } の Unreal パッケージを変換中"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "サムネイルを AVIF に変換"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "サムネイルを AVIF で送る設定のとき、初めて表示されるのを待たずに、すべてのサムネイルを今すぐ変換します。"
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "データベースをバックアップ"
@@ -9395,14 +9391,6 @@ translation = "ファイルの破損を確認"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "保存したファイルをすべて読み戻してフィンガープリントと照合し、ディスクや NAS で劣化したり消えたりしたファイルを見つけます。大きなライブラリでは時間がかかります。"
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "サムネイルを縮小"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "PNG で保存しているサムネイルとモデルビューを 設定 → パフォーマンス → サムネイル の指定どおりに保存し直します。通常は数分の 1 の大きさになります。透明部分があるものとピクセルアートは PNG のままです。"
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10764,18 +10752,6 @@ translation = "テーマ"
 source = "Thumbnails"
 translation = "サムネイル"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "変換中…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "今すぐすべて変換"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF はたいてい半分ほどのサイズです。各サムネイルは初めて表示されたときに変換されます。"
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "バランス"
@@ -10783,18 +10759,6 @@ translation = "バランス"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "サムネイルのサイズでは元の画像と見分けにくい品質です。"
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "形式"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "ロスレス"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG、作成したそのまま。数倍大きくなります。AVIF では送られません。"
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10812,6 +10776,14 @@ translation = "鮮明"
 source = "About twice the size of Balanced."
 translation = "「バランス」の約 2 倍のサイズです。"
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "サイズ"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "小さめ"
@@ -10821,8 +10793,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "グリッドでは十分ですが、近くで見ると少しぼやけます。"
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "新しいサムネイルとモデルビューに適用されます。透明部分があるものとピクセルアートは PNG のままです。既存のものはメンテナンスの「サムネイルを縮小」で作り直せます。"
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "WebP で保存され、圧縮と無劣化のうち小さい方が使われます。元のままの方が小さい小さな画像は、それ自体がサムネイルになります。ここを変更すると、既存のサムネイルはバックグラウンドで作り直されます。"
 
 [messages.settings-title]
 source = "Settings"

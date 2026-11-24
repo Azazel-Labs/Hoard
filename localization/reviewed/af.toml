@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "b8d526b7f0334ee54c3d9f2554389b1295759d70c2e35933035ec57b2646d846"
 
 [messages.about-blender]
@@ -5184,6 +5184,10 @@ translation = "Gee kaarte vir { $map } 'n agtervoegsel"
 source = "those assets not found"
 translation = "daardie bates nie gevind nie"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "duimnaels is 128 of 256 pixels breed"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "net modelle neem 'n duimnael aan wat deur 'n blaaier geteken is"
@@ -9568,14 +9572,6 @@ translation = "Soek 'n winkelbladsy op"
 source = "Converting Unreal packages in { $pack }"
 translation = "Skakel Unreal-pakkette in { $pack } om"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Skakel duimnaels om na AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Skakel elke duimnael nou om, eerder as elkeen wanneer dit die eerste keer gewys word, as duimnaels as AVIF gestuur word."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Rugsteun die databasis"
@@ -9615,14 +9611,6 @@ translation = "Gaan lêers na vir skade"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Lees elke gestoorde lêer terug en vergelyk dit met sy vingerafdruk, om lêers te vang wat verrot het of van 'n skyf of NAS verdwyn het. Neem 'n ruk op 'n groot biblioteek."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Verklein duimnaels"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Stoor die duimnaels en modelaansigte wat as PNG gehou word soos Instellings → Werkverrigting → Duimnaels vra, wat hulle gewoonlik etlike kere kleiner maak. Dié met deursigtigheid, en pixelkuns, bly PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11000,18 +10988,6 @@ translation = "Temas"
 source = "Thumbnails"
 translation = "Duimnaels"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Skakel om…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Skakel nou almal om"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF is dikwels die helfte van die grootte. Elke duimnael word omgeskakel die eerste keer dat dit gewys word."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Gebalanseer"
@@ -11019,18 +10995,6 @@ translation = "Gebalanseer"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Moeilik om van die oorspronklike te onderskei op duimnaelgrootte."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Formaat"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Verliesloos"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, presies soos gemaak. Etlike kere groter. Word nooit as AVIF gestuur nie."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11048,6 +11012,14 @@ translation = "Skerper"
 source = "About twice the size of Balanced."
 translation = "Omtrent twee keer so groot as Gebalanseer."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Grootte"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Kleiner"
@@ -11057,8 +11029,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Goed in die rooster; effens sag van naby."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Vir nuwe duimnaels en modelaansigte. Deursigtige en pixelkuns bly PNG. Verklein duimnaels in Instandhouding doen dié wat jy het oor."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Gestoor as WebP, saamgepers of presies, wat ook al kleiner is. 'n Klein prent wat soos dit is kleiner is, bly sy eie duimnael. 'n Verandering hier maak die duimnaels wat jy het in die agtergrond oor."
 
 [messages.settings-title]
 source = "Settings"

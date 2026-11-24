@@ -9,7 +9,7 @@ use hoard_core::AssetKind;
 use serde_json::{Map, Value, json};
 
 use super::images::analyze_pixels;
-use super::{Analysis, THUMB_SIZE, analyze, thumb_bytes};
+use super::{Analysis, analyze, thumb_bytes, thumb_size};
 use crate::sources;
 use hoard_unreal as unreal;
 
@@ -56,7 +56,7 @@ pub(super) fn analyze_blend(path: &Path, a: &mut Analysis) -> anyhow::Result<()>
         a.meta.insert("compression".into(), json!(c));
     }
     match info.thumbnail {
-        Some(t) => a.thumb = Some(thumb_bytes(t, false)?),
+        Some(t) => a.thumb = Some(thumb_bytes(&t, false)?),
         None => {
             a.meta.insert("note".into(), json!("saved without a preview"));
         }
@@ -192,8 +192,8 @@ pub(super) fn analyze_unreal(path: &Path, ext: &str, a: &mut Analysis) -> anyhow
     a.kind = Some(unreal::kind_of(&class));
 
     if let Some(img) = pkg.thumbnail_image() {
-        let img = img.thumbnail(THUMB_SIZE, THUMB_SIZE).to_rgba8();
-        a.thumb = thumb_bytes(img, false).ok();
+        let img = img.thumbnail(thumb_size(), thumb_size()).to_rgba8();
+        a.thumb = thumb_bytes(&img, false).ok();
     }
 
     // The original file, if the package kept it.

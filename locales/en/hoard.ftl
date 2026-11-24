@@ -289,6 +289,7 @@ error-workers = Background workers: between 1 and { $max }
 error-ai-batch = Assets per AI request: between 1 and 200
 error-conversion-cache = Converted downloads: at least 100 MB
 error-motion-fps = moving thumbnails play at 12, 24 or 30 frames a second
+error-thumb-size = thumbnails are 128 or 256 pixels across
 error-backup-keep = Scheduled backups: keep 1 to { $max }
 error-backup-copy-to = Scheduled backups: { $path } isn’t a folder on the server (give its full path)
 error-conversion-keep-days = Conversion rules: keep originals for 1 to { $max } days
@@ -481,10 +482,6 @@ server-maintenance-reanalyze = Re-analyze every pack
 server-maintenance-reanalyze-blurb = Reads every file again with this version of Hoard: thumbnails, previews, details and rule tags are made afresh. Your own edits stay; the AI isn't asked again.
 server-maintenance-clear-cache = Clear cached conversions
 server-maintenance-clear-cache-blurb = Drops the files kept from “Download as” conversions (they're made again when next asked for) and what interrupted work left behind.
-server-maintenance-shrink-thumbs = Shrink thumbnails
-server-maintenance-shrink-thumbs-blurb = Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG.
-server-maintenance-avif-thumbs = Convert thumbnails to AVIF
-server-maintenance-avif-thumbs-blurb = Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF.
 server-maintenance-gc = Delete unused files
 server-maintenance-gc-blurb = Deletes stored files nothing points at any more, such as the files of packs deleted for good.
 # What came of calling the update address (Settings → Updates).
@@ -3519,15 +3516,17 @@ settings-gpu-on = On the GPU: { $renderer }
 settings-gpu-software = No GPU found, so in software ({ $renderer })
 settings-gpu-none = No GPU or software renderer found, so models get no thumbnails
 settings-thumbs = Thumbnails
-# “Shrink thumbnails” is a task in Maintenance.
-settings-thumbs-what = For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have.
+# Under Thumbnails in Settings → Performance, above the choices of size and quality.
+settings-thumbs-what = Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background.
 # Shown in a chip after the text above. $size is a size like 1.2 GB, how much space previews take now.
 settings-previews-size = Previews: { $size }
 # The note after choosing: $quality is the choice.
 settings-thumbs-saved = Thumbnails: { $quality }
-# Above the choices: thumbnails go to browsers as JPEG or AVIF.
-settings-thumbs-format = Format
-# What browsers get with a choice, before its hint: $quality is a number like 82.
+# Above the choices of how many pixels across thumbnails are made.
+settings-thumbs-size = Size
+# A choice of size: $px is how many pixels across, 128 or 256.
+settings-thumbs-size-option = { $px } px
+# The quality each choice makes thumbnails at, before its hint: $quality is a number like 75.
 settings-thumbs-quality = Quality { $quality }.
 settings-thumbs-small = Smaller
 settings-thumbs-small-hint = Fine in the grid; a little soft up close.
@@ -3535,12 +3534,6 @@ settings-thumbs-balanced = Balanced
 settings-thumbs-balanced-hint = Hard to tell from the original at thumbnail size.
 settings-thumbs-sharp = Sharper
 settings-thumbs-sharp-hint = About twice the size of Balanced.
-settings-thumbs-lossless = Lossless
-settings-thumbs-lossless-hint = PNG, exactly as made. Several times larger, and never sent as AVIF.
-settings-thumbs-avif-what = AVIF is often half the size. Each thumbnail is converted the first time it’s shown.
-# The button under it, shown with AVIF picked; it says Converting… while it runs.
-settings-thumbs-avif-now = Convert all now
-settings-thumbs-avif-converting = Converting…
 settings-motion-thumbs = Moving thumbnails for animations
 settings-motion-thumbs-what = Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them.
 settings-motion-fps = Frame rate

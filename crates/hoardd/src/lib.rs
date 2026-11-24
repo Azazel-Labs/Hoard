@@ -106,6 +106,7 @@ mod tagger;
 mod takes;
 mod text_thumbs;
 mod textures;
+mod thumbs;
 mod tools;
 mod unitymat;
 mod unreal_editor;
@@ -231,7 +232,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     db::settle_packs(&*pool.get()?, None, None)?;
     maintenance::mark_interrupted(&*pool.get()?)?;
     analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
-    analyze::set_thumb_quality(effective.thumb_quality);
+    analyze::set_thumbs(effective.thumb_quality, effective.thumb_size);
     music::configure(effective.soundfont.clone());
     let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
 
@@ -277,6 +278,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
     motion::kick(&state);
+    thumbs::kick(&state);
     let st = Arc::clone(&state);
     tokio::spawn(async move { takes::backfill(&st).await });
     tokio::spawn(unreal_recolour::run(Arc::clone(&state)));

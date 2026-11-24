@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "11d229763b4a84ba31dae7eeb011e2a016a7b2f5def79dfbf8e02a39a7da5729"
 
 [messages.about-blender]
@@ -5040,6 +5040,10 @@ translation = "Hãy đặt hậu tố cho map { $map }"
 source = "those assets not found"
 translation = "không tìm thấy các tài nguyên đó"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "ảnh thu nhỏ rộng 128 hoặc 256 điểm ảnh"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "chỉ mô hình mới nhận ảnh thu nhỏ do trình duyệt vẽ"
@@ -9334,14 +9338,6 @@ translation = "Đang tra cứu trang cửa hàng"
 source = "Converting Unreal packages in { $pack }"
 translation = "Đang chuyển đổi các package Unreal trong { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Chuyển ảnh thu nhỏ sang AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Chuyển đổi mọi ảnh thu nhỏ ngay bây giờ thay vì từng ảnh vào lần đầu hiển thị, khi ảnh thu nhỏ được gửi dưới dạng AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Sao lưu cơ sở dữ liệu"
@@ -9381,14 +9377,6 @@ translation = "Kiểm tra tệp hư hỏng"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Đọc lại mọi tệp đã lưu và so với dấu vân tay của nó, để phát hiện tệp bị hỏng dần hoặc biến mất khỏi ổ đĩa hay NAS. Mất khá lâu với thư viện lớn."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Thu nhỏ ảnh thu nhỏ"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Lưu các ảnh thu nhỏ và ảnh xem mô hình đang ở dạng PNG theo cách Cài đặt → Hiệu năng → Ảnh thu nhỏ yêu cầu, thường giúp chúng nhỏ đi vài lần. Ảnh có độ trong suốt và ảnh pixel art vẫn giữ PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10750,18 +10738,6 @@ translation = "Chủ đề"
 source = "Thumbnails"
 translation = "Ảnh thu nhỏ"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Đang chuyển đổi…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Chuyển đổi tất cả ngay"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF thường chỉ bằng một nửa kích thước. Mỗi ảnh thu nhỏ được chuyển đổi vào lần đầu hiển thị."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Cân bằng"
@@ -10769,18 +10745,6 @@ translation = "Cân bằng"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Khó phân biệt với bản gốc ở kích thước ảnh thu nhỏ."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Định dạng"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Không mất dữ liệu"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, đúng như khi tạo. Lớn hơn vài lần. Không bao giờ được gửi dưới dạng AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10798,6 +10762,14 @@ translation = "Sắc nét hơn"
 source = "About twice the size of Balanced."
 translation = "Lớn khoảng gấp đôi Cân bằng."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Kích thước"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Nhỏ hơn"
@@ -10807,8 +10779,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Ổn trong lưới; hơi mờ khi xem gần."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Cho ảnh thu nhỏ và ảnh xem mô hình mới. Ảnh trong suốt và pixel art vẫn là PNG. Thu nhỏ ảnh thu nhỏ trong Bảo trì sẽ làm lại những ảnh bạn đã có."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Lưu dưới dạng WebP, nén hoặc giữ nguyên, tùy cái nào nhỏ hơn. Ảnh nhỏ mà bản gốc đã nhỏ hơn sẽ tự làm ảnh thu nhỏ của chính nó. Thay đổi ở đây sẽ làm lại các ảnh thu nhỏ bạn đã có ở chế độ nền."
 
 [messages.settings-title]
 source = "Settings"

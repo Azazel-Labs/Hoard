@@ -20,39 +20,27 @@ pub(crate) const MAX_WORKERS: usize = 16;
 /// How much space converted downloads (a texture as PNG, a model as FBX) may take before the least recently used go.
 pub(crate) const DEFAULT_CONVERSION_CACHE_MB: u64 = 10 << 10;
 
-/// How thumbnails and model views are stored. Pictures with transparency, and pixel art, are always PNG.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// How sharp thumbnails and model views are kept. Each is stored in whatever is smallest at that (see
+/// [`crate::analyze::thumb_bytes`]), so there's no format to choose.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum ThumbQuality {
-    /// JPEG at 70: about a fifth of a PNG.
     Small,
-    /// JPEG at 82.
     #[default]
     Balanced,
-    /// JPEG at 92.
+    /// Also what was Lossless, before there was no choosing PNG.
+    #[serde(alias = "lossless")]
     Sharp,
-    /// PNG.
-    Lossless,
 }
 
 impl ThumbQuality {
-    pub(crate) fn jpeg_quality(self) -> Option<u8> {
+    /// The WebP quality pictures that aren't kept exactly are made at, and what a thumbnail records it was made at
+    /// (`assets.thumb_q`): one made at a higher number can be made again at a lower one from itself.
+    pub(crate) fn webp_quality(self) -> u8 {
         match self {
-            Self::Small => Some(70),
-            Self::Balanced => Some(82),
-            Self::Sharp => Some(92),
-            Self::Lossless => None,
-        }
-    }
-
-    /// The AVIF quality thumbnails are sent at when Settings asks for AVIF (about as sharp as the JPEG, and smaller);
-    /// none for Lossless, which keeps them exact.
-    pub(crate) fn avif_quality(self) -> Option<u8> {
-        match self {
-            Self::Small => Some(55),
-            Self::Balanced => Some(68),
-            Self::Sharp => Some(80),
-            Self::Lossless => None,
+            Self::Small => 60,
+            Self::Balanced => 75,
+            Self::Sharp => 88,
         }
     }
 }
@@ -84,6 +72,9 @@ pub(crate) const DEFAULT_BACKUP_KEEP: u32 = 7;
 /// The frame rates motion thumbnails can play at: smoother takes longer to draw and more room.
 pub(crate) const MOTION_FPS: [u32; 3] = [12, 24, 30];
 pub(crate) const DEFAULT_MOTION_FPS: u32 = 12;
+/// The sizes thumbnails can be made at, in pixels across: smaller ones take a quarter of the room.
+pub(crate) const THUMB_SIZES: [u32; 2] = [128, 256];
+pub(crate) const DEFAULT_THUMB_SIZE: u32 = 256;
 /// Most scheduled backups Settings can ask to keep.
 pub(crate) const MAX_BACKUP_KEEP: u32 = 365;
 
@@ -163,8 +154,11 @@ pub(crate) struct Saved {
     pub(crate) guest_browsing: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) thumb_quality: Option<ThumbQuality>,
-    /// Send browsers that read AVIF their thumbnails as AVIF, made from the stored ones and kept with the conversions.
+    /// How many pixels across thumbnails are made: one of [`THUMB_SIZES`].
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) thumb_size: Option<u32>,
+    /// Once whether browsers that read AVIF were sent their thumbnails as AVIF; read from older settings and dropped.
+    #[serde(default, skip_serializing)]
     pub(crate) thumb_avif: Option<bool>,
     /// Search the stores for new packs' pages in the background, attaching the ones that are certain.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -282,7 +276,7 @@ pub(crate) struct Effective {
     pub(crate) motion_thumbs: bool,
     pub(crate) motion_fps: u32,
     pub(crate) thumb_quality: ThumbQuality,
-    pub(crate) thumb_avif: bool,
+    pub(crate) thumb_size: u32,
     pub(crate) conversion_cache_mb: u64,
     pub(crate) backup_every: BackupEvery,
     pub(crate) backup_keep: u32,
@@ -388,7 +382,7 @@ impl Saved {
             motion_thumbs: self.motion_thumbs.unwrap_or(false),
             motion_fps: self.motion_fps.filter(|f| MOTION_FPS.contains(f)).unwrap_or(DEFAULT_MOTION_FPS),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
-            thumb_avif: self.thumb_avif.unwrap_or(false),
+            thumb_size: self.thumb_size.filter(|n| THUMB_SIZES.contains(n)).unwrap_or(DEFAULT_THUMB_SIZE),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
             backup_every: self.backup_every.unwrap_or_default(),
             backup_keep: self.backup_keep.unwrap_or(DEFAULT_BACKUP_KEEP).clamp(1, MAX_BACKUP_KEEP),
@@ -477,6 +471,9 @@ impl Saved {
         }
         if self.motion_fps.is_some_and(|f| !MOTION_FPS.contains(&f)) {
             return Err(tr!("error-motion-fps"));
+        }
+        if self.thumb_size.is_some_and(|n| !THUMB_SIZES.contains(&n)) {
+            return Err(tr!("error-thumb-size"));
         }
         if self.backup_keep.is_some_and(|n| !(1..=MAX_BACKUP_KEEP).contains(&n)) {
             return Err(tr!("error-backup-keep", max = MAX_BACKUP_KEEP));

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "e8ee2dcc96db32b01941d978ee3885f9157e961a16eb84a06dd90d6ec7e81db1"
 
 [messages.about-blender]
@@ -5184,6 +5184,10 @@ translation = "Ge kartor av typen { $map } ett suffix"
 source = "those assets not found"
 translation = "de resurserna hittades inte"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "miniatyrbilder är 128 eller 256 pixlar breda"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "bara modeller kan få en miniatyrbild som ritas av en webbläsare"
@@ -9575,14 +9579,6 @@ translation = "Slår upp en butikssida"
 source = "Converting Unreal packages in { $pack }"
 translation = "Konverterar Unreal-paketfiler i { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Konvertera miniatyrbilder till AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Konverterar alla miniatyrbilder nu i stället för var och en första gången den visas, när miniatyrbilder skickas som AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Säkerhetskopiera databasen"
@@ -9622,14 +9618,6 @@ translation = "Kontrollera filer efter skador"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Läser tillbaka varje lagrad fil och jämför den med dess fingeravtryck, för att hitta filer som har förstörts eller försvunnit från en disk eller NAS. Tar en stund med ett stort bibliotek."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Krymp miniatyrbilder"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Lagrar miniatyrbilderna och modellvyerna som sparats som PNG på det sätt som Inställningar → Prestanda → Miniatyrbilder anger, vilket oftast gör dem flera gånger mindre. De med genomskinlighet, och pixelgrafik, förblir PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11009,18 +10997,6 @@ translation = "Teman"
 source = "Thumbnails"
 translation = "Miniatyrbilder"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Konverterar…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Konvertera alla nu"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF är ofta hälften så stort. Varje miniatyrbild konverteras första gången den visas."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Balanserad"
@@ -11028,18 +11004,6 @@ translation = "Balanserad"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Svår att skilja från originalet i miniatyrstorlek."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Format"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Förlustfri"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, exakt som den skapades. Flera gånger större. Skickas aldrig som AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11057,6 +11021,14 @@ translation = "Skarpare"
 source = "About twice the size of Balanced."
 translation = "Ungefär dubbelt så stor som Balanserad."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Storlek"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Mindre"
@@ -11066,8 +11038,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Bra i rutnätet; lite mjuk på nära håll."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "För nya miniatyrbilder och modellvyer. Genomskinliga och pixelgrafik förblir PNG. Krymp miniatyrbilder under Underhåll gör om de du har."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Sparas som WebP, komprimerade eller exakta, det som blir minst. En liten bild som är mindre som den är blir sin egen miniatyrbild. En ändring här gör om de miniatyrbilder du har i bakgrunden."
 
 [messages.settings-title]
 source = "Settings"

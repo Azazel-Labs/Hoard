@@ -8,7 +8,7 @@ mod models;
 mod sounds;
 
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use hoard_core::AssetKind;
@@ -113,11 +113,24 @@ pub(crate) fn renderer_hint() -> Option<String> {
     RENDERER_HINT.get().cloned().flatten()
 }
 
-/// JPEG quality for thumbnails and model views; 0 keeps them as PNG. See [`crate::settings::ThumbQuality`].
-static THUMB_JPEG_QUALITY: AtomicU8 = AtomicU8::new(82);
+/// The WebP quality and the size thumbnails and model views are made at: see [`crate::settings::ThumbQuality`] and
+/// [`crate::settings::THUMB_SIZES`].
+static THUMB_QUALITY: AtomicU8 = AtomicU8::new(75);
+static THUMB_PX: AtomicU32 = AtomicU32::new(crate::settings::DEFAULT_THUMB_SIZE);
 
-pub(crate) fn set_thumb_quality(q: crate::settings::ThumbQuality) {
-    THUMB_JPEG_QUALITY.store(q.jpeg_quality().unwrap_or(0), Ordering::Relaxed);
+pub(crate) fn set_thumbs(q: crate::settings::ThumbQuality, size: u32) {
+    THUMB_QUALITY.store(q.webp_quality(), Ordering::Relaxed);
+    THUMB_PX.store(size, Ordering::Relaxed);
+}
+
+/// How many pixels across a thumbnail is made, at most.
+pub(crate) fn thumb_size() -> u32 {
+    THUMB_PX.load(Ordering::Relaxed)
+}
+
+/// The WebP quality thumbnails are made at.
+pub(crate) fn thumb_quality() -> u8 {
+    THUMB_QUALITY.load(Ordering::Relaxed)
 }
 
 /// PNG at the strongest compression, and without the alpha channel when every pixel is opaque.
@@ -140,46 +153,69 @@ fn is_opaque(img: &image::RgbaImage) -> bool {
     img.pixels().all(|p| p[3] == 255)
 }
 
-/// Encode a thumbnail or model view sheet the way Settings → Performance → Thumbnails asks. PNG when it has any
-/// transparency (JPEG has none), when it's pixel art (`exact`: JPEG would smear its hard edges), or when the setting
-/// is Lossless. Otherwise JPEG, unless PNG is about as small anyway (flat colors, line art), since then it's exact.
-pub(crate) fn thumb_bytes(img: image::RgbaImage, exact: bool) -> anyhow::Result<Vec<u8>> {
-    let q = THUMB_JPEG_QUALITY.load(Ordering::Relaxed);
-    if q == 0 || exact || !is_opaque(&img) {
-        return png_bytes(img);
-    }
-    let mut jpeg = Vec::new();
-    image::codecs::jpeg::JpegEncoder::new_with_quality(&mut jpeg, q)
-        .encode_image(&DynamicImage::ImageRgba8(img.clone()).to_rgb8())?;
-    let png = png_bytes(img)?;
-    Ok(if jpeg.len() * 10 < png.len() * 8 { jpeg } else { png })
+/// Encode a thumbnail or model view sheet as the smallest WebP at the quality Settings → Performance → Thumbnails
+/// asks for: lossless when it's pixel art (`exact`: lossy would smear its hard edges) or when that's about as small
+/// anyway (flat colors, line art), since then it's exact.
+pub(crate) fn thumb_bytes(img: &image::RgbaImage, exact: bool) -> anyhow::Result<Vec<u8>> {
+    thumb_bytes_at(img, exact, thumb_quality())
 }
 
-/// A thumbnail as AVIF at this quality (0-100), for browsers that read it: see [`crate::previews::avif_thumb`].
-/// Without the alpha plane when every pixel is opaque.
-pub(crate) fn avif_bytes(img: &image::RgbaImage, quality: u8) -> anyhow::Result<Vec<u8>> {
-    use image::ImageEncoder as _;
-    let mut out = Vec::new();
-    // The fastest speed: a 256-pixel thumbnail in about 50 ms on one core, within a tenth of the size slower ones make.
-    let enc = image::codecs::avif::AvifEncoder::new_with_speed_quality(&mut out, 10, quality);
-    let (w, h) = img.dimensions();
-    if is_opaque(img) {
-        let rgb = DynamicImage::ImageRgba8(img.clone()).to_rgb8();
-        enc.write_image(rgb.as_raw(), w, h, image::ExtendedColorType::Rgb8)?;
-    } else {
-        enc.write_image(img.as_raw(), w, h, image::ExtendedColorType::Rgba8)?;
+pub(crate) fn thumb_bytes_at(img: &image::RgbaImage, exact: bool, quality: u8) -> anyhow::Result<Vec<u8>> {
+    if exact {
+        return webp_bytes(img, None);
     }
-    Ok(out)
+    let lossy = webp_bytes(img, Some(quality))?;
+    // Lossless takes several times as long, and with this many colors (a photo, a render) it's never about as small.
+    if !has_few_colors(img, LOSSLESS_COLORS) {
+        return Ok(lossy);
+    }
+    let lossless = webp_bytes(img, None)?;
+    Ok(if lossy.len() * 10 < lossless.len() * 8 { lossy } else { lossless })
+}
+
+/// More colors than this, and a thumbnail isn't tried lossless.
+const LOSSLESS_COLORS: usize = 4096;
+
+/// Whether the picture has at most `most` colors, stopping as soon as it has more.
+fn has_few_colors(img: &image::RgbaImage, most: usize) -> bool {
+    let mut seen = std::collections::HashSet::with_capacity(most + 1);
+    img.pixels().all(|p| {
+        seen.insert(p.0);
+        seen.len() <= most
+    })
+}
+
+/// A picture as WebP, lossy at this quality (0-100) or else lossless; without the alpha channel when every pixel is
+/// opaque.
+fn webp_bytes(img: &image::RgbaImage, quality: Option<u8>) -> anyhow::Result<Vec<u8>> {
+    let (w, h) = img.dimensions();
+    let rgb;
+    let enc = if is_opaque(img) {
+        rgb = DynamicImage::ImageRgba8(img.clone()).to_rgb8();
+        webp::Encoder::from_rgb(rgb.as_raw(), w, h)
+    } else {
+        webp::Encoder::from_rgba(img.as_raw(), w, h)
+    };
+    // Lossless, the quality is how hard it tries: a thumbnail is small enough to try hard.
+    let out = enc
+        .encode_simple(quality.is_none(), quality.map_or(90.0, f32::from))
+        .map_err(|e| anyhow::anyhow!("encoding a WebP: {e:?}"))?;
+    Ok(out.to_vec())
 }
 
 /// The content type of a stored thumbnail, from its first bytes.
 pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
-    if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) { "image/jpeg" } else { "image/png" }
+    if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) {
+        "image/jpeg"
+    } else if bytes.starts_with(b"RIFF") && bytes.get(8..12) == Some(b"WEBP") {
+        "image/webp"
+    } else {
+        "image/png"
+    }
 }
 
 /// Don't try to decode images bigger than this on disk (thumbnails of 30k² PSD exports aren't worth it).
 pub(crate) const MAX_IMAGE_DECODE_BYTES: u64 = 256 << 20;
-pub(crate) const THUMB_SIZE: u32 = 256;
 
 #[derive(Debug, Default)]
 pub(crate) struct Analysis {
@@ -242,8 +278,8 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Texture if matches!(ext, "psd" | "psb") => analyze_psd(path, &mut a),
         AssetKind::Texture if matches!(ext, "kra" | "ora") => analyze_layered_zip(path, &mut a),
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
-        AssetKind::Document if ext == "pdf" => crate::textures::pdf_thumbnail(path, THUMB_SIZE).map(|page| {
-            a.thumb = page.and_then(|p| thumb_bytes(p, false).ok());
+        AssetKind::Document if ext == "pdf" => crate::textures::pdf_thumbnail(path, thumb_size()).map(|page| {
+            a.thumb = page.and_then(|p| thumb_bytes(&p, false).ok());
         }),
         AssetKind::Texture if crate::textures::handles(ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
@@ -254,11 +290,13 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             analyze_music(path, ext, &mut a)
         }
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
-        AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
-            a.meta.extend(f.facts);
-            a.title = f.title;
-            a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
-        }),
+        AssetKind::Font if crate::fonts::EXTS.contains(&ext) => {
+            crate::fonts::analyze(path, ext, thumb_size()).map(|f| {
+                a.meta.extend(f.facts);
+                a.title = f.title;
+                a.thumb = f.thumb.and_then(|t| thumb_bytes(&t, false).ok());
+            })
+        }
         AssetKind::Model
             if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "skp") =>
         {
@@ -293,12 +331,12 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
     }
     if a.thumb.is_none() && text_kind && (sniffed || crate::text_thumbs::handles(ext)) {
         let drawn = if crate::text_thumbs::handles(ext) {
-            crate::text_thumbs::thumbnail(path, ext, THUMB_SIZE)
+            crate::text_thumbs::thumbnail(path, ext, thumb_size())
         } else {
-            crate::text_thumbs::thumbnail_prose(path, THUMB_SIZE)
+            crate::text_thumbs::thumbnail_prose(path, thumb_size())
         };
         match drawn {
-            Ok(drawn) => a.thumb = drawn.and_then(|img| thumb_bytes(img, true).ok()),
+            Ok(drawn) => a.thumb = drawn.and_then(|img| thumb_bytes(&img, true).ok()),
             Err(e) => tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no text thumbnail"),
         }
     }
@@ -312,9 +350,14 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
 mod tests {
     use super::*;
 
+    /// Whether a WebP is lossless (VP8L) rather than lossy (VP8).
+    fn lossless(webp: &[u8]) -> bool {
+        webp.windows(4).any(|w| w == b"VP8L")
+    }
+
     #[test]
-    fn thumbnails_are_jpeg_only_when_opaque_and_not_pixel_art() {
-        // Like a photo or a rendered texture: smooth shading with grain, which is what JPEG is for.
+    fn thumbnails_are_webp_lossy_only_where_that_is_smaller_and_not_pixel_art() {
+        // Like a photo or a rendered texture: smooth shading with grain, which is what lossy is for.
         let mut seed = 0x2545_f491_u32;
         let photo = image::RgbaImage::from_fn(256, 256, |x, y| {
             seed ^= seed << 13;
@@ -325,21 +368,28 @@ mod tests {
             let c = |phase: f32| (128.0 + 90.0 * (fx + phase).sin() * fy.cos() + grain).clamp(0.0, 255.0) as u8;
             image::Rgba([c(0.0), c(1.3), c(2.6), 255])
         });
-        let jpeg = thumb_bytes(photo.clone(), false).unwrap();
-        assert_eq!(thumb_mime(&jpeg), "image/jpeg");
-        let png = thumb_bytes(photo.clone(), true).unwrap();
-        assert_eq!(thumb_mime(&png), "image/png", "pixel art stays PNG");
-        assert!(jpeg.len() * 3 < png.len(), "JPEG {} vs PNG {}", jpeg.len(), png.len());
+        let lossy = thumb_bytes(&photo, false).unwrap();
+        assert_eq!(thumb_mime(&lossy), "image/webp");
+        assert!(!lossless(&lossy));
+        let exact = thumb_bytes(&photo, true).unwrap();
+        assert!(lossless(&exact), "pixel art stays exact");
+        assert_eq!(image::load_from_memory(&exact).unwrap().to_rgba8(), photo);
+        assert!(lossy.len() * 3 < exact.len(), "lossy {} vs lossless {}", lossy.len(), exact.len());
+        let sharp = thumb_bytes_at(&photo, false, 88).unwrap();
+        assert!(sharp.len() > lossy.len(), "a higher quality keeps more");
 
-        // Flat colors: PNG is as small and exact.
+        // Flat colors: lossless is as small and exact.
         let flat =
             image::RgbaImage::from_fn(256, 256, |x, _| image::Rgba([if x < 128 { 200 } else { 30 }, 90, 60, 255]));
-        assert_eq!(thumb_mime(&thumb_bytes(flat, false).unwrap()), "image/png");
+        assert!(lossless(&thumb_bytes(&flat, false).unwrap()));
+        // Only pictures of few colors are tried lossless at all: it takes several times as long.
+        assert!(has_few_colors(&flat, LOSSLESS_COLORS));
+        assert!(!has_few_colors(&photo, LOSSLESS_COLORS));
 
         let mut cutout = photo;
         cutout.put_pixel(0, 0, image::Rgba([0, 0, 0, 0]));
-        let kept = thumb_bytes(cutout, false).unwrap();
-        assert_eq!(thumb_mime(&kept), "image/png", "transparency stays PNG");
-        assert!(image::load_from_memory(&kept).unwrap().color().has_alpha());
+        let kept = thumb_bytes(&cutout, false).unwrap();
+        assert_eq!(thumb_mime(&kept), "image/webp");
+        assert!(image::load_from_memory(&kept).unwrap().color().has_alpha(), "transparency stays");
     }
 }

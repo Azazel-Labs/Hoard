@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "b0e070ec14468a717e5f1975687e625be3d9b777acb2ddd4d4d78bdc5aa38dc0"
 
 [messages.about-blender]
@@ -5196,6 +5196,10 @@ translation = "Anna pääte karttatyypille { $map }"
 source = "those assets not found"
 translation = "resursseja ei löydy"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "pikkukuvat ovat 128 tai 256 pikseliä leveitä"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "vain malleille voi piirtää pikkukuvan selaimessa"
@@ -9621,14 +9625,6 @@ translation = "Haetaan kauppasivua"
 source = "Converting Unreal packages in { $pack }"
 translation = "Muunnetaan Unreal-paketteja: { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Muunna pikkukuvat AVIF-muotoon"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Muuntaa kaikki pikkukuvat nyt sen sijaan, että kukin muunnettaisiin ensimmäisellä näyttökerralla, kun pikkukuvat lähetetään AVIF-muodossa."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Varmuuskopioi tietokanta"
@@ -9668,14 +9664,6 @@ translation = "Tarkista tiedostojen vauriot"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Lukee jokaisen tallennetun tiedoston ja vertaa sitä sen sormenjälkeen, jotta levyltä tai NAS-laitteelta pilaantuneet tai kadonneet tiedostot löytyvät. Kestää jonkin aikaa suuressa kirjastossa."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Pienennä pikkukuvat"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Tallentaa PNG-muodossa säilytetyt pikkukuvat ja mallinäkymät kohdan Asetukset → Suorituskyky → Pikkukuvat mukaisesti, mikä yleensä tekee niistä monta kertaa pienempiä. Läpinäkyvät kuvat ja pikseligrafiikka pysyvät PNG-muodossa."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11055,18 +11043,6 @@ translation = "Teemat"
 source = "Thumbnails"
 translation = "Pikkukuvat"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Muunnetaan…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Muunna kaikki nyt"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF on usein puolet pienempi. Kukin pikkukuva muunnetaan, kun se näytetään ensimmäisen kerran."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Tasapainoinen"
@@ -11074,18 +11050,6 @@ translation = "Tasapainoinen"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Vaikea erottaa alkuperäisestä pikkukuvan koossa."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Muoto"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Häviötön"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, täsmälleen tehtynä. Monta kertaa suurempi. Ei koskaan lähetetä AVIF-muodossa."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11103,6 +11067,14 @@ translation = "Terävämmät"
 source = "About twice the size of Balanced."
 translation = "Noin kaksi kertaa Tasapainoisen kokoinen."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Koko"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Pienemmät"
@@ -11112,8 +11084,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Riittää ruudukossa; hieman pehmeä läheltä."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Uusille pikkukuville ja mallinäkymille. Läpinäkyvät ja pikseligrafiikka pysyvät PNG-muodossa. Ylläpidon Pienennä pikkukuvat tekee olemassa olevat uudelleen."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Tallennetaan WebP-muodossa, pakattuna tai tarkkana sen mukaan, kumpi on pienempi. Pieni kuva, joka on sellaisenaan pienempi, on oma pikkukuvansa. Muutos tässä tekee olemassa olevat pikkukuvat uudelleen taustalla."
 
 [messages.settings-title]
 source = "Settings"

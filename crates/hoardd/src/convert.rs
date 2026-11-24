@@ -220,7 +220,7 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
 fn draw_thumb(glb: &[u8]) -> Option<Vec<u8>> {
     let r = analyze::renderer()?;
     let img = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner).render_slice(glb, 256).ok()?;
-    analyze::thumb_bytes(img, false).ok()
+    analyze::thumb_bytes(&img, false).ok()
 }
 
 /// Thumbnails for a pack's models that have none but were converted already: a .blend with no preview of its own,

@@ -608,10 +608,13 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
                 tx.execute(
                     // A thumbnail a browser drew stays: it shows the model as the viewer does. A .blend's thumbnail is
                     // its own preview, or one drawn from its conversion (below); analysis that can't draw one
-                    // otherwise keeps the one it has.
+                    // otherwise keeps the one it has. One drawn now is marked as drawn the way thumbnails are drawn
+                    // now, even when it comes out the same, so it isn't drawn again.
                     "UPDATE assets SET meta = ?2, kind = ?3,
                             thumb_hash = CASE WHEN thumb_source IS NOT NULL THEN thumb_hash WHEN ext = 'blend' THEN ?4
                                               ELSE COALESCE(?4, thumb_hash) END,
+                            thumb_drawn = CASE WHEN thumb_source IS NULL AND ?4 IS NOT NULL
+                                               THEN MAX(thumb_drawn, ?9) ELSE thumb_drawn END,
                             words = ?5,
                             category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
                      WHERE id = ?1",
@@ -624,6 +627,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
                         human.contains(id.as_str()),
                         item.category,
                         now,
+                        crate::thumbs::drawn(item.kind.as_str()),
                     ],
                 )?;
                 write_tags(&tx, &id, item.tags)?;

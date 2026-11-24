@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "79060b99fac06e84cc49355d4880d0169ee3ef25a516e276eda9db1a67736b00"
 
 [messages.about-blender]
@@ -5230,6 +5230,10 @@ translation = "Дајте суфикс мапама типа { $map }"
 source = "those assets not found"
 translation = "ти ресурси нису пронађени"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "сличице су широке 128 или 256 пиксела"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "сличицу коју исцртава прегледач могу да имају само модели"
@@ -9671,14 +9675,6 @@ translation = "Тражење странице у продавници"
 source = "Converting Unreal packages in { $pack }"
 translation = "Претварање Unreal пакета: { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Претвори сличице у AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Претвара све сличице сада, уместо сваку када се први пут прикаже, када се сличице шаљу као AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Направи резервну копију базе"
@@ -9718,14 +9714,6 @@ translation = "Провери датотеке на оштећења"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Поново чита сваку сачувану датотеку и проверава је према њеном отиску, да би открио датотеке које су се оштетиле или нестале с диска или NAS-а. На великој библиотеци траје неко време."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Смањи сличице"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Чува сличице и приказе модела сачуване као PNG онако како тражи Подешавања → Перформансе → Сличице, што их обично чини неколико пута мањим. Оне с провидношћу и пиксел-арт остају PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11124,18 +11112,6 @@ translation = "Теме"
 source = "Thumbnails"
 translation = "Сличице"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Претвара се…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Претвори све сада"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF је често упола мањи. Свака сличица се претвара први пут када се прикаже."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Уравнотежено"
@@ -11143,18 +11119,6 @@ translation = "Уравнотежено"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Тешко се разликује од оригинала у величини сличице."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Формат"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Без губитака"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, тачно онако како је направљено. Неколико пута веће. Никада се не шаљу као AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11172,6 +11136,14 @@ translation = "Оштрије"
 source = "About twice the size of Balanced."
 translation = "Отприлике двоструко веће од уравнотеженог."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Величина"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Мање"
@@ -11181,8 +11153,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Добро у мрежи; мало мутно изблиза."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "За нове сличице и приказе модела. Провидне и пиксел-арт остају PNG. „Смањи сличице“ у Одржавању поново прави постојеће."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Чувају се као WebP, сажете или тачне, шта год је мање. Мала слика која је већ мања каква јесте сама је своја сличица. Промена овде поново прави постојеће сличице у позадини."
 
 [messages.settings-title]
 source = "Settings"

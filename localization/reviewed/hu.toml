@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "a6f38856daefe606b498438744a22681f1b49622e5ba03d669f5ffb4b74aa3b9"
 
 [messages.about-blender]
@@ -5109,6 +5109,10 @@ translation = "Adjon utótagot ennek a térképtípusnak: { $map }"
 source = "those assets not found"
 translation = "ezek az assetek nem találhatók"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "a bélyegképek 128 vagy 256 képpont szélesek"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "böngésző által rajzolt bélyegképet csak modellek kaphatnak"
@@ -9413,14 +9417,6 @@ translation = "Áruházi oldal keresése"
 source = "Converting Unreal packages in { $pack }"
 translation = "Unreal-csomagfájlok átalakítása: { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Bélyegképek átalakítása AVIF-re"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Most alakítja át az összes bélyegképet, nem egyenként az első megjelenítéskor, ha a bélyegképek AVIF formátumban mennek ki."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Adatbázis biztonsági mentése"
@@ -9460,14 +9456,6 @@ translation = "Fájlok sérülésének ellenőrzése"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Minden tárolt fájlt visszaolvas, és összeveti az ujjlenyomatával, hogy kiszűrje a lemezen vagy NAS-on megromlott vagy eltűnt fájlokat. Nagy könyvtárnál eltart egy ideig."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Bélyegképek zsugorítása"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "A PNG-ként tárolt bélyegképeket és modellnézeteket a Beállítások → Teljesítmény → Bélyegképek szerint tárolja, ami általában többszörösen kisebbé teszi őket. Az átlátszóságot tartalmazók és a pixel art PNG marad."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10841,18 +10829,6 @@ translation = "Témák"
 source = "Thumbnails"
 translation = "Bélyegképek"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Átalakítás…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Összes átalakítása most"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "Az AVIF gyakran feleakkora. Minden bélyegkép az első megjelenítéskor alakul át."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Kiegyensúlyozott"
@@ -10860,18 +10836,6 @@ translation = "Kiegyensúlyozott"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Bélyegképméretben alig különböztethető meg az eredetitől."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Formátum"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Veszteségmentes"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, pontosan úgy, ahogy elkészült. Többszörösen nagyobb. Soha nem mennek ki AVIF-ként."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10889,6 +10853,14 @@ translation = "Élesebb"
 source = "About twice the size of Balanced."
 translation = "Nagyjából kétszer akkora, mint a Kiegyensúlyozott."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Méret"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Kisebb"
@@ -10898,8 +10870,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "A rácsban megfelel; közelről kissé lágy."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Új bélyegképekhez és modellnézetekhez. Az átlátszók és a pixelgrafikák PNG-k maradnak. A Karbantartás Bélyegképek zsugorítása feladata újrakészíti a meglévőket."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "WebP-ként tárolva, tömörítve vagy pontosan, amelyik kisebb. Az a kis kép, amely eredetiben kisebb, saját maga bélyegképe. Ha itt változtat, a meglévő bélyegképek a háttérben újrakészülnek."
 
 [messages.settings-title]
 source = "Settings"

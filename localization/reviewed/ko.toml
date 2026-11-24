@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "a1c4fa507046ea04ba3c4a7f777394d919227403be67540f480e62a7f8c5cd57"
 
 [messages.about-blender]
@@ -5037,6 +5037,10 @@ translation = "{ $map } 맵에 접미사를 지정하세요"
 source = "those assets not found"
 translation = "해당 에셋을 찾을 수 없습니다"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "썸네일 크기는 128 또는 256픽셀입니다"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "브라우저가 그린 썸네일은 모델에만 쓸 수 있습니다"
@@ -9310,14 +9314,6 @@ translation = "스토어 페이지 찾는 중"
 source = "Converting Unreal packages in { $pack }"
 translation = "{ $pack }의 Unreal 패키지 변환하는 중"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "썸네일을 AVIF로 변환"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "썸네일을 AVIF로 보낼 때, 처음 표시될 때마다 변환하는 대신 모든 썸네일을 지금 변환합니다."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "데이터베이스 백업"
@@ -9357,14 +9353,6 @@ translation = "파일 손상 검사"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "저장된 모든 파일을 다시 읽어서 지문과 비교하여, 디스크나 NAS에서 손상되었거나 없어진 파일을 찾아냅니다. 라이브러리가 크면 시간이 걸립니다."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "썸네일 줄이기"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "PNG로 보관된 썸네일과 모델 뷰를 설정 → 성능 → 썸네일에 지정한 방식으로 저장합니다. 보통 크기가 몇 배 작아집니다. 투명도가 있는 것과 픽셀 아트는 PNG로 유지됩니다."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10720,18 +10708,6 @@ translation = "테마"
 source = "Thumbnails"
 translation = "썸네일"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "변환 중…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "지금 모두 변환"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF는 보통 크기가 절반입니다. 각 썸네일은 처음 표시될 때 변환됩니다."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "균형"
@@ -10739,18 +10715,6 @@ translation = "균형"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "썸네일 크기에서는 원본과 구분하기 어렵습니다."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "형식"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "무손실"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, 만든 그대로입니다. 몇 배 더 큽니다. AVIF로 보내지 않습니다."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10768,6 +10732,14 @@ translation = "선명하게"
 source = "About twice the size of Balanced."
 translation = "균형의 약 두 배 크기입니다."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "크기"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "작게"
@@ -10777,8 +10749,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "그리드에서는 괜찮고, 가까이 보면 약간 흐립니다."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "새 썸네일과 모델 뷰에 적용됩니다. 투명한 것과 픽셀 아트는 PNG로 유지됩니다. 기존 썸네일은 유지 관리의 썸네일 줄이기로 다시 만듭니다."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "WebP로 저장되며, 압축과 무손실 중 더 작은 쪽을 씁니다. 원본 그대로가 더 작은 작은 그림은 그 자체가 썸네일이 됩니다. 여기서 바꾸면 기존 썸네일은 백그라운드에서 다시 만들어집니다."
 
 [messages.settings-title]
 source = "Settings"

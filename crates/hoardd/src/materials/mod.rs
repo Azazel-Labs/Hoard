@@ -45,9 +45,6 @@ use names::{Candidate, Found, dir_of, find, role_of_word};
 /// A material made from texture maps, as SQL over an asset `a`.
 pub(crate) const IS_MATERIAL: &str = "(a.ext = 'material' AND json_extract(a.meta, '$.material_maps') IS NOT NULL)";
 
-/// Thumbnail size, as for every other asset.
-const THUMB_SIZE: u32 = 256;
-
 /// A material ready to write: its file and thumbnail are stored.
 struct Made {
     found: Found,
@@ -496,7 +493,9 @@ fn material_tags(tx: &Connection, textures: &[Texture], f: &Found) -> Result<Tag
 
 /// Shade a sphere from the maps' thumbnails. None when there's nothing to shade it with.
 fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) -> Result<Option<Vec<u8>>> {
-    sphere(state, rt, textures, f, THUMB_SIZE)?.map(crate::analyze::png_bytes).transpose()
+    sphere(state, rt, textures, f, crate::analyze::thumb_size())?
+        .map(|img| crate::analyze::thumb_bytes(&img, false))
+        .transpose()
 }
 
 /// [`render_thumb`]'s sphere, `size` pixels square.

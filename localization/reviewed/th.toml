@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "c4d2f5df66635e2f0c72b766892a2bda1b18cd8faccfee0d2ba4669cdf5fff63"
 
 [messages.about-blender]
@@ -5043,6 +5043,10 @@ translation = "กำหนดคำต่อท้ายให้แมป { $m
 source = "those assets not found"
 translation = "ไม่พบแอสเซ็ตเหล่านั้น"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "ภาพย่อมีขนาด 128 หรือ 256 พิกเซล"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "มีเพียงโมเดลที่ใช้ภาพย่อที่เบราว์เซอร์วาดได้"
@@ -9337,14 +9341,6 @@ translation = "กำลังค้นหาหน้าร้านค้า"
 source = "Converting Unreal packages in { $pack }"
 translation = "กำลังแปลงแพ็กเกจ Unreal ใน { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "แปลงภาพย่อเป็น AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "แปลงภาพย่อทั้งหมดตอนนี้ แทนที่จะแปลงทีละภาพเมื่อแสดงครั้งแรก เมื่อตั้งให้ส่งภาพย่อเป็น AVIF"
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "สำรองฐานข้อมูล"
@@ -9384,14 +9380,6 @@ translation = "ตรวจสอบไฟล์ว่าเสียหาย�
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "อ่านไฟล์ที่จัดเก็บไว้ทุกไฟล์และตรวจสอบกับลายนิ้วมือของไฟล์ เพื่อจับไฟล์ที่เสื่อมสภาพหรือหายไปจากดิสก์หรือ NAS ใช้เวลาสักพักสำหรับคลังขนาดใหญ่"
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "ย่อขนาดภาพย่อ"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "จัดเก็บภาพย่อและมุมมองโมเดลที่เก็บเป็น PNG ตามที่ การตั้งค่า → ประสิทธิภาพ → ภาพย่อ กำหนด ซึ่งมักทำให้เล็กลงหลายเท่า ภาพที่มีความโปร่งใสและพิกเซลอาร์ตจะยังเป็น PNG"
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10753,18 +10741,6 @@ translation = "ธีม"
 source = "Thumbnails"
 translation = "ภาพย่อ"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "กำลังแปลง…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "แปลงทั้งหมดตอนนี้"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF มักมีขนาดเพียงครึ่งเดียว ภาพย่อแต่ละภาพจะถูกแปลงเมื่อแสดงครั้งแรก"
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "สมดุล"
@@ -10772,18 +10748,6 @@ translation = "สมดุล"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "แยกจากต้นฉบับได้ยากที่ขนาดภาพย่อ"
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "รูปแบบ"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "ไม่สูญเสียคุณภาพ"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG ตรงตามที่สร้างทุกประการ ใหญ่กว่าหลายเท่า ไม่ส่งเป็น AVIF"
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10801,6 +10765,14 @@ translation = "คมชัดกว่า"
 source = "About twice the size of Balanced."
 translation = "ขนาดประมาณสองเท่าของแบบสมดุล"
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "ขนาด"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "เล็กกว่า"
@@ -10810,8 +10782,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "ดูดีในตาราง แต่จะนุ่มไปเล็กน้อยเมื่อดูใกล้ ๆ"
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "สำหรับภาพย่อและมุมมองโมเดลใหม่ ภาพโปร่งใสและพิกเซลอาร์ตยังคงเป็น PNG ย่อขนาดภาพย่อ ในการบำรุงรักษาจะสร้างภาพที่มีอยู่ใหม่"
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "จัดเก็บเป็น WebP แบบบีบอัดหรือแบบตรงต้นฉบับ แล้วแต่ว่าแบบไหนเล็กกว่า ภาพเล็กที่ไฟล์เดิมเล็กกว่าอยู่แล้วจะใช้ตัวเองเป็นภาพย่อ การเปลี่ยนตรงนี้จะสร้างภาพย่อที่มีอยู่ใหม่ในเบื้องหลัง"
 
 [messages.settings-title]
 source = "Settings"

@@ -152,7 +152,7 @@ fn settings_json_sync(state: &AppState) -> Value {
                 crate::settings::ThumbQuality::default(),
                 saved.thumb_quality.is_some(),
             ),
-            "thumb_avif": option(now.thumb_avif, false, saved.thumb_avif.is_some()),
+            "thumb_size": option(now.thumb_size, crate::settings::DEFAULT_THUMB_SIZE, saved.thumb_size.is_some()),
             "conversion_cache_mb": option(
                 now.conversion_cache_mb,
                 crate::settings::DEFAULT_CONVERSION_CACHE_MB,
@@ -396,7 +396,10 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
         crate::ffmpeg::start(&after.ffmpeg, state.cfg.tools_dir());
     }
     crate::analyze::set_render_enabled(after.render, after.llm_vision && after.llm_enabled());
-    crate::analyze::set_thumb_quality(after.thumb_quality);
+    crate::analyze::set_thumbs(after.thumb_quality, after.thumb_size);
+    if after.thumb_quality != before.thumb_quality || after.thumb_size != before.thumb_size {
+        crate::thumbs::kick(&state);
+    }
     if after.conversion_cache_mb < before.conversion_cache_mb {
         let st = std::sync::Arc::clone(&state);
         tokio::spawn(async move { crate::formats::log_trim(&st).await });

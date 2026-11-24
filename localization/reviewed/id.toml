@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "f2f6a92a7d58de9343f6d38812b230d68df073a04d02512bf242b7684729815b"
 
 [messages.about-blender]
@@ -5071,6 +5071,10 @@ translation = "Beri akhiran untuk map { $map }"
 source = "those assets not found"
 translation = "aset-aset itu tidak ditemukan"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "gambar mini berukuran 128 atau 256 piksel"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "hanya model yang menerima gambar mini yang digambar oleh browser"
@@ -9366,14 +9370,6 @@ translation = "Mencari halaman toko"
 source = "Converting Unreal packages in { $pack }"
 translation = "Mengonversi paket Unreal di { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Konversi gambar mini ke AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Mengonversi semua gambar mini sekarang, bukan satu per satu saat pertama kali ditampilkan, jika gambar mini dikirim sebagai AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Cadangkan basis data"
@@ -9413,14 +9409,6 @@ translation = "Periksa kerusakan berkas"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Membaca kembali setiap berkas tersimpan dan mencocokkannya dengan sidik jarinya, untuk menemukan berkas yang rusak atau hilang dari disk atau NAS. Butuh waktu lama untuk pustaka yang besar."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Perkecil gambar mini"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Menyimpan gambar mini dan tampilan model yang disimpan sebagai PNG sesuai Pengaturan → Performa → Gambar mini, yang biasanya membuatnya beberapa kali lebih kecil. Gambar dengan transparansi, dan pixel art, tetap PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10782,18 +10770,6 @@ translation = "Tema"
 source = "Thumbnails"
 translation = "Gambar mini"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Mengonversi…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Konversi semua sekarang"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF sering kali separuh ukurannya. Setiap gambar mini dikonversi saat pertama kali ditampilkan."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Seimbang"
@@ -10801,18 +10777,6 @@ translation = "Seimbang"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Sulit dibedakan dari aslinya pada ukuran gambar mini."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Format"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Lossless"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, persis seperti dibuat. Beberapa kali lebih besar. Tidak pernah dikirim sebagai AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10830,6 +10794,14 @@ translation = "Lebih tajam"
 source = "About twice the size of Balanced."
 translation = "Sekitar dua kali ukuran Seimbang."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Ukuran"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Lebih kecil"
@@ -10839,8 +10811,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Cukup di kisi; sedikit buram dari dekat."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Untuk gambar mini dan tampilan model baru. Yang transparan dan pixel art tetap PNG. Perkecil gambar mini di Pemeliharaan membuat ulang yang sudah ada."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Disimpan sebagai WebP, terkompresi atau persis, mana yang lebih kecil. Gambar kecil yang apa adanya sudah lebih kecil menjadi gambar mininya sendiri. Perubahan di sini membuat ulang gambar mini yang sudah ada di latar belakang."
 
 [messages.settings-title]
 source = "Settings"

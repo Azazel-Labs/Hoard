@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "774f04261871146c439d2ff7a6a22f213bf79e9c455f84b99a3551374f7aa646"
 
 [messages.about-blender]
@@ -5184,6 +5184,10 @@ translation = "Giv maps af typen { $map } et suffiks"
 source = "those assets not found"
 translation = "de assets blev ikke fundet"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "miniaturer er 128 eller 256 pixel brede"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "kun modeller kan få en miniature tegnet af en browser"
@@ -9574,14 +9578,6 @@ translation = "Slår en butiksside op"
 source = "Converting Unreal packages in { $pack }"
 translation = "Konverterer Unreal-pakker i { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Konvertér miniaturer til AVIF"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Konverterer alle miniaturer nu i stedet for, efterhånden som de vises første gang, når miniaturer sendes som AVIF."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Sikkerhedskopiér databasen"
@@ -9621,14 +9617,6 @@ translation = "Kontrollér filer for skader"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Læser hver gemt fil igen og kontrollerer den mod dens fingeraftryk for at fange filer, der er rådnet eller forsvundet fra en disk eller NAS. Tager et stykke tid på et stort bibliotek."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Formindsk miniaturer"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "Gemmer de miniaturer og modelvisninger, der ligger som PNG, sådan som Indstillinger → Ydeevne → Miniaturer angiver, hvilket som regel gør dem flere gange mindre. Dem med gennemsigtighed og pixelkunst forbliver PNG."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -11006,18 +10994,6 @@ translation = "Temaer"
 source = "Thumbnails"
 translation = "Miniaturer"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Konverterer…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Konvertér alle nu"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF er ofte halvt så stort. Hver miniature konverteres første gang, den vises."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Balanceret"
@@ -11025,18 +11001,6 @@ translation = "Balanceret"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Svær at skelne fra originalen i miniaturestørrelse."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Format"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Tabsfri"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, præcis som lavet. Flere gange større. Sendes aldrig som AVIF."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -11054,6 +11018,14 @@ translation = "Skarpere"
 source = "About twice the size of Balanced."
 translation = "Omtrent dobbelt så stor som Balanceret."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Størrelse"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Mindre"
@@ -11063,8 +11035,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Fint i gitteret; lidt blødt tæt på."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Til nye miniaturer og modelvisninger. Gennemsigtige og pixelkunst forbliver PNG. Formindsk miniaturer under Vedligeholdelse laver dem, du har, om."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "Gemmes som WebP, komprimeret eller nøjagtigt, alt efter hvad der fylder mindst. Et lille billede, der fylder mindre, som det er, er sin egen miniature. En ændring her laver de miniaturer, du har, om i baggrunden."
 
 [messages.settings-title]
 source = "Settings"

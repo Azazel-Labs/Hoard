@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const browser = { ...devices['Desktop Chrome'], viewport: { width: 1400, height: 900 } }
+
 // One hoardd for the run (see e2e/global-setup.ts); tests run in parallel against it, each making its own data where
 // it changes anything.
 export default defineConfig({
@@ -21,5 +23,9 @@ export default defineConfig({
     reducedMotion: 'reduce',
     colorScheme: 'light',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1400, height: 900 } } }],
+  projects: [
+    { name: 'chromium', use: browser, testIgnore: /library-wide[\\/]/ },
+    // Tests that change a setting for the whole library run after the rest, so its effects don't reach them.
+    { name: 'library-wide', use: browser, testMatch: /library-wide[\\/].*\.spec\.ts$/, dependencies: ['chromium'] },
+  ],
 })

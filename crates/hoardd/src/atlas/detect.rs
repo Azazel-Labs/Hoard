@@ -532,7 +532,7 @@ fn sheet_thumbnail(state: &AppState, rt: &Handle, sheet: &crate::spritesheet::Sh
         }
     }
     let (img, exact) = crate::spritesheet::thumbnail(sheet, &pages)?;
-    crate::analyze::thumb_bytes(img, exact).ok()
+    crate::analyze::thumb_bytes(&img, exact).ok()
 }
 
 /// Write what was found: each sheet's file a `sheet` (its sheet, thumbnail, words and category brought up to date if

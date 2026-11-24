@@ -8,7 +8,7 @@ use std::sync::atomic::Ordering;
 use anyhow::Context as _;
 use serde_json::{Map, Value, json};
 
-use super::{Analysis, THUMB_SIZE, VIEWS_ENABLED, renderer, thumb_bytes};
+use super::{Analysis, VIEWS_ENABLED, renderer, thumb_bytes, thumb_size};
 
 /// A glTF/GLB the renderer can read: one using meshopt, Draco or quantization (which the renderer's glTF reader
 /// rejects) is rewritten by polysmelt as a plain GLB (its images taken in) in a temporary folder, anything else is read
@@ -57,12 +57,12 @@ pub(super) fn render_model_thumb(path: &Path, a: &mut Analysis) {
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     // wgpu panics on what it finds invalid; that costs this model its thumbnail, not the whole pack its ingest.
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let img = guard.render_file(file, THUMB_SIZE)?;
+        let img = guard.render_file(file, thumb_size())?;
         let views = VIEWS_ENABLED
             .load(Ordering::Relaxed)
-            .then(|| guard.render_views_file(file, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
+            .then(|| guard.render_views_file(file, thumb_size()).ok().and_then(|v| thumb_bytes(&v, false).ok()))
             .flatten();
-        anyhow::Ok((thumb_bytes(img, false).ok(), views))
+        anyhow::Ok((thumb_bytes(&img, false).ok(), views))
     }));
     match drawn {
         Ok(Ok(out)) => (a.thumb, a.views) = out,
@@ -82,9 +82,9 @@ pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
     let model = drawable(path)?;
     let path = model.path.as_path();
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_file(path, THUMB_SIZE)))
+    let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_file(path, thumb_size())))
         .map_err(|_| anyhow::anyhow!("the renderer failed on this model"))??;
-    thumb_bytes(drawn, false).map(Some)
+    thumb_bytes(&drawn, false).map(Some)
 }
 
 /// A thumbnail of a glTF/GLB model wearing `color` (a texture's thumbnail) as its color map, or its own maps when
@@ -96,13 +96,13 @@ pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Op
     let path = model.path.as_path();
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        match guard.render_file_dressed(path, THUMB_SIZE, color)? {
+        match guard.render_file_dressed(path, thumb_size(), color)? {
             Some(img) => Ok(img),
-            None => guard.render_file(path, THUMB_SIZE),
+            None => guard.render_file(path, thumb_size()),
         }
     }))
     .map_err(|_| anyhow::anyhow!("the renderer failed on this model"))??;
-    thumb_bytes(drawn, false).map(Some)
+    thumb_bytes(&drawn, false).map(Some)
 }
 
 /// STL, PLY and `MagicaVoxel`: facts, and a thumbnail rendered from a GLB made on the spot.

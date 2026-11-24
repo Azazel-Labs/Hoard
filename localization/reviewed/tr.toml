@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "0bbd60a84979160af1d2deba669070f563f4fb6c06edf071965c1651a1eff0a3"
+source = "eb653284dc6f1bac9fe792db0e1e7699a015b188fb09f2b48470b133e993c04c"
 translation = "096f986cef7f3bd51c0943733bc01c58756010c1bb62c61cc14c328066a37b1f"
 
 [messages.about-blender]
@@ -5081,6 +5081,10 @@ translation = "{ $map } haritalarına bir sonek verin"
 source = "those assets not found"
 translation = "bu varlıklar bulunamadı"
 
+[messages.error-thumb-size]
+source = "thumbnails are 128 or 256 pixels across"
+translation = "küçük resimler 128 veya 256 piksel genişliğindedir"
+
 [messages.error-thumbnail-models-only]
 source = "only models take a thumbnail drawn by a browser"
 translation = "tarayıcıda çizilen küçük resmi yalnızca modeller alır"
@@ -9385,14 +9389,6 @@ translation = "Bir mağaza sayfası aranıyor"
 source = "Converting Unreal packages in { $pack }"
 translation = "Unreal paketleri dönüştürülüyor: { $pack }"
 
-[messages.server-maintenance-avif-thumbs]
-source = "Convert thumbnails to AVIF"
-translation = "Küçük resimleri AVIF’e dönüştür"
-
-[messages.server-maintenance-avif-thumbs-blurb]
-source = "Converts every thumbnail now, rather than as each is first shown, when thumbnails are sent as AVIF."
-translation = "Küçük resimler AVIF olarak gönderilirken, her birini ilk gösterildiğinde dönüştürmek yerine hepsini şimdi dönüştürür."
-
 [messages.server-maintenance-backup]
 source = "Back up the database"
 translation = "Veritabanını yedekle"
@@ -9432,14 +9428,6 @@ translation = "Dosyaları hasara karşı denetle"
 [messages.server-maintenance-scrub-blurb]
 source = "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or gone missing from a disk or NAS. Takes a while on a big library."
 translation = "Bir diskte ya da NAS’ta bozulmuş veya kaybolmuş dosyaları yakalamak için saklanan her dosyayı geri okur ve parmak iziyle karşılaştırır. Büyük bir kütüphanede biraz sürer."
-
-[messages.server-maintenance-shrink-thumbs]
-source = "Shrink thumbnails"
-translation = "Küçük resimleri küçült"
-
-[messages.server-maintenance-shrink-thumbs-blurb]
-source = "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG."
-translation = "PNG olarak tutulan küçük resimleri ve model görünümlerini Ayarlar → Performans → Küçük resimler’in istediği biçimde saklar; bu genellikle onları birkaç kat küçültür. Saydamlığı olanlar ve piksel sanatı PNG olarak kalır."
 
 [messages.server-role-ao]
 source = "ambient occlusion"
@@ -10813,18 +10801,6 @@ translation = "Temalar"
 source = "Thumbnails"
 translation = "Küçük resimler"
 
-[messages.settings-thumbs-avif-converting]
-source = "Converting…"
-translation = "Dönüştürülüyor…"
-
-[messages.settings-thumbs-avif-now]
-source = "Convert all now"
-translation = "Hepsini şimdi dönüştür"
-
-[messages.settings-thumbs-avif-what]
-source = "AVIF is often half the size. Each thumbnail is converted the first time it’s shown."
-translation = "AVIF çoğu zaman yarı boyuttadır. Her küçük resim ilk gösterildiğinde dönüştürülür."
-
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Dengeli"
@@ -10832,18 +10808,6 @@ translation = "Dengeli"
 [messages.settings-thumbs-balanced-hint]
 source = "Hard to tell from the original at thumbnail size."
 translation = "Küçük resim boyutunda özgününden ayırt etmek zor."
-
-[messages.settings-thumbs-format]
-source = "Format"
-translation = "Biçim"
-
-[messages.settings-thumbs-lossless]
-source = "Lossless"
-translation = "Kayıpsız"
-
-[messages.settings-thumbs-lossless-hint]
-source = "PNG, exactly as made. Several times larger, and never sent as AVIF."
-translation = "PNG, tam oluşturulduğu gibi. Birkaç kat daha büyük. Hiçbir zaman AVIF olarak gönderilmez."
 
 [messages.settings-thumbs-quality]
 source = "Quality { $quality }."
@@ -10861,6 +10825,14 @@ translation = "Daha keskin"
 source = "About twice the size of Balanced."
 translation = "Dengeli’nin yaklaşık iki katı boyutta."
 
+[messages.settings-thumbs-size]
+source = "Size"
+translation = "Boyut"
+
+[messages.settings-thumbs-size-option]
+source = "{ $px } px"
+translation = "{ $px } px"
+
 [messages.settings-thumbs-small]
 source = "Smaller"
 translation = "Daha küçük"
@@ -10870,8 +10842,8 @@ source = "Fine in the grid; a little soft up close."
 translation = "Izgarada iyi; yakından biraz yumuşak."
 
 [messages.settings-thumbs-what]
-source = "For new thumbnails and model views. Transparent and pixel-art ones stay PNG. Shrink thumbnails in Maintenance redoes the ones you have."
-translation = "Yeni küçük resimler ve model görünümleri için. Saydam olanlar ve piksel sanatı PNG kalır. Bakım'daki Küçük resimleri küçült görevi mevcut olanları yeniden oluşturur."
+source = "Kept as WebP, compressed or exact, whichever is smaller. A small picture that's smaller as it is stays its own thumbnail. Changing these remakes the thumbnails you have, in the background."
+translation = "WebP olarak saklanır; sıkıştırılmış ya da birebir, hangisi daha küçükse. Olduğu haliyle daha küçük olan küçük bir resim kendi küçük resmidir. Burada yapılan bir değişiklik mevcut küçük resimleri arka planda yeniden oluşturur."
 
 [messages.settings-title]
 source = "Settings"

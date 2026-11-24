@@ -438,7 +438,7 @@ export interface Settings {
     /** Search the stores for packs' pages in the background. */
     store_lookup: OptionSetting<boolean>
     thumb_quality: OptionSetting<ThumbQuality>
-    thumb_avif: OptionSetting<boolean>
+    thumb_size: OptionSetting<number>
     /** Make a short looping movie of each animation for its tile. Off by default: it takes space and time. */
     motion_thumbs: OptionSetting<boolean>
     motion_fps: OptionSetting<number>
@@ -577,7 +577,7 @@ export interface S3Setting {
 }
 
 /** How thumbnails are stored: JPEG at three qualities, or PNG. Transparent ones and pixel art are always PNG. */
-export type ThumbQuality = 'small' | 'balanced' | 'sharp' | 'lossless'
+export type ThumbQuality = 'small' | 'balanced' | 'sharp'
 export type BackupEvery = 'off' | 'daily' | 'weekly'
 
 /** Settings to change; `null` goes back to the server's default. */
@@ -605,7 +605,7 @@ export interface SettingsPatch {
   guest_browsing?: boolean | null
   store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
-  thumb_avif?: boolean | null
+  thumb_size?: number | null
   motion_thumbs?: boolean | null
   motion_fps?: number | null
   conversion_cache_mb?: number | null

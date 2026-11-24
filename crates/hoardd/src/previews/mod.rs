@@ -10,10 +10,6 @@
 //!   signed-in person's browser sends that picture to replace the server's. A Lottie animation's only thumbnail is
 //!   the one a browser draws. Where a thumbnail came from is kept, so
 //!   a worse one never replaces a better one and re-analysis leaves it be.
-//! - **AVIF thumbnails** for browsers that read them, when Settings asks: see [`avif`].
-
-mod avif;
-pub(crate) use avif::{AvifThumb, avif_thumb, convert_all as avif_thumbs, vary};
 
 use crate::i18n::tr;
 use axum::Json;
@@ -296,7 +292,8 @@ pub(crate) async fn put_thumb(
         let img = image::load_from_memory(&body)?;
         let (w, h) = img.dimensions();
         anyhow::ensure!(w.max(h) <= 4096 && w.min(h) >= 16, "a {w}×{h} picture isn't a thumbnail");
-        crate::analyze::thumb_bytes(img.thumbnail(256, 256).to_rgba8(), false)
+        let px = crate::analyze::thumb_size();
+        crate::analyze::thumb_bytes(&img.thumbnail(px, px).to_rgba8(), false)
     })
     .await?
     .map_err(|e| AppError::bad_request(tr!("error-not-a-picture", reason = format!("{e:#}"))))?;

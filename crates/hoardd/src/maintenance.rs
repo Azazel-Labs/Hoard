@@ -30,8 +30,6 @@ pub(crate) const BACKUP: &str = "backup";
 pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const REANALYZE: &str = "reanalyze";
 pub(crate) const CLEAR_CACHE: &str = "clear_cache";
-pub(crate) const SHRINK_THUMBS: &str = "shrink_thumbs";
-pub(crate) const AVIF_THUMBS: &str = "avif_thumbs";
 pub(crate) const GC: &str = "gc";
 
 pub(crate) const TASKS: &[Task] = &[
@@ -47,22 +45,12 @@ pub(crate) const TASKS: &[Task] = &[
         label: || tr!("server-maintenance-clear-cache"),
         blurb: || tr!("server-maintenance-clear-cache-blurb"),
     },
-    Task {
-        id: SHRINK_THUMBS,
-        label: || tr!("server-maintenance-shrink-thumbs"),
-        blurb: || tr!("server-maintenance-shrink-thumbs-blurb"),
-    },
-    Task {
-        id: AVIF_THUMBS,
-        label: || tr!("server-maintenance-avif-thumbs"),
-        blurb: || tr!("server-maintenance-avif-thumbs-blurb"),
-    },
     Task { id: GC, label: || tr!("server-maintenance-gc"), blurb: || tr!("server-maintenance-gc-blurb") },
 ];
 
 /// The tasks that stop partway when asked, between one thing and the next. A backup, clearing the cache and deleting
 /// unused files are quick, and best finished once begun.
-const STOPPABLE: &[&str] = &[SCRUB, REANALYZE, SHRINK_THUMBS, AVIF_THUMBS];
+const STOPPABLE: &[&str] = &[SCRUB, REANALYZE];
 
 /// Runs kept in the history.
 const KEEP_RUNS: i64 = 200;
@@ -177,21 +165,9 @@ async fn execute(state: &AppState, t: &'static Task, run: i64, scheduled: bool) 
         SCRUB => scrub(state, &report).await,
         REANALYZE => reanalyze(state, &report).await,
         CLEAR_CACHE => clear_cache(state).await,
-        SHRINK_THUMBS => shrink_thumbs(state, &report).await,
-        AVIF_THUMBS => {
-            crate::previews::avif_thumbs(
-                state,
-                |done, total| report.progress(done, total, ("thumbnail", "thumbnails")),
-                || report.stopped(),
-            )
-            .await
-        }
         GC => gc(state).await,
         other => Err(anyhow::anyhow!("no maintenance task {other}")),
     };
-    if t.id == SHRINK_THUMBS {
-        crate::looks::schedule(state).await;
-    }
     let (ok, summary) = match &result {
         Ok(s) => (true, s.clone()),
         Err(e) => (false, format!("{e:#}")),
@@ -559,83 +535,6 @@ async fn clear_cache(state: &AppState) -> Result<String> {
             plural(usize::try_from(conversions).unwrap_or(usize::MAX), "conversion", "conversions"),
             plural(leftovers, "leftover", "leftovers"),
         )
-    })
-}
-
-/// Re-encode the PNG thumbnails and model views with the current Thumbnails setting, keeping each new one only when
-/// it's clearly smaller.
-async fn shrink_thumbs(state: &AppState, report: &Report) -> Result<String> {
-    // (hash, size, pixel art). A thumbnail shared by several assets is done once.
-    let rows: Vec<(String, i64, bool)> = db::call(&state.pool, |c| {
-        let rows = c
-            .prepare(
-                "SELECT b.hash, b.size, MAX(COALESCE(json_extract(a.meta, '$.\"pixel-art-likely\"'), 0))
-                   FROM blobs b JOIN assets a ON a.thumb_hash = b.hash GROUP BY b.hash
-                 UNION
-                 SELECT b.hash, b.size, 0 FROM blobs b JOIN derivatives d ON d.blob_hash = b.hash
-                  WHERE d.kind = 'views'",
-            )?
-            .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get::<_, i64>(2)? != 0)))?
-            .collect::<rusqlite::Result<Vec<_>>>()?;
-        Ok(rows)
-    })
-    .await?;
-    let total = rows.len();
-    let (mut shrunk, mut saved) = (0usize, 0u64);
-    let mut stopped = None;
-    for (i, (old, size, pixel_art)) in rows.into_iter().enumerate() {
-        report.progress(i, total, ("thumbnail", "thumbnails"));
-        if report.stopped() {
-            stopped = Some(i);
-            break;
-        }
-        if pixel_art {
-            continue;
-        }
-        let Ok(bytes) = state.blobs.read_all(&old).await else { continue };
-        if !bytes.starts_with(b"\x89PNG") {
-            continue;
-        }
-        let smaller = crate::heavy::run("shrink-thumb", move || -> Result<Option<Vec<u8>>> {
-            let img = image::load_from_memory(&bytes)?.to_rgba8();
-            let out = crate::analyze::thumb_bytes(img, false)?;
-            // A PNG made smaller by the stronger compression counts too.
-            // Not worth swapping for less than a tenth.
-            Ok((out.len() * 10 < bytes.len() * 9).then_some(out))
-        })
-        .await;
-        let Ok(Ok(Some(out))) = smaller else { continue };
-        let blob = state.blobs.put_cache_bytes(out).await?;
-        let (o, n, new_size) = (old.clone(), blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
-        db::call(&state.pool, move |c| {
-            let tx = c.transaction()?;
-            tx.execute(
-                "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-                params![n, new_size, db::now()],
-            )?;
-            tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE thumb_hash = ?1", [&o, &n])?;
-            tx.execute("UPDATE derivatives SET blob_hash = ?2 WHERE blob_hash = ?1 AND kind = 'views'", [&o, &n])?;
-            tx.commit()?;
-            Ok(())
-        })
-        .await?;
-        jobs::delete_unused(state, vec![(old, size)]).await?;
-        shrunk += 1;
-        saved += u64::try_from(size - new_size).unwrap_or(0);
-    }
-    report.progress(total, total, ("thumbnail", "thumbnails"));
-    let saving = |n| format!("{}, saving {}", plural(n, "thumbnail", "thumbnails"), human_bytes(saved));
-    Ok(match (stopped, shrunk) {
-        (Some(i), 0) => {
-            format!("Stopped after looking at {i} of {}: none shrunk", plural(total, "thumbnail", "thumbnails"))
-        }
-        (Some(i), n) => format!(
-            "Stopped after looking at {i} of {}: shrank {}",
-            plural(total, "thumbnail", "thumbnails"),
-            saving(n)
-        ),
-        (None, 0) => "Nothing to shrink".to_owned(),
-        (None, n) => format!("Shrank {}", saving(n)),
     })
 }
 

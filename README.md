@@ -1564,8 +1564,8 @@ operation tools are built from, so it can't fall behind them.
 | POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
 | GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
-| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `avif_thumbs`, `clear_cache` or `gc` |
-| POST 🔒 | `/api/admin/maintenance/{task}/stop` | stop `scrub`, `reanalyze`, `shrink_thumbs` or `avif_thumbs` after the item it's on |
+| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `clear_cache` or `gc` |
+| POST 🔒 | `/api/admin/maintenance/{task}/stop` | stop `scrub` or `reanalyze` after the item it's on |
 | POST 🔒 | `/api/admin/jobs/{id}/stop` | take a waiting job off the queue, or stop a running background one (not ingests) |
 | POST 🔒 | `/api/admin/jobs/stop` | `{"kind": "llm_tag"}`: stop every job of a kind, waiting or running; returns `{"stopped": n}` |
 | POST | `/mcp` | MCP over streamable HTTP (needs a sign-in: OAuth or an access token) |

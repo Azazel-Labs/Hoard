@@ -8,7 +8,7 @@ use std::path::Path;
 
 use image::{Rgba, RgbaImage};
 
-use crate::analyze::THUMB_SIZE;
+use crate::analyze::thumb_size;
 use crate::{AppState, db};
 
 /// How much of a file is read: more than the lines a thumbnail has room for.
@@ -165,14 +165,14 @@ async fn draw_one(state: &AppState, id: &str, ext: &str, hash: &str, size: i64) 
             return Ok(false);
         }
         let data = state.blobs.read_all(hash).await?.to_vec();
-        tokio::task::spawn_blocking(move || crate::textures::pdf_thumbnail_of(data, THUMB_SIZE)).await??
+        tokio::task::spawn_blocking(move || crate::textures::pdf_thumbnail_of(data, thumb_size())).await??
     } else {
         let head = state.blobs.head(hash, HEAD).await?;
         let lang = lang(ext);
-        tokio::task::spawn_blocking(move || lang.and_then(|lang| draw(&head, lang, THUMB_SIZE))).await?
+        tokio::task::spawn_blocking(move || lang.and_then(|lang| draw(&head, lang, thumb_size()))).await?
     };
     let Some(img) = picture else { return Ok(false) };
-    let blob = state.blobs.put_cache_bytes(crate::analyze::thumb_bytes(img, !pdf)?).await?;
+    let blob = state.blobs.put_cache_bytes(crate::analyze::thumb_bytes(&img, !pdf)?).await?;
     let id = id.to_owned();
     db::call(&state.pool, move |c| {
         c.execute(
@@ -259,9 +259,9 @@ pub(crate) async fn sniff_others(state: &AppState) -> anyhow::Result<()> {
         if !looks_like_text(&head[..head.len().min(SNIFF as usize)]) {
             continue;
         }
-        let picture = tokio::task::spawn_blocking(move || draw(&head, Lang::Prose, THUMB_SIZE)).await?;
+        let picture = tokio::task::spawn_blocking(move || draw(&head, Lang::Prose, thumb_size())).await?;
         let thumb = match picture {
-            Some(img) => Some(state.blobs.put_cache_bytes(crate::analyze::thumb_bytes(img, true)?).await?),
+            Some(img) => Some(state.blobs.put_cache_bytes(crate::analyze::thumb_bytes(&img, true)?).await?),
             None => None,
         };
         let category = category.clone();

@@ -14,7 +14,6 @@ use crate::blobs::is_valid_hash;
 use crate::db;
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
-use crate::previews::AvifThumb;
 
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub(super) struct FileParams {
@@ -64,28 +63,62 @@ pub(super) async fn asset_thumb(
     let hash = db::call(&state.pool, move |c| db::asset_thumb(c, &id2))
         .await?
         .ok_or_else(|| AppError::not_found(tr!("error-thumbnail-not-found", id = id)))?;
-    let (resp, versioned) = match crate::previews::avif_thumb(&state, &id, &hash, &headers).await? {
-        AvifThumb::Made(resp) => (resp, q.v.is_some()),
-        // Checked again next time, when the AVIF may be there.
-        AvifThumb::Making => (stored_thumb(&state, &hash, &headers).await?, false),
-        AvifThumb::Stored => (stored_thumb(&state, &hash, &headers).await?, q.v.is_some()),
-    };
-    let resp = if versioned { resp } else { crate::previews::unversioned(resp) };
-    // With AVIF on, what's sent depends on what the browser says it reads.
-    Ok(if state.settings.get().thumb_avif { crate::previews::vary(resp) } else { resp })
+    let resp = stored_thumb(&state, &hash, &headers).await?;
+    Ok(if q.v.is_some() { resp } else { crate::previews::unversioned(resp) })
 }
 
-/// A thumbnail as it's stored.
+/// A thumbnail as it's stored, or as PNG for a client that doesn't read WebP.
 async fn stored_thumb(state: &AppState, hash: &str, headers: &HeaderMap) -> ApiResult<Response> {
-    // Thumbnails are JPEG or PNG; the first bytes say which. A browser revalidating its copy gets a 304 without them.
-    let revalidating =
-        headers.get(header::IF_NONE_MATCH).is_some_and(|v| v.as_bytes() == format!("\"{hash}\"").as_bytes());
+    let webp = reads_webp(headers);
+    // Thumbnails are WebP, JPEG or PNG (made before WebP, or the picture itself when it's small); the first bytes say
+    // which. A browser revalidating its copy gets a 304 without them.
+    let revalidating = webp && if_none_match(headers, &format!("\"{hash}\""));
     let mime = if revalidating {
-        "image/png"
+        "image/webp"
     } else {
-        crate::analyze::thumb_mime(&state.blobs.head(hash, 4).await.unwrap_or_default())
+        crate::analyze::thumb_mime(&state.blobs.head(hash, 12).await.unwrap_or_default())
     };
-    serve_blob(state, hash, headers, mime, None).await
+    let mut resp = if mime == "image/webp" && !webp {
+        thumb_as_png(state, hash, headers).await?
+    } else {
+        serve_blob(state, hash, headers, mime, None).await?
+    };
+    resp.headers_mut().insert(header::VARY, HeaderValue::from_static("accept"));
+    Ok(resp)
+}
+
+/// Whether a request takes WebP: browsers say so, and so does asking for anything. The engine plugins ask for JSON,
+/// and read PNG and JPEG only.
+fn reads_webp(headers: &HeaderMap) -> bool {
+    let Some(accept) = headers.get(header::ACCEPT).and_then(|v| v.to_str().ok()) else { return true };
+    accept
+        .split(',')
+        .map(|t| t.split(';').next().unwrap_or("").trim())
+        .any(|t| matches!(t, "image/webp" | "image/*" | "*/*"))
+}
+
+fn if_none_match(headers: &HeaderMap, etag: &str) -> bool {
+    headers.get(header::IF_NONE_MATCH).is_some_and(|v| v.as_bytes() == etag.as_bytes())
+}
+
+/// A WebP thumbnail made PNG as it's sent; a thumbnail is small, so it isn't kept.
+async fn thumb_as_png(state: &AppState, hash: &str, headers: &HeaderMap) -> ApiResult<Response> {
+    let etag = format!("\"{hash}-png\"");
+    if if_none_match(headers, &etag) {
+        return Ok((StatusCode::NOT_MODIFIED, [(header::ETAG, etag)]).into_response());
+    }
+    let webp = state.blobs.read_all(hash).await?;
+    let png = crate::heavy::run("thumb-png", move || -> anyhow::Result<Vec<u8>> {
+        crate::analyze::png_bytes(image::load_from_memory(&webp)?.to_rgba8())
+    })
+    .await??;
+    let private = if state.settings.get().guest_browsing { "public" } else { "private" };
+    Ok(Response::builder()
+        .header(header::CONTENT_TYPE, "image/png")
+        .header(header::ETAG, etag)
+        .header(header::X_CONTENT_TYPE_OPTIONS, "nosniff")
+        .header(header::CACHE_CONTROL, format!("{private}, max-age=31536000, immutable"))
+        .body(Body::from(png))?)
 }
 
 pub(super) async fn blob(
@@ -221,7 +254,13 @@ pub(super) async fn asset_derivative(
     // A recovered source file is served as what it is (a .wav out of a .uasset).
     let ext = match kind.as_str() {
         "glb" => "glb".to_owned(),
-        "views" => "png".to_owned(),
+        // WebP, or JPEG or PNG when made before.
+        "views" => match crate::analyze::thumb_mime(&state.blobs.head(&hash, 12).await.unwrap_or_default()) {
+            "image/webp" => "webp",
+            "image/jpeg" => "jpg",
+            _ => "png",
+        }
+        .to_owned(),
         "motion" => "webp".to_owned(),
         "source" => source_ext.unwrap_or_else(|| "bin".to_owned()),
         "preview" => "mp3".to_owned(),
@@ -278,6 +317,23 @@ pub(super) async fn asset_original(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn browsers_and_anything_goes_take_webp_and_the_engine_plugins_dont() {
+        let with = |accept: Option<&'static str>| {
+            let mut h = HeaderMap::new();
+            if let Some(a) = accept {
+                h.insert(header::ACCEPT, HeaderValue::from_static(a));
+            }
+            reads_webp(&h)
+        };
+        assert!(with(Some("image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")), "Chrome");
+        assert!(with(Some("image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5")), "anything goes");
+        assert!(with(Some("*/*")), "fetch");
+        assert!(with(None));
+        assert!(!with(Some("application/json")), "the engine plugins");
+        assert!(!with(Some("image/png, image/jpeg")));
+    }
 
     #[test]
     fn ranges() {

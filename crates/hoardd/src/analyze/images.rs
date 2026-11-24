@@ -9,7 +9,7 @@ use image::imageops::FilterType;
 use image::{DynamicImage, GenericImageView, ImageReader};
 use serde_json::json;
 
-use super::{Analysis, MAX_IMAGE_DECODE_BYTES, THUMB_SIZE, thumb_bytes};
+use super::{Analysis, MAX_IMAGE_DECODE_BYTES, thumb_bytes, thumb_size};
 
 pub(super) fn analyze_image(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let size = std::fs::metadata(path)?.len();
@@ -38,7 +38,17 @@ pub(super) fn analyze_image(path: &Path, ext: &str, a: &mut Analysis) -> anyhow:
     } else {
         img
     };
-    analyze_pixels(&img, a, true)
+    analyze_pixels(&img, a, true)?;
+    // A small icon or picture is its own thumbnail when that's no more bytes: it's kept in the cache like any
+    // thumbnail, so showing it never wakes the drive the library lives on. Not pixel art, whose thumbnail is it made
+    // bigger with its pixels kept square, which a browser stretching it wouldn't.
+    let still = !["frames", "hdr", "pixel-art-likely"].iter().any(|k| a.meta.contains_key(*k));
+    if let Some(thumb) = &a.thumb
+        && crate::thumbs::is_own_thumb(ext, (w, h), size, thumb.len(), still)
+    {
+        a.thumb = Some(std::fs::read(path)?);
+    }
+    Ok(())
 }
 
 /// Most frames counted in an animated picture.
@@ -135,14 +145,14 @@ pub(super) fn analyze_pixels(img: &DynamicImage, a: &mut Analysis, full: bool) -
     let (w, h) = img.dimensions();
     // Pixel art: small and few distinct colors. Upscale its thumbnail with nearest-neighbor so it stays crisp.
     let pixel_art = full && w.max(h) <= 512 && distinct_colors(img, 64).is_some_and(|n| n <= 48);
-    let thumb = if pixel_art && w.max(h) < THUMB_SIZE {
-        let scale = (THUMB_SIZE / w.max(h)).max(1);
+    let thumb = if pixel_art && w.max(h) < thumb_size() {
+        let scale = (thumb_size() / w.max(h)).max(1);
         img.resize(w * scale, h * scale, FilterType::Nearest)
     } else {
-        img.thumbnail(THUMB_SIZE, THUMB_SIZE)
+        img.thumbnail(thumb_size(), thumb_size())
     };
     let rgba = thumb.to_rgba8();
-    a.thumb = Some(thumb_bytes(rgba.clone(), pixel_art)?);
+    a.thumb = Some(thumb_bytes(&rgba, pixel_art)?);
 
     let has_alpha = img.color().has_alpha() && rgba.pixels().any(|p| p[3] < 250);
     a.meta.insert("alpha".into(), json!(has_alpha));
@@ -343,5 +353,42 @@ mod tests {
         let still = dir.path().join("still.png");
         RgbaImage::from_pixel(8, 8, image::Rgba([0, 0, 0, 255])).save(&still).unwrap();
         assert_eq!(animation(&still, "png"), None);
+    }
+
+    #[test]
+    fn a_small_picture_is_its_own_thumbnail_when_that_is_fewer_bytes() {
+        use image::codecs::jpeg::JpegEncoder;
+        let dir = tempfile::tempdir().unwrap();
+        let mut seed = 0x9e37_79b9_u32;
+        let mut picture = |side: u32| {
+            image::RgbImage::from_fn(side, side, |x, y| {
+                seed ^= seed << 13;
+                seed ^= seed >> 17;
+                seed ^= seed << 5;
+                image::Rgb([(x * 255 / side) as u8, (y * 255 / side) as u8, (seed % 256) as u8])
+            })
+        };
+        let small = picture(200);
+        // Squeezed hard already, as a web icon is: no thumbnail made of it is smaller.
+        let jpeg = dir.path().join("icon.jpg");
+        let mut bytes = Vec::new();
+        JpegEncoder::new_with_quality(&mut bytes, 10).encode_image(&small).unwrap();
+        std::fs::write(&jpeg, &bytes).unwrap();
+        let a = analyze(&jpeg, dir.path(), AssetKind::Texture, "jpg");
+        assert_eq!(a.thumb.as_deref(), Some(bytes.as_slice()));
+
+        // The same picture kept exactly makes a smaller thumbnail.
+        let png = dir.path().join("icon.png");
+        small.save(&png).unwrap();
+        let a = analyze(&png, dir.path(), AssetKind::Texture, "png");
+        assert_eq!(crate::analyze::thumb_mime(&a.thumb.expect("thumbnail")), "image/webp");
+
+        // Bigger than a thumbnail, it never is one.
+        let big = dir.path().join("big.jpg");
+        let mut bytes = Vec::new();
+        JpegEncoder::new_with_quality(&mut bytes, 10).encode_image(&picture(600)).unwrap();
+        std::fs::write(&big, &bytes).unwrap();
+        let a = analyze(&big, dir.path(), AssetKind::Texture, "jpg");
+        assert_eq!(crate::analyze::thumb_mime(&a.thumb.expect("thumbnail")), "image/webp");
     }
 }

@@ -425,8 +425,15 @@ fn draw(
         .map_err(|_| anyhow!("the renderer crashed"))??;
     drop(guard);
     let still = drawn.get(drawn.len() / 2).context("no frames")?.clone();
+    // The motion thumbnail plays at its own size; the still is a thumbnail like any other, at the size set.
+    let px = crate::analyze::thumb_size();
+    let still = if px < SIZE {
+        image::DynamicImage::ImageRgba8(still).resize(px, px, image::imageops::FilterType::Lanczos3).to_rgba8()
+    } else {
+        still
+    };
     let webp = if motion.is_some() { Some(encode(&drawn, ms)?) } else { None };
-    Ok((webp, crate::analyze::thumb_bytes(still, false)?, on_body))
+    Ok((webp, crate::analyze::thumb_bytes(&still, false)?, on_body))
 }
 
 /// The clip a motion thumbnail plays, as its index and length: a document's first that isn't a pose.

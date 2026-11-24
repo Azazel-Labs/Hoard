@@ -1126,4 +1126,36 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // 104: what's drawn is kept with which drawing of it it is (see `motion::DRAWN`), so a fix to how animations are
     // drawn draws them again in the background, each old one showing until its new one is in.
     "ALTER TABLE derivatives ADD COLUMN rev INTEGER NOT NULL DEFAULT 0;",
+    // 105: each thumbnail is kept with how it was made: which drawing of its kind (`thumb_drawn`, see
+    // `thumbs::DRAWN`), how many pixels across (`thumb_px`) and at what WebP quality (`thumb_q`, NULL for JPEG and
+    // PNG from before WebP). `thumb_now` is what Settings asks for now and `thumb_drawing` each kind's current
+    // drawing (`*` for the rest), kept by the server, so a thumbnail written anywhere is marked with them; those that differ are made
+    // again in the background. The thumbnails there are were all drawn 256 across.
+    "CREATE TABLE thumb_now (
+       one INTEGER PRIMARY KEY CHECK (one = 1),
+       px  INTEGER NOT NULL,
+       q   INTEGER NOT NULL
+     );
+     INSERT INTO thumb_now (one, px, q) VALUES (1, 256, 75);
+     CREATE TABLE thumb_drawing (
+       kind TEXT PRIMARY KEY,
+       rev  INTEGER NOT NULL
+     );
+     ALTER TABLE assets ADD COLUMN thumb_drawn INTEGER NOT NULL DEFAULT 0;
+     ALTER TABLE assets ADD COLUMN thumb_px INTEGER;
+     ALTER TABLE assets ADD COLUMN thumb_q INTEGER;
+     UPDATE assets SET thumb_drawn = 1, thumb_px = 256 WHERE thumb_hash IS NOT NULL;
+     CREATE TRIGGER assets_thumb_made AFTER UPDATE OF thumb_hash ON assets
+       WHEN new.thumb_hash IS NOT NULL AND new.thumb_hash IS NOT old.thumb_hash BEGIN
+       UPDATE assets SET thumb_drawn = COALESCE((SELECT rev FROM thumb_drawing WHERE kind = new.kind),
+                                          (SELECT rev FROM thumb_drawing WHERE kind = '*'), 1),
+                         thumb_px = (SELECT px FROM thumb_now), thumb_q = (SELECT q FROM thumb_now)
+        WHERE id = new.id;
+     END;
+     CREATE TRIGGER assets_thumb_first AFTER INSERT ON assets WHEN new.thumb_hash IS NOT NULL BEGIN
+       UPDATE assets SET thumb_drawn = COALESCE((SELECT rev FROM thumb_drawing WHERE kind = new.kind),
+                                          (SELECT rev FROM thumb_drawing WHERE kind = '*'), 1),
+                         thumb_px = (SELECT px FROM thumb_now), thumb_q = (SELECT q FROM thumb_now)
+        WHERE id = new.id;
+     END;",
 ];

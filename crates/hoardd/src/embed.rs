@@ -13,6 +13,7 @@ use candle_core::{Device, Tensor};
 use rusqlite::params;
 use serde::Deserialize;
 
+use crate::resident::Resident;
 use crate::tools::{self, Slot, Status};
 use crate::{AppState, db};
 
@@ -350,12 +351,12 @@ pub(crate) struct Spec {
 #[derive(Debug)]
 pub(crate) struct Index {
     spec: RwLock<&'static Spec>,
-    map: RwLock<Option<HashMap<String, Entry>>>,
+    map: Resident<Entry>,
 }
 
 impl Index {
     pub(crate) const fn new(spec: &'static Spec) -> Self {
-        Self { spec: RwLock::new(spec), map: RwLock::new(None) }
+        Self { spec: RwLock::new(spec), map: Resident::new() }
     }
 
     pub(crate) fn spec(&self) -> &'static Spec {
@@ -375,21 +376,16 @@ impl Index {
     }
 
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
-        self.map.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
+        self.map.read(f)
     }
 
     pub(crate) fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
-        if let Some(m) = self.map.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
-            f(m);
-        }
+        self.map.write(f);
     }
 
     pub(crate) async fn ensure(&self, state: &AppState) -> Result<()> {
-        if self.read(|_| ()).is_some() {
-            return Ok(());
-        }
         let spec = self.spec();
-        let loaded = db::call(&state.pool, move |c| {
+        let load = move |c: &rusqlite::Connection| {
             let mut stmt = c.prepare(spec.load)?;
             let rows = stmt
                 .query_map([spec.model], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
@@ -398,31 +394,25 @@ impl Index {
                     (spec.dims == 0 || v.len() == spec.dims).then_some(())?;
                     Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
                 })
-                .collect::<HashMap<_, _>>();
+                .collect();
             Ok(rows)
-        })
-        .await?;
-        let mut guard = self.map.write().unwrap_or_else(PoisonError::into_inner);
+        };
         // Unless another model's were asked for meanwhile.
-        if guard.is_none() && std::ptr::eq(self.spec(), spec) {
-            tracing::debug!(embeddings = loaded.len(), what = spec.what, "embeddings loaded");
-            *guard = Some(loaded);
-        }
-        Ok(())
+        self.map.ensure(&state.pool, spec.what, load, || std::ptr::eq(self.spec(), spec)).await
     }
 
     #[cfg(test)]
     pub(crate) fn set(&self, m: HashMap<String, Entry>) {
-        *self.map.write().unwrap_or_else(PoisonError::into_inner) = Some(m);
+        self.map.set(m);
     }
 
     pub(crate) fn len(&self) -> usize {
-        self.read(HashMap::len).unwrap_or(0)
+        self.map.len()
     }
 
     /// Let go of every embedding (they'll be loaded again if wanted).
     pub(crate) fn forget(&self) {
-        *self.map.write().unwrap_or_else(PoisonError::into_inner) = None;
+        self.map.forget();
     }
 
     /// Runs `f` with how much a thumbnail looks like `hash`'s by meaning, about 0..=1 (`None` for one without an
@@ -430,19 +420,20 @@ impl Index {
     /// nothing is copied for the thumbnails never asked about.
     pub(crate) fn similar<R>(&self, hash: &str, f: impl FnOnce(Option<Likeness<'_>>) -> R) -> R {
         let spec = self.spec();
-        let guard = self.map.read().unwrap_or_else(PoisonError::into_inner);
-        let Some((m, target)) = guard.as_ref().and_then(|m| Some((m, m.get(hash)?))) else { return f(None) };
-        let (unrelated, same) = if spec.unrelated.is_nan() {
-            // The typical picture's score against this one is what unrelated looks like.
-            let mut all: Vec<f32> = m.values().map(|e| target.cosine(e)).collect();
-            let mid = all.len() / 2;
-            let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
-            (typical, typical + HOSTED_SAME * (1.0 - typical))
-        } else {
-            (spec.unrelated, spec.same)
-        };
-        let span = (same - unrelated).max(1e-6);
-        f(Some(&|h: &str| m.get(h).map(|e| ((target.cosine(e) - unrelated) / span).clamp(0.0, 1.0))))
+        self.map.with(|m| {
+            let Some((m, target)) = m.and_then(|m| Some((m, m.get(hash)?))) else { return f(None) };
+            let (unrelated, same) = if spec.unrelated.is_nan() {
+                // The typical picture's score against this one is what unrelated looks like.
+                let mut all: Vec<f32> = m.values().map(|e| target.cosine(e)).collect();
+                let mid = all.len() / 2;
+                let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
+                (typical, typical + HOSTED_SAME * (1.0 - typical))
+            } else {
+                (spec.unrelated, spec.same)
+            };
+            let span = (same - unrelated).max(1e-6);
+            f(Some(&|h: &str| m.get(h).map(|e| ((target.cosine(e) - unrelated) / span).clamp(0.0, 1.0))))
+        })
     }
 
     /// What matches a text embedding, best first, scored about 0..=0.5.

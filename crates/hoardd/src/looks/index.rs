@@ -1,14 +1,14 @@
 //! The in-memory index "more like this", near copies and color search rank against: each thumbnail's descriptor,
 //! hash and palette.
 
+use crate::resident::Resident;
 use std::collections::HashMap;
-use std::sync::{PoisonError, RwLock};
 
 use anyhow::Result;
 
 use super::features::DIMS;
 use super::{Features, Swatch, VERSION, decode_palette};
-use crate::{AppState, db};
+use crate::AppState;
 
 /// "More like this" keeps at most this many matches, and only those scoring at least the floor.
 const SIMILAR_MAX: usize = 1000;
@@ -42,31 +42,28 @@ impl Entry {
 /// Every thumbnail's look, in memory, loaded from the `looks` table on first use and kept up to date by the looks
 /// job.
 #[derive(Debug, Default)]
-pub(crate) struct Index(pub(super) RwLock<Option<HashMap<String, Entry>>>);
+pub(crate) struct Index(Resident<Entry>);
 
 impl Index {
     /// An empty index that's loaded, for tests.
     #[cfg(test)]
     pub(crate) fn loaded() -> Self {
-        Self(RwLock::new(Some(HashMap::new())))
+        let index = Self::default();
+        index.0.set(HashMap::new());
+        index
     }
 
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
-        self.0.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
+        self.0.read(f)
     }
 
     fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
-        if let Some(m) = self.0.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
-            f(m);
-        }
+        self.0.write(f);
     }
 
     /// Load the index if it isn't yet.
     pub(crate) async fn ensure(&self, state: &AppState) -> Result<()> {
-        if self.read(|_| ()).is_some() {
-            return Ok(());
-        }
-        let loaded = db::call(&state.pool, |c| {
+        let load = |c: &rusqlite::Connection| {
             let mut stmt = c.prepare("SELECT thumb_hash, palette, descriptor, phash FROM looks WHERE version = ?1")?;
             let rows = stmt
                 .query_map([VERSION], |r| {
@@ -82,16 +79,10 @@ impl Index {
                     })?;
                     Some((hash, entry))
                 })
-                .collect::<HashMap<_, _>>();
+                .collect();
             Ok(rows)
-        })
-        .await?;
-        let mut guard = self.0.write().unwrap_or_else(PoisonError::into_inner);
-        if guard.is_none() {
-            tracing::debug!(looks = loaded.len(), "looks index loaded");
-            *guard = Some(loaded);
-        }
-        Ok(())
+        };
+        self.0.ensure(&state.pool, "looks", load, || true).await
     }
 
     pub(crate) fn insert(&self, hash: String, features: Features) {

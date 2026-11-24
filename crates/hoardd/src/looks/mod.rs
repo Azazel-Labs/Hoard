@@ -686,8 +686,7 @@ mod tests {
 
     #[test]
     fn near_pairs_finds_what_near_finds() {
-        let index = Index::default();
-        *index.0.write().unwrap() = Some(HashMap::new());
+        let index = Index::loaded();
         let img = rock(5, [0.6, 0.5, 0.4]);
         let small = image::imageops::resize(&img, 100, 100, image::imageops::FilterType::Triangle);
         index.insert("a".into(), analyze(&png(&img)).unwrap());

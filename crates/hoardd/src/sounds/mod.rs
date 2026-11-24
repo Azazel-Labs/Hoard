@@ -19,8 +19,8 @@
 mod likeness;
 mod listening;
 
+use crate::resident::Resident;
 use std::collections::{HashMap, HashSet};
-use std::sync::{PoisonError, RwLock};
 
 use anyhow::Result;
 use rusqlite::params;
@@ -44,13 +44,15 @@ const NEAR_FLOOR: f32 = 0.9;
 /// Every sound's descriptor, in memory, loaded from the `sounds` table on first use and kept up to date by the sounds
 /// job.
 #[derive(Debug, Default)]
-pub(crate) struct Index(RwLock<Option<HashMap<String, Box<[i8]>>>>);
+pub(crate) struct Index(Resident<Box<[i8]>>);
 
 impl Index {
     /// An empty index that's loaded, for tests.
     #[cfg(test)]
     pub(crate) fn loaded() -> Self {
-        Self(RwLock::new(Some(HashMap::new())))
+        let index = Self::default();
+        index.0.set(HashMap::new());
+        index
     }
 
     /// Add a file's descriptor, for tests.
@@ -62,21 +64,16 @@ impl Index {
     }
 
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Box<[i8]>>) -> R) -> Option<R> {
-        self.0.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
+        self.0.read(f)
     }
 
     fn write(&self, f: impl FnOnce(&mut HashMap<String, Box<[i8]>>)) {
-        if let Some(m) = self.0.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
-            f(m);
-        }
+        self.0.write(f);
     }
 
     /// Load the index if it isn't yet.
     pub(crate) async fn ensure(&self, state: &AppState) -> Result<()> {
-        if self.read(|_| ()).is_some() {
-            return Ok(());
-        }
-        let loaded = db::call(&state.pool, |c| {
+        let load = |c: &rusqlite::Connection| {
             let mut stmt = c.prepare("SELECT hash, descriptor FROM sounds WHERE version = ?1")?;
             let rows = stmt
                 .query_map([VERSION], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
@@ -84,16 +81,10 @@ impl Index {
                     let (hash, d) = row.ok()?;
                     (d.len() == DIMS).then(|| (hash, d.into_iter().map(|b| b as i8).collect()))
                 })
-                .collect::<HashMap<_, _>>();
+                .collect();
             Ok(rows)
-        })
-        .await?;
-        let mut guard = self.0.write().unwrap_or_else(PoisonError::into_inner);
-        if guard.is_none() {
-            tracing::debug!(sounds = loaded.len(), "sounds index loaded");
-            *guard = Some(loaded);
-        }
-        Ok(())
+        };
+        self.0.ensure(&state.pool, "sounds", load, || true).await
     }
 
     /// Files that could be the same sound as `hash`'s, by their descriptors; their prints decide (see [`same_print`]).

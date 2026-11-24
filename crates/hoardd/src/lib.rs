@@ -83,6 +83,7 @@ mod provenance;
 mod recent_log;
 mod reformat;
 mod relocate;
+mod resident;
 mod rhythm;
 mod rive;
 mod scan;

@@ -42,9 +42,9 @@ const SIMILAR_FLOOR: f32 = 0.6;
 /// How alike two files' descriptors must be to compare their prints for a near copy.
 const NEAR_FLOOR: f32 = 0.9;
 /// Every sound's descriptor, in memory, loaded from the `sounds` table on first use and kept up to date by the sounds
-/// job.
+/// job. Each is kept in the map's entry itself, rather than somewhere else in memory to go and fetch for each.
 #[derive(Debug, Default)]
-pub(crate) struct Index(Resident<Box<[i8]>>);
+pub(crate) struct Index(Resident<[i8; DIMS]>);
 
 impl Index {
     /// An empty index that's loaded, for tests.
@@ -59,15 +59,15 @@ impl Index {
     #[cfg(test)]
     pub(crate) fn insert(&self, hash: &str, descriptor: Vec<i8>) {
         self.write(|m| {
-            m.insert(Key::new(hash), descriptor.into_boxed_slice());
+            m.insert(Key::new(hash), descriptor.try_into().expect("a descriptor of DIMS"));
         });
     }
 
-    fn read<R>(&self, f: impl FnOnce(&crate::resident::Map<Box<[i8]>>) -> R) -> Option<R> {
+    fn read<R>(&self, f: impl FnOnce(&crate::resident::Map<[i8; DIMS]>) -> R) -> Option<R> {
         self.0.read(f)
     }
 
-    fn write(&self, f: impl FnOnce(&mut crate::resident::Map<Box<[i8]>>)) {
+    fn write(&self, f: impl FnOnce(&mut crate::resident::Map<[i8; DIMS]>)) {
         self.0.write(f);
     }
 
@@ -79,7 +79,7 @@ impl Index {
                 .query_map([VERSION], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
                 .filter_map(|row| {
                     let (hash, d) = row.ok()?;
-                    (d.len() == DIMS).then(|| (Key::from(hash), d.into_iter().map(|b| b as i8).collect()))
+                    Some((Key::from(hash), <[u8; DIMS]>::try_from(d).ok()?.map(|b| b as i8)))
                 })
                 .collect();
             Ok(rows)
@@ -93,7 +93,7 @@ impl Index {
             let key = Key::new(hash);
             let Some(target) = m.get(&key) else { return Vec::new() };
             m.iter()
-                .filter(|(h, d)| **h != key && similarity(target, d) >= NEAR_FLOOR)
+                .filter(|(h, d)| **h != key && similarity(target, *d) >= NEAR_FLOOR)
                 .map(|(h, _)| h.to_string())
                 .collect()
         })
@@ -220,8 +220,8 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             done += chunk.len();
             state.sounds.write(|m| {
                 for (hash, heard) in computed {
-                    if let Some(h) = heard {
-                        m.insert(hash.into(), h.descriptor.into_boxed_slice());
+                    if let Some(d) = heard.and_then(|h| <[i8; DIMS]>::try_from(h.descriptor).ok()) {
+                        m.insert(hash.into(), d);
                     }
                 }
             });

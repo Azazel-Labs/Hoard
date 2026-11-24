@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 use super::features::DIMS;
-use super::{Features, Swatch, VERSION, decode_palette};
+use super::{Features, VERSION, encode_palette, swatch};
 use crate::AppState;
 
 /// "More like this" keeps at most this many matches, and only those scoring at least the floor.
@@ -22,20 +22,24 @@ const COLOR_FLOOR: f32 = 0.08;
 const COLOR_SIGMA: f32 = 0.08;
 const COLOR_L_WEIGHT: f32 = 0.5;
 
+/// One thumbnail's look, as compact as it's stored: the colors as `encode_palette` has them, worked out again when
+/// a search by color reads them, and the descriptor in the entry itself rather than somewhere else in memory for
+/// "more like this" to go and fetch for each.
 #[derive(Debug)]
 pub(super) struct Entry {
-    pub(super) palette: Vec<Swatch>,
-    pub(super) descriptor: Box<[i8]>,
+    pub(super) palette: Box<[[u8; 4]]>,
+    pub(super) descriptor: [i8; DIMS],
     pub(super) phash: u64,
 }
 
 impl Entry {
     pub(super) fn from(f: Features) -> Option<Self> {
-        (f.descriptor.len() == DIMS).then(|| Self {
-            palette: f.palette,
-            descriptor: f.descriptor.into_boxed_slice(),
-            phash: f.phash,
-        })
+        Some(Self::stored(&encode_palette(&f.palette), f.descriptor.try_into().ok()?, f.phash))
+    }
+
+    /// From a `looks` row's palette, descriptor and perceptual hash.
+    fn stored(palette: &[u8], descriptor: [i8; DIMS], phash: u64) -> Self {
+        Self { palette: palette.as_chunks::<4>().0.into(), descriptor, phash }
     }
 }
 
@@ -71,13 +75,8 @@ impl Index {
                 })?
                 .filter_map(|row| {
                     let (hash, palette, descriptor, phash) = row.ok()?;
-                    let entry = Entry::from(Features {
-                        palette: decode_palette(&palette),
-                        descriptor: descriptor.into_iter().map(|b| b as i8).collect(),
-                        phash: phash as u64,
-                        print: Vec::new(),
-                    })?;
-                    Some((Key::from(hash), entry))
+                    let descriptor = <[u8; DIMS]>::try_from(descriptor).ok()?.map(|b| b as i8);
+                    Some((Key::from(hash), Entry::stored(&palette, descriptor, phash as u64)))
                 })
                 .collect();
             Ok(rows)
@@ -202,10 +201,11 @@ fn close(a: &Entry, b: &Entry, bits: u32, look: f32) -> bool {
 }
 
 /// How much of a picture is close to `lab`: each palette color's share, counted less the further it is.
-pub(super) fn color_score(palette: &[Swatch], lab: [f32; 3]) -> f32 {
+pub(super) fn color_score(palette: &[[u8; 4]], lab: [f32; 3]) -> f32 {
     palette
         .iter()
-        .map(|s| {
+        .map(|c| {
+            let s = swatch(*c);
             let d2 = (COLOR_L_WEIGHT * (s.lab[0] - lab[0])).powi(2)
                 + (s.lab[1] - lab[1]).powi(2)
                 + (s.lab[2] - lab[2]).powi(2);

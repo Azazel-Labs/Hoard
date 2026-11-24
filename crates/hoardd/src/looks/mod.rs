@@ -136,15 +136,15 @@ pub(crate) fn encode_palette(palette: &[Swatch]) -> Vec<u8> {
 }
 
 pub(crate) fn decode_palette(bytes: &[u8]) -> Vec<Swatch> {
-    bytes
-        .as_chunks::<4>()
-        .0
-        .iter()
-        .map(|c| Swatch {
-            lab: [f32::from(c[0]) / 255.0, f32::from(c[1] as i8) / 400.0, f32::from(c[2] as i8) / 400.0],
-            share: f32::from(c[3]) / 255.0,
-        })
-        .collect()
+    bytes.as_chunks::<4>().0.iter().copied().map(swatch).collect()
+}
+
+/// One color of a stored palette (see [`encode_palette`]).
+pub(crate) fn swatch(c: [u8; 4]) -> Swatch {
+    Swatch {
+        lab: [f32::from(c[0]) / 255.0, f32::from(c[1] as i8) / 400.0, f32::from(c[2] as i8) / 400.0],
+        share: f32::from(c[3]) / 255.0,
+    }
 }
 
 /// The palette of a thumbnail as shown on an asset's page, most of the picture first.
@@ -598,11 +598,13 @@ mod tests {
     #[test]
     fn color_search_scores_by_how_much_of_the_picture_is_that_color() {
         let green = oklab([40, 160, 60]);
-        let palette = [Swatch { lab: green, share: 0.6 }, Swatch { lab: oklab([200, 200, 200]), share: 0.4 }];
-        let exact = color_score(&palette, green);
+        let stored =
+            encode_palette(&[Swatch { lab: green, share: 0.6 }, Swatch { lab: oklab([200, 200, 200]), share: 0.4 }]);
+        let palette = stored.as_chunks::<4>().0;
+        let exact = color_score(palette, green);
         assert!((exact - 0.6).abs() < 0.05, "{exact}");
-        assert!(color_score(&palette, oklab([60, 170, 70])) > 0.4, "a nearby shade still counts");
-        assert!(color_score(&palette, oklab([200, 30, 30])) < 0.02, "red isn't green");
+        assert!(color_score(palette, oklab([60, 170, 70])) > 0.4, "a nearby shade still counts");
+        assert!(color_score(palette, oklab([200, 30, 30])) < 0.02, "red isn't green");
     }
 
     #[test]

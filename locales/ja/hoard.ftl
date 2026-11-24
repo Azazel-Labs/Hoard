@@ -1979,7 +1979,15 @@ model-info-materials = マテリアル
 model-info-textures = テクスチャ
 model-info-triangles = 三角形
 model-info-vertices = 頂点
-model-info-meters = glTF の単位はメートルです
+model-info-units = 単位
+model-info-in-meters = ファイルが示す単位から、メートルで表示しています
+model-units-m = メートル
+model-units-cm = センチメートル
+model-units-mm = ミリメートル
+model-units-in = インチ
+model-units-ft = フィート
+model-units-other = 1 単位 = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = 記載なし
 model-info-no-units = このフォーマットは単位を示していません
 model-info-height = 高さ
 model-info-length = 長さ

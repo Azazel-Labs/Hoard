@@ -107,6 +107,8 @@ test.describe('full-screen viewers', () => {
     const row = (label: string) => info.locator('dl > div').filter({ has: page.getByText(label, { exact: true }) }).locator('dd')
     await expect(row('Geometries')).toHaveText('4')
     await expect(row('Triangles')).toHaveText('8')
+    // glTF is in meters by definition.
+    await expect(row('Units')).toHaveText('Meters')
     await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
@@ -194,6 +196,7 @@ test.describe('full-screen viewers', () => {
     // Hoard's GLB of the OBJ shares each face's corners: four per side.
     await expect(row('Vertices')).toHaveText('24')
     // OBJ says nothing of its units.
+    await expect(row('Units')).toHaveText('Not stated')
     await expect(row('Height')).toHaveText('2 units')
     await expect(row('Width')).toHaveText('2 units')
     await info.getByRole('button', { name: 'Close scene information' }).click()

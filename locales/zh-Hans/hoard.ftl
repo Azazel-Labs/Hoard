@@ -1979,7 +1979,15 @@ model-info-materials = 材质
 model-info-textures = 纹理
 model-info-triangles = 三角面
 model-info-vertices = 顶点
-model-info-meters = glTF 以米为单位
+model-info-units = 单位
+model-info-in-meters = 按文件声明的单位换算为米
+model-units-m = 米
+model-units-cm = 厘米
+model-units-mm = 毫米
+model-units-in = 英寸
+model-units-ft = 英尺
+model-units-other = 1 单位 = { NUMBER($n, maximumSignificantDigits: 3) } 米
+model-units-unknown = 未声明
 model-info-no-units = 此格式未说明其单位
 model-info-height = 高度
 model-info-length = 长度

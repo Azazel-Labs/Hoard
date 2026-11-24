@@ -2188,7 +2188,15 @@ model-info-materials = Materiale
 model-info-textures = Teksture
 model-info-triangles = Driehoeke
 model-info-vertices = Hoekpunte
-model-info-meters = glTF is in meter
+model-info-units = Eenhede
+model-info-in-meters = Grootte in meter, volgens die eenhede wat die lêer noem
+model-units-m = Meter
+model-units-cm = Sentimeter
+model-units-mm = Millimeter
+model-units-in = Duim
+model-units-ft = Voet
+model-units-other = 1 eenheid = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Nie gestel nie
 model-info-no-units = Hierdie formaat sê nie wat sy eenhede is nie
 model-info-height = Hoogte
 model-info-length = Lengte

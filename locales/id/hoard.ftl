@@ -2011,7 +2011,15 @@ model-info-materials = Material
 model-info-textures = Tekstur
 model-info-triangles = Segitiga
 model-info-vertices = Verteks
-model-info-meters = glTF memakai satuan meter
+model-info-units = Satuan
+model-info-in-meters = Ukuran dalam meter, menurut satuan yang dinyatakan file
+model-units-m = Meter
+model-units-cm = Sentimeter
+model-units-mm = Milimeter
+model-units-in = Inci
+model-units-ft = Kaki
+model-units-other = 1 satuan = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Tidak dinyatakan
 model-info-no-units = Format ini tidak menyebutkan satuannya
 model-info-height = Tinggi
 model-info-length = Panjang

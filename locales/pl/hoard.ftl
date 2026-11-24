@@ -2385,7 +2385,15 @@ model-info-materials = Materiały
 model-info-textures = Tekstury
 model-info-triangles = Trójkąty
 model-info-vertices = Wierzchołki
-model-info-meters = glTF jest w metrach
+model-info-units = Jednostki
+model-info-in-meters = Wymiary w metrach, według jednostek podanych w pliku
+model-units-m = Metry
+model-units-cm = Centymetry
+model-units-mm = Milimetry
+model-units-in = Cale
+model-units-ft = Stopy
+model-units-other = 1 jednostka = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Nie podano
 model-info-no-units = Ten format nie określa swoich jednostek
 model-info-height = Wysokość
 model-info-length = Długość

@@ -11,6 +11,26 @@ type Loaded = {
   animations: THREE.AnimationClip[]
   /** Image files the model names that its pack doesn't have. */
   missing?: string[]
+  /** How long one of the file's own units is, in meters (see `unitOf`). */
+  unit?: number | null
+}
+
+/** Formats in meters by definition, as polysmelt names them; X3D and VRML scale theirs by `UNIT` while read. */
+const IN_METERS = new Set(['glTF', 'VRM', 'VRMA', 'X3D', 'VRML97'])
+
+/** How long one of the model file's own units is, in meters, from the server GLB's `asset`: polysmelt records the
+ *  unit the file states in `extras.source` (under a name of each format's), and has already scaled the model to
+ *  meters by it. A GLB polysmelt didn't write is glTF (the file itself, or Blender's of it), so in meters. `null`
+ *  when the file doesn't say (OBJ, STL): its numbers are shown as they are. */
+export function unitOf(asset: { generator?: string; extras?: { source?: Record<string, unknown> } } | undefined): number | null {
+  const source = asset?.extras?.source
+  if (!source) return asset?.generator === 'polysmelt' ? null : 1
+  for (const k of ['unitMeters', 'metersPerUnit', 'meters']) {
+    const v = source[k]
+    if (typeof v === 'number' && v > 0) return v
+  }
+  if (source.unit === 'm') return 1
+  return typeof source.format === 'string' && IN_METERS.has(source.format) ? 1 : null
 }
 
 /** What the browser decodes itself; TGA has a loader of its own below. */
@@ -72,8 +92,8 @@ export async function loadModel(url: string, ext: string, manager: THREE.Loading
           throw new Error(body.error ?? `HTTP ${res.status}`)
         }
         const g = await loader.parseAsync(await res.arrayBuffer(), '')
-        const extras = g.asset?.extras as { missing_textures?: string[] } | undefined
-        return { object: g.scene, animations: g.animations, missing: extras?.missing_textures ?? [] }
+        const asset = g.asset as Parameters<typeof unitOf>[0] & { extras?: { missing_textures?: string[] } }
+        return { object: g.scene, animations: g.animations, missing: asset?.extras?.missing_textures ?? [], unit: unitOf(asset) }
       }
       throw new Error(t('model-error-converting'))
     }

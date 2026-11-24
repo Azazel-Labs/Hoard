@@ -2190,7 +2190,15 @@ model-info-materials = Materialer
 model-info-textures = Teksturer
 model-info-triangles = Trekanter
 model-info-vertices = Hjørnepunkter
-model-info-meters = glTF er i meter
+model-info-units = Enheter
+model-info-in-meters = Størrelse i meter, ut fra enhetene filen oppgir
+model-units-m = Meter
+model-units-cm = Centimeter
+model-units-mm = Millimeter
+model-units-in = Tommer
+model-units-ft = Fot
+model-units-other = 1 enhet = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Ikke oppgitt
 model-info-no-units = Dette formatet sier ikke hvilke enheter det bruker
 model-info-height = Høyde
 model-info-length = Lengde

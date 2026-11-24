@@ -2346,7 +2346,15 @@ model-info-materials = Materiale
 model-info-textures = Texturi
 model-info-triangles = Triunghiuri
 model-info-vertices = Vârfuri
-model-info-meters = glTF este în metri
+model-info-units = Unități
+model-info-in-meters = Dimensiuni în metri, după unitățile pe care le indică fișierul
+model-units-m = Metri
+model-units-cm = Centimetri
+model-units-mm = Milimetri
+model-units-in = Inchi
+model-units-ft = Picioare
+model-units-other = 1 unitate = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Neprecizate
 model-info-no-units = Acest format nu spune ce unități folosește
 model-info-height = Înălțime
 model-info-length = Lungime

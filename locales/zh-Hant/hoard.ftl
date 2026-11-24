@@ -1985,7 +1985,15 @@ model-info-materials = 材質
 model-info-textures = 貼圖
 model-info-triangles = 三角形
 model-info-vertices = 頂點
-model-info-meters = glTF 以公尺為單位
+model-info-units = 單位
+model-info-in-meters = 依檔案宣告的單位換算為公尺
+model-units-m = 公尺
+model-units-cm = 公分
+model-units-mm = 公釐
+model-units-in = 英寸
+model-units-ft = 英尺
+model-units-other = 1 單位 = { NUMBER($n, maximumSignificantDigits: 3) } 公尺
+model-units-unknown = 未宣告
 model-info-no-units = 這個格式沒有說明使用的單位
 model-info-height = 高度
 model-info-length = 長度

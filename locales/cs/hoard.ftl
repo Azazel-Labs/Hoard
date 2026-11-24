@@ -2347,7 +2347,15 @@ model-info-materials = Materiály
 model-info-textures = Textury
 model-info-triangles = Trojúhelníky
 model-info-vertices = Vrcholy
-model-info-meters = glTF je v metrech
+model-info-units = Jednotky
+model-info-in-meters = Rozměry v metrech podle jednotek, které soubor uvádí
+model-units-m = Metry
+model-units-cm = Centimetry
+model-units-mm = Milimetry
+model-units-in = Palce
+model-units-ft = Stopy
+model-units-other = 1 jednotka = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Neuvedeno
 model-info-no-units = Tento formát neuvádí, v jakých je jednotkách
 model-info-height = Výška
 model-info-length = Délka

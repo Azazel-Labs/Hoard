@@ -2245,7 +2245,15 @@ model-info-materials = Materiaalit
 model-info-textures = Tekstuurit
 model-info-triangles = Kolmiot
 model-info-vertices = Kärkipisteet
-model-info-meters = glTF on metreissä
+model-info-units = Yksiköt
+model-info-in-meters = Koko metreinä tiedoston ilmoittamien yksiköiden mukaan
+model-units-m = Metrit
+model-units-cm = Senttimetrit
+model-units-mm = Millimetrit
+model-units-in = Tuumat
+model-units-ft = Jalat
+model-units-other = 1 yksikkö = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Ei ilmoitettu
 model-info-no-units = Tämä muoto ei kerro yksiköitään
 model-info-height = Korkeus
 model-info-length = Pituus

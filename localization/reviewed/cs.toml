@@ -7648,6 +7648,10 @@ translation = "Geometrie"
 source = "Height"
 translation = "Výška"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Rozměry v metrech podle jednotek, které soubor uvádí"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Délka"
@@ -7655,10 +7659,6 @@ translation = "Délka"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Materiály"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF je v metrech"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7675,6 +7675,10 @@ translation = "Informace o scéně (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Trojúhelníky"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Jednotky"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7977,6 +7981,34 @@ translation = "Otáčet"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Pomalu otáčet (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Centimetry"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Stopy"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Palce"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Metry"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Milimetry"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 jednotka = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Neuvedeno"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

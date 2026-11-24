@@ -7362,6 +7362,10 @@ translation = "รูปทรงเรขาคณิต"
 source = "Height"
 translation = "ความสูง"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "ขนาดเป็นเมตร ตามหน่วยที่ไฟล์ระบุ"
+
 [messages.model-info-length]
 source = "Length"
 translation = "ความยาว"
@@ -7369,10 +7373,6 @@ translation = "ความยาว"
 [messages.model-info-materials]
 source = "Materials"
 translation = "แมทีเรียล"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF ใช้หน่วยเมตร"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7389,6 +7389,10 @@ translation = "ข้อมูลฉาก (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "สามเหลี่ยม"
+
+[messages.model-info-units]
+source = "Units"
+translation = "หน่วย"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7659,6 +7663,34 @@ translation = "หมุน"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "หมุนช้า ๆ (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "เซนติเมตร"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "ฟุต"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "นิ้ว"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "เมตร"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "มิลลิเมตร"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 หน่วย = { NUMBER($n, maximumSignificantDigits: 3) } ม."
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "ไม่ได้ระบุ"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

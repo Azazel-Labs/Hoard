@@ -1979,7 +1979,15 @@ model-info-materials = Vật liệu
 model-info-textures = Texture
 model-info-triangles = Tam giác
 model-info-vertices = Đỉnh
-model-info-meters = glTF tính bằng mét
+model-info-units = Đơn vị
+model-info-in-meters = Kích thước tính bằng mét, theo đơn vị mà tệp ghi
+model-units-m = Mét
+model-units-cm = Xentimét
+model-units-mm = Milimét
+model-units-in = Inch
+model-units-ft = Foot
+model-units-other = 1 đơn vị = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Không ghi
 model-info-no-units = Định dạng này không cho biết đơn vị của nó
 model-info-height = Chiều cao
 model-info-length = Chiều dài

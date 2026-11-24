@@ -7432,6 +7432,10 @@ translation = "Geometriák"
 source = "Height"
 translation = "Magasság"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Méret méterben, a fájlban megadott mértékegység alapján"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Hosszúság"
@@ -7439,10 +7443,6 @@ translation = "Hosszúság"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Anyagok"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "A glTF méterben van"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7459,6 +7459,10 @@ translation = "Jelenetinformáció (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Háromszögek"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Mértékegység"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7726,6 +7730,34 @@ translation = "Forgatás"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Lassú forgatás (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Centiméter"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Láb"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Hüvelyk"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Méter"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Milliméter"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 egység = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Nincs megadva"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

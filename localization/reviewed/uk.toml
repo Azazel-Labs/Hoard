@@ -7695,6 +7695,10 @@ translation = "Геометрії"
 source = "Height"
 translation = "Висота"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Розміри в метрах, за одиницями, зазначеними у файлі"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Довжина"
@@ -7702,10 +7706,6 @@ translation = "Довжина"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Матеріали"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF вимірюється в метрах"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7722,6 +7722,10 @@ translation = "Відомості про сцену (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Трикутники"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Одиниці"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -8035,6 +8039,34 @@ translation = "Обертати"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Повільно обертати (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Сантиметри"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Фути"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Дюйми"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Метри"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Міліметри"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 одиниця = { NUMBER($n, maximumSignificantDigits: 3) } м"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Не зазначено"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

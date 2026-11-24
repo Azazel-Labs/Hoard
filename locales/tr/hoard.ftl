@@ -2028,7 +2028,15 @@ model-info-materials = Malzemeler
 model-info-textures = Dokular
 model-info-triangles = Üçgenler
 model-info-vertices = Köşeler
-model-info-meters = glTF metre cinsindendir
+model-info-units = Birimler
+model-info-in-meters = Dosyanın belirttiği birimlere göre metre cinsinden boyut
+model-units-m = Metre
+model-units-cm = Santimetre
+model-units-mm = Milimetre
+model-units-in = İnç
+model-units-ft = Fit
+model-units-other = 1 birim = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Belirtilmemiş
 model-info-no-units = Bu biçim birimlerinin ne olduğunu belirtmiyor
 model-info-height = Yükseklik
 model-info-length = Uzunluk

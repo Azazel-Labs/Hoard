@@ -7404,6 +7404,10 @@ translation = "Geometriler"
 source = "Height"
 translation = "Yükseklik"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Dosyanın belirttiği birimlere göre metre cinsinden boyut"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Uzunluk"
@@ -7411,10 +7415,6 @@ translation = "Uzunluk"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Malzemeler"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF metre cinsindendir"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7431,6 +7431,10 @@ translation = "Sahne bilgisi (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Üçgenler"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Birimler"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7698,6 +7702,34 @@ translation = "Döndür"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Yavaşça döndür (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Santimetre"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Fit"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "İnç"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Metre"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Milimetre"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 birim = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Belirtilmemiş"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

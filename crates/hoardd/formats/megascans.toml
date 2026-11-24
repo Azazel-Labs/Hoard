@@ -24,7 +24,7 @@ size_max = ["semanticTags.*size*max*", "semanticTags.*max*size*"]
 size = "meta[key=scanArea].value"
 # Only a surface tiles; a 3D asset's measurements are its own, not a repeat's.
 tiles = ["meta[key=tileable].value", "semanticTags.asset_type ~ *surface*", "type ~ *surface*", "categories ~ surface*"]
-# Quixel's API writes metres ("2x2 m", "0.91x0.91"), its file spec decimetres ("20x20").
+# Quixel's API writes meters ("2x2 m", "0.91x0.91"), its file spec decimeters ("20x20").
 physical_size = ["meta[key=scanArea].value", "maps.physicalSize", "components.uris.physicalSize"]
 displacement = "meta[key=height].value"
 

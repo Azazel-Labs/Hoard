@@ -7376,6 +7376,10 @@ translation = "ジオメトリ"
 source = "Height"
 translation = "高さ"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "ファイルが示す単位から、メートルで表示しています"
+
 [messages.model-info-length]
 source = "Length"
 translation = "長さ"
@@ -7383,10 +7387,6 @@ translation = "長さ"
 [messages.model-info-materials]
 source = "Materials"
 translation = "マテリアル"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF の単位はメートルです"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7403,6 +7403,10 @@ translation = "シーン情報（I）"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "三角形"
+
+[messages.model-info-units]
+source = "Units"
+translation = "単位"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7670,6 +7674,34 @@ translation = "回転"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "ゆっくり回転（A）"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "センチメートル"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "フィート"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "インチ"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "メートル"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "ミリメートル"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 単位 = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "記載なし"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

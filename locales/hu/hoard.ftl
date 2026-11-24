@@ -2056,7 +2056,15 @@ model-info-materials = Anyagok
 model-info-textures = Textúrák
 model-info-triangles = Háromszögek
 model-info-vertices = Csúcspontok
-model-info-meters = A glTF méterben van
+model-info-units = Mértékegység
+model-info-in-meters = Méret méterben, a fájlban megadott mértékegység alapján
+model-units-m = Méter
+model-units-cm = Centiméter
+model-units-mm = Milliméter
+model-units-in = Hüvelyk
+model-units-ft = Láb
+model-units-other = 1 egység = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Nincs megadva
 model-info-no-units = Ez a formátum nem adja meg a mértékegységét
 model-info-height = Magasság
 model-info-length = Hosszúság

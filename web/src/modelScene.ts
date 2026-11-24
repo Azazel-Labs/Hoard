@@ -176,8 +176,8 @@ function unitOf(o: THREE.Object3D): number {
  *  so an `Armature|Hips` clip moves a `mixamorig:Hips` character. A track for a node it lacks is left as it is.
  *
  *  Given the clip's own file (`from`), its position keys are put in `root`'s units and to its size too: a step of
- *  10 from an FBX in centimetres, under a node scaled by 0.01, is 10 cm on that character but would be 10 metres on
- *  one made in metres, and a step that's a fifth of one character's height stays a fifth of a smaller one's. */
+ *  10 from an FBX in centimeters, under a node scaled by 0.01, is 10 cm on that character but would be 10 meters on
+ *  one made in meters, and a step that's a fifth of one character's height stays a fifth of a smaller one's. */
 export function bindClip(clip: THREE.AnimationClip, root: THREE.Object3D, from?: THREE.Object3D): THREE.AnimationClip {
   const exact = new Map<string, THREE.Object3D>()
   const loose = new Map<string, THREE.Object3D>()

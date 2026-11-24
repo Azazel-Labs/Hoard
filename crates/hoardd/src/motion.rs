@@ -33,7 +33,7 @@ const QUALITY: f32 = 70.0;
 /// whenever a fix changes how they're drawn: those drawn before are drawn again in the background, each showing until
 /// its new one is in.
 ///
-/// 1. A clip from a file in other units (an FBX in centimetres) moves the character it's drawn on by as much in its
+/// 1. A clip from a file in other units (an FBX in centimeters) moves the character it's drawn on by as much in its
 ///    own units, not 100 times as far.
 pub(crate) const DRAWN: i64 = 1;
 
@@ -497,8 +497,8 @@ fn encode(frames: &[image::RgbaImage], ms: u32) -> Result<Vec<u8>> {
 /// nothing `to` has, and morph weights, are left out. Its index in `to`, or `None` when it would move nothing.
 ///
 /// Its moves are put in `to`'s units and to its size, as the viewer's are (`bindClip` in modelScene.ts): a step of 10
-/// from an FBX in centimetres, under a node scaled by 0.01, is 10 cm on its own character but would be 10 metres on
-/// one made in metres, and a step that's a fifth of one character's height stays a fifth of a smaller one's.
+/// from an FBX in centimeters, under a node scaled by 0.01, is 10 cm on its own character but would be 10 meters on
+/// one made in meters, and a step that's a fifth of one character's height stays a fifth of a smaller one's.
 fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Result<Option<usize>> {
     let Some(anim) = list(from.json.get("animations")).get(index) else { return Ok(None) };
     let (mut exact, mut loose) = (HashMap::new(), HashMap::new());
@@ -874,8 +874,8 @@ mod tests {
         assert_eq!((frames.len(), ms), (12, 83));
     }
 
-    /// A clip from an FBX in centimetres, its bones under a node scaled by 0.01, moving its hips 5 metres (500) along
-    /// x over a second, played on a character made in metres with a spine as far above its hips: it moves 5 metres
+    /// A clip from an FBX in centimeters, its bones under a node scaled by 0.01, moving its hips 5 meters (500) along
+    /// x over a second, played on a character made in meters with a spine as far above its hips: it moves 5 meters
     /// there too, not 500.
     #[test]
     fn a_clip_in_other_units_moves_the_character_as_far_in_its_own() {

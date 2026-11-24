@@ -7356,6 +7356,10 @@ translation = "지오메트리"
 source = "Height"
 translation = "높이"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "파일에 명시된 단위로 환산한 미터 크기"
+
 [messages.model-info-length]
 source = "Length"
 translation = "길이"
@@ -7363,10 +7367,6 @@ translation = "길이"
 [messages.model-info-materials]
 source = "Materials"
 translation = "머티리얼"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF는 미터 단위입니다"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7383,6 +7383,10 @@ translation = "장면 정보(I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "삼각형"
+
+[messages.model-info-units]
+source = "Units"
+translation = "단위"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7650,6 +7654,34 @@ translation = "회전"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "천천히 회전(A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "센티미터"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "피트"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "인치"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "미터"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "밀리미터"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1단위 = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "명시되지 않음"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

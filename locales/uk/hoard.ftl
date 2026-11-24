@@ -2437,7 +2437,15 @@ model-info-materials = Матеріали
 model-info-textures = Текстури
 model-info-triangles = Трикутники
 model-info-vertices = Вершини
-model-info-meters = glTF вимірюється в метрах
+model-info-units = Одиниці
+model-info-in-meters = Розміри в метрах, за одиницями, зазначеними у файлі
+model-units-m = Метри
+model-units-cm = Сантиметри
+model-units-mm = Міліметри
+model-units-in = Дюйми
+model-units-ft = Фути
+model-units-other = 1 одиниця = { NUMBER($n, maximumSignificantDigits: 3) } м
+model-units-unknown = Не зазначено
 model-info-no-units = Цей формат не вказує своїх одиниць виміру
 model-info-height = Висота
 model-info-length = Довжина

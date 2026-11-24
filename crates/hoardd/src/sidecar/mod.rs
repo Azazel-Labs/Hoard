@@ -101,7 +101,7 @@ fn file_name(uri: &str) -> Option<String> {
 }
 
 /// A length's unit in meters; `None` for one that isn't a length.
-fn unit_metres(unit: &str) -> Option<f32> {
+fn unit_meters(unit: &str) -> Option<f32> {
     match unit {
         "m" | "meter" | "meters" | "metre" | "metres" => Some(1.0),
         "dm" => Some(0.1),
@@ -122,12 +122,12 @@ fn split_unit(s: &str) -> (&str, &str) {
 fn meters(s: &str) -> Option<f32> {
     let (n, unit) = split_unit(s);
     let v: f32 = n.parse().ok()?;
-    (v > 0.0).then_some(v * unit_metres(&unit.to_ascii_lowercase())?)
+    (v > 0.0).then_some(v * unit_meters(&unit.to_ascii_lowercase())?)
 }
 
 /// An area's width and height in meters: `"2x2 m"`, `"200 x 200 cm"`, `"0.91x0.91"`, `"40x40"`. Without a unit,
-/// numbers up to 20 are meters and larger ones decimetres: Quixel's API writes meters and its file spec decimetres.
-fn area_metres(s: &str) -> Option<(f32, f32)> {
+/// numbers up to 20 are meters and larger ones decimeters: Quixel's API writes meters and its file spec decimeters.
+fn area_meters(s: &str) -> Option<(f32, f32)> {
     let (n, unit) = split_unit(s);
     let parts: Vec<f32> = n.split(['x', 'X', '×', '*']).map(|p| p.trim().parse().ok()).collect::<Option<_>>()?;
     let (w, h) = match parts.as_slice() {
@@ -141,7 +141,7 @@ fn area_metres(s: &str) -> Option<(f32, f32)> {
     let scale = if unit.is_empty() {
         if w.max(h) > 20.0 { 0.1 } else { 1.0 }
     } else {
-        unit_metres(&unit.to_ascii_lowercase())?
+        unit_meters(&unit.to_ascii_lowercase())?
     };
     Some((w * scale, h * scale))
 }
@@ -244,7 +244,7 @@ pub(crate) fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
 
     // Only a surface tiles: its size is one repeat's, and its height map's reach is its displacement.
     let surface = x.tiles.holds(at);
-    let physical_size = surface.then(|| x.physical_size.all(at).iter().find_map(|s| area_metres(s))).flatten();
+    let physical_size = surface.then(|| x.physical_size.all(at).iter().find_map(|s| area_meters(s))).flatten();
     let displacement =
         surface.then(|| x.displacement.all(at).iter().find_map(|s| meters(s))).flatten().filter(|&m| m < 1.0);
 

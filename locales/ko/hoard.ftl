@@ -1955,7 +1955,15 @@ model-info-materials = 머티리얼
 model-info-textures = 텍스처
 model-info-triangles = 삼각형
 model-info-vertices = 버텍스
-model-info-meters = glTF는 미터 단위입니다
+model-info-units = 단위
+model-info-in-meters = 파일에 명시된 단위로 환산한 미터 크기
+model-units-m = 미터
+model-units-cm = 센티미터
+model-units-mm = 밀리미터
+model-units-in = 인치
+model-units-ft = 피트
+model-units-other = 1단위 = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = 명시되지 않음
 model-info-no-units = 이 형식은 단위를 지정하지 않습니다
 model-info-height = 높이
 model-info-length = 길이

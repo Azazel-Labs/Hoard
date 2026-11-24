@@ -86,12 +86,27 @@ const modeLabel = computed(() => MODES.find((m) => m.mode === mode.value)!.label
 // The textures switch means something only with the model's own materials, the light switch only in the final render.
 const ownMaterials = computed(() => mode.value === 'final' || mode.value === 'raw')
 
-/** A length as people say it, to three figures: meters for glTF (in cm or mm when small), else plain units. */
+/** A length as people say it, to three figures: meters when the file says its units (in cm or mm when small), else
+ *  plain units. */
 function length(n: number, meters: boolean): string {
   if (!meters) return t('model-length-units', { n })
   if (n >= 1 || n === 0) return t('model-length-m', { n })
   if (n >= 0.01) return t('model-length-cm', { n: n * 100 })
   return t('model-length-mm', { n: n * 1000 })
+}
+
+/** The units a model file was made in, by name where they have one. */
+const UNIT_NAMES: [number, () => string][] = [
+  [1, () => t('model-units-m')],
+  [0.01, () => t('model-units-cm')],
+  [0.001, () => t('model-units-mm')],
+  [0.0254, () => t('model-units-in')],
+  [0.3048, () => t('model-units-ft')],
+]
+function unitName(unit: number | null): string {
+  if (unit === null) return t('model-units-unknown')
+  const named = UNIT_NAMES.find(([m]) => Math.abs(unit / m - 1) < 1e-6)
+  return named ? named[1]() : t('model-units-other', { n: unit })
 }
 
 /** Load the model into a new stage; switching texture resolution starts over, keeping the switches as they were. */
@@ -419,8 +434,9 @@ function onKey(e: KeyboardEvent) {
           <div><dt>{{ t('model-info-textures') }}</dt><dd>{{ formatNumber(stats.textures) }}</dd></div>
           <div><dt>{{ t('model-info-triangles') }}</dt><dd>{{ formatNumber(stats.triangles) }}</dd></div>
           <div><dt>{{ t('model-info-vertices') }}</dt><dd>{{ formatNumber(stats.vertices) }}</dd></div>
+          <div><dt>{{ t('model-info-units') }}</dt><dd>{{ unitName(stats.unit) }}</dd></div>
         </dl>
-        <dl class="size" :title="stats.meters ? t('model-info-meters') : t('model-info-no-units')">
+        <dl class="size" :title="stats.meters ? t('model-info-in-meters') : t('model-info-no-units')">
           <div><dt>{{ t('model-info-height') }}</dt><dd>{{ length(stats.size.y, stats.meters) }}</dd></div>
           <div><dt>{{ t('model-info-length') }}</dt><dd>{{ length(stats.size.z, stats.meters) }}</dd></div>
           <div><dt>{{ t('model-info-width') }}</dt><dd>{{ length(stats.size.x, stats.meters) }}</dd></div>

@@ -43,8 +43,10 @@ export interface SceneStats {
   vertices: number
   /** The bounding box as the model loaded: X, Y (up) and Z. */
   size: { x: number; y: number; z: number }
-  /** glTF is in meters; other formats say nothing dependable about their units. */
+  /** Whether `size` is in meters: the file says what its units are (see `unitOf`). */
   meters: boolean
+  /** How long one of the file's own units is, in meters; `null` when it doesn't say. */
+  unit: number | null
   /** The map views worth offering: a map at least one material has. */
   maps: MapMode[]
 }
@@ -154,7 +156,7 @@ export class ModelStage {
   private redrawUntil = 0
   private counts = { triangles: 0, vertices: 0 }
   private size = new THREE.Vector3()
-  private meters = false
+  private unit: number | null = null
   playing = true
   private missing: string[] = []
   private stopMaps: (() => void) | null = null
@@ -333,7 +335,7 @@ export class ModelStage {
     }
 
     const src = sourceFor(full)
-    const { object, animations, missing } = await loadModel(src.url, src.ext, manager)
+    const { object, animations, missing, unit } = await loadModel(src.url, src.ext, manager)
     if (this.disposed) {
       disposeObject(object)
       throw new Error('closed')
@@ -433,7 +435,7 @@ export class ModelStage {
     this.frameHome()
     this.counts = { triangles: Math.round(triangles), vertices }
     this.bounds().box.getSize(this.size)
-    this.meters = ['glb', 'gltf'].includes(extOf(full.path))
+    this.unit = unit ?? null
 
     // Clips embedded in the file plus linked clip files ("Knight@Run.fbx"); a character wearing an animation plays
     // only that.
@@ -667,7 +669,8 @@ export class ModelStage {
       textures: sources.size,
       ...this.counts,
       size: { x: this.size.x, y: this.size.y, z: this.size.z },
-      meters: this.meters,
+      meters: this.unit !== null,
+      unit: this.unit,
       maps: MAP_MODES.filter((m) => maps.has(m)),
     }
   }

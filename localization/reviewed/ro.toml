@@ -7648,6 +7648,10 @@ translation = "Geometrii"
 source = "Height"
 translation = "Înălțime"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Dimensiuni în metri, după unitățile pe care le indică fișierul"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Lungime"
@@ -7655,10 +7659,6 @@ translation = "Lungime"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Materiale"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF este în metri"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7675,6 +7675,10 @@ translation = "Informații despre scenă (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Triunghiuri"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Unități"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7976,6 +7980,34 @@ translation = "Rotire"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Rotire lentă (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Centimetri"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Picioare"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Inchi"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Metri"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Milimetri"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 unitate = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Neprecizate"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

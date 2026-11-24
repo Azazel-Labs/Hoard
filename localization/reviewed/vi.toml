@@ -7362,6 +7362,10 @@ translation = "Hình học"
 source = "Height"
 translation = "Chiều cao"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Kích thước tính bằng mét, theo đơn vị mà tệp ghi"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Chiều dài"
@@ -7369,10 +7373,6 @@ translation = "Chiều dài"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Vật liệu"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF tính bằng mét"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7389,6 +7389,10 @@ translation = "Thông tin cảnh (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Tam giác"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Đơn vị"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7656,6 +7660,34 @@ translation = "Xoay"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Xoay chậm (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Xentimét"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Foot"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Inch"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Mét"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Milimét"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 đơn vị = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Không ghi"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

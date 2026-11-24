@@ -94,7 +94,7 @@ the first that finds something, so put the best place first. A field with many v
 | `size_min`, `size_max`, `size` | one | its size in words ("1 m to 2 m"), from a range or else `size` |
 | `texel_density` | one | for the description |
 | `tiles` | yes/no | it's a surface that repeats: anything found that isn't `false`, `no`, `0` or empty |
-| `physical_size` | one | a surface's real size per repeat ("2x2 m"; without a unit, numbers over 20 are decimetres) |
+| `physical_size` | one | a surface's real size per repeat ("2x2 m"; without a unit, numbers over 20 are decimeters) |
 | `displacement` | one | a surface's height-map depth ("2 cm") |
 
 Three fields are groups, and each can appear more than once. `each` finds the items, and the other selectors are read

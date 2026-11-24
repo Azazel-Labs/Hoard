@@ -2194,7 +2194,15 @@ model-info-materials = Materials
 model-info-textures = Textures
 model-info-triangles = Triangles
 model-info-vertices = Vèrtexs
-model-info-meters = glTF és en metres
+model-info-units = Unitats
+model-info-in-meters = Mida en metres, segons les unitats que indica el fitxer
+model-units-m = Metres
+model-units-cm = Centímetres
+model-units-mm = Mil·límetres
+model-units-in = Polzades
+model-units-ft = Peus
+model-units-other = 1 unitat = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = No s’indica
 model-info-no-units = Aquest format no indica quines són les seves unitats
 model-info-height = Alçada
 model-info-length = Llargada

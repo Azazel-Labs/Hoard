@@ -64,7 +64,7 @@ fn reads_the_older_shape() {
     assert!(s.describe(&[]).starts_with("An asset from Quixel Megascans, scanned in Iceland. Size 2x2 m."));
 }
 
-/// A surface in the shape of Quixel's asset spec: maps under `components`, sizes in decimetres.
+/// A surface in the shape of Quixel's asset spec: maps under `components`, sizes in decimeters.
 const SURFACE_SPEC: &str = r#"{
         "id": "sbkpa", "name": "Mossy Ground", "categories": ["surface_scans", "soil"],
         "meta": [
@@ -102,9 +102,9 @@ fn reads_a_surfaces_maps_and_size() {
     // A 3D asset's measurements aren't a repeat.
     let s = read("xeokah0.json", STAND).unwrap();
     assert_eq!((s.physical_size, s.displacement), (None, None));
-    assert_eq!(area_metres("200 x 100 cm"), Some((2.0, 1.0)));
-    assert_eq!(area_metres("40x40"), Some((4.0, 4.0)));
-    assert_eq!(area_metres("2x2 furlongs"), None);
+    assert_eq!(area_meters("200 x 100 cm"), Some((2.0, 1.0)));
+    assert_eq!(area_meters("40x40"), Some((4.0, 4.0)));
+    assert_eq!(area_meters("2x2 furlongs"), None);
 }
 
 #[test]

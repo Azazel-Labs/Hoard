@@ -7575,6 +7575,10 @@ translation = "Γεωμετρίες"
 source = "Height"
 translation = "Ύψος"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Διαστάσεις σε μέτρα, από τις μονάδες που δηλώνει το αρχείο"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Μήκος"
@@ -7582,10 +7586,6 @@ translation = "Μήκος"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Υλικά"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "Το glTF είναι σε μέτρα"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7602,6 +7602,10 @@ translation = "Πληροφορίες σκηνής (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Τρίγωνα"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Μονάδες"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7896,6 +7900,34 @@ translation = "Περιστροφή"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Αργή περιστροφή (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Εκατοστά"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Πόδια"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Ίντσες"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Μέτρα"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Χιλιοστά"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 μονάδα = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Δεν δηλώνονται"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

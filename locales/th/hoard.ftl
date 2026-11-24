@@ -1979,7 +1979,15 @@ model-info-materials = แมทีเรียล
 model-info-textures = เท็กซ์เจอร์
 model-info-triangles = สามเหลี่ยม
 model-info-vertices = จุดยอด
-model-info-meters = glTF ใช้หน่วยเมตร
+model-info-units = หน่วย
+model-info-in-meters = ขนาดเป็นเมตร ตามหน่วยที่ไฟล์ระบุ
+model-units-m = เมตร
+model-units-cm = เซนติเมตร
+model-units-mm = มิลลิเมตร
+model-units-in = นิ้ว
+model-units-ft = ฟุต
+model-units-other = 1 หน่วย = { NUMBER($n, maximumSignificantDigits: 3) } ม.
+model-units-unknown = ไม่ได้ระบุ
 model-info-no-units = รูปแบบนี้ไม่ได้ระบุหน่วย
 model-info-height = ความสูง
 model-info-length = ความยาว

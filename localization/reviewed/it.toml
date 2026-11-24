@@ -7557,6 +7557,10 @@ translation = "Geometrie"
 source = "Height"
 translation = "Altezza"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "Dimensioni in metri, secondo le unità indicate dal file"
+
 [messages.model-info-length]
 source = "Length"
 translation = "Lunghezza"
@@ -7564,10 +7568,6 @@ translation = "Lunghezza"
 [messages.model-info-materials]
 source = "Materials"
 translation = "Materiali"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF è in metri"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7584,6 +7584,10 @@ translation = "Informazioni sulla scena (I)"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "Triangoli"
+
+[messages.model-info-units]
+source = "Units"
+translation = "Unità"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7866,6 +7870,34 @@ translation = "Ruota"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "Ruota lentamente (A)"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "Centimetri"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "Piedi"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "Pollici"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "Metri"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "Millimetri"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 unità = { NUMBER($n, maximumSignificantDigits: 3) } m"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "Non indicate"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

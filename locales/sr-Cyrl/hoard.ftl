@@ -2286,7 +2286,15 @@ model-info-materials = Материјали
 model-info-textures = Текстуре
 model-info-triangles = Троуглови
 model-info-vertices = Темена
-model-info-meters = glTF је у метрима
+model-info-units = Јединице
+model-info-in-meters = Величина у метрима, према јединицама које датотека наводи
+model-units-m = Метри
+model-units-cm = Центиметри
+model-units-mm = Милиметри
+model-units-in = Инчи
+model-units-ft = Стопе
+model-units-other = 1 јединица = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Није наведено
 model-info-no-units = Овај формат не наводи своје јединице
 model-info-height = Висина
 model-info-length = Дужина

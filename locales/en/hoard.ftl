@@ -2441,7 +2441,15 @@ model-info-materials = Materials
 model-info-textures = Textures
 model-info-triangles = Triangles
 model-info-vertices = Vertices
-model-info-meters = glTF is in meters
+model-info-units = Units
+model-info-in-meters = Sized in meters, from the units the file states
+model-units-m = Meters
+model-units-cm = Centimeters
+model-units-mm = Millimeters
+model-units-in = Inches
+model-units-ft = Feet
+model-units-other = 1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Not stated
 model-info-no-units = This format doesn’t say what its units are
 model-info-height = Height
 model-info-length = Length

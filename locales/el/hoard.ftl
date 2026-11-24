@@ -2238,7 +2238,15 @@ model-info-materials = Υλικά
 model-info-textures = Υφές
 model-info-triangles = Τρίγωνα
 model-info-vertices = Κορυφές
-model-info-meters = Το glTF είναι σε μέτρα
+model-info-units = Μονάδες
+model-info-in-meters = Διαστάσεις σε μέτρα, από τις μονάδες που δηλώνει το αρχείο
+model-units-m = Μέτρα
+model-units-cm = Εκατοστά
+model-units-mm = Χιλιοστά
+model-units-in = Ίντσες
+model-units-ft = Πόδια
+model-units-other = 1 μονάδα = { NUMBER($n, maximumSignificantDigits: 3) } m
+model-units-unknown = Δεν δηλώνονται
 model-info-no-units = Αυτή η μορφή δεν λέει ποιες είναι οι μονάδες της
 model-info-height = Ύψος
 model-info-length = Μήκος

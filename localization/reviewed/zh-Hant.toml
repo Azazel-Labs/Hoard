@@ -7368,6 +7368,10 @@ translation = "幾何體"
 source = "Height"
 translation = "高度"
 
+[messages.model-info-in-meters]
+source = "Sized in meters, from the units the file states"
+translation = "依檔案宣告的單位換算為公尺"
+
 [messages.model-info-length]
 source = "Length"
 translation = "長度"
@@ -7375,10 +7379,6 @@ translation = "長度"
 [messages.model-info-materials]
 source = "Materials"
 translation = "材質"
-
-[messages.model-info-meters]
-source = "glTF is in meters"
-translation = "glTF 以公尺為單位"
 
 [messages.model-info-no-units]
 source = "This format doesn’t say what its units are"
@@ -7395,6 +7395,10 @@ translation = "場景資訊（I）"
 [messages.model-info-triangles]
 source = "Triangles"
 translation = "三角形"
+
+[messages.model-info-units]
+source = "Units"
+translation = "單位"
 
 [messages.model-info-vertices]
 source = "Vertices"
@@ -7662,6 +7666,34 @@ translation = "旋轉"
 [messages.model-turn-title]
 source = "Turn slowly (A)"
 translation = "緩慢旋轉（A）"
+
+[messages.model-units-cm]
+source = "Centimeters"
+translation = "公分"
+
+[messages.model-units-ft]
+source = "Feet"
+translation = "英尺"
+
+[messages.model-units-in]
+source = "Inches"
+translation = "英寸"
+
+[messages.model-units-m]
+source = "Meters"
+translation = "公尺"
+
+[messages.model-units-mm]
+source = "Millimeters"
+translation = "公釐"
+
+[messages.model-units-other]
+source = "1 unit = { NUMBER($n, maximumSignificantDigits: 3) } m"
+translation = "1 單位 = { NUMBER($n, maximumSignificantDigits: 3) } 公尺"
+
+[messages.model-units-unknown]
+source = "Not stated"
+translation = "未宣告"
 
 [messages.model-view-prefix]
 source = 'View:{ " " }'

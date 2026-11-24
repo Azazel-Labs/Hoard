@@ -18,7 +18,7 @@ const MAX_ATTEMPTS = 8
 /**
  * A request that sends nothing and hears nothing for this long is given up on and sent again. A connection can go
  * quiet without failing (a proxy or the network dropping it, say), and nothing else would notice: the upload just
- * stopped until it was cancelled.
+ * stopped until it was canceled.
  */
 const STALL_MS = 120_000
 

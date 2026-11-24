@@ -312,7 +312,12 @@ pub(crate) async fn authenticate(state: &AppState, method: &Method, headers: &He
 }
 
 async fn require(state: &AppState, role: Role, mut req: Request, next: Next) -> ApiResult<Response> {
-    let who = authenticate(state, req.method(), req.headers()).await?.ok_or_else(AppError::unauthorized)?;
+    let who = match authenticate(state, req.method(), req.headers()).await? {
+        Some(who) => who,
+        None => crate::uploads::keyed(state, req.method(), req.uri().path(), req.headers())
+            .await?
+            .ok_or_else(AppError::unauthorized)?,
+    };
     who.needs(role)?;
     req.extensions_mut().insert(who);
     Ok(next.run(req).await)

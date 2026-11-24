@@ -241,6 +241,15 @@ impl Described {
         if let Some(why) = self.for_people {
             return Some(format!("`{}` is for a person to do in Hoard themselves: {why}", self.name));
         }
+        if matches!(self.body, Some(Body::File | Body::Form)) {
+            // Files sent through an assistant would pass through its context, slowly and at great cost, and would
+            // be a way to put any bytes into the library past the uploads' own checks.
+            return Some(format!(
+                "`{}` takes files, which aren't sent over MCP: for a pack, create_upload answers with addresses to \
+                 send its files to over HTTP (with curl, say)",
+                self.name
+            ));
+        }
         (role < self.access.role())
             .then(|| format!("`{}` needs an account or token that can {}", self.name, self.access.role().as_str()))
     }

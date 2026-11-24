@@ -22,6 +22,11 @@
 //! all in, or the one asked for), or the pack these very files made when `force` sends them again. Its new files are
 //! added and the ones that changed are replaced; `copy` makes a pack of its own instead.
 //! What's on disk is the source of truth for progress, so a server restart mid-upload loses nothing.
+//!
+//! Files aren't sent over MCP. Registered over MCP, an upload is answered with addresses to send its files to over
+//! HTTP instead, and a key ([`KEY_HEADER`]) that lets requests send this one upload's files, see what's arrived and
+//! finish it, without signing in. The key is the registration's claim, so it lasts as long as the upload does, and
+//! stops working once the same files are registered again.
 
 mod watch;
 
@@ -36,7 +41,7 @@ use crate::{AppState, db, jobs};
 use anyhow::Context;
 use axum::Json;
 use axum::extract::{Multipart, Path, Query, Request, State};
-use axum::http::{HeaderMap, StatusCode, Version};
+use axum::http::{HeaderMap, Method, StatusCode, Version};
 use axum::response::{IntoResponse, Response};
 use futures_util::StreamExt;
 use hoard_core::Pack;
@@ -52,6 +57,9 @@ pub(crate) const MAX_REQUEST_BYTES: usize = 96 << 20;
 /// The size of each part of a big file. Small enough that a lost connection costs little and several are in flight at
 /// once, big enough that a round trip per part doesn't matter.
 const PART_BYTES: u64 = 8 << 20;
+/// The header carrying an upload's key (see the module's notes).
+const KEY_HEADER: &str = "x-hoard-upload-key";
+
 /// Uploads nothing has arrived for in this long are removed, with what they staged (looked for at startup and every
 /// hour).
 const STALE_HOURS: i64 = 24;
@@ -75,7 +83,8 @@ pub(crate) fn operations() -> Vec<Operation> {
                  file's relative path and size, and get an upload id and what has arrived already (so an interrupted \
                  upload carries on). Send each file with `send_upload_chunk` (big ones) or `send_upload_batch` (many \
                  small ones), then `complete_upload`. A pack with exactly these files already is added to, unless \
-                 `copy`.",
+                 `copy`. Files aren't sent over MCP: called over MCP, the answer's `send` gives addresses to send them \
+                 to over HTTP instead, with a key that lets those requests in for this upload only.",
             )
             .limit(64 << 20),
         Editor.get("/api/uploads/{id}", status).named(
@@ -240,7 +249,11 @@ fn merge_target(c: &rusqlite::Connection, same: Option<&str>, name: Option<&str>
     .optional()?)
 }
 
-async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> ApiResult<Response> {
+async fn create(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<CreateBody>,
+) -> ApiResult<Response> {
     if body.files.is_empty() {
         return Err(AppError::bad_request(tr!("error-upload-no-files-listed")));
     }
@@ -289,7 +302,7 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
             let mut s = session_status(&state, id).await?;
             s.resumed = true;
             s.claim = Some(claim);
-            return Ok((StatusCode::OK, Json(s)).into_response());
+            return Ok(answer(&state, &headers, StatusCode::OK, s));
         }
         Some(Existing::Imported(pack)) if !body.force && !body.copy => {
             let msg = tr!("error-already-imported", name = pack.name);
@@ -350,7 +363,81 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
     .await?;
     let mut s = session_status(&state, &id).await?;
     s.claim = Some(claim);
-    Ok((StatusCode::CREATED, Json(s)).into_response())
+    Ok(answer(&state, &headers, StatusCode::CREATED, s))
+}
+
+/// A registered upload, with (for an assistant, over MCP) the addresses to send its files to.
+fn answer(state: &AppState, headers: &HeaderMap, status: StatusCode, s: SessionStatus) -> Response {
+    if !crate::mcp::operations::over_mcp() {
+        return (status, Json(s)).into_response();
+    }
+    let send = addresses(&crate::mcp::base_url(state, headers), &s);
+    let mut v = serde_json::to_value(s).unwrap_or_default();
+    v["send"] = send;
+    (status, Json(v)).into_response()
+}
+
+/// How to send an upload's files over HTTP, for an assistant (see the module's notes).
+fn addresses(base: &str, s: &SessionStatus) -> serde_json::Value {
+    let (id, key) = (&s.pack.id, s.claim.as_deref().unwrap_or_default());
+    let up = format!("{base}/api/uploads/{id}");
+    let mb = PART_BYTES >> 20;
+    json!({
+        "how": format!(
+            "Send the files over HTTP yourself (with curl, say), not through MCP, each request with the header \
+             `{KEY_HEADER}: {key}`. It works for this upload only, until it's finished or canceled. A file over {mb} MB \
+             goes in parts of `part_bytes` (the last one shorter), each to `part` with its offset (0, {PART_BYTES}, \
+             …), several at once if you like; smaller files go whole, many to a request, to `batch`, as a multipart \
+             form of a `relpath` field then a `file`, repeated, up to {} MB a request. Paths are those registered, \
+             URL-encoded in `part`'s. `files` lists what has arrived already (and a big file's `parts`), so after \
+             any failure send just the rest. Once every file is there, POST to `complete` (or call complete_upload).",
+            MAX_REQUEST_BYTES >> 20
+        ),
+        "header": format!("{KEY_HEADER}: {key}"),
+        "part": format!("PUT {up}/chunk?path={{path}}&offset={{offset}}"),
+        "batch": format!("POST {up}/batch"),
+        "status": format!("GET {up}"),
+        "complete": format!("POST {up}/complete"),
+        "examples": [
+            format!("curl -fsS -H '{KEY_HEADER}: {key}' -F relpath=Textures/rock.png -F file=@Textures/rock.png {up}/batch"),
+            format!(
+                "dd if=Rock.fbx bs={mb}M skip=1 count=1 status=none | curl -fsS -X PUT -H '{KEY_HEADER}: {key}' \
+                 --data-binary @- '{up}/chunk?path=Rock.fbx&offset={PART_BYTES}'"
+            ),
+            format!("curl -fsS -X POST -H '{KEY_HEADER}: {key}' {up}/complete"),
+        ],
+    })
+}
+
+/// Who a request is that carries an upload's key instead of a sign-in: allowed to send that upload's files, see what
+/// has arrived and finish it, and nothing else.
+pub(crate) async fn keyed(
+    state: &AppState,
+    method: &Method,
+    path: &str,
+    headers: &HeaderMap,
+) -> ApiResult<Option<crate::auth::Who>> {
+    let Some(key) = headers.get(KEY_HEADER).and_then(|v| v.to_str().ok()) else { return Ok(None) };
+    let Some(id) = keyed_upload(method, path) else { return Ok(None) };
+    let (id, key) = (id.to_owned(), key.to_owned());
+    let valid = db::call(&state.pool, move |c| {
+        Ok(c.query_row("SELECT 1 FROM upload_meta WHERE pack_id = ?1 AND claim = ?2", params![id, key], |_| Ok(()))
+            .optional()?
+            .is_some())
+    })
+    .await?;
+    Ok(valid.then(|| crate::auth::Who::Token { name: "upload key".into(), role: crate::auth::Role::Edit, owner: None }))
+}
+
+/// The upload a request with a key may be for: sending its files, what has arrived, finishing it.
+fn keyed_upload<'a>(method: &Method, path: &'a str) -> Option<&'a str> {
+    let rest = path.strip_prefix("/api/uploads/")?;
+    let (id, then) = rest.split_once('/').unwrap_or((rest, ""));
+    let allowed = matches!(
+        (method, then),
+        (&Method::PUT, "chunk") | (&Method::POST, "batch" | "complete") | (&Method::GET | &Method::HEAD, "")
+    );
+    (allowed && !id.is_empty()).then_some(id)
 }
 
 async fn status(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<SessionStatus>> {
@@ -826,6 +913,21 @@ pub(crate) async fn sweep_loop(state: AppState) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_key_opens_only_its_uploads_own_requests() {
+        use axum::http::Method;
+        assert_eq!(keyed_upload(&Method::PUT, "/api/uploads/u1/chunk"), Some("u1"));
+        assert_eq!(keyed_upload(&Method::POST, "/api/uploads/u1/batch"), Some("u1"));
+        assert_eq!(keyed_upload(&Method::POST, "/api/uploads/u1/complete"), Some("u1"));
+        assert_eq!(keyed_upload(&Method::GET, "/api/uploads/u1"), Some("u1"));
+        // Not canceling it, registering another, or anything else.
+        assert_eq!(keyed_upload(&Method::DELETE, "/api/uploads/u1"), None);
+        assert_eq!(keyed_upload(&Method::POST, "/api/uploads"), None);
+        assert_eq!(keyed_upload(&Method::POST, "/api/uploads/"), None);
+        assert_eq!(keyed_upload(&Method::GET, "/api/uploads/u1/chunk"), None);
+        assert_eq!(keyed_upload(&Method::PUT, "/api/packs/u1"), None);
+    }
 
     fn pack(c: &rusqlite::Connection, id: &str, name: &str, status: &str, created: &str) {
         c.execute(

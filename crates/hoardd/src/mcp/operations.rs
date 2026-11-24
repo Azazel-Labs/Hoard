@@ -7,7 +7,6 @@ use std::sync::{Arc, Mutex, PoisonError};
 
 use axum::Router;
 use axum::body::Body;
-use base64::Engine as _;
 use http::{HeaderMap, HeaderValue, Request, StatusCode, header};
 use serde_json::{Value, json};
 use tower::ServiceExt as _;
@@ -42,8 +41,7 @@ pub(super) fn tools(may_change: bool) -> Vec<Value> {
             "name": { "type": "string", "description": "The operation, as find_operations names it." },
             "path": { "type": "object", "description": "Its path's parameters, by name (`{\"id\": \"…\"}`)." },
             "query": { "type": "object", "description": "Its query parameters, by name." },
-            "body": { "description": "Its JSON body, as describe_operation says." },
-            "body_base64": { "type": "string", "description": "For an operation that takes a file's bytes: them, in base64." }
+            "body": { "description": "Its JSON body, as describe_operation says." }
         },
         "required": ["name"]
     });
@@ -208,14 +206,6 @@ fn describe(role: Role, args: &Value) -> Result<Value, ToolError> {
     let d = lookup(role, args)?;
     let mut v = serde_json::to_value(d)?;
     v["call_with"] = json!(if d.changes() { "run_operation" } else { "read_operation" });
-    match &d.body {
-        Some(Takes::File) => v["send"] = json!("the file's bytes, in base64, as `body_base64`"),
-        Some(Takes::Form) => {
-            v["send"] =
-                json!("a multipart form, which can't be sent over MCP: send the files with create_upload instead");
-        }
-        _ => {}
-    }
     Ok(v)
 }
 
@@ -304,22 +294,8 @@ async fn run(
             }
             None => (Body::empty(), None),
         },
-        Some(Takes::File) => {
-            let b64 = args["body_base64"].as_str().ok_or_else(|| {
-                ToolError::Failed(format!("`{}` takes a file's bytes, in base64, as `body_base64`", d.name))
-            })?;
-            let bytes = base64::engine::general_purpose::STANDARD
-                .decode(b64.trim())
-                .map_err(|e| ToolError::Failed(format!("`body_base64` isn't base64: {e}")))?;
-            (Body::from(bytes), Some("application/octet-stream"))
-        }
-        Some(Takes::Form) => {
-            return Err(ToolError::Failed(format!(
-                "`{}` takes a multipart form, which can't be sent over MCP: send the files with create_upload, \
-                 send_upload_chunk and complete_upload instead",
-                d.name
-            )));
-        }
+        // Refused by `lookup` (see `Described::refused`).
+        Some(Takes::File | Takes::Form) => unreachable!("files aren't sent over MCP"),
         None => (Body::empty(), None),
     };
     let mut req = Request::builder().method(d.method).uri(&uri).body(body)?;
@@ -445,6 +421,20 @@ mod tests {
         assert!(!names(Role::Admin).contains(&"create_token"));
         assert!(lookup(Role::Admin, &json!({ "name": "create_token" })).is_err());
         assert!(lookup(Role::View, &json!({ "name": "merge_tags" })).is_err());
+    }
+
+    #[test]
+    fn files_arent_sent_over_mcp() {
+        let names = offered(Role::Admin).map(|d| d.name).collect::<Vec<_>>();
+        for name in ["send_upload_chunk", "send_upload_batch", "upload_pack", "set_asset_thumbnail"] {
+            assert!(!names.contains(&name), "{name}");
+            let Err(ToolError::Failed(why)) = lookup(Role::Admin, &json!({ "name": name })) else { panic!("{name}") };
+            assert!(why.contains("create_upload"), "{why}");
+        }
+        // What's needed to send them another way still is.
+        for name in ["create_upload", "get_upload", "complete_upload"] {
+            assert!(names.contains(&name), "{name}");
+        }
     }
 
     #[test]

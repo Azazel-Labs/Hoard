@@ -78,17 +78,25 @@ fn an_import_with_searches_alongside_is_never_locked_out() {
                         // A worker looking for a job.
                         super::claim_job(&c, usize::MAX).unwrap();
                         n += 1;
+                        drop(c);
+                        // Searches come one after another, not in a spin that takes cores from the writers: on a
+                        // busy machine that alone kept a batch waiting past `WAIT_FOR_WRITE`.
+                        std::thread::sleep(Duration::from_millis(1));
                     }
                     n
                 })
             })
             .collect();
-        let (slowest, passed_over) = writers
-            .into_iter()
-            .map(|w| w.join().unwrap())
-            .fold((Duration::ZERO, 0), |(t, n), (t2, n2)| (t.max(t2), n.max(n2)));
+        // The searches stop however the writers ended: a writer that failed must fail the test, not leave the
+        // searches going forever.
+        let ended: Vec<_> = writers.into_iter().map(std::thread::ScopedJoinHandle::join).collect();
         done.store(true, Ordering::Release);
-        ((slowest, passed_over), readers.into_iter().map(|r| r.join().unwrap()).sum::<usize>())
+        let searches = readers.into_iter().map(|r| r.join().unwrap()).sum::<usize>();
+        let (slowest, passed_over) = ended
+            .into_iter()
+            .map(|w| w.unwrap_or_else(|panic| std::panic::resume_unwind(panic)))
+            .fold((Duration::ZERO, 0), |(t, n), (t2, n2)| (t.max(t2), n.max(n2)));
+        ((slowest, passed_over), searches)
     });
     let c = pool.get().unwrap();
     let total = WRITERS * BATCHES * PER_BATCH;

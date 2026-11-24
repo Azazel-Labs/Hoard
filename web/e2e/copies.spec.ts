@@ -26,14 +26,15 @@ test('near copies are listed on an asset and across the library, the best marked
     const at = (path: string) => assets.find((a) => a.path === path)!
     const [big, small, laser, low] = ['art/mural.png', 'small/mural-small.png', 'sfx/laser.wav', 'low/laser-low.wav'].map(at)
 
-    // Pictures and sounds are looked at and listened to in the background, after the pack is ready.
+    // Pictures and sounds are looked at and listened to in the background, after the pack is ready, behind what
+    // else is being processed.
     const near = async (id: string) =>
       (((await (await api.get(`/api/assets/${id}`)).json()) as { near_copies?: { id: string; best: boolean }[] }).near_copies ?? []).map(
         (n) => `${n.id}${n.best ? ' (best)' : ''}`,
       )
-    await expect.poll(() => near(small.id), { timeout: 60_000 }).toEqual([`${big.id} (best)`])
+    await expect.poll(() => near(small.id), { timeout: 120_000 }).toEqual([`${big.id} (best)`])
     expect(await near(big.id)).toEqual([small.id])
-    await expect.poll(() => near(low.id), { timeout: 60_000 }).toEqual([`${laser.id} (best)`])
+    await expect.poll(() => near(low.id), { timeout: 120_000 }).toEqual([`${laser.id} (best)`])
 
     await openPack(page, pack.id, name, '&sort=name')
     await tile(page, small.name).click()

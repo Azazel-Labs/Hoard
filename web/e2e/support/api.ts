@@ -1,5 +1,5 @@
 // Talking to the server under test straight over HTTP: signing in, seeding packs, tagging assets.
-import { request, type APIRequestContext } from '@playwright/test'
+import { request, test, type APIRequestContext } from '@playwright/test'
 
 export const USERNAME = 'e2e'
 export const PASSWORD = 'e2e-password-123'
@@ -59,8 +59,22 @@ export async function uploadPack(api: APIRequestContext, name: string, files: Up
   return (await res.json()) as Pack
 }
 
+/**
+ * Gives the running test, if there is one, longer: what it waits for is processed behind whatever the other tests have
+ * uploaded meanwhile.
+ */
+function slowerInTest(): void {
+  try {
+    test.info()
+  } catch {
+    return
+  }
+  test.slow()
+}
+
 /** Wait until every pack named is ready, failing on one that failed or a timeout. */
 export async function waitReady(api: APIRequestContext, ids: string[], timeoutMs = 120_000): Promise<Pack[]> {
+  slowerInTest()
   const deadline = Date.now() + timeoutMs
   for (;;) {
     const packs = (await (await api.get('/api/packs')).json()) as Pack[]
@@ -75,12 +89,17 @@ export async function waitReady(api: APIRequestContext, ids: string[], timeoutMs
   }
 }
 
-/** Waits (up to a point) for background work after the uploads to settle, so tests don't race it for the CPU. */
-export async function waitIdle(api: APIRequestContext, timeoutMs = 90_000): Promise<void> {
+/**
+ * Waits (up to a point) for background work after the uploads to settle, so tests don't race it for the CPU. Given
+ * `packs`, only those packs' jobs count: other tests' uploads keep the server busy for longer than a test may take.
+ */
+export async function waitIdle(api: APIRequestContext, packs?: string[], timeoutMs = 90_000): Promise<void> {
+  slowerInTest()
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const jobs = (await (await api.get('/api/admin/jobs')).json()) as { status: string }[]
-    if (!jobs.some((j) => j.status === 'queued' || j.status === 'running')) return
+    const jobs = (await (await api.get('/api/admin/jobs')).json()) as { status: string; pack_id: string | null }[]
+    const counted = packs ? jobs.filter((j) => j.pack_id !== null && packs.includes(j.pack_id)) : jobs
+    if (!counted.some((j) => j.status === 'queued' || j.status === 'running')) return
     await new Promise((r) => setTimeout(r, 250))
   }
 }

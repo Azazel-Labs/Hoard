@@ -43,7 +43,7 @@ test.describe('full-screen viewers', () => {
     const api = await signedIn(baseURL!)
     const pack = await uploadPack(api, 'E2E Painted 3MF', [{ relpath: 'Painted_Cube.3mf', data: paintedCube3mf() }])
     await waitReady(api, [pack.id])
-    await waitIdle(api)
+    await waitIdle(api, [pack.id])
     const [model] = await assetsOf(api, pack.id)
     expect(model.kind).toBe('model')
     const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: Record<string, unknown> }
@@ -69,7 +69,7 @@ test.describe('full-screen viewers', () => {
     const pack = await uploadPack(api, name, [{ relpath: 'Shed.skp', data: skp }])
     try {
       await waitReady(api, [pack.id])
-      await waitIdle(api)
+      await waitIdle(api, [pack.id])
       const [model] = await assetsOf(api, pack.id)
       expect(model.kind).toBe('model')
       const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { has_thumb: boolean; meta: { triangles?: number } }
@@ -132,7 +132,7 @@ test.describe('full-screen viewers', () => {
     ])
     try {
       await waitReady(api, [pack.id])
-      await waitIdle(api)
+      await waitIdle(api, [pack.id])
       const assets = await assetsOf(api, pack.id)
       expect(assets.map((a) => a.path).sort()).toEqual(['Board.glb', 'Sign/Sign.glb'])
       for (const a of assets) {

@@ -230,7 +230,7 @@ test.describe('materials', () => {
       ...maps.map(([m, c]) => ({ relpath: `Signpost/Signpost_${m}.png`, data: checker(64, c, c, 8) })),
     ])
     await waitReady(api, [pack.id])
-    await waitIdle(api)
+    await waitIdle(api, [pack.id])
     const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
     expect(assets.map((a) => a.path).filter((p) => /\.(gltf|bin|glb)$/.test(p))).toEqual(['Signpost.glb'])
     expect(assets.filter((a) => a.kind === 'texture')).toHaveLength(3)
@@ -261,7 +261,7 @@ test.describe('materials', () => {
       },
     ])
     await waitReady(api, [pack.id])
-    await waitIdle(api)
+    await waitIdle(api, [pack.id])
     const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
     const material = assets.find((a) => a.path === 'Mats/Planks.material')
     expect(material, assets.map((a) => a.path).join(', ')).toBeTruthy()
@@ -308,7 +308,7 @@ test.describe('materials', () => {
       },
     ])
     await waitReady(api, [pack.id])
-    await waitIdle(api)
+    await waitIdle(api, [pack.id])
     const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string; has_thumb: boolean })[]
     const byPath = (p: string) => assets.find((a) => a.path === p)
     const swatches = assets.filter((a) => a.path.endsWith('.material')).map((a) => a.path)
@@ -410,7 +410,7 @@ test.describe('materials', () => {
       { relpath: 'Textures/brick.png.meta', data: meta(guid('tex'), 'TextureImporter:\n') },
     ])
     await waitReady(api, [pack.id])
-    await waitIdle(api)
+    await waitIdle(api, [pack.id])
     const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
     const crate = assets.find((a) => a.path === 'Models/Crate.fbx')!
     const full = (await (await api.get(`/api/assets/${crate.id}`)).json()) as {

@@ -2,7 +2,7 @@
 //!
 //! Every crate the server, the CLI and the desktop app are built from (not the ones only used to build or test them),
 //! and every package in the portal's bundle (`web/package-lock.json`'s non-dev packages), with their license and the
-//! license files they come with, and Hoard's own license. Identical texts are kept once. The result is
+//! license files they come with, art copied in from elsewhere (`ART`), and Hoard's own license. Identical texts are kept once. The result is
 //! `web/public/licenses.json`, which the portal loads when the page asks for it; `--check` says whether it's current
 //! (CI runs that after `npm ci`).
 
@@ -21,6 +21,24 @@ const SHIPPED: &[&str] = &["hoardd", "hoard", "hoard-desktop"];
 const PLATFORMS: &[&str] =
     &["x86_64-pc-windows-msvc", "aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"];
 
+/// Art copied into the portal rather than installed (an icon drawn from a set): its name, version, license, where
+/// it's from, and the folder its license file is kept in.
+struct Art {
+    name: &'static str,
+    version: &'static str,
+    license: &'static str,
+    url: &'static str,
+    dir: &'static str,
+}
+
+const ART: &[Art] = &[Art {
+    name: "with icons",
+    version: "0.6.0",
+    license: "MIT",
+    url: "https://github.com/withevergrow/withicons",
+    dir: "web/src/assets/withicons",
+}];
+
 /// Write `web/public/licenses.json`, or with `check` say whether it's current.
 pub(crate) fn run(check: bool) -> Result<()> {
     let root = root();
@@ -29,8 +47,18 @@ pub(crate) fn run(check: bool) -> Result<()> {
     let mut web = npm(&root.join("web"), &mut texts)?;
     rust.sort_by_key(key);
     web.sort_by_key(key);
+    let art: Vec<Value> = ART
+        .iter()
+        .map(|a| {
+            let texts = texts.of(&root.join(a.dir));
+            if texts.is_empty() {
+                bail!("{} has no license file", a.dir);
+            }
+            Ok(json!({ "name": a.name, "version": a.version, "license": a.license, "url": a.url, "texts": texts }))
+        })
+        .collect::<Result<_>>()?;
     let own = std::fs::read_to_string(root.join("LICENSE")).context("read LICENSE")?.replace("\r\n", "\n");
-    let out = json!({ "hoard": own.trim(), "crates": rust, "npm": web, "texts": texts.list });
+    let out = json!({ "hoard": own.trim(), "crates": rust, "npm": web, "art": art, "texts": texts.list });
     let text = serde_json::to_string(&out)? + "\n";
     let path = root.join("web/public/licenses.json");
     if check {

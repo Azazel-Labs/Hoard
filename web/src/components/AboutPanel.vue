@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // Settings → About: what Hoard is, which version and edition this is, where it lives (GitHub, and the Steam store for
 // the Steam build), its license, and everyone else's work it's made with: the programs and models it downloads when
-// they're needed, and every crate and npm package it's built from with their licenses (`cargo xtask licenses` writes
-// those to licenses.json, loaded only when this page is opened).
+// they're needed, and every crate, npm package and piece of art it's built from with their licenses (`cargo xtask
+// licenses` writes those to licenses.json, loaded only when this page is opened).
 import { computed, onMounted, reactive, ref } from 'vue'
 import type { Stats } from '../api'
 import { isDesktop, may, steamApp } from '../auth'
@@ -12,7 +12,7 @@ import ReportDialog from './ReportDialog.vue'
 const props = defineProps<{ stats: Stats | null }>()
 
 interface Package { name: string; version: string; license: string | null; url: string | null; texts: number[] }
-interface Licenses { hoard: string; crates: Package[]; npm: Package[]; texts: string[] }
+interface Licenses { hoard: string; crates: Package[]; npm: Package[]; art?: Package[]; texts: string[] }
 
 const REPO = 'https://github.com/Azazel-Labs/Hoard'
 const DISCORD = 'https://discord.gg/zf9ncS4EW'
@@ -64,6 +64,8 @@ const all = computed(() => {
   return [
     ...l.crates.map((p) => ({ ...p, key: `crate:${p.name}@${p.version}`, from: 'crates.io' })),
     ...l.npm.map((p) => ({ ...p, key: `npm:${p.name}@${p.version}`, from: 'npm' })),
+    // Art copied in (an icon from a set), from wherever it's published.
+    ...(l.art ?? []).map((p) => ({ ...p, key: `art:${p.name}@${p.version}`, from: p.url ? new URL(p.url).host : '' })),
   ]
 })
 const shown = computed(() => {

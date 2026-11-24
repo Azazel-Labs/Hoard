@@ -17,10 +17,12 @@ defineProps<{ page: string; size?: number }>()
     aria-hidden="true"
   >
     <template v-if="page === 'dragon'">
-      <!-- A pile of coins with a gem on top: the dragon's hoard. -->
-      <ellipse cx="8" cy="12" rx="5.5" ry="1.8" />
-      <path d="M3.5 10.6c1-1.3 2.6-2 4.5-2s3.5.7 4.5 2" />
-      <path d="M6 5.5 8 2.5l2 3-2 2.5-2-2.5ZM6 5.5h4" />
+      <!-- A horned dragon's head, filled: with icons' dragon-head-solid (MIT, see src/assets/withicons), drawn on 24
+           units and scaled to these 16. -->
+      <g fill="currentColor" stroke="none" transform="scale(0.6667)">
+        <path d="M12 4.6c3.6 0 6.6 2 6.6 5.8c0 2.6-1.2 4.2-2 5.6c-.3 2.5-.2 5.8-4.6 5.8S7.7 18.5 7.4 16c-.8-1.4-2-3-2-5.6c0-3.8 3-5.8 6.6-5.8m1.4 6c0 .9.5 1.6 1.4 1.6C16.1 12.2 17 11 17 9zm-2.8 0L7 9c0 2 .9 3.2 2.2 3.2c.9 0 1.4-.7 1.4-1.6m2.6 8.6l1-.3l-.3-1.1l-1 .4Zm-2.1-1l-1-.4l-.3 1.1l1 .3Z" />
+        <path d="M14.6 5.4c.8-2.6 3.4-4 7-4.2c-2 1.6-3 3.8-3.2 6.8c-.8-1.4-2.2-2.4-3.8-2.6m-5.2 0c-1.6.2-3 1.2-3.8 2.6c-.2-3-1.2-5.2-3.2-6.8c3.6.2 6.2 1.6 7 4.2" />
+      </g>
     </template>
     <template v-else-if="page === 'appearance'">
       <path d="M8 1.8a6.2 6.2 0 1 0 0 12.4c1 0 1.4-.6 1.4-1.3 0-1.1-1-1.4-1-2.3 0-.8.6-1.3 1.4-1.3h1.7a2.7 2.7 0 0 0 2.7-2.7C14.2 4 11.4 1.8 8 1.8Z" />

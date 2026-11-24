@@ -1,10 +1,30 @@
+import { readFile } from 'node:fs/promises'
 import vue from '@vitejs/plugin-vue'
-import { defineConfig } from 'vite'
+import { type Plugin, defineConfig } from 'vite'
+
+/** The Fluent catalogs without their comments, which are for translators: a fifth of the English one, which every
+ *  page loads. A `#` starting a line is always a comment (a value's later lines are indented). */
+function catalogsWithoutComments(): Plugin {
+  return {
+    name: 'catalogs-without-comments',
+    enforce: 'pre',
+    async load(id) {
+      const [path, query] = id.split('?')
+      if (!path.endsWith('.ftl') || query !== 'raw') return null
+      const text = (await readFile(path, 'utf8'))
+        .split(/\r?\n/)
+        .filter((line) => !line.startsWith('#'))
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+      return `export default ${JSON.stringify(text)}`
+    },
+  }
+}
 
 // In dev, Vite serves the UI on :5173 and proxies the API to hoardd on :4627.
 // In production, hoardd serves the built `dist/` itself, so there's no CORS to configure.
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [catalogsWithoutComments(), vue()],
   build: {
     rolldownOptions: {
       output: {

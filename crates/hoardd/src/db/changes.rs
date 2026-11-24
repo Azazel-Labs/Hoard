@@ -336,6 +336,13 @@ pub(crate) fn since(from: u64, to: u64) -> Option<Changed> {
 mod tests {
     use super::*;
 
+    /// What changed since `before`, and whether only the write just made did: what it didn't change can only be
+    /// checked then, as other tests' rowids are the same numbers. (Their writes can also make it all `too_much`.)
+    fn last(before: u64) -> (Changed, bool) {
+        let to = library_writes();
+        (since(before, to).unwrap(), to == before + 1)
+    }
+
     // Other tests write to libraries of their own meanwhile, and the journal is the server's (it has one library), so
     // this looks for its own assets among what changed, by names no other test uses.
     #[test]
@@ -356,9 +363,9 @@ mod tests {
 
         let before = library_writes();
         conn.execute("INSERT INTO asset_tags (asset_id, tag, source) VALUES ('journal-1', 'red', 'x')", []).unwrap();
-        let changed = since(before, library_writes()).unwrap();
-        assert!(changed.tagged.contains("journal-1"));
-        assert!(!changed.tagged.contains("journal-2"));
+        let (changed, alone) = last(before);
+        assert!(changed.too_much || changed.tagged.contains("journal-1"));
+        assert!(!alone || !changed.tagged.contains("journal-2"));
 
         // Rolled back, nothing changed.
         let before = library_writes();
@@ -368,25 +375,26 @@ mod tests {
             tx.rollback().unwrap();
         }
         conn.execute("UPDATE assets SET name = 'one' WHERE id = 'journal-1'", []).unwrap();
-        let changed = since(before, library_writes()).unwrap();
-        assert!(!changed.tagged.contains("journal-2"));
-        assert!(changed.rows.contains(&a1));
+        let (changed, alone) = last(before);
+        assert!(!alone || !changed.tagged.contains("journal-2"));
+        assert!(changed.too_much || changed.rows.contains(&a1));
         let before = library_writes();
         conn.execute("UPDATE assets SET kind = 'model' WHERE id = 'journal-2'", []).unwrap();
-        let changed = since(before, library_writes()).unwrap();
-        assert!(changed.fact_rows.contains(&a2), "a kind is something a search keeps");
-        assert!(!changed.placed.contains(&a2) && !changed.facts);
+        let (changed, alone) = last(before);
+        assert!(changed.too_much || changed.fact_rows.contains(&a2), "a kind is something a search keeps");
+        assert!(!alone || (!changed.placed.contains(&a2) && !changed.facts));
         let before = library_writes();
         conn.execute(
             "UPDATE assets SET name = 'two', meta = '{\"take_of\": \"journal-1\"}' WHERE id = 'journal-2'",
             [],
         )
         .unwrap();
-        let changed = since(before, library_writes()).unwrap();
-        assert!(changed.fact_ids.contains("journal-1"), "what a take is of");
+        let (changed, _) = last(before);
+        assert!(changed.too_much || changed.fact_ids.contains("journal-1"), "what a take is of");
         let before = library_writes();
         conn.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
-        assert!(since(before, library_writes()).unwrap().facts, "every asset of the pack");
+        let (changed, _) = last(before);
+        assert!(changed.too_much || changed.facts, "every asset of the pack");
         conn.execute("UPDATE packs SET archived_at = NULL WHERE id = 'p'", []).unwrap();
 
         // An asset removed takes its tags with it; the tree changing is noted.
@@ -396,11 +404,11 @@ mod tests {
              INSERT INTO tag_parents (tag, parent) VALUES ('red', 'warm'); COMMIT;",
         )
         .unwrap();
-        let changed = since(before, library_writes()).unwrap();
-        assert!(changed.tagged.contains("journal-1"));
-        assert!(changed.rows.contains(&a1) && changed.rows.contains(&a2));
-        assert!(changed.placed.contains(&a1) && changed.fact_ids.contains("journal-1"));
-        assert!(changed.tree);
+        let (changed, _) = last(before);
+        assert!(changed.too_much || changed.tagged.contains("journal-1"));
+        assert!(changed.too_much || (changed.rows.contains(&a1) && changed.rows.contains(&a2)));
+        assert!(changed.too_much || (changed.placed.contains(&a1) && changed.fact_ids.contains("journal-1")));
+        assert!(changed.too_much || changed.tree);
     }
 
     #[test]

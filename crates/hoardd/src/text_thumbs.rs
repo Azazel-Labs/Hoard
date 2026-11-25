@@ -268,20 +268,22 @@ pub(crate) async fn sniff_others(state: &AppState) -> anyhow::Result<()> {
         db::call(&state.pool, move |c| {
             let tx = c.transaction()?;
             if let Some(b) = &thumb {
-                tx.execute(
+                tx.prepare_cached(
                     "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-                    rusqlite::params![b.hash, b.size as i64, db::now()],
-                )?;
+                )?
+                .execute(rusqlite::params![b.hash, b.size as i64, db::now()])?;
             }
-            let n = tx.execute(
-                "UPDATE assets SET kind = 'document', meta = json_set(meta, '$.text', json('true')),
+            let n = tx
+                .prepare_cached(
+                    "UPDATE assets SET kind = 'document', meta = json_set(meta, '$.text', json('true')),
                      category = CASE WHEN human_edited THEN category ELSE ?2 END,
                      thumb_hash = COALESCE(thumb_hash, ?3)
                    WHERE id = ?1 AND kind = 'other'",
-                rusqlite::params![id, category, thumb.as_ref().map(|b| b.hash.clone())],
-            )?;
+                )?
+                .execute(rusqlite::params![id, category, thumb.as_ref().map(|b| b.hash.clone())])?;
             if n > 0 {
-                tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = 'kind:other'", [&id])?;
+                tx.prepare_cached("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = 'kind:other'")?
+                    .execute([&id])?;
                 db::upsert_tag(&tx, &id, "kind:document", hoard_core::TagSource::Meta, 1.0)?;
                 db::reindex_asset(&tx, &id)?;
             }

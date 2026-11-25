@@ -138,11 +138,11 @@ fn write(
             if kind == AssetKind::Model.as_str()
                 && let Some(tris) = s.lod_tris(path)
             {
-                tx.execute(
+                tx.prepare_cached(
                     "UPDATE assets SET meta = json_set(COALESCE(meta, '{}'), '$.triangles', ?2)
                      WHERE id = ?1 AND json_extract(meta, '$.triangles') IS NULL",
-                    params![asset, i64::try_from(tris).unwrap_or(i64::MAX)],
-                )?;
+                )?
+                .execute(params![asset, i64::try_from(tris).unwrap_or(i64::MAX)])?;
             }
         }
         for t in tags {
@@ -205,17 +205,17 @@ fn write(
         )
     };
     applied.described = description.is_none();
-    tx.execute(
+    tx.prepare_cached(
         "UPDATE packs SET name = COALESCE(?2, name), description = COALESCE(description, ?3), tags = ?4, file_tags = ?5
          WHERE id = ?1",
-        params![
-            pack_id,
-            applied.renamed,
-            new_description,
-            serde_json::to_string(&pack_tags)?,
-            serde_json::to_string(&file_tags)?
-        ],
-    )?;
+    )?
+    .execute(params![
+        pack_id,
+        applied.renamed,
+        new_description,
+        serde_json::to_string(&pack_tags)?,
+        serde_json::to_string(&file_tags)?
+    ])?;
     credit(&tx, pack_id, sidecars)?;
     tx.commit()?;
     Ok(applied)
@@ -225,21 +225,21 @@ fn write(
 /// one they know. Neither replaces what's there.
 fn credit(tx: &rusqlite::Connection, pack_id: &str, sidecars: &[Sidecar]) -> Result<()> {
     if let Some(seller) = sidecars.iter().find_map(|s| s.seller.as_deref()) {
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO pack_context (pack_id, seller) VALUES (?1, ?2)
              ON CONFLICT (pack_id) DO UPDATE SET seller = COALESCE(seller, excluded.seller)",
-            params![pack_id, seller],
-        )?;
+        )?
+        .execute(params![pack_id, seller])?;
     }
     let licenses: BTreeSet<&str> = sidecars.iter().filter_map(|s| s.license.as_deref()).collect();
     if let [license] = licenses.into_iter().collect::<Vec<_>>().as_slice()
         && crate::credits::license_name(license).is_some()
     {
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO pack_context (pack_id, store_license) VALUES (?1, ?2)
              ON CONFLICT (pack_id) DO UPDATE SET store_license = COALESCE(store_license, excluded.store_license)",
-            params![pack_id, license],
-        )?;
+        )?
+        .execute(params![pack_id, license])?;
     }
     Ok(())
 }
@@ -257,15 +257,16 @@ fn name_and_link(tx: &rusqlite::Connection, s: &Sidecar, mine: &[&(String, Strin
         } else {
             continue;
         };
-        tx.execute("UPDATE assets SET name = ?2 WHERE id = ?1 AND NOT human_edited AND name <> ?2", params![id, name])?;
+        tx.prepare_cached("UPDATE assets SET name = ?2 WHERE id = ?1 AND NOT human_edited AND name <> ?2")?
+            .execute(params![id, name])?;
     }
     let Some((json, ..)) = mine.iter().find(|(_, p, _)| *p == s.path) else { return Ok(()) };
     for (id, _, kind) in mine {
         if kind == AssetKind::Model.as_str() || kind == AssetKind::Material.as_str() {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sidecar') ON CONFLICT DO NOTHING",
-                params![id, json],
-            )?;
+            )?
+            .execute(params![id, json])?;
         }
     }
     Ok(())

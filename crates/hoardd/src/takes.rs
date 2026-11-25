@@ -183,23 +183,22 @@ fn write(
     let tx = c.transaction()?;
     let mut replaced: Vec<(String, i64)> = Vec::new();
     let size_of = |tx: &rusqlite::Transaction<'_>, hash: &str| -> rusqlite::Result<i64> {
-        tx.query_row("SELECT COALESCE((SELECT size FROM blobs WHERE hash = ?1), 0)", [hash], |r| r.get(0))
+        tx.prepare_cached("SELECT COALESCE((SELECT size FROM blobs WHERE hash = ?1), 0)")?
+            .query_row([hash], |r| r.get(0))
     };
+    // Cached, as these run for each take.
     for t in fresh {
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-            params![t.blob.hash, i64::try_from(t.blob.size).unwrap_or(i64::MAX), now],
-        )?;
+        )?
+        .execute(params![t.blob.hash, i64::try_from(t.blob.size).unwrap_or(i64::MAX), now])?;
         let old: Option<(String, String)> = tx
-            .query_row(
-                "SELECT id, blob_hash FROM assets WHERE pack_id = ?1 AND path = ?2",
-                params![pack_id, t.path],
-                |r| Ok((r.get(0)?, r.get(1)?)),
-            )
+            .prepare_cached("SELECT id, blob_hash FROM assets WHERE pack_id = ?1 AND path = ?2")?
+            .query_row(params![pack_id, t.path], |r| Ok((r.get(0)?, r.get(1)?)))
             .optional()?;
         let id = old.as_ref().map_or_else(|| uuid::Uuid::now_v7().to_string(), |(id, _)| id.clone());
         let meta = json!({ "take_of": t.of, "take": t.name, "take_from": t.from });
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
                                  created_at, updated_at)
              VALUES (?1, ?2, ?3, ?4, ?5, 'glb', 'animation', 'animations', ?6, ?7, ?8, ?9, ?9)
@@ -207,18 +206,18 @@ fn write(
                  blob_hash = excluded.blob_hash, meta = excluded.meta, words = excluded.words,
                  updated_at = excluded.updated_at,
                  name = CASE WHEN human_edited THEN name ELSE excluded.name END",
-            params![
-                id,
-                pack_id,
-                t.blob.hash,
-                t.path,
-                crate::tagger::display_name(&t.name),
-                meta.to_string(),
-                crate::tagger::fts_words(&t.path),
-                t.thumb,
-                now
-            ],
-        )?;
+        )?
+        .execute(params![
+            id,
+            pack_id,
+            t.blob.hash,
+            t.path,
+            crate::tagger::display_name(&t.name),
+            meta.to_string(),
+            crate::tagger::fts_words(&t.path),
+            t.thumb,
+            now
+        ])?;
         if let Some((_, was)) = old.filter(|(_, was)| *was != t.blob.hash) {
             // Made again from changed contents: what was drawn of the old take goes, its file's picture standing in
             // until it's drawn again.
@@ -230,27 +229,25 @@ fn write(
                 .query_map([&id], |r| Ok((r.get(0)?, r.get(1)?)))?
                 .collect::<rusqlite::Result<_>>()?;
             replaced.extend(drawn);
-            tx.execute("DELETE FROM derivatives WHERE asset_id = ?1", [&id])?;
-            tx.execute(
-                "UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL",
-                params![id, t.thumb],
-            )?;
+            tx.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1")?.execute([&id])?;
+            tx.prepare_cached("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL")?
+                .execute(params![id, t.thumb])?;
             replaced.push((was.clone(), size_of(&tx, &was)?));
         }
         // Its tags are its file's, but for the file's kind.
-        tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source <> 'human'", [&id])?;
-        tx.execute(
+        tx.prepare_cached("DELETE FROM asset_tags WHERE asset_id = ?1 AND source <> 'human'")?.execute([&id])?;
+        tx.prepare_cached(
             "INSERT INTO asset_tags (asset_id, tag, source, confidence)
              SELECT ?1, tag, source, confidence FROM asset_tags WHERE asset_id = ?2 AND tag NOT LIKE 'kind:%'
              ON CONFLICT DO NOTHING",
-            params![id, t.of],
-        )?;
+        )?
+        .execute(params![id, t.of])?;
         db::upsert_tag(&tx, &id, "kind:animation", TagSource::Meta, 1.0)?;
         db::reindex_asset(&tx, &id)?;
         crate::animations::store(&tx, &id, t.rig.as_ref())?;
     }
     for (id, blob) in gone {
-        tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
+        tx.prepare_cached("DELETE FROM assets WHERE id = ?1")?.execute([id])?;
         replaced.push((blob.clone(), size_of(&tx, blob)?));
     }
     tx.commit()?;

@@ -553,11 +553,11 @@ fn write(conn: &mut Connection, pack_id: &str, textures: &[Texture], found: &[Fo
         let mut stmt = tx.prepare("SELECT id, path, ext FROM assets WHERE pack_id = ?1 AND kind = 'sheet'")?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
     };
-    tx.execute(
+    tx.prepare_cached(
         "UPDATE assets SET meta = json_remove(meta, '$.atlas')
           WHERE pack_id = ?1 AND json_extract(meta, '$.atlas') IS NOT NULL",
-        [pack_id],
-    )?;
+    )?
+    .execute([pack_id])?;
     let tags_of = |id: &str| -> Result<tagger::TagSet> {
         let mut set = tagger::TagSet::default();
         let mut stmt = tx.prepare_cached("SELECT tag, source, confidence FROM asset_tags WHERE asset_id = ?1")?;
@@ -570,15 +570,15 @@ fn write(conn: &mut Connection, pack_id: &str, textures: &[Texture], found: &[Fo
         Ok(set)
     };
     let mut kept = HashSet::new();
+    // Cached, as these run for each sheet and its pages.
     for f in found {
         kept.insert(f.file_id.clone());
         for &p in &f.pages {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'texture') ON CONFLICT DO NOTHING",
-                params![f.file_id, textures[p].id],
-            )?;
-            tx.execute(
-                "UPDATE assets SET meta = json_set(meta, '$.atlas', json(?2)) WHERE id = ?1",
+            )?
+            .execute(params![f.file_id, textures[p].id])?;
+            tx.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.atlas', json(?2)) WHERE id = ?1")?.execute(
                 params![
                     textures[p].id,
                     json!({ "file": f.file_path, "format": f.format, "sprites": f.sprites }).to_string()
@@ -586,45 +586,44 @@ fn write(conn: &mut Connection, pack_id: &str, textures: &[Texture], found: &[Fo
             )?;
         }
         if let Some(loose) = &f.loose {
-            tx.execute("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sprite'", [&f.file_id])?;
+            tx.prepare_cached("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sprite'")?
+                .execute([&f.file_id])?;
             for &t in loose {
-                tx.execute(
+                tx.prepare_cached(
                     "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sprite') ON CONFLICT DO NOTHING",
-                    params![f.file_id, textures[t].id],
-                )?;
+                )?
+                .execute(params![f.file_id, textures[t].id])?;
             }
-            tx.execute(
-                "UPDATE assets SET meta = json_set(meta, '$.loose', ?2) WHERE id = ?1",
-                params![f.file_id, loose.len() as i64],
-            )?;
+            tx.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.loose', ?2) WHERE id = ?1")?
+                .execute(params![f.file_id, loose.len() as i64])?;
         }
         let Some(new) = &f.new else { continue };
         for b in [Some(&new.blob), new.thumb.as_ref()].into_iter().flatten() {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-                params![b.hash, b.size as i64, now],
-            )?;
+            )?
+            .execute(params![b.hash, b.size as i64, now])?;
         }
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, 'sheet', ?2, ?3)
              ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
-            params![f.file_id, new.blob.hash, now],
-        )?;
+        )?
+        .execute(params![f.file_id, new.blob.hash, now])?;
         let category = tagger::categorize(AssetKind::Sheet, &tags_of(&f.file_id)?);
-        tx.execute(
+        tx.prepare_cached(
             "UPDATE assets SET kind = 'sheet', meta = json_set(meta, '$.sheet', json(?2)), words = ?3,
                     thumb_hash = COALESCE(?4, thumb_hash), updated_at = ?5,
                     category = CASE WHEN human_edited THEN category ELSE ?6 END
               WHERE id = ?1",
-            params![
-                f.file_id,
-                new.summary.to_string(),
-                format!("{} sprite sheet {}", tagger::fts_words(&f.file_path), new.words),
-                new.thumb.as_ref().map(|t| t.hash.clone()),
-                now,
-                category,
-            ],
-        )?;
+        )?
+        .execute(params![
+            f.file_id,
+            new.summary.to_string(),
+            format!("{} sprite sheet {}", tagger::fts_words(&f.file_path), new.words),
+            new.thumb.as_ref().map(|t| t.hash.clone()),
+            now,
+            category,
+        ])?;
         db::reindex_asset(&tx, &f.file_id)?;
     }
     for (id, path, ext) in before {
@@ -633,14 +632,14 @@ fn write(conn: &mut Connection, pack_id: &str, textures: &[Texture], found: &[Fo
         }
         let kind = AssetKind::from_ext(&ext.to_lowercase());
         let category = tagger::categorize(kind, &tags_of(&id)?);
-        tx.execute("DELETE FROM derivatives WHERE asset_id = ?1 AND kind = 'sheet'", [&id])?;
-        tx.execute("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sprite'", [&id])?;
-        tx.execute(
+        tx.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1 AND kind = 'sheet'")?.execute([&id])?;
+        tx.prepare_cached("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sprite'")?.execute([&id])?;
+        tx.prepare_cached(
             "UPDATE assets SET kind = ?2, meta = json_remove(meta, '$.sheet', '$.loose'), words = ?3, thumb_hash = NULL,
                     updated_at = ?4, category = CASE WHEN human_edited THEN category ELSE ?5 END
               WHERE id = ?1",
-            params![id, kind.as_str(), tagger::fts_words(&path), now, category],
-        )?;
+        )?
+        .execute(params![id, kind.as_str(), tagger::fts_words(&path), now, category])?;
         db::reindex_asset(&tx, &id)?;
     }
     crate::links::assign_families(&tx, pack_id)?;

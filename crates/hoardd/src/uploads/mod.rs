@@ -473,37 +473,36 @@ async fn expected(state: &AppState, id: &str, path: &str) -> ApiResult<(u64, u64
 async fn record(state: &AppState, id: &str, path: &str, part: Option<u64>, bytes: u64, size: u64) -> ApiResult<u64> {
     let (id2, p2) = (id.to_owned(), path.to_owned());
     let received = db::call(&state.pool, move |c| {
+        // Cached, as this runs for every part of every file uploaded.
         let tx = c.transaction()?;
-        let before =
-            tx.query_row("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2", params![id2, p2], |r| {
-                r.get::<_, i64>(0)
-            })? as u64;
+        let before = tx
+            .prepare_cached("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2")?
+            .query_row(params![id2, p2], |r| r.get::<_, i64>(0))? as u64;
         if let Some(part) = part {
             // A part that was already counted (sent twice by a retry) adds nothing.
-            let new = tx.execute(
-                "INSERT OR IGNORE INTO upload_parts (pack_id, path, part, bytes) VALUES (?1, ?2, ?3, ?4)",
-                params![id2, p2, part as i64, bytes as i64],
-            )?;
+            let new = tx
+                .prepare_cached(
+                    "INSERT OR IGNORE INTO upload_parts (pack_id, path, part, bytes) VALUES (?1, ?2, ?3, ?4)",
+                )?
+                .execute(params![id2, p2, part as i64, bytes as i64])?;
             if new == 1 {
-                tx.execute(
+                tx.prepare_cached(
                     "UPDATE upload_files SET received = MIN(size, received + ?3) WHERE pack_id = ?1 AND path = ?2",
-                    params![id2, p2, bytes as i64],
-                )?;
+                )?
+                .execute(params![id2, p2, bytes as i64])?;
             }
         } else {
-            tx.execute(
-                "UPDATE upload_files SET received = ?3 WHERE pack_id = ?1 AND path = ?2",
-                params![id2, p2, bytes as i64],
-            )?;
+            tx.prepare_cached("UPDATE upload_files SET received = ?3 WHERE pack_id = ?1 AND path = ?2")?
+                .execute(params![id2, p2, bytes as i64])?;
         }
-        let received =
-            tx.query_row("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2", params![id2, p2], |r| {
-                r.get::<_, i64>(0)
-            })? as u64;
-        tx.execute("UPDATE upload_meta SET touched_at = ?2 WHERE pack_id = ?1", params![id2, db::now()])?;
+        let received = tx
+            .prepare_cached("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2")?
+            .query_row(params![id2, p2], |r| r.get::<_, i64>(0))? as u64;
+        tx.prepare_cached("UPDATE upload_meta SET touched_at = ?2 WHERE pack_id = ?1")?
+            .execute(params![id2, db::now()])?;
         // Counted as it completes: counting them all again took longer the more files the upload had.
         if received == size && before < size {
-            tx.execute("UPDATE packs SET files_done = files_done + 1 WHERE id = ?1", [&id2])?;
+            tx.prepare_cached("UPDATE packs SET files_done = files_done + 1 WHERE id = ?1")?.execute([&id2])?;
         }
         tx.commit()?;
         Ok(received)

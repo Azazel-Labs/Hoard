@@ -279,21 +279,23 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     // A big pack has thousands: in slices, so nobody else waits seconds to write meanwhile.
     let mut slices = db::Slices::new(conn);
     let mut kept = HashSet::new();
+    // Its statements are cached, as they run for each material and compiling the ones on the assets table costs more
+    // than running them.
     for m in &made {
         let tx = slices.tx()?;
         let f = &m.found;
         let id = existing.get(&f.path).map_or_else(|| uuid::Uuid::now_v7().to_string(), |(id, ..)| id.clone());
         kept.insert(id.clone());
         for b in [Some(&m.descriptor), m.thumb.as_ref()].into_iter().flatten() {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-                params![b.hash, b.size as i64, now],
-            )?;
+            )?
+            .execute(params![b.hash, b.size as i64, now])?;
         }
         let meta = m.meta();
         let tags = material_tags(tx, &textures, f)?;
         let category = tagger::categorize(AssetKind::Material, &tags);
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
                                  created_at, updated_at)
              VALUES (?1, ?2, ?3, ?4, ?5, 'material', 'material', ?6, ?7, ?8, ?9, ?10, ?10)
@@ -302,42 +304,42 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                  thumb_hash = COALESCE(excluded.thumb_hash, thumb_hash), updated_at = excluded.updated_at,
                  name = CASE WHEN human_edited THEN name ELSE excluded.name END,
                  category = CASE WHEN human_edited THEN category ELSE excluded.category END",
-            params![
-                id,
-                pack_id,
-                m.descriptor.hash,
-                f.path,
-                f.name,
-                category,
-                meta.to_string(),
-                format!("{} material pbr{}", tagger::fts_words(&f.path), engine_words(f)),
-                m.thumb.as_ref().map(|t| t.hash.clone()),
-                now,
-            ],
-        )?;
+        )?
+        .execute(params![
+            id,
+            pack_id,
+            m.descriptor.hash,
+            f.path,
+            f.name,
+            category,
+            meta.to_string(),
+            format!("{} material pbr{}", tagger::fts_words(&f.path), engine_words(f)),
+            m.thumb.as_ref().map(|t| t.hash.clone()),
+            now,
+        ])?;
         // A reviewed asset keeps the rule tags it was reviewed with.
-        tx.execute(
+        tx.prepare_cached(
             "DELETE FROM asset_tags WHERE asset_id = ?1 AND (source = 'meta' OR source = 'rule' AND NOT EXISTS
                (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
-            [&id],
-        )?;
+        )?
+        .execute([&id])?;
         for s in tags.into_vec() {
             db::upsert_tag(tx, &id, &s.tag, s.source, s.confidence)?;
         }
         db::reindex_asset(tx, &id)?;
-        tx.execute("DELETE FROM material_maps WHERE material_id = ?1", [&id])?;
-        tx.execute("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'texture'", [&id])?;
+        tx.prepare_cached("DELETE FROM material_maps WHERE material_id = ?1")?.execute([&id])?;
+        tx.prepare_cached("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'texture'")?.execute([&id])?;
         for (i, role, res) in &f.maps {
             let t = &textures[*i].id;
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO material_maps (material_id, texture_id, role, resolution) VALUES (?1, ?2, ?3, ?4)
                  ON CONFLICT DO NOTHING",
-                params![id, t, role.as_str(), res],
-            )?;
-            tx.execute(
+            )?
+            .execute(params![id, t, role.as_str(), res])?;
+            tx.prepare_cached(
                 "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'texture') ON CONFLICT DO NOTHING",
-                params![id, t],
-            )?;
+            )?
+            .execute(params![id, t])?;
         }
         link_source(tx, &id, f)?;
     }
@@ -384,16 +386,16 @@ fn engine_words(f: &Found) -> &'static str {
 
 /// The engine's materials a material was read from go behind it.
 fn link_source(tx: &Connection, id: &str, f: &Found) -> Result<()> {
-    tx.execute(
+    tx.prepare_cached(
         "DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sidecar'
            AND to_id IN (SELECT id FROM assets WHERE ext IN ('mat', 'mtl'))",
-        [id],
-    )?;
+    )?
+    .execute([id])?;
     for (source, _) in &f.sources {
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sidecar') ON CONFLICT DO NOTHING",
-            params![id, source],
-        )?;
+        )?
+        .execute(params![id, source])?;
     }
     Ok(())
 }

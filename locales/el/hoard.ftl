@@ -486,6 +486,7 @@ app-lazy-settings = ρυθμίσεων
 app-lazy-archive = αρχειοθήκης
 app-lazy-shortcuts = συντομεύσεων
 app-lazy-setup = αρχικής ρύθμισης
+app-lazy-explorer = του εξερευνητή πλεγμάτων
 app-theme-system = Όπως το θέμα του συστήματος
 app-theme-light = Φωτεινό θέμα
 app-theme-dark = Σκοτεινό θέμα
@@ -761,6 +762,7 @@ app-update-search-title = Διατήρηση της τρέχουσας επιλ�
 app-save-search-new = Αποθήκευση ως νέας
 app-select-title = Επιλέξτε πολλά στοιχεία για να τους δώσετε ετικέτες, κατηγορία, να τα βάλετε σε συλλογή, να τα κατεβάσετε ή να τα αρχειοθετήσετε μαζί (X ή Ctrl-κλικ)
 app-select = Επιλογή
+app-explore-title = Εξερεύνηση αυτών των μοντέλων σε 3D
 app-tile-size = Μέγεθος πλακιδίων
 app-supporting-title = Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο. Ένα στοιχείο που το πακέτο έχει σε πολλές μορφές εμφανίζεται μία φορά, στη μορφή που το Hoard διαβάζει καλύτερα.
 app-supporting-hidden =
@@ -2304,6 +2306,37 @@ model-key-light = φως
 model-key-grid = κάνναβος
 model-key-background = φόντο
 model-key-play = αναπαραγωγή
+explorer-dialog = Εξερευνητής πλεγμάτων: πετάξτε ανάμεσα στα μοντέλα αυτών των αποτελεσμάτων
+explorer-title = Εξερευνητής πλεγμάτων
+explorer-group-view = Προβολή
+explorer-true-size = Πραγματικό μέγεθος
+explorer-true-size-title = Εμφάνιση κάθε μοντέλου στο πραγματικό του μέγεθος σε μέτρα, έως 12 m, αντί να προσαρμόζεται στο τετράγωνό του (T)
+explorer-animate = Κίνηση
+explorer-animate-title = Αναπαραγωγή του πρώτου κλιπ κάθε κινούμενου μοντέλου (Διάστημα)
+explorer-orbit = Τροχιά
+explorer-orbit-title = Σύρετε για να περιστραφείτε γύρω από το επιλεγμένο μοντέλο αντί να κοιτάτε γύρω (O)
+explorer-open = Άνοιγμα
+explorer-open-title = Άνοιγμα των λεπτομερειών αυτού του μοντέλου (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Κανένα από αυτά τα αποτελέσματα δεν μπορεί να εμφανιστεί σε 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] Φορτώθηκε { $loaded } από { $total } μοντέλο
+       *[other] Φορτώθηκαν { $loaded } από { $total } μοντέλα
+    }
+explorer-hud-loading = { $count } φορτώνονται
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Ταχύτητα { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Κλικ για επιλογή · σύρσιμο για να κοιτάξετε γύρω · σύρσιμο με το μεσαίο κουμπί για μετατόπιση · Alt και σύρσιμο για τροχιά · κύλιση για κίνηση, με πατημένο το δεξί κουμπί για αλλαγή ταχύτητας · διπλό κλικ για καδράρισμα
+explorer-key-fly = πτήση
+explorer-key-down-up = κάτω, πάνω
+explorer-key-faster = πιο γρήγορα
+explorer-key-open = άνοιγμα
+explorer-key-true-size = πραγματικό μέγεθος
+explorer-key-orbit = τροχιά
+explorer-key-animate = κίνηση
+explorer-key-close = κλείσιμο
 
 ## Υλικά
 

@@ -1020,6 +1020,10 @@ translation = "Edita…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Canvia les etiquetes i els camps de tots (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Explora aquests models en 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "menys"
@@ -1155,6 +1159,10 @@ translation = "Tipus"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "l'arxiu"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "l'explorador de malles"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5351,6 +5359,122 @@ translation = "El nom i la contrasenya no coincideixen"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Aquest no és el codi de configuració donat al servidor a HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Anima"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Reprodueix el primer clip de cada model animat (Espai)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Explorador de malles: vola entre els models d'aquests resultats"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Cap d'aquests resultats es pot mostrar en 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Vista"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] { $loaded } de { $total } model carregat
+       *[other] { $loaded } de { $total } models carregats
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } carregant-se"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Velocitat { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animar"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "tancar"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "baixar, pujar"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "més ràpid"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "volar"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "obrir"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "òrbita"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "mida real"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Fes clic per seleccionar · arrossega per mirar · arrossega amb el botó del mig per desplaçar · Alt i arrossega per orbitar · desplaça la roda per moure't, amb el botó dret premut per canviar la velocitat · doble clic per enquadrar"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Obre"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Obre els detalls d'aquest model (Retorn)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Òrbita"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Arrossega per girar al voltant del model seleccionat en lloc de mirar al voltant (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Explorador de malles"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Mida real"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Mostra cada model a la seva mida real en metres, fins a 12 m, en lloc d'ajustar-lo al seu quadrat (T)"
 
 [messages.folders-browse]
 source = "Browse…"

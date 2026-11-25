@@ -482,6 +482,7 @@ app-lazy-settings = instellings
 app-lazy-archive = die argief
 app-lazy-shortcuts = die kortpaaie
 app-lazy-setup = opstelling
+app-lazy-explorer = die maasverkenner
 app-theme-system = Volg stelseltema
 app-theme-light = Ligte tema
 app-theme-dark = Donker tema
@@ -745,6 +746,7 @@ app-update-search-title = Hou wat nou gekies is in hierdie gestoorde soektog
 app-save-search-new = Stoor as nuwe
 app-select-title = Kies etlike bates om saam te etiketteer, te kategoriseer, te versamel, af te laai of te argiveer (X, of Ctrl-klik)
 app-select = Kies
+app-explore-title = Verken hierdie modelle in 3D
 app-tile-size = Teëlgrootte
 app-supporting-title = glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys. ’n Bate wat die pak in verskeie formate het, word een keer gewys, in die formaat wat Hoard die beste lees.
 app-supporting-hidden =
@@ -2242,6 +2244,37 @@ model-key-light = lig
 model-key-grid = rooster
 model-key-background = agtergrond
 model-key-play = speel
+explorer-dialog = Maasverkenner: vlieg tussen die modelle in hierdie resultate
+explorer-title = Maasverkenner
+explorer-group-view = Aansig
+explorer-true-size = Ware grootte
+explorer-true-size-title = Wys elke model op sy ware grootte in meter, tot 12 m, in plaas daarvan om in sy vierkant te pas (T)
+explorer-animate = Animeer
+explorer-animate-title = Speel elke geanimeerde model se eerste snit (Spasie)
+explorer-orbit = Wentel
+explorer-orbit-title = Sleep om om die gekose model te draai in plaas daarvan om rond te kyk (O)
+explorer-open = Maak oop
+explorer-open-title = Maak hierdie model se besonderhede oop (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Geen van hierdie resultate kan in 3D gewys word nie.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } van { $total } model gelaai
+       *[other] { $loaded } van { $total } modelle gelaai
+    }
+explorer-hud-loading = { $count } word gelaai
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Spoed { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Klik om te kies · sleep om rond te kyk · middelsleep om te skuif · Alt-sleep om te wentel · rol om te beweeg, met die regterknoppie ingehou om die spoed te verander · dubbelklik om in te pas
+explorer-key-fly = vlieg
+explorer-key-down-up = af, op
+explorer-key-faster = vinniger
+explorer-key-open = maak oop
+explorer-key-true-size = ware grootte
+explorer-key-orbit = wentel
+explorer-key-animate = animeer
+explorer-key-close = maak toe
 
 ## Materiale (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

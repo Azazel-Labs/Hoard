@@ -987,6 +987,10 @@ translation = "编辑…"
 source = "Change the tags and fields of all of them (E)"
 translation = "更改全部的标签和字段 (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "以 3D 方式浏览这些模型"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "收起"
@@ -1122,6 +1126,10 @@ translation = "类型"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "归档"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "网格浏览器"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5210,6 +5218,118 @@ translation = "用户名和密码不匹配"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "这不是通过 HOARD_SETUP_CODE 提供给服务器的设置代码"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "动画"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "播放每个带动画模型的第一个片段（空格）"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "网格浏览器：在这些结果的模型之间飞行"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "这些结果中没有可以 3D 显示的内容。"
+
+[messages.explorer-group-view]
+source = "View"
+translation = "视图"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "已加载 { $loaded } / { $total } 个模型"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } 个加载中"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "速度 { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "动画"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "关闭"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "下降、上升"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "加速"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "飞行"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "打开"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "环绕"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "真实尺寸"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "单击选择 · 拖动环顾 · 中键拖动平移 · Alt+拖动环绕 · 滚动前后移动，按住右键滚动可调整速度 · 双击聚焦"
+
+[messages.explorer-open]
+source = "Open"
+translation = "打开"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "打开此模型的详细信息（Enter）"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "环绕"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "拖动时环绕所选模型旋转，而不是环顾四周（O）"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "网格浏览器"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "真实尺寸"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "以米为单位按真实尺寸显示每个模型（最大 12 m），而不是缩放到格子内（T）"
 
 [messages.folders-browse]
 source = "Browse…"

@@ -482,6 +482,7 @@ app-lazy-settings = inställningarna
 app-lazy-archive = arkivet
 app-lazy-shortcuts = kortkommandona
 app-lazy-setup = installationen
+app-lazy-explorer = mesh-utforskaren
 app-theme-system = Följ systemets tema
 app-theme-light = Ljust tema
 app-theme-dark = Mörkt tema
@@ -745,6 +746,7 @@ app-update-search-title = Behåll det som är valt nu i den här sparade söknin
 app-save-search-new = Spara som ny
 app-select-title = Välj flera resurser för att tagga, kategorisera, samla, ladda ner eller arkivera dem tillsammans (X, eller Ctrl-klick)
 app-select = Välj
+app-explore-title = Utforska de här modellerna i 3D
 app-tile-size = Rutstorlek
 app-supporting-title = glTF-buffertar, materialbibliotek, materialens kartor, material som bara en modell använder och butiksfiler som beskriver modeller. De följer med när du laddar ner det som använder dem. Ett spritearks sidor, och de sprites som paketet även har som separata bilder, visas tillsammans med arket. En tillgång som paketet har i flera format visas en gång, i det format Hoard läser bäst.
 app-supporting-hidden =
@@ -2245,6 +2247,37 @@ model-key-light = ljus
 model-key-grid = rutnät
 model-key-background = bakgrund
 model-key-play = spela upp
+explorer-dialog = Mesh-utforskare: flyg runt bland modellerna i de här resultaten
+explorer-title = Mesh-utforskare
+explorer-group-view = Vy
+explorer-true-size = Verklig storlek
+explorer-true-size-title = Visa varje modell i verklig storlek i meter, upp till 12 m, i stället för anpassad till sin ruta (T)
+explorer-animate = Animera
+explorer-animate-title = Spela upp det första klippet för varje animerad modell (Blanksteg)
+explorer-orbit = Omloppsbana
+explorer-orbit-title = Dra för att kretsa runt den valda modellen i stället för att se dig omkring (O)
+explorer-open = Öppna
+explorer-open-title = Öppna den här modellens detaljer (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Inget av de här resultaten kan visas i 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } av { $total } modell inläst
+       *[other] { $loaded } av { $total } modeller inlästa
+    }
+explorer-hud-loading = { $count } läses in
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Fart { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Klicka för att välja · dra för att se dig omkring · dra med mittknappen för att panorera · Alt-dra för att kretsa · scrolla för att röra dig, med höger knapp nedtryckt för att ändra farten · dubbelklicka för att anpassa
+explorer-key-fly = flyg
+explorer-key-down-up = ner, upp
+explorer-key-faster = snabbare
+explorer-key-open = öppna
+explorer-key-true-size = verklig storlek
+explorer-key-orbit = kretsa
+explorer-key-animate = animera
+explorer-key-close = stäng
 
 ## Material (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

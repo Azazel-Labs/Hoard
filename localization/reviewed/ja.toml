@@ -984,6 +984,10 @@ translation = "編集…"
 source = "Change the tags and fields of all of them (E)"
 translation = "すべてのタグとフィールドを変更 (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "これらのモデルを 3D で見て回る"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "減らす"
@@ -1119,6 +1123,10 @@ translation = "種類"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "アーカイブ"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "メッシュエクスプローラー"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5213,6 +5221,118 @@ translation = "名前とパスワードが一致しません"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "HOARD_SETUP_CODE でサーバーに指定されたセットアップコードと一致しません"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "アニメーション"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "アニメーション付きモデルの最初のクリップを再生する（Space）"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "メッシュエクスプローラー：この結果のモデルの間を飛び回る"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "この結果には 3D で表示できるものがありません。"
+
+[messages.explorer-group-view]
+source = "View"
+translation = "表示"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "{ $total } 件中 { $loaded } 件のモデルを読み込み済み"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } 件を読み込み中"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "速度 { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "アニメーション"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "閉じる"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "下降、上昇"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "速く"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "飛行"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "開く"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "周回"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "実寸"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "クリックで選択 · ドラッグで見回す · 中ボタンドラッグで移動 · Alt+ドラッグで周回 · スクロールで前後に移動、右ボタンを押しながらで速度を変更 · ダブルクリックで画面に収める"
+
+[messages.explorer-open]
+source = "Open"
+translation = "開く"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "このモデルの詳細を開く（Enter）"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "周回"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "ドラッグで見回す代わりに、選択したモデルの周りを回る（O）"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "メッシュエクスプローラー"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "実寸"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "各モデルをマス目に合わせず、メートル単位の実寸（最大 12 m）で表示する（T）"
 
 [messages.folders-browse]
 source = "Browse…"

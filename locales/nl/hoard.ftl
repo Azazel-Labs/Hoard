@@ -482,6 +482,7 @@ app-lazy-settings = de instellingen
 app-lazy-archive = het archief
 app-lazy-shortcuts = de sneltoetsen
 app-lazy-setup = de installatie
+app-lazy-explorer = de mesh-verkenner
 app-theme-system = Systeemthema volgen
 app-theme-light = Licht thema
 app-theme-dark = Donker thema
@@ -745,6 +746,7 @@ app-update-search-title = Bewaar wat nu is gekozen in deze opgeslagen zoekopdrac
 app-save-search-new = Opslaan als nieuwe
 app-select-title = Kies meerdere assets om ze samen te taggen, te categoriseren, in een collectie te zetten, te downloaden of te archiveren (X, of Ctrl-klik)
 app-select = Selecteren
+app-explore-title = Deze modellen in 3D verkennen
 app-tile-size = Tegelgrootte
 app-supporting-title = glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond. Een asset die het pakket in meerdere formaten heeft, wordt één keer getoond, in het formaat dat Hoard het best leest.
 app-supporting-hidden =
@@ -2242,6 +2244,37 @@ model-key-light = licht
 model-key-grid = raster
 model-key-background = achtergrond
 model-key-play = afspelen
+explorer-dialog = Mesh-verkenner: vlieg tussen de modellen in deze resultaten
+explorer-title = Mesh-verkenner
+explorer-group-view = Weergave
+explorer-true-size = Ware grootte
+explorer-true-size-title = Elk model op zijn ware grootte in meters tonen, tot 12 m, in plaats van passend in zijn vak (T)
+explorer-animate = Animeren
+explorer-animate-title = De eerste clip van elk geanimeerd model afspelen (Spatie)
+explorer-orbit = Draaien
+explorer-orbit-title = Slepen draait om het geselecteerde model in plaats van rond te kijken (O)
+explorer-open = Openen
+explorer-open-title = De details van dit model openen (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Geen van deze resultaten kan in 3D worden getoond.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } van { $total } model geladen
+       *[other] { $loaded } van { $total } modellen geladen
+    }
+explorer-hud-loading = { $count } aan het laden
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Snelheid { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Klik om te selecteren · sleep om rond te kijken · sleep met de middelste knop om te verschuiven · Alt-slepen om te draaien · scroll om te bewegen, met de rechterknop ingedrukt om de snelheid te wijzigen · dubbelklik om in te passen
+explorer-key-fly = vliegen
+explorer-key-down-up = omlaag, omhoog
+explorer-key-faster = sneller
+explorer-key-open = openen
+explorer-key-true-size = ware grootte
+explorer-key-orbit = draaien
+explorer-key-animate = animeren
+explorer-key-close = sluiten
 
 ## Materialen (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

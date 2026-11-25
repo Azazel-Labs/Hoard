@@ -492,6 +492,7 @@ app-lazy-settings = setările
 app-lazy-archive = arhiva
 app-lazy-shortcuts = comenzile rapide
 app-lazy-setup = configurarea
+app-lazy-explorer = exploratorul de mesh-uri
 app-theme-system = Ca tema sistemului
 app-theme-light = Temă luminoasă
 app-theme-dark = Temă întunecată
@@ -783,6 +784,7 @@ app-update-search-title = Păstrați selecția curentă în această căutare sa
 app-save-search-new = Salvați ca nouă
 app-select-title = Alegeți mai multe resurse pentru a le eticheta, categorisi, colecta, descărca sau arhiva împreună (X sau Ctrl-clic)
 app-select = Selectați
+app-explore-title = Explorează aceste modele în 3D
 app-tile-size = Mărimea dalelor
 app-supporting-title = Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia. Un element pe care pachetul îl are în mai multe formate este afișat o dată, în formatul pe care Hoard îl citește cel mai bine.
 app-supporting-hidden =
@@ -2416,6 +2418,38 @@ model-key-light = lumină
 model-key-grid = grilă
 model-key-background = fundal
 model-key-play = redare
+explorer-dialog = Explorator de mesh-uri: zboară printre modelele din aceste rezultate
+explorer-title = Explorator de mesh-uri
+explorer-group-view = Vizualizare
+explorer-true-size = Mărime reală
+explorer-true-size-title = Arată fiecare model la mărimea lui reală în metri, până la 12 m, în loc să fie încadrat în pătratul lui (T)
+explorer-animate = Animează
+explorer-animate-title = Redă primul clip al fiecărui model animat (Spațiu)
+explorer-orbit = Orbită
+explorer-orbit-title = Tragerea rotește în jurul modelului selectat în loc să privești în jur (O)
+explorer-open = Deschide
+explorer-open-title = Deschide detaliile acestui model (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Niciunul dintre aceste rezultate nu poate fi afișat în 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } din { $total } model încărcat
+        [few] { $loaded } din { $total } modele încărcate
+       *[other] { $loaded } din { $total } de modele încărcate
+    }
+explorer-hud-loading = { $count } se încarcă
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Viteză { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Clic pentru selectare · trage pentru a privi · trage cu butonul din mijloc pentru deplasare · Alt și trage pentru orbită · derulează pentru a te mișca, cu butonul drept apăsat pentru a schimba viteza · dublu clic pentru încadrare
+explorer-key-fly = zbor
+explorer-key-down-up = jos, sus
+explorer-key-faster = mai repede
+explorer-key-open = deschide
+explorer-key-true-size = mărime reală
+explorer-key-orbit = orbită
+explorer-key-animate = animează
+explorer-key-close = închide
 
 ## Materiale (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

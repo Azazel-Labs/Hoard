@@ -1020,6 +1020,10 @@ translation = "Bewerken…"
 source = "Change the tags and fields of all of them (E)"
 translation = "De tags en velden van alle wijzigen (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Deze modellen in 3D verkennen"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "minder"
@@ -1155,6 +1159,10 @@ translation = "Soort"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "het archief"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "de mesh-verkenner"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5351,6 +5359,122 @@ translation = "Die naam en dat wachtwoord horen niet bij elkaar"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Dat is niet de installatiecode die de server in HOARD_SETUP_CODE heeft gekregen"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animeren"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "De eerste clip van elk geanimeerd model afspelen (Spatie)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Mesh-verkenner: vlieg tussen de modellen in deze resultaten"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Geen van deze resultaten kan in 3D worden getoond."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Weergave"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] { $loaded } van { $total } model geladen
+       *[other] { $loaded } van { $total } modellen geladen
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } aan het laden"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Snelheid { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animeren"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "sluiten"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "omlaag, omhoog"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "sneller"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "vliegen"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "openen"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "draaien"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "ware grootte"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Klik om te selecteren · sleep om rond te kijken · sleep met de middelste knop om te verschuiven · Alt-slepen om te draaien · scroll om te bewegen, met de rechterknop ingedrukt om de snelheid te wijzigen · dubbelklik om in te passen"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Openen"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "De details van dit model openen (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Draaien"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Slepen draait om het geselecteerde model in plaats van rond te kijken (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Mesh-verkenner"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Ware grootte"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Elk model op zijn ware grootte in meters tonen, tot 12 m, in plaats van passend in zijn vak (T)"
 
 [messages.folders-browse]
 source = "Browse…"

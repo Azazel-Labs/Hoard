@@ -494,6 +494,7 @@ app-lazy-settings = настройки
 app-lazy-archive = архив
 app-lazy-shortcuts = сочетания клавиш
 app-lazy-setup = начальная настройка
+app-lazy-explorer = обозреватель мешей
 app-theme-system = Как в системе
 app-theme-light = Светлая тема
 app-theme-dark = Тёмная тема
@@ -795,6 +796,7 @@ app-update-search-title = Сохранить текущий выбор в это
 app-save-search-new = Сохранить как новый
 app-select-title = Выберите несколько ассетов, чтобы вместе добавить им теги, категорию, собрать в коллекцию, скачать или отправить в архив (X или Ctrl+щелчок)
 app-select = Выбрать
+app-explore-title = Осмотреть эти модели в 3D
 app-tile-size = Размер плиток
 app-supporting-title = Буферы glTF, библиотеки материалов, карты материалов, материалы, которые носит только одна модель, и файлы магазинов с описанием моделей. Они скачиваются вместе с тем, что их использует. Страницы спрайт-листа и его спрайты, которые есть в наборе и отдельными картинками, показываются вместе с листом. Ресурс, который есть в наборе в нескольких форматах, показывается один раз, в формате, который Hoard читает лучше всего.
 app-supporting-hidden =
@@ -2468,6 +2470,39 @@ model-key-light = свет
 model-key-grid = сетка
 model-key-background = фон
 model-key-play = воспроизвести
+explorer-dialog = Обозреватель мешей: летайте среди моделей из этих результатов
+explorer-title = Обозреватель мешей
+explorer-group-view = Вид
+explorer-true-size = Реальный размер
+explorer-true-size-title = Показывать каждую модель в реальном размере в метрах, до 12 м, а не вписывать её в клетку (T)
+explorer-animate = Анимация
+explorer-animate-title = Воспроизводить первый клип каждой анимированной модели (Пробел)
+explorer-orbit = Орбита
+explorer-orbit-title = Перетаскивание вращает вокруг выбранной модели, а не осматривает окрестности (O)
+explorer-open = Открыть
+explorer-open-title = Открыть сведения об этой модели (Enter)
+explorer-size = { $x } × { $y } × { $z } м
+explorer-empty = Ни один из этих результатов нельзя показать в 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] Загружено { $loaded } из { $total } модели
+        [few] Загружено { $loaded } из { $total } моделей
+        [many] Загружено { $loaded } из { $total } моделей
+       *[other] Загружено { $loaded } из { $total } модели
+    }
+explorer-hud-loading = Загружается: { $count }
+explorer-hud-memory = ~{ $mb } МБ
+explorer-hud-speed = Скорость { $speed } м/с
+explorer-hud-fps = { $fps } кадр/с
+explorer-keys-mouse = Щелчок выбирает · перетаскивание — осмотреться · перетаскивание средней кнопкой сдвигает · Alt и перетаскивание — орбита · прокрутка перемещает, с зажатой правой кнопкой меняет скорость · двойной щелчок — показать целиком
+explorer-key-fly = полёт
+explorer-key-down-up = вниз, вверх
+explorer-key-faster = быстрее
+explorer-key-open = открыть
+explorer-key-true-size = реальный размер
+explorer-key-orbit = орбита
+explorer-key-animate = анимация
+explorer-key-close = закрыть
 
 ## Материалы (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

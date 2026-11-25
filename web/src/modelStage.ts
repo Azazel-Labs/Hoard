@@ -133,7 +133,7 @@ export class ModelStage {
   private animation = false
   private resizeObs: ResizeObserver | null = null
   private timer = new THREE.Timer()
-  private materials = new Map<AnyMaterial, Partial<Record<MapSlot, THREE.Texture | null>>>()
+  private materials: MaterialMaps = new Map()
   private home = { position: new THREE.Vector3(), target: new THREE.Vector3() }
   private glide: { from: THREE.Vector3; to: THREE.Vector3; fromT: THREE.Vector3; toT: THREE.Vector3; t: number } | null = null
   private paused = false
@@ -211,11 +211,7 @@ export class ModelStage {
 
     // A soft studio room for image-based light: PBR materials (glTF's especially, which are often metallic) look
     // black or flat under direct lights alone. A key light rides with the camera so the side you look at is lit.
-    const pmrem = new THREE.PMREMGenerator(renderer)
-    const room = new RoomEnvironment()
-    this.envMap = pmrem.fromScene(room, 0.04).texture
-    room.dispose()
-    pmrem.dispose()
+    this.envMap = studioRoom(renderer)
     this.scene.add(this.hemi)
     this.camera.add(this.key, this.key.target)
     this.key.position.set(1.2, 1.6, 0.6)
@@ -277,62 +273,19 @@ export class ModelStage {
       clipLinks = [own]
       this.wearing = true
     }
-    const byName = new Map<string, AssetLink>()
-    const byStem = new Map<string, AssetLink>()
-    for (const t of [...named, ...guesses]) {
-      if (!byName.has(nameOf(t.path))) byName.set(nameOf(t.path), t)
-      // A name match beats a stem match, and among stems the browser-readable file wins.
-      const prev = byStem.get(stemOf(t.path))
-      if (!prev || (!BROWSER_IMAGES.has(extOf(prev.path)) && BROWSER_IMAGES.has(extOf(t.path)))) byStem.set(stemOf(t.path), t)
-    }
-    const byPath = new Map([...named, ...guesses].map((t) => [t.path.toLowerCase(), t]))
-    const packFiles = `/api/packs/${full.pack_id}/files/`
-    /** The file name each rewritten URL was asked for by, to name what failed. */
-    const askedAs = new Map<string, string>()
-    const manager = new THREE.LoadingManager()
-    manager.setURLModifier((url) => {
-      if (/^(blob|data):/.test(url)) return url
-      let path = url.split(/[?#]/)[0]
-      try {
-        path = decodeURIComponent(path)
-      } catch {
-        // Not percent-encoded after all.
-      }
-      if (!IMAGE_EXTS.has(extOf(path))) return url
-      // The exact file first (glTF's relative paths), then by name, then by name without the extension.
-      const inPack = path.startsWith(packFiles) ? path.slice(packFiles.length).replace(/\\/g, '/') : ''
-      const hit = byPath.get(inPack.toLowerCase()) ?? byName.get(nameOf(path)) ?? byStem.get(stemOf(path))
-      // The loader was picked by the extension asked for: a TGA standing in for a PNG goes through the server.
-      // (Light previews are never TGA.)
-      const tgaForOther = this.fullTextures && hit && extOf(hit.path) === 'tga' && extOf(path) !== 'tga'
-      const out = !hit
-        ? url
-        : tgaForOther
-          ? `${asUrl(hit, 'png', 2048)}&download=0&wait=60`
-          : textureUrl(hit, full.pack_id, this.fullTextures)
-      askedAs.set(out, path.split(/[\\/]/).pop()!)
-      return out
-    })
-    manager.onError = (url) => {
-      const name = askedAs.get(url)
-      if (name && !this.missing.includes(name)) {
+    const manager = textureManager(full, named, guesses, this.fullTextures, {
+      start: () => this.pending++,
+      end: () => {
+        this.pending = Math.max(0, this.pending - 1)
+        this.redraw()
+        this.checkSettled()
+      },
+      missing: (name) => {
+        if (this.missing.includes(name)) return
         this.missing.push(name)
         this.onMissing?.([...this.missing])
-      }
-    }
-    manager.addHandler(/\.tga$/i, new TgaOrImageLoader(manager))
-    const itemStart = manager.itemStart.bind(manager)
-    const itemEnd = manager.itemEnd.bind(manager)
-    manager.itemStart = (url) => {
-      this.pending++
-      itemStart(url)
-    }
-    manager.itemEnd = (url) => {
-      itemEnd(url)
-      this.pending = Math.max(0, this.pending - 1)
-      this.redraw()
-      this.checkSettled()
-    }
+      },
+    })
 
     const src = sourceFor(full)
     const { object, animations, missing, unit } = await loadModel(src.url, src.ext, manager)
@@ -341,39 +294,14 @@ export class ModelStage {
       throw new Error('closed')
     }
 
-    let triangles = 0
-    let vertices = 0
-    const textured = { any: false }
-    const converted = new Map<THREE.Material, AnyMaterial>()
-    object.traverse((o) => {
-      const mesh = o as THREE.Mesh
-      if (!mesh.isMesh && !(o as THREE.Points).isPoints && !(o as THREE.Line).isLine) return
-      if (mesh.isMesh) {
-        this.meshes.push(mesh)
-        const g = mesh.geometry
-        triangles += (g.index?.count ?? g.attributes.position?.count ?? 0) / 3
-        vertices += g.attributes.position?.count ?? 0
-      }
-      const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((m) => {
-        // Meshes share materials: convert each once, so they stay shared.
-        let s = converted.get(m)
-        if (!s) {
-          s = toStandard(m) as AnyMaterial
-          converted.set(m, s)
-        }
-        sanitize(s, mesh.geometry)
-        if (s.map) textured.any = true
-        return s
-      })
-      mesh.material = Array.isArray(mesh.material) ? list : list[0]
-      for (const m of list) this.track(m)
-    })
+    const made = standardize(object)
+    const { triangles, vertices, textured } = made
+    this.meshes = made.meshes
+    this.materials = made.materials
     this.meshCount = this.meshes.length
     // Nothing moves in a model without animation, so its meshes can be drawn together.
     if (!animations.length && !clipLinks.length) this.meshes = mergeStill(object, this.meshes)
 
-    // A model that names no textures, next to textures named after it: try them on.
-    let guessed = 0
     const onMaps = () => {
       // A view built from the maps that were there shows the new ones only once built again.
       if (this.views) this.buildViews()
@@ -393,36 +321,9 @@ export class ModelStage {
         this.checkSettled()
       }
     }
-    // Materials that go in the model's slots (Unity's, by an FBX's material names): each on the slots it names
-    // that have no color map of their own.
-    const slotted = (full.materials ?? []).filter((m) => m.slots?.length)
-    // Or a material made from maps that share its name: its maps by role.
-    const material = textured.any || slotted.length ? undefined : full.materials?.[0]
-    if (slotted.length) {
-      const stops: (() => void)[] = []
-      for (const info of slotted) {
-        const wear = new Map(
-          [...this.materials].filter(([m]) => info.slots!.includes(m.name) && !(m as THREE.MeshStandardMaterial).map),
-        )
-        if (!wear.size) continue
-        const tint = info.look?.base_color
-        for (const m of wear.keys()) {
-          const lit = m as THREE.MeshStandardMaterial
-          if (tint) lit.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
-        }
-        if (!info.maps.length) continue
-        const applied = applyToModel(info, full.pack_id, false, wear, onMaps, track)
-        stops.push(applied.stop)
-        guessed = Math.max(guessed, applied.count)
-      }
-      this.stopMaps = () => stops.forEach((stop) => stop())
-    } else if (material) {
-      const applied = applyToModel(material, full.pack_id, false, this.materials, onMaps, track)
-      this.stopMaps = applied.stop
-      guessed = applied.count
-    } else if (!textured.any && guesses.length && !this.colored()) {
-      guessed = this.applyGuesses(guesses, full.pack_id, false, manager)
-    }
+    const dressed = dressModel(full, guesses, this.materials, textured, { fullTextures: this.fullTextures, manager, onMaps, track })
+    const guessed = dressed.guessed
+    this.stopMaps = dressed.stop
 
     for (const name of missing ?? []) if (!this.missing.includes(name)) this.missing.push(name)
     if (missing?.length) this.onMissing?.([...this.missing])
@@ -501,66 +402,6 @@ export class ModelStage {
     this.hold()
     this.redraw()
     if (this.paused) this.renderOnce()
-  }
-
-  private track(m: AnyMaterial) {
-    if (this.materials.has(m)) return
-    const maps: Partial<Record<MapSlot, THREE.Texture | null>> = {}
-    for (const slot of MAP_SLOTS) if (m[slot]) maps[slot] = m[slot]
-    this.materials.set(m, maps)
-  }
-
-  /** Whether the model paints its surfaces with colors of its own (Kenney's kits: tire gray, paint red), so a
-   *  texture found by name (most likely a 2D sprite of it) would only cover them up: two colors besides white, or
-   *  one that isn't a gray (a white body with orange trim). */
-  private colored(): boolean {
-    const colors = new Set<number>()
-    let hue = false
-    for (const m of this.materials.keys()) {
-      const c = m.color
-      if (!c || c.getHex() === 0xffffff) continue
-      colors.add(c.getHex())
-      hue ||= Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) > 0.05
-    }
-    return colors.size > 1 || hue
-  }
-
-  private applyGuesses(guesses: AssetLink[], packId: string, flipY: boolean, manager: THREE.LoadingManager): number {
-    const roles = new Map<MapSlot, AssetLink>()
-    const unknown: AssetLink[] = []
-    for (const g of guesses) {
-      const role = roleOf(g.path)
-      if (role === null) unknown.push(g)
-      else if (role !== 'skip' && !roles.has(role)) roles.set(role, g)
-    }
-    // No texture says it's the color: the first one whose name doesn't say otherwise ("Barrel.png") is.
-    if (!roles.has('map') && unknown.length) roles.set('map', unknown[0])
-    if (!roles.has('map')) return 0
-    const image = new THREE.TextureLoader(manager)
-    const tga = new TGALoader(manager)
-    const textures = new Map<MapSlot, THREE.Texture>()
-    for (const [role, link] of roles) {
-      const url = textureUrl(link, packId, this.fullTextures)
-      const t: THREE.Texture = this.fullTextures && extOf(link.path) === 'tga' ? tga.load(url) : image.load(url)
-      // TGA comes back as pixel data the loader has already turned the right way up.
-      if (!(t as THREE.DataTexture).isDataTexture) t.flipY = flipY
-      if (role === 'map' || role === 'emissiveMap') t.colorSpace = THREE.SRGBColorSpace
-      t.wrapS = t.wrapT = THREE.RepeatWrapping
-      textures.set(role, t)
-    }
-    for (const [m, maps] of this.materials) {
-      for (const [slot, t] of textures) {
-        if (slot !== 'map' && !(slot in m)) continue
-        m[slot] = t
-        maps[slot] = t
-      }
-      // A painted color map stands for the whole surface: a gray base color would only darken it, and an
-      // emissive map shows only through a lit emissive color.
-      m.color?.set(0xffffff)
-      if (textures.has('emissiveMap') && 'emissive' in m) (m as THREE.MeshStandardMaterial).emissive.set(0xffffff)
-      m.needsUpdate = true
-    }
-    return textures.size
   }
 
   /** Bounding sphere of the model as it stands, for framing. */
@@ -1169,4 +1010,257 @@ export class ModelStage {
       this.renderer = null
     }
   }
+}
+
+// The pieces of loading a model that the explorer shares with the viewers: the same light, the same texture lookup,
+// the same materials, the same dressing, so a model looks alike wherever it's shown.
+
+/** Each material a model draws with, and the maps it had when it loaded (a view or "textures off" puts them back). */
+export type MaterialMaps = Map<AnyMaterial, Partial<Record<MapSlot, THREE.Texture | null>>>
+
+/** A soft studio room for image-based light: PBR materials (glTF's especially, which are often metallic) look black
+ *  or flat under direct lights alone. The caller owns the texture. */
+export function studioRoom(renderer: THREE.WebGPURenderer): THREE.Texture {
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  const room = new RoomEnvironment()
+  const env = pmrem.fromScene(room, 0.04).texture
+  room.dispose()
+  pmrem.dispose()
+  return env
+}
+
+export interface TextureHooks {
+  /** A file starts loading. */
+  start?: () => void
+  /** A file has loaded or failed. */
+  end?: () => void
+  /** An image the model asked for couldn't be found or loaded, by the name it asked for. */
+  missing?: (name: string) => void
+}
+
+/** The loading manager every file a model's loader asks for passes through (the server's GLBs carry their textures,
+ *  so it's a fallback): textures are matched to the pack's files by name, as they often carry the artist's absolute
+ *  path, or point at a PSD where the pack ships a PNG. */
+export function textureManager(
+  full: Asset,
+  named: AssetLink[],
+  guesses: AssetLink[],
+  fullTextures: boolean,
+  hooks: TextureHooks = {},
+): THREE.LoadingManager {
+  const byName = new Map<string, AssetLink>()
+  const byStem = new Map<string, AssetLink>()
+  for (const t of [...named, ...guesses]) {
+    if (!byName.has(nameOf(t.path))) byName.set(nameOf(t.path), t)
+    // A name match beats a stem match, and among stems the browser-readable file wins.
+    const prev = byStem.get(stemOf(t.path))
+    if (!prev || (!BROWSER_IMAGES.has(extOf(prev.path)) && BROWSER_IMAGES.has(extOf(t.path)))) byStem.set(stemOf(t.path), t)
+  }
+  const byPath = new Map([...named, ...guesses].map((t) => [t.path.toLowerCase(), t]))
+  const packFiles = `/api/packs/${full.pack_id}/files/`
+  /** The file name each rewritten URL was asked for by, to name what failed. */
+  const askedAs = new Map<string, string>()
+  const manager = new THREE.LoadingManager()
+  manager.setURLModifier((url) => {
+    if (/^(blob|data):/.test(url)) return url
+    let path = url.split(/[?#]/)[0]
+    try {
+      path = decodeURIComponent(path)
+    } catch {
+      // Not percent-encoded after all.
+    }
+    if (!IMAGE_EXTS.has(extOf(path))) return url
+    // The exact file first (glTF's relative paths), then by name, then by name without the extension.
+    const inPack = path.startsWith(packFiles) ? path.slice(packFiles.length).replace(/\\/g, '/') : ''
+    const hit = byPath.get(inPack.toLowerCase()) ?? byName.get(nameOf(path)) ?? byStem.get(stemOf(path))
+    // The loader was picked by the extension asked for: a TGA standing in for a PNG goes through the server.
+    // (Light previews are never TGA.)
+    const tgaForOther = fullTextures && hit && extOf(hit.path) === 'tga' && extOf(path) !== 'tga'
+    const out = !hit
+      ? url
+      : tgaForOther
+        ? `${asUrl(hit, 'png', 2048)}&download=0&wait=60`
+        : textureUrl(hit, full.pack_id, fullTextures)
+    askedAs.set(out, path.split(/[\\/]/).pop()!)
+    return out
+  })
+  manager.onError = (url) => {
+    const name = askedAs.get(url)
+    if (name) hooks.missing?.(name)
+  }
+  manager.addHandler(/\.tga$/i, new TgaOrImageLoader(manager))
+  const itemStart = manager.itemStart.bind(manager)
+  const itemEnd = manager.itemEnd.bind(manager)
+  manager.itemStart = (url) => {
+    hooks.start?.()
+    itemStart(url)
+  }
+  manager.itemEnd = (url) => {
+    itemEnd(url)
+    hooks.end?.()
+  }
+  return manager
+}
+
+export interface Standardized {
+  /** The meshes, before any merging. */
+  meshes: THREE.Mesh[]
+  materials: MaterialMaps
+  triangles: number
+  vertices: number
+  /** Whether any material came with a color map of its own. */
+  textured: { any: boolean }
+}
+
+/** Put a loaded model on PBR materials (each converted once, so meshes that shared one still do) made safe for its
+ *  geometry, and count what it draws. */
+export function standardize(object: THREE.Object3D): Standardized {
+  const meshes: THREE.Mesh[] = []
+  const materials: MaterialMaps = new Map()
+  let triangles = 0
+  let vertices = 0
+  const textured = { any: false }
+  const converted = new Map<THREE.Material, AnyMaterial>()
+  object.traverse((o) => {
+    const mesh = o as THREE.Mesh
+    if (!mesh.isMesh && !(o as THREE.Points).isPoints && !(o as THREE.Line).isLine) return
+    if (mesh.isMesh) {
+      meshes.push(mesh)
+      const g = mesh.geometry
+      triangles += (g.index?.count ?? g.attributes.position?.count ?? 0) / 3
+      vertices += g.attributes.position?.count ?? 0
+    }
+    const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((m) => {
+      // Meshes share materials: convert each once, so they stay shared.
+      let s = converted.get(m)
+      if (!s) {
+        s = toStandard(m) as AnyMaterial
+        converted.set(m, s)
+      }
+      sanitize(s, mesh.geometry)
+      if (s.map) textured.any = true
+      return s
+    })
+    mesh.material = Array.isArray(mesh.material) ? list : list[0]
+    for (const m of list) {
+      if (materials.has(m)) continue
+      const maps: Partial<Record<MapSlot, THREE.Texture | null>> = {}
+      for (const slot of MAP_SLOTS) if (m[slot]) maps[slot] = m[slot]
+      materials.set(m, maps)
+    }
+  })
+  return { meshes, materials, triangles, vertices, textured }
+}
+
+export interface DressOptions {
+  fullTextures: boolean
+  /** The model's loading manager (`textureManager`), which guessed textures load through. */
+  manager: THREE.LoadingManager
+  /** A material's maps arrived late. */
+  onMaps: () => void
+  /** A material's map starts loading; the returned function hears whether it did. */
+  track: (name: string) => (ok: boolean) => void
+}
+
+/** Give a model the textures it doesn't name: a pack's materials put in its slots, a material made from maps that
+ *  share its name, or textures named after it. Returns how many maps it took and what stops the late ones. */
+export function dressModel(
+  full: Asset,
+  guesses: AssetLink[],
+  materials: MaterialMaps,
+  textured: { any: boolean },
+  { fullTextures, manager, onMaps, track }: DressOptions,
+): { guessed: number; stop: (() => void) | null } {
+  // Materials that go in the model's slots (Unity's, by an FBX's material names): each on the slots it names
+  // that have no color map of their own.
+  const slotted = (full.materials ?? []).filter((m) => m.slots?.length)
+  // Or a material made from maps that share its name: its maps by role.
+  const material = textured.any || slotted.length ? undefined : full.materials?.[0]
+  if (slotted.length) {
+    const stops: (() => void)[] = []
+    let guessed = 0
+    for (const info of slotted) {
+      const wear = new Map([...materials].filter(([m]) => info.slots!.includes(m.name) && !(m as THREE.MeshStandardMaterial).map))
+      if (!wear.size) continue
+      const tint = info.look?.base_color
+      for (const m of wear.keys()) {
+        const lit = m as THREE.MeshStandardMaterial
+        if (tint) lit.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
+      }
+      if (!info.maps.length) continue
+      const applied = applyToModel(info, full.pack_id, false, wear, onMaps, track)
+      stops.push(applied.stop)
+      guessed = Math.max(guessed, applied.count)
+    }
+    return { guessed, stop: () => stops.forEach((stop) => stop()) }
+  }
+  if (material) {
+    const applied = applyToModel(material, full.pack_id, false, materials, onMaps, track)
+    return { guessed: applied.count, stop: applied.stop }
+  }
+  // A model that names no textures, next to textures named after it: try them on.
+  if (!textured.any && guesses.length && !colored(materials)) {
+    return { guessed: applyGuesses(materials, guesses, full.pack_id, false, manager, fullTextures), stop: null }
+  }
+  return { guessed: 0, stop: null }
+}
+
+/** Whether the model paints its surfaces with colors of its own (Kenney's kits: tire gray, paint red), so a texture
+ *  found by name (most likely a 2D sprite of it) would only cover them up: two colors besides white, or one that
+ *  isn't a gray (a white body with orange trim). */
+function colored(materials: MaterialMaps): boolean {
+  const colors = new Set<number>()
+  let hue = false
+  for (const m of materials.keys()) {
+    const c = m.color
+    if (!c || c.getHex() === 0xffffff) continue
+    colors.add(c.getHex())
+    hue ||= Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) > 0.05
+  }
+  return colors.size > 1 || hue
+}
+
+function applyGuesses(
+  materials: MaterialMaps,
+  guesses: AssetLink[],
+  packId: string,
+  flipY: boolean,
+  manager: THREE.LoadingManager,
+  fullTextures: boolean,
+): number {
+  const roles = new Map<MapSlot, AssetLink>()
+  const unknown: AssetLink[] = []
+  for (const g of guesses) {
+    const role = roleOf(g.path)
+    if (role === null) unknown.push(g)
+    else if (role !== 'skip' && !roles.has(role)) roles.set(role, g)
+  }
+  // No texture says it's the color: the first one whose name doesn't say otherwise ("Barrel.png") is.
+  if (!roles.has('map') && unknown.length) roles.set('map', unknown[0])
+  if (!roles.has('map')) return 0
+  const image = new THREE.TextureLoader(manager)
+  const tga = new TGALoader(manager)
+  const textures = new Map<MapSlot, THREE.Texture>()
+  for (const [role, link] of roles) {
+    const url = textureUrl(link, packId, fullTextures)
+    const t: THREE.Texture = fullTextures && extOf(link.path) === 'tga' ? tga.load(url) : image.load(url)
+    // TGA comes back as pixel data the loader has already turned the right way up.
+    if (!(t as THREE.DataTexture).isDataTexture) t.flipY = flipY
+    if (role === 'map' || role === 'emissiveMap') t.colorSpace = THREE.SRGBColorSpace
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    textures.set(role, t)
+  }
+  for (const [m, maps] of materials) {
+    for (const [slot, t] of textures) {
+      if (slot !== 'map' && !(slot in m)) continue
+      m[slot] = t
+      maps[slot] = t
+    }
+    // A painted color map stands for the whole surface: a gray base color would only darken it, and an
+    // emissive map shows only through a lit emissive color.
+    m.color?.set(0xffffff)
+    if (textures.has('emissiveMap') && 'emissive' in m) (m as THREE.MeshStandardMaterial).emissive.set(0xffffff)
+    m.needsUpdate = true
+  }
+  return textures.size
 }

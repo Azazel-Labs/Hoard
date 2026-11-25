@@ -1020,6 +1020,10 @@ translation = "Rediger…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Ændr tags og felter på dem alle (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Udforsk disse modeller i 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "færre"
@@ -1155,6 +1159,10 @@ translation = "Type"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "arkivet"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "mesh-udforskeren"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5351,6 +5359,122 @@ translation = "Navnet og adgangskoden passer ikke sammen"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Det er ikke den opsætningskode, serveren har fået i HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animer"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Afspil hver animeret models første klip (Mellemrum)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Mesh-udforsker: flyv rundt blandt modellerne i disse resultater"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Ingen af disse resultater kan vises i 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Visning"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] { $loaded } af { $total } model indlæst
+       *[other] { $loaded } af { $total } modeller indlæst
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } indlæses"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Fart { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animer"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "luk"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "ned, op"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "hurtigere"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "flyv"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "åbn"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "kredsløb"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "faktisk størrelse"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Klik for at vælge · træk for at se dig om · træk med midterknappen for at panorere · Alt-træk for at kredse · rul for at bevæge dig, med højre knap holdt nede for at ændre farten · dobbeltklik for at tilpasse"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Åbn"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Åbn denne models detaljer (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Kredsløb"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Træk for at dreje rundt om den valgte model i stedet for at se dig omkring (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Mesh-udforsker"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Faktisk størrelse"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Vis hver model i dens faktiske størrelse i meter, op til 12 m, i stedet for tilpasset dens felt (T)"
 
 [messages.folders-browse]
 source = "Browse…"

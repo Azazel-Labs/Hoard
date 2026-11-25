@@ -996,6 +996,10 @@ translation = "Edit…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Ubah tag dan kolom semuanya (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Jelajahi model-model ini dalam 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "lebih sedikit"
@@ -1131,6 +1135,10 @@ translation = "Jenis"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "arsip"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "penjelajah mesh"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5238,6 +5246,118 @@ translation = "Nama dan kata sandi itu tidak cocok"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Itu bukan kode penyiapan yang diberikan ke server di HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animasikan"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Putar klip pertama setiap model beranimasi (Spasi)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Penjelajah mesh: terbang di antara model dalam hasil ini"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Tidak ada hasil ini yang dapat ditampilkan dalam 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Tampilan"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "{ $loaded } dari { $total } model dimuat"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } sedang dimuat"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Kecepatan { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animasi"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "tutup"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "turun, naik"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "lebih cepat"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "terbang"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "buka"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "orbit"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "ukuran asli"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Klik untuk memilih · seret untuk melihat · seret dengan tombol tengah untuk menggeser · Alt-seret untuk orbit · gulir untuk bergerak, sambil menahan tombol kanan untuk mengubah kecepatan · klik dua kali untuk membingkai"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Buka"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Buka detail model ini (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Orbit"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Seret untuk berputar mengelilingi model terpilih alih-alih melihat sekeliling (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Penjelajah mesh"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Ukuran asli"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Tampilkan setiap model dalam ukuran aslinya dalam meter, hingga 12 m, alih-alih disesuaikan dengan kotaknya (T)"
 
 [messages.folders-browse]
 source = "Browse…"

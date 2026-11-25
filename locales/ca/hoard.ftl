@@ -482,6 +482,7 @@ app-lazy-settings = la configuració
 app-lazy-archive = l'arxiu
 app-lazy-shortcuts = les dreceres
 app-lazy-setup = la configuració inicial
+app-lazy-explorer = l'explorador de malles
 app-theme-system = Segueix el tema del sistema
 app-theme-light = Tema clar
 app-theme-dark = Tema fosc
@@ -745,6 +746,7 @@ app-update-search-title = Conserva el que està triat ara en aquesta cerca desad
 app-save-search-new = Desa com a nova
 app-select-title = Trieu diversos recursos per etiquetar-los, categoritzar-los, afegir-los a una col·lecció, baixar-los o arxivar-los alhora (X, o Ctrl+clic)
 app-select = Selecciona
+app-explore-title = Explora aquests models en 3D
 app-tile-size = Mida de les miniatures
 app-supporting-title = Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir. Les pàgines d’un full de sprites, i els sprites que el paquet també té com a imatges soltes, es mostren amb el full. Un recurs que el paquet té en diversos formats es mostra un sol cop, en el format que Hoard llegeix millor.
 app-supporting-hidden =
@@ -2248,6 +2250,37 @@ model-key-light = llum
 model-key-grid = graella
 model-key-background = fons
 model-key-play = reprodueix
+explorer-dialog = Explorador de malles: vola entre els models d'aquests resultats
+explorer-title = Explorador de malles
+explorer-group-view = Vista
+explorer-true-size = Mida real
+explorer-true-size-title = Mostra cada model a la seva mida real en metres, fins a 12 m, en lloc d'ajustar-lo al seu quadrat (T)
+explorer-animate = Anima
+explorer-animate-title = Reprodueix el primer clip de cada model animat (Espai)
+explorer-orbit = Òrbita
+explorer-orbit-title = Arrossega per girar al voltant del model seleccionat en lloc de mirar al voltant (O)
+explorer-open = Obre
+explorer-open-title = Obre els detalls d'aquest model (Retorn)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Cap d'aquests resultats es pot mostrar en 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } de { $total } model carregat
+       *[other] { $loaded } de { $total } models carregats
+    }
+explorer-hud-loading = { $count } carregant-se
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Velocitat { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Fes clic per seleccionar · arrossega per mirar · arrossega amb el botó del mig per desplaçar · Alt i arrossega per orbitar · desplaça la roda per moure't, amb el botó dret premut per canviar la velocitat · doble clic per enquadrar
+explorer-key-fly = volar
+explorer-key-down-up = baixar, pujar
+explorer-key-faster = més ràpid
+explorer-key-open = obrir
+explorer-key-true-size = mida real
+explorer-key-orbit = òrbita
+explorer-key-animate = animar
+explorer-key-close = tancar
 
 ## Materials
 

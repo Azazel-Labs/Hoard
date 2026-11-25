@@ -1044,6 +1044,10 @@ translation = "Изменить…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Изменить теги и поля у всех (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Осмотреть эти модели в 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "меньше"
@@ -1185,6 +1189,10 @@ translation = "Вид"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "архив"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "обозреватель мешей"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5469,6 +5477,124 @@ translation = "Имя и пароль не совпадают"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Это не тот код настройки, что задан серверу в HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Анимация"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Воспроизводить первый клип каждой анимированной модели (Пробел)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Обозреватель мешей: летайте среди моделей из этих результатов"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Ни один из этих результатов нельзя показать в 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Вид"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } кадр/с"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] Загружено { $loaded } из { $total } модели
+        [few] Загружено { $loaded } из { $total } моделей
+        [many] Загружено { $loaded } из { $total } моделей
+       *[other] Загружено { $loaded } из { $total } модели
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "Загружается: { $count }"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } МБ"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Скорость { $speed } м/с"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "анимация"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "закрыть"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "вниз, вверх"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "быстрее"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "полёт"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "открыть"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "орбита"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "реальный размер"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Щелчок выбирает · перетаскивание — осмотреться · перетаскивание средней кнопкой сдвигает · Alt и перетаскивание — орбита · прокрутка перемещает, с зажатой правой кнопкой меняет скорость · двойной щелчок — показать целиком"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Открыть"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Открыть сведения об этой модели (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Орбита"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Перетаскивание вращает вокруг выбранной модели, а не осматривает окрестности (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } м"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Обозреватель мешей"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Реальный размер"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Показывать каждую модель в реальном размере в метрах, до 12 м, а не вписывать её в клетку (T)"
 
 [messages.folders-browse]
 source = "Browse…"

@@ -37,6 +37,7 @@ import InsecureNotice from './components/InsecureNotice.vue'
 import NewsTray from './components/NewsTray.vue'
 import { markAllSeenWithUndo, markSeen, news, newsTray, type NewThing, unseen } from './news'
 import { archiveWithUndo, countText } from './archive'
+import { isModelAsset } from './viewers'
 import { copyText, reducedMotion, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { usePanelFit } from './panelFit'
@@ -49,6 +50,7 @@ const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t
 const ArchiveView = lazy(() => import('./components/ArchiveView.vue'), () => t('app-lazy-archive'))
 const ShortcutsDialog = lazy(() => import('./components/ShortcutsDialog.vue'), () => t('app-lazy-shortcuts'), 'overlay')
 const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), () => t('app-lazy-setup'), 'overlay')
+const ModelExplorer = lazy(() => import('./components/ModelExplorer.vue'), () => t('app-lazy-explorer'), 'overlay')
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 100
@@ -73,6 +75,12 @@ const collections = ref<Collection[]>([])
 const slots = shallowRef<(Asset | undefined)[]>([])
 /** The results that have arrived, in order. */
 const items = computed(() => slots.value.filter((a): a is Asset => !!a))
+/** The search the mesh explorer shows, as it was when opened; null while it's closed. */
+const exploring = shallowRef<SearchParams | null>(null)
+/** Whether the results hold models to fly among: one loaded, or the kind counts say so. */
+const hasModels = computed(
+  () => items.value.some(isModelAsset) || kindFacets.value.some((f) => (f.value === 'model' || f.value === 'animation') && f.count > 0),
+)
 /** The one tag being browsed, whose page shows above the results. */
 const singleTag = computed(() =>
   filters.tags.length === 1 && !filters.similar && !filters.color && !filters.imitation ? filters.tags[0] : '',
@@ -1600,6 +1608,19 @@ const commands = computed<Command[]>(() => {
             @click="packPanelHidden = ''"
           >{{ t('pack-panel-label') }}</button>
           <button
+            v-if="hasModels && (!filters.kind || filters.kind === 'model' || filters.kind === 'animation')"
+            type="button"
+            class="btn ghost explore-btn"
+            :title="t('app-explore-title')"
+            :aria-label="t('app-explore-title')"
+            @click="exploring = queryParams()"
+          >
+            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+              <path d="M8 1.8 13.5 4.9v6.2L8 14.2 2.5 11.1V4.9z" />
+              <path d="M2.5 4.9 8 8l5.5-3.1M8 8v6.2" />
+            </svg>
+          </button>
+          <button
             v-if="items.length"
             type="button"
             class="btn ghost select-btn"
@@ -1836,6 +1857,7 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
+    <ModelExplorer v-if="exploring" :query="exploring" @close="exploring = null" @open="(a) => ((exploring = null), openAsset(a))" />
     <NewsTray v-if="newsTray" @close="closeNews" @go="goToNew" />
     <BulkEditDialog
       v-if="bulkOpen"
@@ -1971,6 +1993,8 @@ const commands = computed<Command[]>(() => {
 .sort { display: flex; align-items: center; gap: 0.25rem; }
 .sort .field { width: auto; padding: 0.3em 0.5em; font-size: var(--step--1); }
 .sort-way { padding: 0.4em; color: var(--muted); }
+.explore-btn { padding: 0.4em; color: var(--muted); }
+.explore-btn:hover { color: var(--text); }
 .filters-toggle { display: none; }
 .badge {
   min-width: 1.2rem; padding: 0 0.3rem; border-radius: 999px; background: var(--text); color: var(--bg);

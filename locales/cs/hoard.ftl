@@ -492,6 +492,7 @@ app-lazy-settings = nastavení
 app-lazy-archive = archiv
 app-lazy-shortcuts = klávesové zkratky
 app-lazy-setup = průvodce nastavením
+app-lazy-explorer = průzkumník sítí
 app-theme-system = Podle systému
 app-theme-light = Světlý motiv
 app-theme-dark = Tmavý motiv
@@ -781,6 +782,7 @@ app-update-search-title = Uložit aktuální výběr do tohoto uloženého hled�
 app-save-search-new = Uložit jako nové
 app-select-title = Vyberte několik assetů, které chcete společně oštítkovat, zařadit do kategorie, přidat do kolekce, stáhnout nebo archivovat (X nebo Ctrl+klik)
 app-select = Vybrat
+app-explore-title = Prozkoumat tyto modely ve 3D
 app-tile-size = Velikost dlaždic
 app-supporting-title = Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu. Asset, který balíček má v několika formátech, se zobrazí jednou, ve formátu, který Hoard čte nejlépe.
 app-supporting-hidden =
@@ -2418,6 +2420,38 @@ model-key-light = světlo
 model-key-grid = mřížka
 model-key-background = pozadí
 model-key-play = přehrát
+explorer-dialog = Průzkumník sítí: létejte mezi modely z těchto výsledků
+explorer-title = Průzkumník sítí
+explorer-group-view = Zobrazení
+explorer-true-size = Skutečná velikost
+explorer-true-size-title = Zobrazit každý model ve skutečné velikosti v metrech, nejvýš 12 m, místo přizpůsobení jeho čtverci (T)
+explorer-animate = Animovat
+explorer-animate-title = Přehrát první klip každého animovaného modelu (Mezerník)
+explorer-orbit = Orbit
+explorer-orbit-title = Tažením otáčet kolem vybraného modelu místo rozhlížení (O)
+explorer-open = Otevřít
+explorer-open-title = Otevřít podrobnosti tohoto modelu (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Žádný z těchto výsledků nelze zobrazit ve 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] Načteno { $loaded } z { $total } modelu
+        [few] Načteno { $loaded } z { $total } modelů
+       *[other] Načteno { $loaded } z { $total } modelů
+    }
+explorer-hud-loading = Načítá se: { $count }
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Rychlost { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Kliknutím vyberete · tažením se rozhlížíte · tažením prostředním tlačítkem posouváte · tažením s Alt obíháte · kolečkem se pohybujete, s podrženým pravým tlačítkem měníte rychlost · dvojklikem zaměříte
+explorer-key-fly = let
+explorer-key-down-up = dolů, nahoru
+explorer-key-faster = rychleji
+explorer-key-open = otevřít
+explorer-key-true-size = skutečná velikost
+explorer-key-orbit = orbit
+explorer-key-animate = animovat
+explorer-key-close = zavřít
 
 ## Materiály
 

@@ -36,6 +36,20 @@ test.describe('full-screen viewers', () => {
     await expect(viewer).toBeHidden()
   })
 
+  test("the results' models open in the mesh explorer, which loads them as it goes", async ({ page, seed }) => {
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await expect(tile(page, 'Crate')).toBeVisible()
+    await page.getByRole('button', { name: 'Explore these models in 3D' }).click()
+    const explorer = page.getByRole('dialog', { name: /^Mesh explorer/ })
+    await expect(explorer).toBeVisible()
+    await expect(explorer.locator('canvas')).toBeVisible({ timeout: 20_000 })
+    // The camera starts over the first rows: what's under it loads without flying anywhere.
+    await expect(explorer.getByRole('status')).toContainText(/[1-9]\d* of \d+ models? loaded/, { timeout: 30_000 })
+    await expect(explorer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(explorer).toBeHidden()
+  })
+
   // The server reads it, filaments and painting included, and the viewer shows the GLB it makes.
   test('a painted 3MF print shows its filament colors', async ({ page, baseURL }) => {
     // A pack to upload and process, then the viewer's GLB to make.

@@ -988,6 +988,10 @@ translation = "Düzenle…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Hepsinin etiketlerini ve alanlarını değiştir (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Bu modelleri 3B olarak keşfet"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "daha az"
@@ -1123,6 +1127,10 @@ translation = "Tür"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "arşiv"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "örgü gezgini"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5248,6 +5256,118 @@ translation = "Bu ad ve parola eşleşmiyor"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Bu, sunucuya HOARD_SETUP_CODE ile verilen kurulum kodu değil"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Canlandır"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Her animasyonlu modelin ilk klibini oynat (Boşluk)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Örgü gezgini: bu sonuçlardaki modellerin arasında uçun"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Bu sonuçların hiçbiri 3B olarak gösterilemiyor."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Görünüm"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "{ $total } modelden { $loaded } tanesi yüklendi"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } yükleniyor"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Hız { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "canlandır"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "kapat"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "aşağı, yukarı"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "daha hızlı"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "uç"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "aç"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "yörünge"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "gerçek boyut"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Seçmek için tıklayın · bakmak için sürükleyin · kaydırmak için orta tuşla sürükleyin · yörünge için Alt ile sürükleyin · ilerlemek için tekerleği çevirin, hızı değiştirmek için sağ tuşu basılı tutun · sığdırmak için çift tıklayın"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Aç"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Bu modelin ayrıntılarını aç (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Yörünge"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Sürüklemek etrafa bakmak yerine seçili modelin çevresinde döndürür (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Örgü gezgini"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Gerçek boyut"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Her modeli karesine sığdırmak yerine metre cinsinden gerçek boyutunda, en fazla 12 m, göster (T)"
 
 [messages.folders-browse]
 source = "Browse…"

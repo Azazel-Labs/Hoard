@@ -1034,6 +1034,10 @@ translation = "Upravit…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Změnit štítky a pole u všech (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Prozkoumat tyto modely ve 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "méně"
@@ -1174,6 +1178,10 @@ translation = "Druh"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "archiv"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "průzkumník sítí"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5423,6 +5431,123 @@ translation = "Jméno a heslo k sobě nepatří"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "To není instalační kód zadaný serveru v HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animovat"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Přehrát první klip každého animovaného modelu (Mezerník)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Průzkumník sítí: létejte mezi modely z těchto výsledků"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Žádný z těchto výsledků nelze zobrazit ve 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Zobrazení"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] Načteno { $loaded } z { $total } modelu
+        [few] Načteno { $loaded } z { $total } modelů
+       *[other] Načteno { $loaded } z { $total } modelů
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "Načítá se: { $count }"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Rychlost { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animovat"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "zavřít"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "dolů, nahoru"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "rychleji"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "let"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "otevřít"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "orbit"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "skutečná velikost"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Kliknutím vyberete · tažením se rozhlížíte · tažením prostředním tlačítkem posouváte · tažením s Alt obíháte · kolečkem se pohybujete, s podrženým pravým tlačítkem měníte rychlost · dvojklikem zaměříte"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Otevřít"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Otevřít podrobnosti tohoto modelu (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Orbit"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Tažením otáčet kolem vybraného modelu místo rozhlížení (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Průzkumník sítí"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Skutečná velikost"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Zobrazit každý model ve skutečné velikosti v metrech, nejvýš 12 m, místo přizpůsobení jeho čtverci (T)"
 
 [messages.folders-browse]
 source = "Browse…"

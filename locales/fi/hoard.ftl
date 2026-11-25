@@ -490,6 +490,7 @@ app-lazy-settings = asetukset
 app-lazy-archive = arkisto
 app-lazy-shortcuts = pikanäppäimet
 app-lazy-setup = käyttöönotto
+app-lazy-explorer = mesh-tutkija
 app-theme-system = Järjestelmän teema
 app-theme-light = Vaalea teema
 app-theme-dark = Tumma teema
@@ -757,6 +758,7 @@ app-update-search-title = Säilytä nykyinen valinta tässä tallennetussa hauss
 app-save-search-new = Tallenna uutena
 app-select-title = Valitse useita resursseja lisätäksesi tunnisteita, luokitellaksesi, kerätäksesi, ladataksesi tai arkistoidaksesi ne yhdessä (X tai Ctrl-napsautus)
 app-select = Valitse
+app-explore-title = Tutki näitä malleja 3D:nä
 app-tile-size = Ruutujen koko
 app-supporting-title = glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä. Resurssi, joka paketissa on useassa muodossa, näytetään kerran, siinä muodossa, jonka Hoard lukee parhaiten.
 app-supporting-hidden =
@@ -2299,6 +2301,37 @@ model-key-light = valo
 model-key-grid = ruudukko
 model-key-background = tausta
 model-key-play = toista
+explorer-dialog = Mesh-tutkija: lennä näiden tulosten mallien seassa
+explorer-title = Mesh-tutkija
+explorer-group-view = Näkymä
+explorer-true-size = Todellinen koko
+explorer-true-size-title = Näytä jokainen malli todellisessa koossaan metreinä, enintään 12 m, sen sijaan että se sovitetaan ruutuunsa (T)
+explorer-animate = Animoi
+explorer-animate-title = Toista jokaisen animoidun mallin ensimmäinen leike (välilyönti)
+explorer-orbit = Kiertoliike
+explorer-orbit-title = Vetäminen kiertää valitun mallin ympäri katselun sijaan (O)
+explorer-open = Avaa
+explorer-open-title = Avaa tämän mallin tiedot (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Mitään näistä tuloksista ei voi näyttää 3D:nä.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded }/{ $total } malli ladattu
+       *[other] { $loaded }/{ $total } mallia ladattu
+    }
+explorer-hud-loading = { $count } latautuu
+explorer-hud-memory = ~{ $mb } Mt
+explorer-hud-speed = Nopeus { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Napsauta valitaksesi · vedä katsoaksesi ympärillesi · vedä keskipainikkeella siirtääksesi · Alt-veto kiertää · vieritä liikkuaksesi, oikea painike pohjassa muuttaaksesi nopeutta · kaksoisnapsauta sovittaaksesi
+explorer-key-fly = lennä
+explorer-key-down-up = alas, ylös
+explorer-key-faster = nopeammin
+explorer-key-open = avaa
+explorer-key-true-size = todellinen koko
+explorer-key-orbit = kiertoliike
+explorer-key-animate = animoi
+explorer-key-close = sulje
 
 ## Materiaalit
 

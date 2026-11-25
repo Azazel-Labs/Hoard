@@ -1000,6 +1000,10 @@ translation = "Szerkesztés…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Az összes címkéjének és mezőjének módosítása (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Ezeknek a modelleknek a felfedezése 3D-ben"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "kevesebb"
@@ -1135,6 +1139,10 @@ translation = "Típus"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "archívum"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "a hálóböngésző"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5276,6 +5284,118 @@ translation = "A név és a jelszó nem egyezik"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Ez nem az a beállítási kód, amelyet a szerver a HOARD_SETUP_CODE változóban kapott"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animálás"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Minden animált modell első klipjének lejátszása (Szóköz)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Hálóböngésző: repülj a találatok modelljei között"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Ezek közül a találatok közül egyik sem jeleníthető meg 3D-ben."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Nézet"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "{ $total } modellből { $loaded } betöltve"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } betöltése folyamatban"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Sebesség: { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animálás"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "bezárás"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "le, fel"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "gyorsabban"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "repülés"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "megnyitás"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "keringés"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "valódi méret"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Kattintás: kijelölés · húzás: körbenézés · középső gombos húzás: mozgatás · Alt-húzás: keringés · görgetés: haladás, jobb gombot nyomva tartva: sebesség · dupla kattintás: igazítás"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Megnyitás"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "A modell részleteinek megnyitása (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Keringés"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Húzással a kijelölt modell körül forogsz körbenézés helyett (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Hálóböngésző"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Valódi méret"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Minden modell valódi méretében, méterben, legfeljebb 12 m-ig, ahelyett hogy a négyzetébe lenne igazítva (T)"
 
 [messages.folders-browse]
 source = "Browse…"

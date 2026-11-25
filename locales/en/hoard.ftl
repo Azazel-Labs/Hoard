@@ -547,6 +547,7 @@ app-lazy-settings = settings
 app-lazy-archive = the archive
 app-lazy-shortcuts = the shortcuts
 app-lazy-setup = setup
+app-lazy-explorer = the mesh explorer
 app-theme-system = Match system theme
 app-theme-light = Light theme
 app-theme-dark = Dark theme
@@ -837,6 +838,8 @@ app-update-search-title = Keep what's chosen now in this saved search
 app-save-search-new = Save as new
 app-select-title = Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)
 app-select = Select
+# A small cube button beside Select, shown when the results hold 3D models: opens them all in a 3D space to fly around.
+app-explore-title = Explore these models in 3D
 app-tile-size = Tile size
 app-supporting-title = glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best.
 app-supporting-hidden =
@@ -2505,6 +2508,48 @@ model-key-light = light
 model-key-grid = grid
 model-key-background = background
 model-key-play = play
+
+## Mesh explorer (ModelExplorer.vue): every model a search found, laid out in rows on a floor in 3D, loaded as the
+## camera flies near
+
+explorer-dialog = Mesh explorer: fly among the models in these results
+explorer-title = Mesh explorer
+explorer-group-view = View
+explorer-true-size = True size
+explorer-true-size-title = Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)
+explorer-animate = Animate
+explorer-animate-title = Play each animated model's first clip (Space)
+# Orbit: dragging turns the camera around the selected model (or the floor ahead) instead of looking around.
+explorer-orbit = Orbit
+explorer-orbit-title = Drag to turn around the selected model instead of looking around (O)
+explorer-open = Open
+explorer-open-title = Open this model's details (Enter)
+# The picked model's width, height and depth, in meters.
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = None of these results can be shown in 3D.
+# The status line at the top left. $total is how many models the search found that can be shown in 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }
+explorer-hud-loading = { $count } loading
+# A rough estimate of the graphics memory the loaded models take. MB is megabytes.
+explorer-hud-memory = ~{ $mb } MB
+# How fast the camera flies; $speed is in meters per second.
+explorer-hud-speed = Speed { $speed } m/s
+# Frames drawn per second; none while nothing moves.
+explorer-hud-fps = { $fps } fps
+# The key help along the bottom; the words after each key.
+explorer-keys-mouse = Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame
+explorer-key-fly = fly
+explorer-key-down-up = down, up
+explorer-key-faster = faster
+explorer-key-open = open
+explorer-key-true-size = true size
+explorer-key-orbit = orbit
+explorer-key-animate = animate
+explorer-key-close = close
 
 ## Materials (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

@@ -984,6 +984,10 @@ translation = "편집…"
 source = "Change the tags and fields of all of them (E)"
 translation = "모든 항목의 태그와 필드 변경 (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "이 모델들을 3D로 둘러보기"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "접기"
@@ -1119,6 +1123,10 @@ translation = "종류"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "보관함"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "메시 탐색기"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5204,6 +5212,118 @@ translation = "이름과 비밀번호가 일치하지 않습니다"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "HOARD_SETUP_CODE로 서버에 지정한 설정 코드가 아닙니다"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "애니메이션"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "애니메이션이 있는 각 모델의 첫 번째 클립 재생 (Space)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "메시 탐색기: 이 결과의 모델 사이를 날아다니기"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "이 결과 중 3D로 표시할 수 있는 항목이 없습니다."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "보기"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "모델 { $total }개 중 { $loaded }개 불러옴"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count }개 불러오는 중"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "속도 { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "애니메이션"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "닫기"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "아래, 위"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "더 빠르게"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "비행"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "열기"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "궤도"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "실제 크기"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "클릭하여 선택 · 드래그하여 둘러보기 · 가운데 버튼 드래그로 이동 · Alt+드래그로 궤도 회전 · 스크롤로 전진/후진, 오른쪽 버튼을 누른 채로 속도 변경 · 더블클릭으로 화면에 맞추기"
+
+[messages.explorer-open]
+source = "Open"
+translation = "열기"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "이 모델의 세부 정보 열기 (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "궤도"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "드래그하면 둘러보는 대신 선택한 모델 주위를 회전 (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "메시 탐색기"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "실제 크기"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "각 모델을 칸에 맞추지 않고 미터 단위의 실제 크기(최대 12m)로 표시 (T)"
 
 [messages.folders-browse]
 source = "Browse…"

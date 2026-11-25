@@ -1024,6 +1024,10 @@ translation = "Измени…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Промени ознаке и поља свих (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Истражите ове моделе у 3D-у"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "мање"
@@ -1159,6 +1163,10 @@ translation = "Врста"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "архива"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "истраживач мрежа"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5402,6 +5410,118 @@ translation = "Име и лозинка се не поклапају"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "То није код за подешавање који је серверу дат у HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Анимирај"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Пусти први клип сваког анимираног модела (Размак)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Истраживач мрежа: летите међу моделима из ових резултата"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Ниједан од ових резултата не може да се прикаже у 3D-у."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Приказ"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "Учитано модела: { $loaded } од { $total }"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "Учитава се: { $count }"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Брзина { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "анимирај"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "затвори"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "доле, горе"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "брже"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "лет"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "отвори"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "орбита"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "стварна величина"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Клик за избор · превлачење за разгледање · превлачење средњим тастером за померање · Alt и превлачење за кружење · скроловање за кретање, уз држање десног тастера за промену брзине · двоклик за уклапање"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Отвори"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Отвори детаље овог модела (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Орбита"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Превлачење кружи око изабраног модела уместо разгледања (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Истраживач мрежа"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Стварна величина"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Прикажи сваки модел у стварној величини у метрима, до 12 m, уместо уклопљеног у своје поље (T)"
 
 [messages.folders-browse]
 source = "Browse…"

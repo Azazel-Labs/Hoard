@@ -1044,6 +1044,10 @@ translation = "Edytuj…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Zmień tagi i pola wszystkich (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Przeglądaj te modele w 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "mniej"
@@ -1179,6 +1183,10 @@ translation = "Rodzaj"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "archiwum"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "eksploratora siatek"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5457,6 +5465,124 @@ translation = "Nazwa i hasło nie pasują do siebie"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "To nie jest kod konfiguracji podany serwerowi w HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animuj"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Odtwarzaj pierwszy klip każdego animowanego modelu (Spacja)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Eksplorator siatek: lataj między modelami z tych wyników"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Żadnego z tych wyników nie można pokazać w 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Widok"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } kl./s"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] Wczytano { $loaded } z { $total } modelu
+        [few] Wczytano { $loaded } z { $total } modeli
+        [many] Wczytano { $loaded } z { $total } modeli
+       *[other] Wczytano { $loaded } z { $total } modelu
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "Wczytywanie: { $count }"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Prędkość { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animacja"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "zamknij"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "w dół, w górę"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "szybciej"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "lot"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "otwórz"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "orbita"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "rzeczywisty rozmiar"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Kliknięcie zaznacza · przeciąganie rozgląda się · przeciąganie środkowym przyciskiem przesuwa · Alt i przeciąganie krąży · przewijanie porusza, z wciśniętym prawym przyciskiem zmienia prędkość · dwuklik kadruje"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Otwórz"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Otwórz szczegóły tego modelu (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Orbita"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Przeciąganie obraca wokół zaznaczonego modelu zamiast rozglądania się (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Eksplorator siatek"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Rzeczywisty rozmiar"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Pokaż każdy model w rzeczywistym rozmiarze w metrach, do 12 m, zamiast dopasowywać go do jego pola (T)"
 
 [messages.folders-browse]
 source = "Browse…"

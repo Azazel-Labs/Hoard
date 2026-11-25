@@ -1024,6 +1024,10 @@ translation = "Επεξεργασία…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Αλλαγή των ετικετών και των πεδίων όλων (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Εξερεύνηση αυτών των μοντέλων σε 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "λιγότερα"
@@ -1163,6 +1167,10 @@ translation = "Τύπος"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "αρχειοθήκης"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "του εξερευνητή πλεγμάτων"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5367,6 +5375,122 @@ translation = "Το όνομα και ο κωδικός πρόσβασης δε�
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Αυτός δεν είναι ο κωδικός ρύθμισης που δόθηκε στον διακομιστή στο HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Κίνηση"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Αναπαραγωγή του πρώτου κλιπ κάθε κινούμενου μοντέλου (Διάστημα)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Εξερευνητής πλεγμάτων: πετάξτε ανάμεσα στα μοντέλα αυτών των αποτελεσμάτων"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Κανένα από αυτά τα αποτελέσματα δεν μπορεί να εμφανιστεί σε 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Προβολή"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] Φορτώθηκε { $loaded } από { $total } μοντέλο
+       *[other] Φορτώθηκαν { $loaded } από { $total } μοντέλα
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } φορτώνονται"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Ταχύτητα { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "κίνηση"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "κλείσιμο"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "κάτω, πάνω"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "πιο γρήγορα"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "πτήση"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "άνοιγμα"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "τροχιά"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "πραγματικό μέγεθος"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Κλικ για επιλογή · σύρσιμο για να κοιτάξετε γύρω · σύρσιμο με το μεσαίο κουμπί για μετατόπιση · Alt και σύρσιμο για τροχιά · κύλιση για κίνηση, με πατημένο το δεξί κουμπί για αλλαγή ταχύτητας · διπλό κλικ για καδράρισμα"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Άνοιγμα"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Άνοιγμα των λεπτομερειών αυτού του μοντέλου (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Τροχιά"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Σύρετε για να περιστραφείτε γύρω από το επιλεγμένο μοντέλο αντί να κοιτάτε γύρω (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Εξερευνητής πλεγμάτων"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Πραγματικό μέγεθος"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Εμφάνιση κάθε μοντέλου στο πραγματικό του μέγεθος σε μέτρα, έως 12 m, αντί να προσαρμόζεται στο τετράγωνό του (T)"
 
 [messages.folders-browse]
 source = "Browse…"

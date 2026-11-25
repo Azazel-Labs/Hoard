@@ -482,6 +482,7 @@ app-lazy-settings = innstillingene
 app-lazy-archive = arkivet
 app-lazy-shortcuts = snarveiene
 app-lazy-setup = oppsettet
+app-lazy-explorer = mesh-utforskeren
 app-theme-system = Følg systemtemaet
 app-theme-light = Lyst tema
 app-theme-dark = Mørkt tema
@@ -745,6 +746,7 @@ app-update-search-title = Behold det som er valgt nå i dette lagrede søket
 app-save-search-new = Lagre som nytt
 app-select-title = Velg flere ressurser for å tagge, kategorisere, samle, laste ned eller arkivere dem samlet (X, eller Ctrl-klikk)
 app-select = Velg
+app-explore-title = Utforsk disse modellene i 3D
 app-tile-size = Flisstørrelse
 app-supporting-title = glTF-buffere, materialbiblioteker, kartene til materialer, materialer som bare én modell bruker, og butikkfilene som beskriver modeller. De følger med når du laster ned det som bruker dem. Et spritearks sider, og spritene pakken også har som egne bilder, vises sammen med arket. En ressurs pakken har i flere formater, vises én gang, i formatet Hoard leser best.
 app-supporting-hidden =
@@ -2244,6 +2246,37 @@ model-key-light = lys
 model-key-grid = rutenett
 model-key-background = bakgrunn
 model-key-play = spill av
+explorer-dialog = Mesh-utforsker: fly rundt blant modellene i disse resultatene
+explorer-title = Mesh-utforsker
+explorer-group-view = Visning
+explorer-true-size = Faktisk størrelse
+explorer-true-size-title = Vis hver modell i faktisk størrelse i meter, opptil 12 m, i stedet for tilpasset ruten sin (T)
+explorer-animate = Animer
+explorer-animate-title = Spill av det første klippet til hver animerte modell (Mellomrom)
+explorer-orbit = Bane
+explorer-orbit-title = Dra for å gå rundt den valgte modellen i stedet for å se deg rundt (O)
+explorer-open = Åpne
+explorer-open-title = Åpne detaljene for denne modellen (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Ingen av disse resultatene kan vises i 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] { $loaded } av { $total } modell lastet inn
+       *[other] { $loaded } av { $total } modeller lastet inn
+    }
+explorer-hud-loading = { $count } lastes inn
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Fart { $speed } m/s
+explorer-hud-fps = { $fps } fps
+explorer-keys-mouse = Klikk for å velge · dra for å se deg rundt · dra med midtknappen for å panorere · Alt-dra for å gå i bane · rull for å bevege deg, med høyre knapp holdt inne for å endre farten · dobbeltklikk for å tilpasse
+explorer-key-fly = fly
+explorer-key-down-up = ned, opp
+explorer-key-faster = raskere
+explorer-key-open = åpne
+explorer-key-true-size = faktisk størrelse
+explorer-key-orbit = bane
+explorer-key-animate = animer
+explorer-key-close = lukk
 
 ## Materialer (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

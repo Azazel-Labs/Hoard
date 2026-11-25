@@ -494,6 +494,7 @@ app-lazy-settings = ustawień
 app-lazy-archive = archiwum
 app-lazy-shortcuts = skrótów
 app-lazy-setup = konfiguracji
+app-lazy-explorer = eksploratora siatek
 app-theme-system = Motyw systemu
 app-theme-light = Motyw jasny
 app-theme-dark = Motyw ciemny
@@ -789,6 +790,7 @@ app-update-search-title = Zachowaj obecny wybór w tym zapisanym wyszukiwaniu
 app-save-search-new = Zapisz jako nowe
 app-select-title = Zaznacz kilka zasobów, by razem je otagować, skategoryzować, dodać do kolekcji, pobrać lub zarchiwizować (X lub Ctrl+kliknięcie)
 app-select = Zaznacz
+app-explore-title = Przeglądaj te modele w 3D
 app-tile-size = Rozmiar kafelków
 app-supporting-title = Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa. Strony arkusza sprite’ów oraz jego sprite’y, które paczka ma też jako osobne obrazy, są pokazywane razem z arkuszem. Zasób, który paczka ma w kilku formatach, jest pokazywany raz, w formacie, który Hoard czyta najlepiej.
 app-supporting-hidden =
@@ -2441,6 +2443,39 @@ model-key-light = światło
 model-key-grid = siatka
 model-key-background = tło
 model-key-play = odtwarzanie
+explorer-dialog = Eksplorator siatek: lataj między modelami z tych wyników
+explorer-title = Eksplorator siatek
+explorer-group-view = Widok
+explorer-true-size = Rzeczywisty rozmiar
+explorer-true-size-title = Pokaż każdy model w rzeczywistym rozmiarze w metrach, do 12 m, zamiast dopasowywać go do jego pola (T)
+explorer-animate = Animuj
+explorer-animate-title = Odtwarzaj pierwszy klip każdego animowanego modelu (Spacja)
+explorer-orbit = Orbita
+explorer-orbit-title = Przeciąganie obraca wokół zaznaczonego modelu zamiast rozglądania się (O)
+explorer-open = Otwórz
+explorer-open-title = Otwórz szczegóły tego modelu (Enter)
+explorer-size = { $x } × { $y } × { $z } m
+explorer-empty = Żadnego z tych wyników nie można pokazać w 3D.
+explorer-hud-loaded =
+    { $total ->
+        [one] Wczytano { $loaded } z { $total } modelu
+        [few] Wczytano { $loaded } z { $total } modeli
+        [many] Wczytano { $loaded } z { $total } modeli
+       *[other] Wczytano { $loaded } z { $total } modelu
+    }
+explorer-hud-loading = Wczytywanie: { $count }
+explorer-hud-memory = ~{ $mb } MB
+explorer-hud-speed = Prędkość { $speed } m/s
+explorer-hud-fps = { $fps } kl./s
+explorer-keys-mouse = Kliknięcie zaznacza · przeciąganie rozgląda się · przeciąganie środkowym przyciskiem przesuwa · Alt i przeciąganie krąży · przewijanie porusza, z wciśniętym prawym przyciskiem zmienia prędkość · dwuklik kadruje
+explorer-key-fly = lot
+explorer-key-down-up = w dół, w górę
+explorer-key-faster = szybciej
+explorer-key-open = otwórz
+explorer-key-true-size = rzeczywisty rozmiar
+explorer-key-orbit = orbita
+explorer-key-animate = animacja
+explorer-key-close = zamknij
 
 ## Materiały (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 

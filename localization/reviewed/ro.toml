@@ -1039,6 +1039,10 @@ translation = "Editează…"
 source = "Change the tags and fields of all of them (E)"
 translation = "Schimbă etichetele și câmpurile tuturor (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "Explorează aceste modele în 3D"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "mai puține"
@@ -1179,6 +1183,10 @@ translation = "Tip"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "arhiva"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "exploratorul de mesh-uri"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5437,6 +5445,123 @@ translation = "Numele și parola nu se potrivesc"
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Acesta nu este codul de configurare dat serverului în HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "Animează"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "Redă primul clip al fiecărui model animat (Spațiu)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "Explorator de mesh-uri: zboară printre modelele din aceste rezultate"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "Niciunul dintre aceste rezultate nu poate fi afișat în 3D."
+
+[messages.explorer-group-view]
+source = "View"
+translation = "Vizualizare"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = """
+{ $total ->
+        [one] { $loaded } din { $total } model încărcat
+        [few] { $loaded } din { $total } modele încărcate
+       *[other] { $loaded } din { $total } de modele încărcate
+    }"""
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "{ $count } se încarcă"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "Viteză { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "animează"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "închide"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "jos, sus"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "mai repede"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "zbor"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "deschide"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "orbită"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "mărime reală"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "Clic pentru selectare · trage pentru a privi · trage cu butonul din mijloc pentru deplasare · Alt și trage pentru orbită · derulează pentru a te mișca, cu butonul drept apăsat pentru a schimba viteza · dublu clic pentru încadrare"
+
+[messages.explorer-open]
+source = "Open"
+translation = "Deschide"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "Deschide detaliile acestui model (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "Orbită"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "Tragerea rotește în jurul modelului selectat în loc să privești în jur (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "Explorator de mesh-uri"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "Mărime reală"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "Arată fiecare model la mărimea lui reală în metri, până la 12 m, în loc să fie încadrat în pătratul lui (T)"
 
 [messages.folders-browse]
 source = "Browse…"

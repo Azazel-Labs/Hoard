@@ -984,6 +984,10 @@ translation = "แก้ไข…"
 source = "Change the tags and fields of all of them (E)"
 translation = "เปลี่ยนแท็กและช่องข้อมูลของทั้งหมด (E)"
 
+[messages.app-explore-title]
+source = "Explore these models in 3D"
+translation = "สำรวจโมเดลเหล่านี้แบบ 3 มิติ"
+
 [messages.app-facets-fewer]
 source = "fewer"
 translation = "น้อยลง"
@@ -1119,6 +1123,10 @@ translation = "ประเภท"
 [messages.app-lazy-archive]
 source = "the archive"
 translation = "ที่เก็บถาวร"
+
+[messages.app-lazy-explorer]
+source = "the mesh explorer"
+translation = "ตัวสำรวจเมช"
 
 [messages.app-lazy-settings]
 source = "settings"
@@ -5210,6 +5218,118 @@ translation = "ชื่อและรหัสผ่านไม่ตรง�
 [messages.error-wrong-setup-code]
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "นี่ไม่ใช่รหัสตั้งค่าที่กำหนดให้เซิร์ฟเวอร์ใน HOARD_SETUP_CODE"
+
+[messages.explorer-animate]
+source = "Animate"
+translation = "เคลื่อนไหว"
+
+[messages.explorer-animate-title]
+source = "Play each animated model's first clip (Space)"
+translation = "เล่นคลิปแรกของโมเดลที่มีภาพเคลื่อนไหวแต่ละตัว (Space)"
+
+[messages.explorer-dialog]
+source = "Mesh explorer: fly among the models in these results"
+translation = "ตัวสำรวจเมช: บินไปรอบ ๆ โมเดลในผลลัพธ์เหล่านี้"
+
+[messages.explorer-empty]
+source = "None of these results can be shown in 3D."
+translation = "ไม่มีผลลัพธ์ใดที่แสดงแบบ 3 มิติได้"
+
+[messages.explorer-group-view]
+source = "View"
+translation = "มุมมอง"
+
+[messages.explorer-hud-fps]
+source = "{ $fps } fps"
+translation = "{ $fps } fps"
+
+[messages.explorer-hud-loaded]
+source = """
+{ $total ->
+        [one] { $loaded } of { $total } model loaded
+       *[other] { $loaded } of { $total } models loaded
+    }"""
+translation = "โหลดโมเดลแล้ว { $loaded } จาก { $total }"
+
+[messages.explorer-hud-loading]
+source = "{ $count } loading"
+translation = "กำลังโหลด { $count }"
+
+[messages.explorer-hud-memory]
+source = "~{ $mb } MB"
+translation = "~{ $mb } MB"
+
+[messages.explorer-hud-speed]
+source = "Speed { $speed } m/s"
+translation = "ความเร็ว { $speed } m/s"
+
+[messages.explorer-key-animate]
+source = "animate"
+translation = "เคลื่อนไหว"
+
+[messages.explorer-key-close]
+source = "close"
+translation = "ปิด"
+
+[messages.explorer-key-down-up]
+source = "down, up"
+translation = "ลง, ขึ้น"
+
+[messages.explorer-key-faster]
+source = "faster"
+translation = "เร็วขึ้น"
+
+[messages.explorer-key-fly]
+source = "fly"
+translation = "บิน"
+
+[messages.explorer-key-open]
+source = "open"
+translation = "เปิด"
+
+[messages.explorer-key-orbit]
+source = "orbit"
+translation = "วงโคจร"
+
+[messages.explorer-key-true-size]
+source = "true size"
+translation = "ขนาดจริง"
+
+[messages.explorer-keys-mouse]
+source = "Click to select · drag to look · middle-drag to pan · Alt-drag to orbit · scroll to move, with the right button held to change speed · double-click to frame"
+translation = "คลิกเพื่อเลือก · ลากเพื่อมองไปรอบ ๆ · ลากด้วยปุ่มกลางเพื่อเลื่อน · Alt+ลากเพื่อโคจร · เลื่อนล้อเพื่อเคลื่อนที่ กดปุ่มขวาค้างไว้เพื่อเปลี่ยนความเร็ว · ดับเบิลคลิกเพื่อจัดให้พอดี"
+
+[messages.explorer-open]
+source = "Open"
+translation = "เปิด"
+
+[messages.explorer-open-title]
+source = "Open this model's details (Enter)"
+translation = "เปิดรายละเอียดของโมเดลนี้ (Enter)"
+
+[messages.explorer-orbit]
+source = "Orbit"
+translation = "วงโคจร"
+
+[messages.explorer-orbit-title]
+source = "Drag to turn around the selected model instead of looking around (O)"
+translation = "ลากเพื่อหมุนรอบโมเดลที่เลือกแทนการมองไปรอบ ๆ (O)"
+
+[messages.explorer-size]
+source = "{ $x } × { $y } × { $z } m"
+translation = "{ $x } × { $y } × { $z } m"
+
+[messages.explorer-title]
+source = "Mesh explorer"
+translation = "ตัวสำรวจเมช"
+
+[messages.explorer-true-size]
+source = "True size"
+translation = "ขนาดจริง"
+
+[messages.explorer-true-size-title]
+source = "Show each model at its real size in meters, up to 12 m, instead of fitted to its square (T)"
+translation = "แสดงแต่ละโมเดลตามขนาดจริงเป็นเมตร สูงสุด 12 m แทนการปรับให้พอดีกับช่อง (T)"
 
 [messages.folders-browse]
 source = "Browse…"

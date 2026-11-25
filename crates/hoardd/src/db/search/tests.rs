@@ -66,7 +66,7 @@ fn tag_rows_put_right_in_place_are_as_if_read_again() {
     let put_right_after = |kept: &mut TagRows, changes: &str| {
         let before = crate::db::library_writes();
         conn.execute_batch(changes).unwrap();
-        let changed = crate::db::changes::since(before, crate::db::library_writes()).unwrap();
+        let changed = crate::db::changes::since(conn.path().unwrap(), before, crate::db::library_writes()).unwrap();
         assert!(!changed.too_much);
         let tree = Tree::load(&conn).unwrap();
         put_right(&conn, kept, &changed, &tree).unwrap();
@@ -956,8 +956,8 @@ fn what_is_kept_of_every_asset_finds_what_the_library_has() {
         let mut kept = Facts::clone(&facts(&conn).unwrap().unwrap());
         let before = crate::db::library_writes();
         conn.execute_batch(change).unwrap();
-        // (What other tests change in libraries of their own meanwhile is noted too.)
-        let changed = crate::db::changes::since(before, crate::db::library_writes());
+        // (What other tests change in libraries of their own meanwhile is left out.)
+        let changed = crate::db::changes::since(conn.path().unwrap(), before, crate::db::library_writes());
         if let Some(c) = changed.filter(|c| !c.facts && !c.too_much) {
             assert!(patch_facts(&conn, &mut kept, &c).unwrap(), "{when}: put right");
             same(&kept, when);
@@ -971,11 +971,11 @@ fn what_is_kept_of_every_asset_finds_what_the_library_has() {
          UPDATE assets SET rating = 4, name = 'renamed' WHERE id = 'a51';",
     )
     .unwrap();
-    let changed = crate::db::changes::since(before, crate::db::library_writes()).unwrap();
+    let changed = crate::db::changes::since(conn.path().unwrap(), before, crate::db::library_writes()).unwrap();
     let row = |id: &str| conn.query_row("SELECT rowid FROM assets WHERE id = ?1", [id], |r| r.get::<_, i64>(0));
     let (a50, a51) = (row("a50").unwrap(), row("a51").unwrap());
     assert!(
-        changed.too_much || !(changed.fact_rows.contains(&a50) || changed.fact_rows.contains(&a51)),
+        !changed.too_much && !changed.fact_rows.contains(&a50) && !changed.fact_rows.contains(&a51),
         "kept as it was"
     );
     check("tags changed");

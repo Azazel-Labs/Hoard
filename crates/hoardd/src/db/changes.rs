@@ -278,9 +278,14 @@ const KEPT: usize = 512;
 /// The most assets [`JOURNAL`] names in all, once it has more than one write.
 const KEPT_ASSETS: usize = 4 * MOST;
 
-/// What each recent write to the library changed, with its number ([`library_writes`] once it was made), oldest
-/// first. (Shared, so what's read from it is put together once it's let go: each write waits for it to commit.)
-static JOURNAL: Mutex<VecDeque<(u64, Arc<Changed>)>> = Mutex::new(VecDeque::new());
+/// What each recent write to the library changed, with its number ([`library_writes`] once it was made) and the
+/// database it was to (its path), oldest first. (Shared, so what's read from it is put together once it's let go:
+/// each write waits for it to commit.) The server has one database, but tests open many at once, and another's row
+/// numbers among what changed would be put right for no reason.
+static JOURNAL: Mutex<VecDeque<Noted>> = Mutex::new(VecDeque::new());
+
+/// A write's number, the database it was to and what it changed (see [`JOURNAL`]).
+type Noted = (u64, Arc<str>, Arc<Changed>);
 
 /// How many writes to the library (see [`NOT_SEARCHED`]) there have been since the server started.
 static LIBRARY_WRITES: AtomicU64 = AtomicU64::new(0);
@@ -291,8 +296,9 @@ pub(crate) fn library_writes() -> u64 {
     LIBRARY_WRITES.load(Ordering::Acquire)
 }
 
-/// The transaction was committed (SQLite's WAL hook): what it changed is there for others to read.
-pub(crate) fn committed(pending: &mut Pending) {
+/// The transaction was committed (SQLite's WAL hook) to `database` (its path): what it changed is there for others to
+/// read.
+pub(crate) fn committed(pending: &mut Pending, database: &Arc<str>) {
     let Pending { mut changed, mut library, seen } = std::mem::take(pending);
     // Nothing a hook sees (the schema changing, say): it could have been anything.
     if !seen {
@@ -306,19 +312,19 @@ pub(crate) fn committed(pending: &mut Pending) {
     let mut journal = JOURNAL.lock().unwrap_or_else(PoisonError::into_inner);
     // In the journal before it's counted, so whoever reads the count finds what changed up to it.
     let number = LIBRARY_WRITES.load(Ordering::Acquire) + 1;
-    journal.push_back((number, Arc::new(changed)));
-    let mut size: usize = journal.iter().map(|(_, c)| c.size()).sum();
+    journal.push_back((number, Arc::clone(database), Arc::new(changed)));
+    let mut size: usize = journal.iter().map(|(_, _, c)| c.size()).sum();
     while journal.len() > KEPT || (journal.len() > 1 && size > KEPT_ASSETS) {
-        if let Some((_, c)) = journal.pop_front() {
+        if let Some((_, _, c)) = journal.pop_front() {
             size -= c.size();
         }
     }
     LIBRARY_WRITES.store(number, Ordering::Release);
 }
 
-/// What changed in the library after its `from`th write, up to and including its `to`th, or `None` if that's no
-/// longer known (it was too long ago).
-pub(crate) fn since(from: u64, to: u64) -> Option<Changed> {
+/// What changed in the library at `database` (its path, as its connections give it) after the `from`th write, up to
+/// and including the `to`th, or `None` if that's no longer known (it was too long ago).
+pub(crate) fn since(database: &str, from: u64, to: u64) -> Option<Changed> {
     let mut changed = Changed::default();
     if from >= to {
         return Some(changed);
@@ -326,10 +332,14 @@ pub(crate) fn since(from: u64, to: u64) -> Option<Changed> {
     let writes: Vec<Arc<Changed>> = {
         let journal = JOURNAL.lock().unwrap_or_else(PoisonError::into_inner);
         // Everything after `from` has to be there.
-        if journal.front().is_none_or(|(n, _)| *n > from + 1) {
+        if journal.front().is_none_or(|(n, _, _)| *n > from + 1) {
             return None;
         }
-        journal.iter().filter(|(n, _)| *n > from && *n <= to).map(|(_, c)| Arc::clone(c)).collect()
+        journal
+            .iter()
+            .filter(|(n, d, _)| *n > from && *n <= to && **d == *database)
+            .map(|(_, _, c)| Arc::clone(c))
+            .collect()
     };
     for c in writes {
         changed.add(&c);
@@ -344,20 +354,18 @@ pub(crate) fn since(from: u64, to: u64) -> Option<Changed> {
 mod tests {
     use super::*;
 
-    /// What changed since `before`, and whether only the write just made did: what it didn't change can only be
-    /// checked then, as other tests' rowids are the same numbers. (Their writes can also make it all `too_much`.)
-    fn last(before: u64) -> (Changed, bool) {
-        let to = library_writes();
-        (since(before, to).unwrap(), to == before + 1)
+    /// What changed in the library at `path` since `before`.
+    fn last(path: &str, before: u64) -> Changed {
+        since(path, before, library_writes()).unwrap()
     }
 
-    // Other tests write to libraries of their own meanwhile, and the journal is the server's (it has one library), so
-    // this looks for its own assets among what changed, by names no other test uses.
+    // Other tests write to libraries of their own meanwhile: what they change is left out.
     #[test]
     fn notes_what_a_committed_write_changed_and_forgets_a_rolled_back_one() {
         let dir = tempfile::tempdir().unwrap();
         let pool = super::super::open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
         let mut conn = pool.get().unwrap();
+        let path = conn.path().unwrap().to_owned();
         conn.execute_batch(
             "INSERT INTO packs (id, name, status, created_at) VALUES ('p', 'P', 'ready', 'x');
              INSERT INTO blobs (hash, size, created_at) VALUES ('b', 1, 'x');
@@ -371,9 +379,9 @@ mod tests {
 
         let before = library_writes();
         conn.execute("INSERT INTO asset_tags (asset_id, tag, source) VALUES ('journal-1', 'red', 'x')", []).unwrap();
-        let (changed, alone) = last(before);
-        assert!(changed.too_much || changed.tagged.contains("journal-1"));
-        assert!(!alone || !changed.tagged.contains("journal-2"));
+        let changed = last(&path, before);
+        assert!(changed.tagged.contains("journal-1"));
+        assert!(!changed.tagged.contains("journal-2"));
 
         // Rolled back, nothing changed.
         let before = library_writes();
@@ -383,26 +391,26 @@ mod tests {
             tx.rollback().unwrap();
         }
         conn.execute("UPDATE assets SET name = 'one' WHERE id = 'journal-1'", []).unwrap();
-        let (changed, alone) = last(before);
-        assert!(!alone || !changed.tagged.contains("journal-2"));
-        assert!(changed.too_much || changed.rows.contains(&a1));
+        let changed = last(&path, before);
+        assert!(!changed.tagged.contains("journal-2"));
+        assert!(changed.rows.contains(&a1));
         let before = library_writes();
         conn.execute("UPDATE assets SET kind = 'model' WHERE id = 'journal-2'", []).unwrap();
-        let (changed, alone) = last(before);
-        assert!(changed.too_much || changed.fact_rows.contains(&a2), "a kind is something a search keeps");
-        assert!(!alone || (!changed.placed.contains(&a2) && !changed.facts));
+        let changed = last(&path, before);
+        assert!(changed.fact_rows.contains(&a2), "a kind is something a search keeps");
+        assert!((!changed.placed.contains(&a2) && !changed.facts));
         let before = library_writes();
         conn.execute(
             "UPDATE assets SET name = 'two', meta = '{\"take_of\": \"journal-1\"}' WHERE id = 'journal-2'",
             [],
         )
         .unwrap();
-        let (changed, _) = last(before);
-        assert!(changed.too_much || changed.fact_ids.contains("journal-1"), "what a take is of");
+        let changed = last(&path, before);
+        assert!(changed.fact_ids.contains("journal-1"), "what a take is of");
         let before = library_writes();
         conn.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
-        let (changed, _) = last(before);
-        assert!(changed.too_much || changed.facts, "every asset of the pack");
+        let changed = last(&path, before);
+        assert!(changed.facts, "every asset of the pack");
         conn.execute("UPDATE packs SET archived_at = NULL WHERE id = 'p'", []).unwrap();
 
         // An asset removed takes its tags with it; the tree changing is noted.
@@ -412,20 +420,20 @@ mod tests {
              INSERT INTO tag_parents (tag, parent) VALUES ('red', 'warm'); COMMIT;",
         )
         .unwrap();
-        let (changed, _) = last(before);
-        assert!(changed.too_much || changed.tagged.contains("journal-1"));
-        assert!(changed.too_much || (changed.rows.contains(&a1) && changed.rows.contains(&a2)));
-        assert!(changed.too_much || (changed.placed.contains(&a1) && changed.fact_ids.contains("journal-1")));
-        assert!(changed.too_much || changed.tree);
+        let changed = last(&path, before);
+        assert!(changed.tagged.contains("journal-1"));
+        assert!((changed.rows.contains(&a1) && changed.rows.contains(&a2)));
+        assert!((changed.placed.contains(&a1) && changed.fact_ids.contains("journal-1")));
+        assert!(changed.tree);
     }
 
     #[test]
     fn what_was_too_long_ago_is_not_known() {
-        let mut journal = VecDeque::from([(5, Arc::new(Changed::default()))]);
-        std::mem::swap(&mut journal, &mut JOURNAL.lock().unwrap());
+        let mut journal = VecDeque::from([(5, Arc::from("old.db"), Arc::new(Changed::default()))]);
+        std::mem::swap(&mut journal, &mut *JOURNAL.lock().unwrap());
         // (Put back at once: other tests use it.)
-        let (old, now) = (since(3, 5), since(4, 5));
-        std::mem::swap(&mut journal, &mut JOURNAL.lock().unwrap());
+        let (old, now) = (since("old.db", 3, 5), since("old.db", 4, 5));
+        std::mem::swap(&mut journal, &mut *JOURNAL.lock().unwrap());
         assert!(old.is_none());
         assert!(now.is_some());
     }

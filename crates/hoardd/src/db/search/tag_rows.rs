@@ -130,7 +130,7 @@ pub(super) fn tag_rows(conn: &Connection, tree: &Tree) -> Result<Arc<TagRows>> {
         if *at == writes {
             return Ok(Arc::clone(rows));
         }
-        if let Some(changed) = crate::db::changes::since(*at, writes).filter(|c| !c.too_much) {
+        if let Some(changed) = crate::db::changes::since(path, *at, writes).filter(|c| !c.too_much) {
             put_right(conn, Arc::make_mut(rows), &changed, tree)?;
             *at = writes;
             return Ok(Arc::clone(rows));

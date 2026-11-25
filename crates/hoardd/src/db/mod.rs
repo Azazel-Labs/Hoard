@@ -78,6 +78,7 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         changes::watch(c, &pending)?;
         let (rolled, committed) = (Arc::clone(&pending), pending);
         let (undone, done) = (Arc::clone(&written), Arc::clone(&written));
+        let database: Arc<str> = c.path().unwrap_or_default().into();
         c.rollback_hook(Some(move || {
             changes::rolled_back(&mut rolled.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
             turn_over(&undone);
@@ -86,7 +87,7 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // commit hook, which runs just before. Taking the place of SQLite's own hook, this checkpoints the log the
         // way that does (at 1000 pages, without waiting on readers).
         c.wal_hook(Some(move |wal: &mut rusqlite::hooks::Wal, pages| {
-            changes::committed(&mut committed.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
+            changes::committed(&mut committed.lock().unwrap_or_else(std::sync::PoisonError::into_inner), &database);
             WRITES.fetch_add(1, Ordering::AcqRel);
             if pages >= 1000 {
                 // As SQLite's own: a checkpoint that can't finish now is done by a later one.

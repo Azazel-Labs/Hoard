@@ -67,7 +67,7 @@ pub(super) fn facts(conn: &Connection) -> Result<Option<Arc<Facts>>> {
         let changed = if at == writes {
             Some(crate::db::changes::Changed::default())
         } else {
-            crate::db::changes::since(at, writes)
+            crate::db::changes::since(&path, at, writes)
         };
         if let Some(c) = changed.filter(|c| !c.facts && !c.too_much)
             && ((c.fact_rows.is_empty() && c.fact_ids.is_empty()) || patch_facts(conn, Arc::make_mut(&mut facts), &c)?)

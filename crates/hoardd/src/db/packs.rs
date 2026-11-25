@@ -246,15 +246,15 @@ pub(crate) fn delete_pack_in(tx: &rusqlite::Transaction<'_>, id: &str) -> Result
 /// Remember that an asset of a watched pack was deleted for good, so a rescan doesn't add its file back: its path,
 /// and the path of the file it was converted from. Does nothing for a pack Hoard keeps itself.
 pub(crate) fn skip_on_rescan(c: &Connection, asset_id: &str) -> Result<()> {
-    c.execute(
+    c.prepare_cached(
         "INSERT OR IGNORE INTO skipped_files (pack_id, path)
          SELECT a.pack_id, a.path FROM assets a JOIN packs p ON p.id = a.pack_id
           WHERE a.id = ?1 AND p.folder IS NOT NULL
          UNION
          SELECT a.pack_id, o.path FROM asset_origin o JOIN assets a ON a.id = o.asset_id JOIN packs p ON p.id = a.pack_id
           WHERE o.asset_id = ?1 AND p.folder IS NOT NULL",
-        [asset_id],
-    )?;
+    )?
+    .execute([asset_id])?;
     Ok(())
 }
 
@@ -352,17 +352,18 @@ pub(crate) fn purge_archived(
             std::thread::sleep(DELETE_PAUSE);
         }
         let tx = conn.transaction()?;
+        // Cached, as these run for each asset and deleting from assets fires its triggers.
         for id in batch {
-            let archived: bool = tx.query_row(
-                "SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)",
-                [id],
-                |r| r.get(0),
-            )?;
+            let archived: bool = tx
+                .prepare_cached("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)")?
+                .query_row([id], |r| r.get(0))?;
             if !archived {
                 continue;
             }
             skip_on_rescan(&tx, id)?;
-            n.assets += tx.execute("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL", [id])? as u64;
+            n.assets += tx
+                .prepare_cached("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL")?
+                .execute([id])? as u64;
         }
         tx.commit()?;
     }

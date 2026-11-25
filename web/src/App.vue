@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import {
   api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type SearchParams,
 } from './api'
-import { filesFromDrop, groupsFromPicked, type Group } from './drop'
+import { useDropImport } from './dropImport'
 import { KIND_LABEL, KIND_NAME } from './kinds'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, shows, toggleIn } from './prefs'
@@ -14,7 +14,6 @@ import { teach } from './storeFormats'
 import { knownTags, leaveOut, marked, pieces, type Piece } from './searchSyntax'
 import { DARK_THEMES, LIGHT_THEMES, SCHEMES, setTheme, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
-import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
 import UploadQueue from './components/UploadQueue.vue'
 import AssetDetail from './components/AssetDetail.vue'
 import SelectionBag from './components/SelectionBag.vue'
@@ -140,13 +139,12 @@ const sideBar = ref<InstanceType<typeof FilterSidebar> | null>(null)
 const sideEl = computed(() => (sideBar.value?.$el as HTMLElement | undefined) ?? null)
 let unswipeSide = () => {}
 
-const queue = ref<InstanceType<typeof UploadQueue> | null>(null)
 const folderInput = ref<HTMLInputElement | null>(null)
-/** A dropped/picked folder that contains several packs: ask how to import it. */
-const pendingSplit = ref<{ group: Group; parts: number } | null>(null)
-const dragDepth = ref(0)
-/** How many files or folders are being dragged over the page (0 when the browser won't say). */
-const dragCount = ref(0)
+const queue = ref<InstanceType<typeof UploadQueue> | null>(null)
+const { pendingSplit, dragDepth, dragCount, resolveSplit, onDragEnter, onDragLeave, onDrop, onPick } = useDropImport(
+  queue,
+  () => editor.value,
+)
 
 // ------------------------------------------------------------------ data
 
@@ -663,67 +661,6 @@ const packShown = computed(
 const sidePanel = computed(
   () => view.value === 'library' && (bagShown.value || (!!selected.value && !prefs.detailPage) || packShown.value),
 )
-
-// ------------------------------------------------------------------ uploads
-
-/** Queue groups for import; a lone folder full of packs gets a choice first. */
-function importGroups(groups: Group[]) {
-  if (!editor.value) return
-  if (groups.length === 1) {
-    const parts = looksLikeFolderOfPacks(groups[0].files)
-    if (parts) {
-      pendingSplit.value = { group: groups[0], parts }
-      return
-    }
-  }
-  queue.value?.enqueue(groups)
-}
-
-function resolveSplit(split: boolean) {
-  const p = pendingSplit.value
-  pendingSplit.value = null
-  if (!p) return
-  const { name, files, handle } = p.group
-  // Each part keeps the folder it came from, so a reload can read it again and pick its part back out.
-  queue.value?.enqueue(split ? splitPerSubfolder(name, files).map((g) => ({ ...g, handle, root: name })) : [p.group])
-}
-
-// Something dragged from the page itself (a picture, a tile) isn't files to add, though a browser offers a picture as one.
-let draggingOwn = false
-document.addEventListener('dragstart', () => (draggingOwn = true))
-document.addEventListener('dragend', () => (draggingOwn = false))
-function onDragEnter(e: DragEvent) {
-  if (draggingOwn || !editor.value || !e.dataTransfer?.types.includes('Files')) return
-  if (!dragDepth.value) dragCount.value = e.dataTransfer.items?.length ?? 0
-  dragDepth.value++
-}
-function onDragLeave() {
-  dragDepth.value = Math.max(0, dragDepth.value - 1)
-}
-async function onDrop(e: DragEvent) {
-  dragDepth.value = 0
-  const own = draggingOwn
-  draggingOwn = false
-  if (!e.dataTransfer || own) return
-  const groups = await filesFromDrop(e.dataTransfer)
-  if (groups.length) importGroups(groups)
-}
-function onPick(e: Event) {
-  const input = e.target as HTMLInputElement
-  const files = [...(input.files ?? [])]
-  input.value = ''
-  importGroups(groupsFromPicked(files))
-}
-/** Folder picker: webkitRelativePath is "Folder/sub/file.png". */
-function onPickFolder(e: Event) {
-  const input = e.target as HTMLInputElement
-  const files = [...(input.files ?? [])]
-  input.value = ''
-  if (files.length) importGroups(groupsFromPicked(files))
-}
-function onCreated() {
-  refreshPacks()
-}
 
 // ------------------------------------------------------------------ misc
 
@@ -1442,7 +1379,7 @@ const commands = computed<Command[]>(() => {
           </button>
         </template>
         <input ref="fileInput" type="file" multiple hidden @change="onPick" />
-        <input ref="folderInput" type="file" webkitdirectory multiple hidden @change="onPickFolder" />
+        <input ref="folderInput" type="file" webkitdirectory multiple hidden @change="onPick" />
       </div>
     </header>
 
@@ -1739,7 +1676,7 @@ const commands = computed<Command[]>(() => {
 
     <DropOverlay :show="dragDepth > 0" :count="dragCount" />
 
-    <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
+    <UploadQueue ref="queue" @created="refreshPacks()" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
     <ModelExplorer v-if="exploring" :query="exploring" @close="exploring = null" @open="(a) => ((exploring = null), openAsset(a))" />

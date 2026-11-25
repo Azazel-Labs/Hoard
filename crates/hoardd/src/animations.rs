@@ -115,11 +115,13 @@ pub(crate) fn rig_of_glb(glb: &[u8]) -> Option<Rig> {
 pub(crate) fn store(conn: &Connection, asset_id: &str, rig: Option<&Rig>) -> Result<()> {
     REVISION.fetch_add(1, Ordering::AcqRel);
     match rig {
-        Some(r) => conn.execute(
-            "INSERT INTO rigs (asset_id, rig) VALUES (?1, ?2) ON CONFLICT (asset_id) DO UPDATE SET rig = excluded.rig",
-            params![asset_id, serde_json::to_string(r)?],
-        )?,
-        None => conn.execute("DELETE FROM rigs WHERE asset_id = ?1", [asset_id])?,
+        // (Cached: an import keeps a rig for every rigged model.)
+        Some(r) => conn
+            .prepare_cached(
+                "INSERT INTO rigs (asset_id, rig) VALUES (?1, ?2) ON CONFLICT (asset_id) DO UPDATE SET rig = excluded.rig",
+            )?
+            .execute(params![asset_id, serde_json::to_string(r)?])?,
+        None => conn.prepare_cached("DELETE FROM rigs WHERE asset_id = ?1")?.execute([asset_id])?,
     };
     Ok(())
 }

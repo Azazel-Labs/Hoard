@@ -331,21 +331,23 @@ pub(crate) fn ingest_pack(
     if let Some(text) = &readme {
         save_readme(&tx, pack_id, text)?;
     }
-    for (path, guid) in &guids {
-        tx.execute(
-            "INSERT INTO unity_guids (pack_id, guid, path) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-            params![pack_id, guid, path],
-        )?;
+    // (Each prepared once: a Unity pack has a GUID for every file.)
+    let mut guid =
+        tx.prepare("INSERT INTO unity_guids (pack_id, guid, path) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING")?;
+    for (path, g) in &guids {
+        guid.execute(params![pack_id, g, path])?;
     }
+    let mut unmap = tx.prepare("DELETE FROM unity_remaps WHERE pack_id = ?1 AND path = ?2")?;
     for (path, _) in &guids {
-        tx.execute("DELETE FROM unity_remaps WHERE pack_id = ?1 AND path = ?2", params![pack_id, path])?;
+        unmap.execute(params![pack_id, path])?;
     }
-    for (path, slot, guid) in &remaps {
-        tx.execute(
-            "INSERT INTO unity_remaps (pack_id, path, slot, guid) VALUES (?1, ?2, ?3, ?4) ON CONFLICT DO NOTHING",
-            params![pack_id, path, slot, guid],
-        )?;
+    let mut remap = tx.prepare(
+        "INSERT INTO unity_remaps (pack_id, path, slot, guid) VALUES (?1, ?2, ?3, ?4) ON CONFLICT DO NOTHING",
+    )?;
+    for (path, slot, g) in &remaps {
+        remap.execute(params![pack_id, path, slot, g])?;
     }
+    drop((guid, unmap, remap));
     let n_links = links::link_pack(&tx, pack_id, &refs)?;
     let n_families = links::assign_families(&tx, pack_id)?;
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
@@ -600,12 +602,13 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
                     insert_blob(&tx, t, &now)?;
                 }
                 // A reviewed asset keeps the rule tags it was reviewed with.
-                tx.execute(
+                // (Cached: the assets table's indexes and triggers make compiling these cost more than running them.)
+                tx.prepare_cached(
                     "DELETE FROM asset_tags WHERE asset_id = ?1 AND (source = 'meta' OR source = 'rule' AND NOT EXISTS
                        (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
-                    [&id],
-                )?;
-                tx.execute(
+                )?
+                .execute([&id])?;
+                tx.prepare_cached(
                     // A thumbnail a browser drew stays: it shows the model as the viewer does. A .blend's thumbnail is
                     // its own preview, or one drawn from its conversion (below); analysis that can't draw one
                     // otherwise keeps the one it has. One drawn now is marked as drawn the way thumbnails are drawn
@@ -618,18 +621,18 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
                             words = ?5,
                             category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
                      WHERE id = ?1",
-                    params![
-                        id,
-                        serde_json::Value::Object(item.analysis.meta).to_string(),
-                        item.kind.as_str(),
-                        thumb.as_ref().map(|t| t.hash.clone()),
-                        tagger::fts_words(&item.rel),
-                        human.contains(id.as_str()),
-                        item.category,
-                        now,
-                        crate::thumbs::drawn(item.kind.as_str()),
-                    ],
-                )?;
+                )?
+                .execute(params![
+                    id,
+                    serde_json::Value::Object(item.analysis.meta).to_string(),
+                    item.kind.as_str(),
+                    thumb.as_ref().map(|t| t.hash.clone()),
+                    tagger::fts_words(&item.rel),
+                    human.contains(id.as_str()),
+                    item.category,
+                    now,
+                    crate::thumbs::drawn(item.kind.as_str()),
+                ])?;
                 write_tags(&tx, &id, item.tags)?;
                 db::reindex_asset(&tx, &id)?;
                 // A converted model's rig comes from its conversion, and stays.

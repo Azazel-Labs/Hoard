@@ -17,13 +17,15 @@ pub(crate) fn job_pending(
         Some((f, v)) => (Some(format!("$.{f}")), Some(v)),
         None => (None, None),
     };
-    Ok(conn.query_row(
-        "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status IN ('queued', 'running')
-                          AND (?2 IS NULL OR pack_id = ?2)
-                          AND (?3 IS NULL OR json_extract(payload, ?3) = ?4))",
-        params![kind, pack_id, path, value],
-        |r| r.get(0),
-    )?)
+    // Kept compiled, as are the queue's other statements: a rescan asks this for every pack, and the workers claim
+    // and finish jobs all day.
+    Ok(conn
+        .prepare_cached(
+            "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status IN ('queued', 'running')
+                              AND (?2 IS NULL OR pack_id = ?2)
+                              AND (?3 IS NULL OR json_extract(payload, ?3) = ?4))",
+        )?
+        .query_row(params![kind, pack_id, path, value], |r| r.get(0))?)
 }
 
 pub(crate) fn enqueue(
@@ -33,10 +35,10 @@ pub(crate) fn enqueue(
     payload: &serde_json::Value,
 ) -> Result<i64> {
     let now = now();
-    conn.execute(
+    conn.prepare_cached(
         "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?4, ?4)",
-        params![kind, pack_id, payload.to_string(), now],
-    )?;
+    )?
+    .execute(params![kind, pack_id, payload.to_string(), now])?;
     Ok(conn.last_insert_rowid())
 }
 
@@ -66,62 +68,61 @@ pub(crate) fn rank_sql(col: &str) -> String {
 pub(crate) fn claim_job(conn: &Connection, background_slots: usize) -> Result<Option<JobRow>> {
     let now = now();
     // Looked for first: an UPDATE waits its turn to write even when it finds nothing, and the workers ask often.
-    let waiting: bool = conn.query_row(
-        "SELECT EXISTS (SELECT 1 FROM jobs WHERE status = 'queued' AND run_after <= ?1)",
-        [&now],
-        |r| r.get(0),
-    )?;
+    let waiting: bool = conn
+        .prepare_cached("SELECT EXISTS (SELECT 1 FROM jobs WHERE status = 'queued' AND run_after <= ?1)")?
+        .query_row([&now], |r| r.get(0))?;
     if !waiting {
         return Ok(None);
     }
     // An upload going into a pack the library had already waits for whatever's working on that pack to finish, so
     // two jobs never add to one pack at once.
-    let background = crate::jobs::BACKGROUND.iter().map(|k| format!("'{k}'")).collect::<Vec<_>>().join(", ");
     let slots = i64::try_from(background_slots).unwrap_or(i64::MAX);
     Ok(conn
-        .query_row(
-            &format!(
-                "UPDATE jobs SET status = 'running', attempts = attempts + 1, updated_at = ?1
-                 WHERE id = (SELECT q.id FROM jobs q WHERE q.status = 'queued' AND q.run_after <= ?1
-                               AND NOT (q.kind = ?2 AND json_extract(q.payload, '$.from') IS NOT NULL
-                                        AND EXISTS (SELECT 1 FROM jobs r WHERE r.pack_id = q.pack_id AND r.status = 'running'))
-                               AND (q.kind NOT IN ({background})
-                                    OR (SELECT COUNT(*) FROM jobs r WHERE r.status = 'running' AND r.kind IN ({background})) < ?3)
-                              ORDER BY {}, q.id LIMIT 1)
-                 RETURNING id, kind, pack_id, payload, attempts",
-                rank_sql("q.kind")
-            ),
-            params![&now, crate::jobs::INGEST, slots],
-            |r| {
-                let payload: String = r.get(3)?;
-                Ok(JobRow {
-                    id: r.get(0)?,
-                    kind: r.get(1)?,
-                    pack_id: r.get(2)?,
-                    payload: serde_json::from_str(&payload).unwrap_or_default(),
-                    attempts: r.get(4)?,
-                })
-            },
-        )
+        .prepare_cached(&CLAIM)?
+        .query_row(params![&now, crate::jobs::INGEST, slots], |r| {
+            let payload: String = r.get(3)?;
+            Ok(JobRow {
+                id: r.get(0)?,
+                kind: r.get(1)?,
+                pack_id: r.get(2)?,
+                payload: serde_json::from_str(&payload).unwrap_or_default(),
+                attempts: r.get(4)?,
+            })
+        })
         .optional()?)
 }
+
+/// The UPDATE that claims a job for [`claim_job`]: `?1` now, `?2` the ingest kind, `?3` the background slots.
+static CLAIM: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+    let background = crate::jobs::BACKGROUND.iter().map(|k| format!("'{k}'")).collect::<Vec<_>>().join(", ");
+    format!(
+        "UPDATE jobs SET status = 'running', attempts = attempts + 1, updated_at = ?1
+         WHERE id = (SELECT q.id FROM jobs q WHERE q.status = 'queued' AND q.run_after <= ?1
+                       AND NOT (q.kind = ?2 AND json_extract(q.payload, '$.from') IS NOT NULL
+                                AND EXISTS (SELECT 1 FROM jobs r WHERE r.pack_id = q.pack_id AND r.status = 'running'))
+                       AND (q.kind NOT IN ({background})
+                            OR (SELECT COUNT(*) FROM jobs r WHERE r.status = 'running' AND r.kind IN ({background})) < ?3)
+                      ORDER BY {}, q.id LIMIT 1)
+         RETURNING id, kind, pack_id, payload, attempts",
+        rank_sql("q.kind")
+    )
+});
 
 pub(crate) fn finish_job(conn: &Connection, id: i64, error: Option<&str>, retry_in_secs: Option<i64>) -> Result<()> {
     let now = time::OffsetDateTime::now_utc();
     let fmt = |t: time::OffsetDateTime| t.format(&time::format_description::well_known::Rfc3339).unwrap_or_default();
     match (error, retry_in_secs) {
-        (None, _) => conn.execute(
-            "UPDATE jobs SET status = 'done', error = NULL, updated_at = ?2 WHERE id = ?1",
-            params![id, fmt(now)],
-        )?,
-        (Some(e), Some(secs)) => conn.execute(
-            "UPDATE jobs SET status = 'queued', error = ?2, run_after = ?3, updated_at = ?4 WHERE id = ?1",
-            params![id, e, fmt(now + time::Duration::seconds(secs)), fmt(now)],
-        )?,
-        (Some(e), None) => conn.execute(
-            "UPDATE jobs SET status = 'failed', error = ?2, updated_at = ?3 WHERE id = ?1",
-            params![id, e, fmt(now)],
-        )?,
+        (None, _) => conn
+            .prepare_cached("UPDATE jobs SET status = 'done', error = NULL, updated_at = ?2 WHERE id = ?1")?
+            .execute(params![id, fmt(now)])?,
+        (Some(e), Some(secs)) => conn
+            .prepare_cached(
+                "UPDATE jobs SET status = 'queued', error = ?2, run_after = ?3, updated_at = ?4 WHERE id = ?1",
+            )?
+            .execute(params![id, e, fmt(now + time::Duration::seconds(secs)), fmt(now)])?,
+        (Some(e), None) => conn
+            .prepare_cached("UPDATE jobs SET status = 'failed', error = ?2, updated_at = ?3 WHERE id = ?1")?
+            .execute(params![id, e, fmt(now)])?,
     };
     Ok(())
 }

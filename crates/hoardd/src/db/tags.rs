@@ -107,7 +107,8 @@ pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> 
                 merged.push(t);
             }
         }
-        tx.execute("UPDATE packs SET tags = ?2 WHERE id = ?1", params![id, serde_json::to_string(&merged)?])?;
+        tx.prepare_cached("UPDATE packs SET tags = ?2 WHERE id = ?1")?
+            .execute(params![id, serde_json::to_string(&merged)?])?;
     }
     for id in &touched {
         reindex_asset(&tx, id)?;

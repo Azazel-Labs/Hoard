@@ -103,8 +103,7 @@ pub(super) fn store_derivative(
             "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, ?4, ?2, ?3)
              ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
         )?
-        .execute(params![asset_id, v.hash, now, kind],
-        )?;
+        .execute(params![asset_id, v.hash, now, kind])?;
     }
     Ok(())
 }

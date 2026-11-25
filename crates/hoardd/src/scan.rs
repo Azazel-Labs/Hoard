@@ -357,7 +357,7 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
         );
         db::enqueue(c, jobs::RETAG, Some(pack_id), &json!({ "assets": changed, "then_llm": false }))?;
     }
-    c.execute("UPDATE packs SET dir_times = ?2 WHERE id = ?1", params![pack_id, times])?;
+    c.prepare_cached("UPDATE packs SET dir_times = ?2 WHERE id = ?1")?.execute(params![pack_id, times])?;
     Ok(added || !gone.is_empty() || !changed.is_empty())
 }
 

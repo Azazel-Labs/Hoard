@@ -732,7 +732,8 @@ pub(crate) fn search_ranked(
         let mut page_params = f.params.clone();
         page_params.push(SqlValue::Integer(limit));
         page_params.push(SqlValue::Integer(offset));
-        conn.prepare(&format!(
+        // Kept compiled: the next pages of a search, asked for as the grid scrolls, are the same statement.
+        conn.prepare_cached(&format!(
             "SELECT a.rowid FROM assets a {blobs} {} {where_sql} ORDER BY {order} LIMIT ? OFFSET ?",
             f.join
         ))?

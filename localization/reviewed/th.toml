@@ -7861,6 +7861,18 @@ translation = """
        *[other] รอให้ค้นพบ { $count } รายการ
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "ภาพถัดไป"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "ภาพที่ { $n } จาก { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "ภาพก่อนหน้า"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "แพ็กทั้งหมด"

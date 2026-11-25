@@ -8071,6 +8071,18 @@ translation = """
        *[other] { $count } da scoprire
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Immagine successiva"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Immagine { $n } di { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Immagine precedente"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tutti i pacchetti"

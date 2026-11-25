@@ -7931,6 +7931,18 @@ translation = """
        *[other] { $count } felfedezésre vár
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Következő kép"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "{ $n }. kép / { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Előző kép"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Összes csomag"

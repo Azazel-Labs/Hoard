@@ -8190,6 +8190,18 @@ translation = """
        *[other] { $count } de descoperit
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Imaginea următoare"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Imaginea { $n } din { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Imaginea anterioară"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Toate pachetele"

@@ -8196,6 +8196,18 @@ translation = """
        *[other] { $count } k objevení
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Další obrázek"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Obrázek { $n } z { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Předchozí obrázek"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Všechny balíčky"

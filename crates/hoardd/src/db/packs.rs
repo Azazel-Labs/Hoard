@@ -35,6 +35,7 @@ fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
         store_url: r.get(12)?,
         license_tier: r.get(13)?,
         preview: Vec::new(),
+        showcase: Vec::new(),
         preview_kinds: Vec::new(),
         unreal_packages: 0,
         unreal_converted: 0,
@@ -135,6 +136,18 @@ fn cover(conn: &Connection, pack_id: &str) -> Result<(Vec<String>, Vec<String>)>
     Ok((ids, kinds))
 }
 
+/// Up to twelve of the pack's pictures of itself for its cover to go through (see migration 109's `showcase`), by
+/// path: those with a thumbnail, and not a texture a model wears.
+fn showcase(conn: &Connection, pack_id: &str) -> Result<Vec<String>> {
+    let mut stmt = conn.prepare_cached(
+        "SELECT id FROM assets a
+          WHERE pack_id = ?1 AND showcase AND thumb_hash IS NOT NULL AND archived_at IS NULL
+            AND NOT EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id AND l.rel = 'texture')
+          ORDER BY path LIMIT 12",
+    )?;
+    Ok(stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
+}
+
 /// Which packs [`list_packs`] lists.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Packs {
@@ -160,6 +173,7 @@ pub(crate) fn list_packs(conn: &Connection, which: Packs) -> Result<Vec<Pack>> {
     let mut rows = stmt.query_map([], pack_from_row)?.collect::<rusqlite::Result<Vec<_>>>()?;
     for p in &mut rows {
         (p.preview, p.preview_kinds) = cover(conn, &p.id)?;
+        p.showcase = showcase(conn, &p.id)?;
     }
     fill_counts(conn, &mut rows)?;
     Ok(rows)
@@ -174,6 +188,7 @@ pub(crate) fn get_pack(conn: &Connection, id: &str) -> Result<Option<Pack>> {
         )
         .optional()?;
     if let Some(p) = &mut pack {
+        p.showcase = showcase(conn, &p.id)?;
         fill_counts(conn, std::slice::from_mut(p))?;
     }
     Ok(pack)
@@ -555,6 +570,41 @@ mod tests {
         let (ids, kinds) = cover(&conn, "p").unwrap();
         assert_eq!(ids, ["m1", "t1", "s1", "m2"]);
         assert_eq!(kinds, ["model", "texture", "audio", "model"]);
+    }
+
+    /// A pack's pictures of itself are the images named or filed as previews, screenshots and marketing shots, but
+    /// not a material's maps, nor textures a model wears, nor any without a thumbnail.
+    #[test]
+    fn a_packs_showcase_is_its_pictures_of_itself() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p', 'P', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, thumb_hash, created_at, updated_at) VALUES
+               ('a', 'p', 'h', 'Preview.png', 'Preview', 'png', 'texture', 'h', 'x', 'x'),
+               ('b', 'p', 'h', 'Screenshots/01.jpg', '01', 'jpg', 'texture', 'h', 'x', 'x'),
+               ('c', 'p', 'h', 'Marketing/Key Art.png', 'Key Art', 'png', 'texture', 'h', 'x', 'x'),
+               ('d', 'p', 'h', 'Cover.jpg', 'Cover', 'jpg', 'texture', 'h', 'x', 'x'),
+               ('e', 'p', 'h', 'Textures/GroundCover_D.png', 'GroundCover_D', 'png', 'texture', 'h', 'x', 'x'),
+               ('f', 'p', 'h', 'Preview/Rock_Normal.png', 'Rock_Normal', 'png', 'texture', 'h', 'x', 'x'),
+               ('g', 'p', 'h', 'Screenshots/02.jpg', '02', 'jpg', 'texture', NULL, 'x', 'x'),
+               ('i', 'p', 'h', 'Previews/Rock.png', 'Rock', 'png', 'texture', 'h', 'x', 'x'),
+               ('j', 'p', 'h', 'Previews/Rock.glb', 'Rock', 'glb', 'model', 'h', 'x', 'x'),
+               ('k', 'p', 'h', 'Sample.png', 'Sample', 'png', 'texture', 'h', 'x', 'x');
+             INSERT INTO asset_links (from_id, to_id, rel) VALUES ('j', 'i', 'texture');",
+        )
+        .unwrap();
+        assert_eq!(showcase(&conn, "p").unwrap(), ["d", "c", "a", "k", "b"]);
+        let plan: String = conn
+            .query_row(
+                "EXPLAIN QUERY PLAN SELECT id FROM assets WHERE pack_id = 'p' AND showcase ORDER BY path",
+                [],
+                |r| r.get(3),
+            )
+            .unwrap();
+        assert!(plan.contains("assets_showcase"), "{plan}");
     }
 
     /// A pack was updated when any of its assets last was; one with none yet, when it came.

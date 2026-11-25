@@ -1602,6 +1602,12 @@ packs-from-after = { "" }
 packs-added = Added { $date }
 pack-panel-label = About this pack
 pack-panel-hide = Hide the pack’s details
+# The pack panel’s cover, when it goes through the pack’s own pictures (previews, screenshots, marketing shots):
+# buttons to step back and on, and one dot per picture.
+pack-cover-previous = Previous picture
+pack-cover-next = Next picture
+# A dot: it is picture $n of the $count.
+pack-cover-picture = Picture { $n } of { $count }
 pack-panel-kinds = What’s in it
 pack-panel-all = All packs
 packs-download = Download pack (.zip)

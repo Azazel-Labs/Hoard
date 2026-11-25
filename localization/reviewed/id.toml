@@ -7890,6 +7890,18 @@ translation = """
        *[other] { $count } menunggu ditemukan
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Gambar berikutnya"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Gambar { $n } dari { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Gambar sebelumnya"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Semua paket"

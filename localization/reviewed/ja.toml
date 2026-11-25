@@ -7872,6 +7872,18 @@ translation = """
        *[other] 未確認 { $count } 件
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "次の画像"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "画像 { $n }/{ $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "前の画像"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "すべてのパック"

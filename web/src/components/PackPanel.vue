@@ -4,6 +4,7 @@ import { packCreditsUrl, packZipUrl, thumbUrl, type AssetKind, type Pack } from 
 import { humanBytes } from '../format'
 import { KIND_LABEL } from '../kinds'
 import { formatDate, formatNumber, t } from '../i18n'
+import ShowcaseCover from './ShowcaseCover.vue'
 
 // The pack being browsed, in the panel's place while no asset is open: its cover, what it is and where it's from,
 // what's in it (each kind narrows the grid), and its downloads.
@@ -35,7 +36,10 @@ const license = computed(() => {
       </button>
     </header>
 
-    <div v-if="pack.preview.length" class="cover checker">
+    <div v-if="pack.showcase?.length" class="cover">
+      <ShowcaseCover class="whole" :ids="pack.showcase" big />
+    </div>
+    <div v-else-if="pack.preview.length" class="cover checker">
       <img
         v-for="(id, i) in pack.preview"
         :key="id"
@@ -113,6 +117,7 @@ h2 { margin: 0; font-size: 1.3rem; font-weight: 650; letter-spacing: -0.01em; ov
 .cover img:only-child { grid-column: 1 / -1; grid-row: 1 / -1; object-fit: contain; }
 .cover img:first-child:nth-last-child(2), .cover img:first-child:nth-last-child(2) ~ img { grid-row: 1 / -1; }
 .cover img:first-child:nth-last-child(3) { grid-row: 1 / -1; }
+.cover .whole { grid-column: 1 / -1; grid-row: 1 / -1; }
 .facts { margin: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; color: var(--muted); font-size: var(--step--1); }
 .desc { margin: 0; white-space: pre-line; line-height: 1.5; font-size: 0.9rem; overflow-wrap: anywhere; }
 .error { margin: 0; color: var(--danger); font-size: var(--step--1); }

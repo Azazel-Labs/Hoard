@@ -7864,6 +7864,18 @@ translation = """
        *[other] 還有 { $count } 項待發現
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "下一張圖片"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "第 { $n } 張，共 { $count } 張"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "上一張圖片"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "所有素材包"

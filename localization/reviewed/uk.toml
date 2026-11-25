@@ -8249,6 +8249,18 @@ translation = """
        *[other] Залишилося знайти: { $count }
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Наступне зображення"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Зображення { $n } з { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Попереднє зображення"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Усі пакети"

@@ -7858,6 +7858,18 @@ translation = """
        *[other] Còn { $count } điều để khám phá
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Ảnh tiếp theo"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Ảnh { $n }/{ $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Ảnh trước"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tất cả các gói"

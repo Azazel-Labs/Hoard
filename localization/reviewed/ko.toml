@@ -7852,6 +7852,18 @@ translation = """
        *[other] 확인할 항목 { $count }개
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "다음 사진"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "사진 { $n }/{ $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "이전 사진"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "모든 팩"

@@ -10,6 +10,7 @@ import { archiveWithUndo } from '../archive'
 import { mayEdit } from '../auth'
 import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
 import { formatDate, t } from '../i18n'
+import ShowcaseCover from './ShowcaseCover.vue'
 import PackContextForm from './PackContextForm.vue'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
@@ -419,8 +420,9 @@ async function archive(p: Pack) {
     <ul>
       <li v-for="p in rendered" :key="p.id" :class="[`st-${p.status}`, { flash: justReady.has(p.id) }]">
         <button type="button" class="cover checker" :aria-label="t('packs-browse-named', { name: p.name })" tabindex="-1" @click="$emit('browse', p)">
+          <ShowcaseCover v-if="p.showcase?.length" class="whole" :ids="p.showcase" />
           <img
-              v-for="(id, i) in p.preview"
+              v-for="(id, i) in p.showcase?.length ? [] : p.preview"
               :key="id"
               :src="thumbUrl({ id })"
               :class="{ glyphs: p.preview_kinds?.[i] === 'font' }"
@@ -583,6 +585,7 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 .cover img:only-child { grid-column: 1 / -1; grid-row: 1 / -1; object-fit: contain; }
 .cover img:first-child:nth-last-child(2), .cover img:first-child:nth-last-child(2) ~ img { grid-row: 1 / -1; }
 .cover img:first-child:nth-last-child(3) { grid-row: 1 / -1; }
+.cover .whole { grid-column: 1 / -1; grid-row: 1 / -1; }
 .cover-empty {
   grid-column: 1 / -1; grid-row: 1 / -1; display: grid; place-items: center; background: var(--panel);
   font-size: 2rem; font-weight: 700; color: var(--faint); font-variation-settings: 'CASL' 1;

@@ -1175,4 +1175,68 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "CREATE TABLE tags_apart (a TEXT NOT NULL, b TEXT NOT NULL, PRIMARY KEY (a, b)) WITHOUT ROWID;",
     // 108: step 91's table is spelled the American way.
     "ALTER TABLE unreal_recolour RENAME TO unreal_recolor;",
+    // 109: a pack's pictures of itself, for its cover (`db::packs::showcase`): images named or in a folder named as
+    // previews, screenshots, promotional or marketing shots and the like, and not named as one of a material's maps.
+    // As a CASE, so that each test is made only when the one before it passed: an AND or OR outside one makes both
+    // of its sides, and testing every texture added against every map's name made adding textures much slower.
+    "ALTER TABLE assets ADD COLUMN showcase INTEGER GENERATED ALWAYS AS (
+         CASE
+           WHEN kind IS NOT 'texture' THEN 0
+           WHEN path LIKE '%preview%'
+                 OR path LIKE '%screenshot%'
+                 OR path LIKE '%promo%'
+                 OR path LIKE '%marketing%'
+                 OR path LIKE '%showcase%'
+                 OR path LIKE '%thumbnail%'
+                 OR path LIKE '%overview%'
+                 OR path LIKE '%keyart%'
+                 OR path LIKE '%key_art%'
+                 OR path LIKE '%presentation%'
+                 OR path LIKE '%renders/%'
+                 OR path LIKE '%screens/%'
+                 OR lower(path) GLOB 'cover.*'
+                 OR lower(path) GLOB '*/cover.*'
+                 OR lower(path) GLOB 'cover[ _-]*'
+                 OR lower(path) GLOB '*/cover[ _-]*'
+                 OR lower(path) GLOB 'sample.*'
+                 OR lower(path) GLOB '*/sample.*' THEN
+             CASE WHEN lower(path) GLOB '*[_ -]n.*'
+                 OR lower(path) GLOB '*[_ -]nrm.*'
+                 OR lower(path) GLOB '*[_ -]normal.*'
+                 OR lower(path) GLOB '*[_ -]normalgl.*'
+                 OR lower(path) GLOB '*[_ -]normaldx.*'
+                 OR lower(path) GLOB '*[_ -]d.*'
+                 OR lower(path) GLOB '*[_ -]diffuse.*'
+                 OR lower(path) GLOB '*[_ -]albedo.*'
+                 OR lower(path) GLOB '*[_ -]basecolor.*'
+                 OR lower(path) GLOB '*[_ -]base_color.*'
+                 OR lower(path) GLOB '*[_ -]color.*'
+                 OR lower(path) GLOB '*[_ -]r.*'
+                 OR lower(path) GLOB '*[_ -]rough.*'
+                 OR lower(path) GLOB '*[_ -]roughness.*'
+                 OR lower(path) GLOB '*[_ -]m.*'
+                 OR lower(path) GLOB '*[_ -]metal.*'
+                 OR lower(path) GLOB '*[_ -]metallic.*'
+                 OR lower(path) GLOB '*[_ -]metalness.*'
+                 OR lower(path) GLOB '*[_ -]ao.*'
+                 OR lower(path) GLOB '*[_ -]occlusion.*'
+                 OR lower(path) GLOB '*[_ -]orm.*'
+                 OR lower(path) GLOB '*[_ -]arm.*'
+                 OR lower(path) GLOB '*[_ -]h.*'
+                 OR lower(path) GLOB '*[_ -]height.*'
+                 OR lower(path) GLOB '*[_ -]disp.*'
+                 OR lower(path) GLOB '*[_ -]displacement.*'
+                 OR lower(path) GLOB '*[_ -]e.*'
+                 OR lower(path) GLOB '*[_ -]emissive.*'
+                 OR lower(path) GLOB '*[_ -]emission.*'
+                 OR lower(path) GLOB '*[_ -]mask.*'
+                 OR lower(path) GLOB '*[_ -]opacity.*'
+                 OR lower(path) GLOB '*[_ -]alpha.*'
+                 OR lower(path) GLOB '*[_ -]spec.*'
+                 OR lower(path) GLOB '*[_ -]specular.*'
+                 OR lower(path) GLOB '*[_ -]gloss.*' THEN 0 ELSE 1 END
+           ELSE 0
+         END
+     ) VIRTUAL;
+     CREATE INDEX assets_showcase ON assets (pack_id, path) WHERE showcase;",
 ];

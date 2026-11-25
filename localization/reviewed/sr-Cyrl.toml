@@ -8131,6 +8131,18 @@ translation = """
        *[other] За откривање: { $count }
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Следећа слика"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Слика { $n } од { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Претходна слика"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Сви пакети"

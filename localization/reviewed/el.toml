@@ -8105,6 +8105,18 @@ translation = """
        *[other] { $count } για ανακάλυψη
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Επόμενη εικόνα"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Εικόνα { $n } από { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Προηγούμενη εικόνα"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Όλα τα πακέτα"

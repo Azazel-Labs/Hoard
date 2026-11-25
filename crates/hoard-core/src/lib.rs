@@ -758,6 +758,10 @@ pub struct Pack {
     /// Up to four asset ids with thumbnails, for a cover mosaic (mixed kinds where the pack has them).
     #[serde(default)]
     pub preview: Vec<String>,
+    /// Up to twelve of the pack's pictures of itself (its previews, screenshots and other marketing shots), for a
+    /// cover that goes from one to the next. Empty when it has none, and the cover is `preview`'s mosaic.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub showcase: Vec<String>,
     /// The kind of each `preview` asset (`font` thumbnails are light glyphs on transparency, for clients to tint).
     #[serde(default)]
     pub preview_kinds: Vec<String>,

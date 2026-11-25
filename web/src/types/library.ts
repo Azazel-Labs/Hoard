@@ -375,6 +375,9 @@ export interface Pack {
   license_tier: string | null
   /** Up to four asset ids with thumbnails, for the cover mosaic. */
   preview: string[]
+  /** Up to twelve of its pictures of itself (previews, screenshots, marketing shots), for a cover that goes from one to
+   *  the next instead of the mosaic. */
+  showcase?: string[]
   /** Kind of each preview asset; font thumbnails are tinted to the theme. */
   preview_kinds?: string[]
   /** Unreal packages still in package form, and assets converted from them. */

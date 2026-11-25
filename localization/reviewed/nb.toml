@@ -8064,6 +8064,18 @@ translation = """
        *[other] { $count } å finne
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Neste bilde"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Bilde { $n } av { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Forrige bilde"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Alle pakker"

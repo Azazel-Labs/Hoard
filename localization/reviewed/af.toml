@@ -8060,6 +8060,18 @@ translation = """
        *[other] { $count } om te vind
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Volgende prent"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Prent { $n } van { $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Vorige prent"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Alle pakke"

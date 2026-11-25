@@ -7903,6 +7903,18 @@ translation = """
        *[other] Keşfedilecek { $count } şey
     }"""
 
+[messages.pack-cover-next]
+source = "Next picture"
+translation = "Sonraki resim"
+
+[messages.pack-cover-picture]
+source = "Picture { $n } of { $count }"
+translation = "Resim { $n }/{ $count }"
+
+[messages.pack-cover-previous]
+source = "Previous picture"
+translation = "Önceki resim"
+
 [messages.pack-panel-all]
 source = "All packs"
 translation = "Tüm paketler"

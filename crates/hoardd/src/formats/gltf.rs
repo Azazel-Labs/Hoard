@@ -139,11 +139,12 @@ pub(crate) fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
     }
     let mut read = polysmelt::gltf::files_in(dir);
     let glb = polysmelt::gltf::pack_glb(&serde_json::to_vec(&doc)?, |uri| {
-        read(uri).map_err(|e| match e {
-            polysmelt::Error::Io(_) => {
-                polysmelt::Error::InvalidInput(format!("glTF file {uri} is missing from the pack"))
-            }
-            e @ polysmelt::Error::InvalidInput(_) => e,
+        read(uri).map_err(|e| match e.kind() {
+            polysmelt::ErrorKind::Io => polysmelt::Error::new(
+                polysmelt::ErrorKind::MissingAsset,
+                format!("glTF file {uri} is missing from the pack"),
+            ),
+            _ => e,
         })
     })?;
     if kept.is_empty() {

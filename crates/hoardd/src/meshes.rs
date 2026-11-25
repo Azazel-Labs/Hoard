@@ -16,11 +16,18 @@ use polysmelt::assets::{Assets, Folder};
 use polysmelt::document::{Keep, Pose};
 use serde_json::{Map, Value};
 
-pub(crate) use polysmelt::mesh::{Image, Material, Mesh, to_glb};
+pub(crate) use polysmelt::mesh::{Image, Material, Mesh};
+
+/// The formats (lowercase, without the dot) Hoard reads models in itself, without Blender. polysmelt reads more;
+/// each one Hoard takes on is added here deliberately, since it then counts files with that extension as models.
+pub(crate) const READS: &[&str] = &[
+    "stl", "ply", "vox", "obj", "fbx", "3ds", "3mf", "usd", "usda", "usdc", "usdz", "gltf", "glb", "skp", "bvh", "dae",
+    "zae", "kmz", "off", "vrm", "vrma", "x3d", "x3dv", "x3dz", "wrl", "wrz", "dxf", "splat", "spz",
+];
 
 /// Whether Hoard reads models in this format (lowercase, without the dot) itself, without Blender.
 pub(crate) fn reads(ext: &str) -> bool {
-    polysmelt::formats::EXTENSIONS.contains(&ext)
+    READS.contains(&ext)
 }
 
 /// Whether a model in this format becomes a GLB by being read into a mesh. A glTF is packed as it is instead,
@@ -30,8 +37,13 @@ pub(crate) fn rebuilt_as_glb(ext: &str) -> bool {
 }
 
 /// Read a model with polysmelt.
-fn open(path: &Path, ext: &str, assets: &dyn Assets, keep: Keep) -> Result<polysmelt::document::Document<'static>> {
-    Ok(polysmelt::formats::load(path, ext, assets, keep)?)
+fn open(path: &Path, ext: &str, assets: &dyn Assets, keep: Keep) -> Result<polysmelt::Document> {
+    let mut loader = polysmelt::Loader::new().keep(keep);
+    // The file's own name may not say: a stored copy is read as the format it was added as.
+    if let Some(format) = polysmelt::Format::from_extension(ext) {
+        loader = loader.format(format);
+    }
+    Ok(loader.open_with(path, assets)?)
 }
 
 /// A pack laid out in a folder: polysmelt finds the files a model points at, and Hoard decodes the textures.
@@ -101,14 +113,14 @@ pub(crate) struct Rigged {
 
 /// A model's mesh, facts, skeleton and clips, read once.
 pub(crate) fn load_rigged(path: &Path, ext: &str, root: &Path) -> Result<Rigged> {
-    let doc = open(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
-    let rig = crate::animations::rig(&Value::Object(doc.json.clone()));
+    let doc = open(path, ext, &Pack::new(root), Keep::MESHES.with_animations(true))?;
+    let rig = crate::animations::rig(&Value::Object(doc.json().clone()));
     Ok(Rigged { mesh: doc.flatten(Pose::Rest)?, facts: doc.facts, rig })
 }
 
 /// A model's document to pose: its meshes, skins, materials, textures and clips, any compression decoded.
-pub(crate) fn posable(path: &Path, ext: &str, root: &Path) -> Result<polysmelt::document::Document<'static>> {
-    let mut doc = open(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
+pub(crate) fn posable(path: &Path, ext: &str, root: &Path) -> Result<polysmelt::Document> {
+    let mut doc = open(path, ext, &Pack::new(root), Keep::MESHES.with_animations(true))?;
     doc.decode()?;
     Ok(doc)
 }
@@ -116,43 +128,37 @@ pub(crate) fn posable(path: &Path, ext: &str, root: &Path) -> Result<polysmelt::
 /// The facts about a model without drawing its mesh. A glTF's are counted from its JSON, so nothing in its buffers
 /// (Draco, meshopt, textures) is decoded.
 pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, Value>> {
-    let nothing = Keep {
-        animations: false,
-        skins: false,
-        morph_targets: false,
-        materials: false,
-        textures: false,
-        image_bytes: false,
-        cameras: false,
-        lights: false,
-        extras: false,
-        // The limits as they are.
-        ..Keep::ALL
-    };
+    let nothing = Keep::ALL
+        .with_animations(false)
+        .with_skins(false)
+        .with_morph_targets(false)
+        .with_materials(false)
+        .with_textures(false)
+        .with_image_bytes(false)
+        .with_cameras(false)
+        .with_lights(false)
+        .with_extras(false);
     Ok(open(path, ext, &Pack::new(root), nothing)?.facts)
 }
 
 /// The names of a model's materials, in its order, each once: what an engine's materials are matched to (Unity
 /// gives an FBX's material slots the `.mat` files of their names). Textures aren't looked for.
 pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
-    let names_only = Keep {
-        animations: false,
-        skins: false,
-        morph_targets: false,
-        materials: true,
-        textures: false,
-        image_bytes: false,
-        cameras: false,
-        lights: false,
-        extras: false,
-        // The limits as they are.
-        ..Keep::ALL
-    };
+    let names_only = Keep::ALL
+        .with_animations(false)
+        .with_skins(false)
+        .with_morph_targets(false)
+        .with_materials(true)
+        .with_textures(false)
+        .with_image_bytes(false)
+        .with_cameras(false)
+        .with_lights(false)
+        .with_extras(false);
     let folder = path.parent().unwrap_or(Path::new("."));
     let pack = Pack { guess: false, ..Pack::new(folder) };
     let doc = open(path, ext, &pack, names_only)?;
     let mut names: Vec<String> = Vec::new();
-    for m in doc.json.get("materials").and_then(Value::as_array).into_iter().flatten() {
+    for m in doc.json().get("materials").and_then(Value::as_array).into_iter().flatten() {
         let Some(name) = m.get("name").and_then(Value::as_str).map(str::trim).filter(|n| !n.is_empty()) else {
             continue;
         };
@@ -179,7 +185,7 @@ pub(crate) fn plain_glb(path: &Path, ext: &str, facing: Facing) -> Result<Vec<u8
     let folder = path.parent().unwrap_or(Path::new("."));
     let mut doc = open(path, ext, &Pack::new(folder), Keep::MESHES)?;
     doc.decode()?;
-    turn(&mut doc.json, facing);
+    turn(doc.json_mut(), facing);
     Ok(doc.to_glb()?)
 }
 
@@ -236,11 +242,11 @@ pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     doc.decode()?;
     let c = doc.counts();
     // A file of clips with no mesh is an animation: the viewer plays it on a character it fits.
-    let clips = doc.json.get("animations").and_then(Value::as_array).is_some_and(|a| !a.is_empty());
+    let clips = doc.json().get("animations").and_then(Value::as_array).is_some_and(|a| !a.is_empty());
     anyhow::ensure!(clips || c.triangles + c.points + c.lines > 0, "this model draws nothing");
     let missing = pack.missing();
     if !missing.is_empty()
-        && let Some(asset) = doc.json.get_mut("asset").and_then(Value::as_object_mut)
+        && let Some(asset) = doc.json_mut().get_mut("asset").and_then(Value::as_object_mut)
     {
         let extras = asset.entry("extras").or_insert_with(|| Value::Object(Map::new()));
         if let Some(extras) = extras.as_object_mut() {
@@ -256,7 +262,7 @@ pub(crate) fn clip_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     let pack = Pack { guess: false, ..Pack::new(root) };
     let mut doc = open(path, ext, &pack, Keep::ALL)?;
     doc.decode()?;
-    strip_to_clips(&mut doc.json)?;
+    strip_to_clips(doc.json_mut())?;
     // Repacking drops the bytes only the meshes and images used.
     crate::webglb::repack(&doc.to_glb()?)
 }
@@ -267,7 +273,7 @@ pub(crate) fn take_glbs(path: &Path, ext: &str, root: &Path) -> Result<Vec<(Stri
     let pack = Pack { guess: false, ..Pack::new(root) };
     let mut doc = open(path, ext, &pack, Keep::ALL)?;
     doc.decode()?;
-    let whole = doc.json.clone();
+    let whole = doc.json().clone();
     let rig =
         crate::animations::rig(&Value::Object(whole.clone())).ok_or_else(|| anyhow::anyhow!("it has no clips"))?;
     let mut out = Vec::new();
@@ -281,7 +287,7 @@ pub(crate) fn take_glbs(path: &Path, ext: &str, root: &Path) -> Result<Vec<(Stri
             *clips = vec![one];
         }
         strip_to_clips(&mut json)?;
-        doc.json = json;
+        *doc.json_mut() = json;
         out.push((clip.name.clone(), crate::webglb::repack(&doc.to_glb()?)?));
     }
     Ok(out)
@@ -362,7 +368,7 @@ fn image_from_bytes(bytes: &[u8], hint: &Path) -> Option<Image> {
     image::DynamicImage::ImageRgba8(img.to_rgba8())
         .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
         .ok()?;
-    Some(Image { bytes: png, mime: "image/png" })
+    Some(Image { bytes: png.into(), mime: "image/png" })
 }
 
 #[cfg(test)]
@@ -373,7 +379,7 @@ mod tests {
     /// first and DXF a drawing, which stay as they are.
     #[test]
     fn what_polysmelt_reads_is_a_model_or_a_clip() {
-        for ext in polysmelt::formats::EXTENSIONS.iter().filter(|e| !matches!(**e, "kmz" | "dxf")) {
+        for ext in READS.iter().filter(|e| !matches!(**e, "kmz" | "dxf")) {
             let kind = hoard_core::AssetKind::from_ext(ext);
             assert!(
                 matches!(kind, hoard_core::AssetKind::Model | hoard_core::AssetKind::Animation),
@@ -442,7 +448,7 @@ mod tests {
         assert_eq!(mesh.images.len(), 1);
         assert_eq!(mesh.images[0].mime, "image/png");
         assert_eq!(mesh.materials[0].color_image, Some(0));
-        assert!(to_glb(&mesh).unwrap().starts_with(b"glTF"));
+        assert!(mesh.to_glb().unwrap().starts_with(b"glTF"));
     }
 
     #[test]

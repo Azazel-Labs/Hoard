@@ -34,7 +34,7 @@ const SAMPLE: usize = 200;
 
 /// The libraries that make what rules convert to, as `asset_origin.converter` names them. Keep in step with
 /// Cargo.lock (a test checks).
-const POLYSMELT: &str = "polysmelt 0.14.0";
+const POLYSMELT: &str = "polysmelt 0.17.7";
 const FLACENC: &str = "flacenc 0.5.1";
 
 /// The formats rules convert to.
@@ -43,12 +43,9 @@ pub(crate) const TARGETS: &[&str] = &["glb", "flac"];
 /// The formats a rule converting to `to` can convert from.
 pub(crate) fn sources(to: &str) -> Vec<&'static str> {
     match to {
-        "glb" => polysmelt::formats::EXTENSIONS
-            .iter()
-            .chain(crate::convert::CONVERTIBLE)
-            .copied()
-            .filter(|e| *e != "glb")
-            .collect(),
+        "glb" => {
+            crate::meshes::READS.iter().chain(crate::convert::CONVERTIBLE).copied().filter(|e| *e != "glb").collect()
+        }
         "flac" => vec!["wav"],
         _ => Vec::new(),
     }

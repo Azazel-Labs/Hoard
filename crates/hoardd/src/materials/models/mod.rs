@@ -91,7 +91,7 @@ pub(super) fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pac
             }
             let bytes = rt.block_on(state.blobs.read_all(&color))?.to_vec();
             let mime = crate::analyze::thumb_mime(&bytes);
-            mesh.images.push(crate::meshes::Image { bytes, mime });
+            mesh.images.push(crate::meshes::Image { bytes: bytes.into(), mime });
             let image = mesh.images.len() - 1;
             if mesh.materials.is_empty() {
                 mesh.materials.push(crate::meshes::Material::plain("material", [1.0; 4]));
@@ -183,7 +183,7 @@ fn dress_slots(
             if !images.contains_key(&hash) {
                 let bytes = rt.block_on(state.blobs.read_all(&hash))?.to_vec();
                 let mime = crate::analyze::thumb_mime(&bytes);
-                mesh.images.push(crate::meshes::Image { bytes, mime });
+                mesh.images.push(crate::meshes::Image { bytes: bytes.into(), mime });
                 images.insert(hash.clone(), mesh.images.len() - 1);
             }
             m.color_image = images.get(&hash).copied();

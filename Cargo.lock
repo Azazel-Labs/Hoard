@@ -1947,6 +1947,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e1d926b4d407d372f141f93bb444696142c29d32962ccbd3531117cf3aa0bfa9"
 
 [[package]]
+name = "e57"
+version = "0.11.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24d81940bab8d2040f5175030abe9ba15df7a9d4f582209ebe13c9e10d0422b7"
+dependencies = [
+ "roxmltree 0.21.2",
+]
+
+[[package]]
 name = "either"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4392,6 +4401,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "laz"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dccd63a9175618371557b3e92b61ab4e7cffb459d8d2d32ec4e39feaddc61b2"
+dependencies = [
+ "byteorder",
+ "num-traits",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6079,20 +6098,23 @@ dependencies = [
 
 [[package]]
 name = "polysmelt"
-version = "0.14.0"
+version = "0.17.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cd9efb08a67ae6875536c5337b5ec940e0eceabedf554a32f911e19e6b710f5"
+checksum = "425a33ffd3eabee5e007ee9061ea486e84d0b5908e14be37e485bf269fd9169e"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",
+ "bytes",
  "draco-core",
+ "e57",
+ "fdeflate",
  "flate2",
  "image-webp",
+ "laz",
  "openusd",
  "openusd-schemas",
  "quick-xml 0.41.0",
  "serde_json",
- "thiserror 2.0.21",
  "zip 9.5.1",
 ]
 

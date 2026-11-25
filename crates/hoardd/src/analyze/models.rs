@@ -140,7 +140,7 @@ pub(crate) fn mesh_thumb_bytes(mesh: &crate::meshes::Mesh, path: &Path) -> anyho
 }
 
 fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let glb = crate::meshes::to_glb(mesh)?;
+    let glb = mesh.to_glb()?;
     let tmp = path.with_extension(format!("{ext}.hoard-preview.glb"));
     std::fs::write(&tmp, glb)?;
     render_model_thumb(&tmp, a);
@@ -327,7 +327,7 @@ mod tests {
             images: Vec::new(),
             skeleton: Vec::new(),
         };
-        let packed = polysmelt::gltf::compress(&polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
+        let packed = polysmelt::gltf::compress(&mesh.to_glb().unwrap()).unwrap();
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("grid.glb");
         std::fs::write(&path, packed).unwrap();
@@ -343,7 +343,7 @@ mod tests {
 
         // Plain glTF is drawn where it is.
         let plain = dir.path().join("plain.glb");
-        std::fs::write(&plain, polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
+        std::fs::write(&plain, mesh.to_glb().unwrap()).unwrap();
         assert_eq!(drawable(&plain).unwrap().path, plain);
     }
     /// A Collada file is read by Hoard itself: counted, drawn for its thumbnail, and offered as a GLB.

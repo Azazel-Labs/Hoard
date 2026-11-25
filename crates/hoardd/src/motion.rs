@@ -397,7 +397,7 @@ fn draw(
     motion: Option<u32>,
 ) -> Result<(Option<Vec<u8>>, Vec<u8>, bool)> {
     let from = crate::meshes::posable(&clip.path, &clip.ext, &clip.root)?;
-    let (index, secs) = take(&from.json).context("it has no clip to play")?;
+    let (index, secs) = take(from.json()).context("it has no clip to play")?;
     let worn = match body {
         Some(body) => {
             let mut doc = crate::meshes::posable(&body.path, &body.ext, &body.root)?;
@@ -411,7 +411,7 @@ fn draw(
         None if body.is_some() => return Err(anyhow!("it moves none of the character's bones")),
         None => return Err(NoCharacter.into()),
     };
-    crate::meshes::turn(&mut doc.json, facing);
+    crate::meshes::turn(doc.json_mut(), facing);
     let fps = f64::from(motion.unwrap_or(crate::settings::DEFAULT_MOTION_FPS));
     let (frames, ms) = if motion.is_some() {
         frames(&doc, index, secs, fps)?
@@ -442,7 +442,7 @@ fn take(json: &Map<String, Value>) -> Option<(usize, f64)> {
 }
 
 /// The model posed at each frame of clip `index` at `fps`, each as a GLB, and how long a frame shows in milliseconds.
-fn frames(doc: &Document<'_>, index: usize, secs: f64, fps: f64) -> Result<(Vec<Vec<u8>>, u32)> {
+fn frames(doc: &Document, index: usize, secs: f64, fps: f64) -> Result<(Vec<Vec<u8>>, u32)> {
     let span = secs.min(MAX_SECS);
     let (count, ms) = timing(span, fps);
     let step = span / f64::from(count);
@@ -459,11 +459,11 @@ fn middle(secs: f64, fps: f64) -> f64 {
 }
 
 /// The model posed `time` seconds into clip `index`, as a GLB.
-fn posed(doc: &Document<'_>, index: usize, time: f64) -> Result<Vec<u8>> {
+fn posed(doc: &Document, index: usize, time: f64) -> Result<Vec<u8>> {
     #[expect(clippy::cast_possible_truncation, reason = "a time in a clip of seconds")]
     let time = time as f32;
     let mesh = doc.flatten(Pose::Animation { index, time })?.context("the posed model draws nothing")?;
-    Ok(crate::meshes::to_glb(&mesh)?)
+    Ok(mesh.to_glb()?)
 }
 
 /// How many frames a stretch of `span` seconds has at `fps` (two at least), and how long each shows.
@@ -499,17 +499,17 @@ fn encode(frames: &[image::RgbaImage], ms: u32) -> Result<Vec<u8>> {
 /// Its moves are put in `to`'s units and to its size, as the viewer's are (`bindClip` in modelScene.ts): a step of 10
 /// from an FBX in centimeters, under a node scaled by 0.01, is 10 cm on its own character but would be 10 meters on
 /// one made in meters, and a step that's a fifth of one character's height stays a fifth of a smaller one's.
-fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Result<Option<usize>> {
-    let Some(anim) = list(from.json.get("animations")).get(index) else { return Ok(None) };
+fn transplant(from: &Document, index: usize, to: &mut Document) -> Result<Option<usize>> {
+    let Some(anim) = list(from.json().get("animations")).get(index) else { return Ok(None) };
     let (mut exact, mut loose) = (HashMap::new(), HashMap::new());
-    for (i, n) in list(to.json.get("nodes")).iter().enumerate() {
+    for (i, n) in list(to.json().get("nodes")).iter().enumerate() {
         let Some(name) = n.get("name").and_then(Value::as_str) else { continue };
         exact.entry(name.to_owned()).or_insert(i);
         if let Some(b) = crate::animations::bone(name) {
             loose.entry(b).or_insert(i);
         }
     }
-    let nodes = list(from.json.get("nodes"));
+    let nodes = list(from.json().get("nodes"));
     let counterpart = |i: usize| -> Option<usize> {
         let name = nodes.get(i)?.get("name")?.as_str()?;
         exact.get(name).or_else(|| loose.get(&crate::animations::bone(name)?)).copied()
@@ -521,7 +521,7 @@ fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Resul
             pairs.push((i, t));
         }
     }
-    let (from_world, to_world) = (Skeleton::of(&from.json), Skeleton::of(&to.json));
+    let (from_world, to_world) = (Skeleton::of(from.json()), Skeleton::of(to.json()));
     let (from_length, to_length) = (
         from_world.length(&pairs.iter().map(|p| p.0).collect()),
         to_world.length(&pairs.iter().map(|p| p.1).collect()),
@@ -572,14 +572,14 @@ fn transplant(from: &Document<'_>, index: usize, to: &mut Document<'_>) -> Resul
     }
     let name = anim.get("name").cloned().unwrap_or(Value::Null);
     let Copier { accessors, views, buffers, .. } = copy;
-    let base = list(to.json.get("buffers")).len();
+    let base = list(to.json().get("buffers")).len();
     for (k, bytes) in buffers.into_iter().enumerate() {
         let at = to.push_buffer(bytes);
         anyhow::ensure!(at == base + k, "buffers were added out of order");
     }
-    array(&mut to.json, "accessors").extend(accessors);
-    array(&mut to.json, "bufferViews").extend(views);
-    let animations = array(&mut to.json, "animations");
+    array(to.json_mut(), "accessors").extend(accessors);
+    array(to.json_mut(), "bufferViews").extend(views);
+    let animations = array(to.json_mut(), "animations");
     animations.push(json!({ "name": name, "samplers": new_samplers, "channels": channels }));
     Ok(Some(animations.len() - 1))
 }
@@ -684,7 +684,7 @@ fn array<'v>(json: &'v mut Map<String, Value>, key: &str) -> &'v mut Vec<Value> 
 
 /// The accessors, buffer views and buffers of one document copied to the end of another's, each once.
 struct Copier<'d> {
-    from: &'d Document<'d>,
+    from: &'d Document,
     /// Where `to`'s lists end, before anything is copied.
     base: (usize, usize, usize),
     accessor_at: HashMap<usize, usize>,
@@ -696,8 +696,8 @@ struct Copier<'d> {
 }
 
 impl<'d> Copier<'d> {
-    fn new(from: &'d Document<'d>, to: &Document<'_>) -> Self {
-        let n = |k| list(to.json.get(k)).len();
+    fn new(from: &'d Document, to: &Document) -> Self {
+        let n = |k| list(to.json().get(k)).len();
         Self {
             from,
             base: (n("accessors"), n("bufferViews"), n("buffers")),
@@ -714,7 +714,7 @@ impl<'d> Copier<'d> {
         if let Some(&at) = self.accessor_at.get(&i) {
             return Ok(at);
         }
-        let mut a = list(self.from.json.get("accessors")).get(i).with_context(|| format!("no accessor {i}"))?.clone();
+        let mut a = list(self.from.json().get("accessors")).get(i).with_context(|| format!("no accessor {i}"))?.clone();
         for p in ["/bufferView", "/sparse/indices/bufferView", "/sparse/values/bufferView"] {
             let view = a.pointer(p).and_then(Value::as_u64).and_then(|v| usize::try_from(v).ok());
             if let Some(v) = view {
@@ -735,7 +735,7 @@ impl<'d> Copier<'d> {
         if k == 1.0 {
             return self.accessor(i);
         }
-        let a = list(self.from.json.get("accessors")).get(i).with_context(|| format!("no accessor {i}"))?.clone();
+        let a = list(self.from.json().get("accessors")).get(i).with_context(|| format!("no accessor {i}"))?.clone();
         let index = |v: Option<&Value>| v.and_then(Value::as_u64).and_then(|v| usize::try_from(v).ok());
         let width = match a.get("type").and_then(Value::as_str) {
             Some("SCALAR") => 1,
@@ -750,7 +750,7 @@ impl<'d> Copier<'d> {
         if width == 0 || a.get("sparse").is_some() || index(a.get("componentType")) != Some(5126) {
             return self.accessor(i);
         }
-        let view = list(self.from.json.get("bufferViews")).get(v).with_context(|| format!("no buffer view {v}"))?;
+        let view = list(self.from.json().get("bufferViews")).get(v).with_context(|| format!("no buffer view {v}"))?;
         let buffer = index(view.get("buffer")).with_context(|| format!("buffer view {v} names no buffer"))?;
         let start = index(view.get("byteOffset")).unwrap_or(0) + index(a.get("byteOffset")).unwrap_or(0);
         let stride = index(view.get("byteStride")).unwrap_or(width * 4);
@@ -788,7 +788,7 @@ impl<'d> Copier<'d> {
             return Ok(at);
         }
         let mut v =
-            list(self.from.json.get("bufferViews")).get(i).with_context(|| format!("no buffer view {i}"))?.clone();
+            list(self.from.json().get("bufferViews")).get(i).with_context(|| format!("no buffer view {i}"))?.clone();
         let b = v.get("buffer").and_then(Value::as_u64).and_then(|b| usize::try_from(b).ok());
         let b = b.with_context(|| format!("buffer view {i} names no buffer"))?;
         let at = if let Some(&at) = self.buffer_at.get(&b) {
@@ -810,16 +810,15 @@ impl<'d> Copier<'d> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use polysmelt::assets::Memory;
     use polysmelt::document::Keep;
 
-    fn doc(gltf: &str) -> Document<'static> {
-        let keep = Keep { animations: true, ..Keep::MESHES };
-        polysmelt::formats::load_bytes(gltf.as_bytes(), "m.gltf", "gltf", &Memory::new(), keep).unwrap().into_owned()
+    fn doc(gltf: &str) -> Document {
+        let keep = Keep::MESHES.with_animations(true);
+        polysmelt::Loader::new().keep(keep).read(gltf.as_bytes().to_vec(), "m.gltf").unwrap()
     }
 
     /// A character: one triangle on a node named `Hips`, under a root.
-    fn character() -> Document<'static> {
+    fn character() -> Document {
         let data = "AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA";
         doc(&format!(
             r#"{{"asset":{{"version":"2.0"}},"scene":0,"scenes":[{{"nodes":[0]}}],
@@ -833,7 +832,7 @@ mod tests {
     }
 
     /// A clip with no mesh moving `bone` 5 along x over a second, and a pose.
-    fn clip(bone: &str) -> Document<'static> {
+    fn clip(bone: &str) -> Document {
         let data = "AAAAAAAAgD8AAAAAAAAAAAAAAAAAAKBAAAAAAAAAAAA=";
         doc(&format!(
             r#"{{"asset":{{"version":"2.0"}},"scene":0,"scenes":[{{"nodes":[0]}}],
@@ -854,7 +853,7 @@ mod tests {
         ))
     }
 
-    fn x_at(doc: &Document<'_>, index: usize, time: f32) -> f32 {
+    fn x_at(doc: &Document, index: usize, time: f32) -> f32 {
         let mesh = doc.flatten(Pose::Animation { index, time }).unwrap().unwrap();
         mesh.prims[0].positions.iter().map(|p| p[0]).fold(f32::INFINITY, f32::min)
     }
@@ -862,12 +861,12 @@ mod tests {
     #[test]
     fn a_clip_without_a_mesh_plays_on_the_character_by_bone_name() {
         let from = clip("mixamorig:Hips");
-        let (index, secs) = take(&from.json).unwrap();
+        let (index, secs) = take(from.json()).unwrap();
         assert_eq!((index, secs), (1, 1.0), "the pose is passed over");
         let mut body = character();
         let at = transplant(&from, index, &mut body).unwrap().unwrap();
         assert_eq!(at, 0);
-        assert_eq!(body.json["animations"][0]["channels"].as_array().unwrap().len(), 1, "morph weights are left out");
+        assert_eq!(body.json()["animations"][0]["channels"].as_array().unwrap().len(), 1, "morph weights are left out");
         assert!(x_at(&body, at, 0.0).abs() < 1e-5);
         assert!((x_at(&body, at, 0.5) - 2.5).abs() < 1e-4);
         let (frames, ms) = frames(&body, at, secs, 12.0).unwrap();
@@ -908,8 +907,8 @@ mod tests {
         assert!(x_at(&body, at, 0.0).abs() < 1e-4);
         let x = x_at(&body, at, 0.5);
         assert!((x - 2.5).abs() < 1e-3, "half way it's {x} along, not 2.5");
-        let max = &body.json["accessors"]
-            [body.json["animations"][at]["samplers"][0]["output"].as_u64().unwrap() as usize]["max"];
+        let max = &body.json()["accessors"]
+            [body.json()["animations"][at]["samplers"][0]["output"].as_u64().unwrap() as usize]["max"];
         let max: Vec<f64> = max.as_array().unwrap().iter().map(|v| v.as_f64().unwrap()).collect();
         assert!(
             max.iter().zip([5.0, 1.0, 0.0]).all(|(a, b)| (a - b).abs() < 1e-4),
@@ -921,7 +920,7 @@ mod tests {
     fn a_clip_of_other_bones_moves_nothing() {
         let mut body = character();
         assert!(transplant(&clip("Spine"), 1, &mut body).unwrap().is_none());
-        assert!(body.json.get("animations").is_none());
+        assert!(body.json().get("animations").is_none());
     }
 
     #[test]

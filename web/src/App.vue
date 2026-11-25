@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import {
-  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type SearchParams,
+  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type SearchParams,
 } from './api'
 import { useDropImport } from './dropImport'
 import { KIND_LABEL, KIND_NAME } from './kinds'
@@ -37,6 +37,7 @@ import { archiveWithUndo, countText } from './archive'
 import { isModelAsset } from './viewers'
 import { reducedMotion, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
+import { queryParams, useSearchResults } from './searchResults'
 import { usePanelFit } from './panelFit'
 import { usePackWatch } from './packWatch'
 import { copiedTags, copyTags, tagsToPaste } from './tagClipboard'
@@ -55,7 +56,6 @@ const NewsTray = lazy(() => import('./components/NewsTray.vue'), () => t('app-la
 const BulkEditDialog = lazy(() => import('./components/BulkEditDialog.vue'), () => t('app-lazy-bulk-edit'), 'overlay')
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
-const PAGE = 100
 
 /** The view in the address: #packs, #archive, #settings/<page>; anything else is the library. */
 function viewFromHash(): { view: View; section: string } {
@@ -72,11 +72,15 @@ const view = ref<View>(initial.view)
 const settingsSection = ref(initial.section || 'appearance')
 
 const { packs, stats, collections, busyPacks, refreshPacks, startPolling } = usePackWatch(() => runSearch({ keep: true }))
-/** The results by place, one per match: empty until its page arrives, so the grid is as tall as every match from
- *  the start and fills in wherever it's scrolled to. */
-const slots = shallowRef<(Asset | undefined)[]>([])
-/** The results that have arrived, in order. */
-const items = computed(() => slots.value.filter((a): a is Asset => !!a))
+const {
+  slots, items, total, supportingHidden, folders, kindFacets, tagFacets, loading, fetchingPages, rising, runSearch, resultAt, scrolled,
+} = useSearchResults({
+  inView: () => ({ start: win.start.value, end: win.end.value }),
+  // Everything a different search finds isn't what was picked.
+  onStart: (keep) => { if (!keep) allOf.value = null },
+  // Different results start from the top, not wherever the last ones were scrolled to.
+  onNewResults: () => { if (mainEl.value?.scrollTop) mainEl.value.scrollTo({ top: 0 }) },
+})
 /** The search the mesh explorer shows, as it was when opened; null while it's closed. */
 const exploring = shallowRef<SearchParams | null>(null)
 /** Whether the results hold models to fly among: one loaded, or the kind counts say so. */
@@ -87,13 +91,6 @@ const hasModels = computed(
 const singleTag = computed(() =>
   filters.tags.length === 1 && !filters.similar && !filters.color && !filters.imitation ? filters.tags[0] : '',
 )
-const total = ref(0)
-const supportingHidden = ref(0)
-/** The folders in the one being browsed, with how many matches each holds. */
-const folders = ref<Facet[]>([])
-const kindFacets = ref<Facet[]>([])
-const tagFacets = ref<Facet[]>([])
-const loading = ref(false)
 const selected = ref<Asset | null>(null)
 const showFilters = ref(false)
 // A new server with nowhere to keep files opens the setup first; it stays up until it's finished.
@@ -148,140 +145,6 @@ const { pendingSplit, dragDepth, dragCount, resolveSplit, onDragEnter, onDragLea
 )
 
 // ------------------------------------------------------------------ data
-
-let searchSeq = 0
-/** Stops the requests of the search on screen when another takes its place, so the server doesn't go on with them. */
-let searchAbort = new AbortController()
-/** Pages of the current results that have arrived, and those on their way. */
-let pagesIn = new Set<number>()
-let pagesOnTheWay = new Map<number, Promise<void>>()
-const fetchingPages = ref(0)
-
-/** What the filters search for, without which page of it. */
-function queryParams(): SearchParams {
-  return {
-      q: filters.q.trim() || undefined,
-      kind: filters.kind || undefined,
-      tags: filters.tags,
-      pack: filters.pack?.id,
-      folder: filters.pack ? (filters.folder ?? undefined) : undefined,
-      collection: filters.collection?.id,
-      sort: filters.sort || undefined,
-      similar: filters.similar?.id,
-      color: filters.color || undefined,
-      imitation: filters.imitation || undefined,
-      bpm_min: filters.bpmMin === '' ? undefined : filters.bpmMin,
-      bpm_max: filters.bpmMax === '' ? undefined : filters.bpmMax,
-      key: filters.key || undefined,
-      compatible_keys: (filters.key && filters.mixKeys) || undefined,
-      favorites: filters.favorites || undefined,
-      project: filters.project || undefined,
-      reviewed: filters.reviewed ? filters.reviewed === 'yes' : undefined,
-      rating_min: filters.ratingMin || undefined,
-      hide_supporting: !prefs.showSupporting,
-  }
-}
-
-function searchPage(page: number, sidebar = false) {
-  return api.search({
-      ...queryParams(),
-      // The sidebar's tags only need the count, not the tiles again.
-      limit: sidebar ? 1 : PAGE,
-      offset: page * PAGE,
-      facets: sidebar,
-    }, searchAbort.signal)
-}
-
-/** Search from the top. `keep` (the same search again, after something changed) leaves the tiles showing in place
- *  while their pages are fetched again, instead of turning them back into placeholders. */
-async function runSearch(opts: { keep?: boolean } = {}) {
-  const seq = ++searchSeq
-  searchAbort.abort()
-  searchAbort = new AbortController()
-  pagesIn = new Set()
-  pagesOnTheWay = new Map()
-  fetchingPages.value = 0
-  loading.value = true
-  // Everything a different search finds isn't what was picked.
-  if (!opts.keep) allOf.value = null
-  try {
-    const res = await searchPage(0)
-    if (seq !== searchSeq) return
-    const next = new Array<Asset | undefined>(res.total)
-    for (let i = 0; i < res.total; i++) next[i] = opts.keep ? slots.value[i] : undefined
-    res.items.forEach((a, i) => (next[i] = a))
-    slots.value = next
-    // Different results start from the top, not wherever the last ones were scrolled to.
-    if (!opts.keep && mainEl.value?.scrollTop) mainEl.value.scrollTo({ top: 0 })
-    pagesIn.add(0)
-    total.value = res.total
-    supportingHidden.value = res.supporting_hidden ?? 0
-    folders.value = res.folders ?? []
-    kindFacets.value = res.kinds
-    // Counting the tags goes through everything found once more: they follow the tiles instead of holding them up.
-    searchPage(0, true)
-      .then((sidebar) => seq === searchSeq && (tagFacets.value = sidebar.tags))
-      .catch(() => {})
-    // A new search's first tiles rise in, once: scrolled back to later, they just appear.
-    rising.value = opts.keep ? 0 : res.items.length
-    setTimeout(() => seq === searchSeq && (rising.value = 0), 1000)
-  } catch (e) {
-    if (seq !== searchSeq) return
-    showError(t('app-search-failed', { error: (e as Error).message }), { label: t('app-retry'), run: () => runSearch(opts) })
-  } finally {
-    if (seq === searchSeq) {
-      loading.value = false
-      await nextTick()
-      fillWindow()
-    }
-  }
-}
-
-/** Fetch one page of the current results into its place. */
-function loadPage(page: number): Promise<void> {
-  if (pagesIn.has(page)) return Promise.resolve()
-  const coming = pagesOnTheWay.get(page)
-  if (coming) return coming
-  const seq = searchSeq
-  const onTheWay = pagesOnTheWay
-  fetchingPages.value++
-  const run = searchPage(page)
-    .then((res) => {
-      if (seq !== searchSeq) return
-      const next = slots.value.slice()
-      // Matches came or went since the first page: go by the count as it is now.
-      next.length = res.total
-      res.items.forEach((a, i) => {
-        if (page * PAGE + i < next.length) next[page * PAGE + i] = a
-      })
-      slots.value = next
-      total.value = res.total
-      pagesIn.add(page)
-    })
-    .catch((e: Error) => {
-      if (seq === searchSeq) showError(t('app-search-failed', { error: e.message }), { label: t('app-retry'), run: fillWindow })
-    })
-    .finally(() => {
-      onTheWay.delete(page)
-      if (seq === searchSeq) fetchingPages.value--
-    })
-  onTheWay.set(page, run)
-  return run
-}
-
-/** Fetch the pages under the rows in view, and a screenful either side so scrolling on finds them there. */
-function fillWindow() {
-  if (loading.value || !slots.value.length) return
-  const ahead = win.end.value - win.start.value
-  const from = Math.max(0, win.start.value - ahead)
-  const to = Math.min(slots.value.length, win.end.value + ahead)
-  // Nearest first: the rows in view, then the ones the scrolling is heading for.
-  const mid = Math.floor((win.start.value + win.end.value) / 2 / PAGE)
-  const pages = []
-  for (let p = Math.floor(from / PAGE); p * PAGE < to; p++) pages.push(p)
-  pages.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid))
-  for (const p of pages) void loadPage(p)
-}
 
 let debounce: ReturnType<typeof setTimeout> | undefined
 /** The search field's hint: the noise being searched by, or, searching sounds, that a noise can be written there too. */
@@ -396,16 +259,9 @@ function applySearch(s: { id: number; query: string }) {
 /** Every selected asset is a favorite already, so the button takes them out. */
 const allStarred = computed(() => checked.value.length > 0 && checked.value.every((id) => mine.favorites.has(id)))
 const mainEl = ref<HTMLElement | null>(null)
-/** How many of a new search's first tiles rise in. */
-const rising = ref(0)
 const win = useVirtualGrid({ scroller: mainEl, grid: gridEl, count: () => slots.value.length })
-// Wherever the grid is scrolled, its pages are fetched. Dragging the scrollbar across thousands of results asks for
-// the places it passes only once it slows down.
-let fillTimer: ReturnType<typeof setTimeout> | undefined
-watch([win.start, win.end], () => {
-  clearTimeout(fillTimer)
-  fillTimer = setTimeout(fillWindow, pagesOnTheWay.size ? 60 : 0)
-})
+// Wherever the grid is scrolled, its pages are fetched.
+watch([win.start, win.end], scrolled)
 
 const appEl = ref<HTMLElement | null>(null)
 const { isNarrow, detailDrag, fit, startResize, resizeBy, appStyle } = usePanelFit({
@@ -756,8 +612,7 @@ const placeOf = (id: string | undefined) => (id ? slots.value.findIndex((a) => a
 async function step(delta: number) {
   const next = placeOf(selected.value?.id) + delta
   if (next < 0 || next >= slots.value.length) return
-  if (!slots.value[next]) await loadPage(Math.floor(next / PAGE))
-  const target = slots.value[next]
+  const target = await resultAt(next)
   if (!target) return
   openAsset(target)
   focusTile(target.id)
@@ -791,8 +646,7 @@ async function moveFocus(key: string) {
   const perRow = win.columns.value
   const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: perRow, ArrowUp: -perRow, j: 1, k: -1 }[key] ?? 0
   const next = current < 0 ? from : Math.min(count - 1, Math.max(0, from + delta))
-  if (!slots.value[next]) await loadPage(Math.floor(next / PAGE))
-  const a = slots.value[next]
+  const a = await resultAt(next)
   if (!a) return
   focusTile(a.id)
   if (selected.value && selected.value.id !== a.id) openAsset(a)
@@ -1037,7 +891,6 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   unswipeSide()
-  clearTimeout(fillTimer)
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('popstate', onHistory)
   document.removeEventListener('scroll', onAnyScroll, { capture: true })

@@ -236,20 +236,21 @@ pub(crate) fn use_due(column: &str) -> String {
 /// Sessions end after [`SESSION_DAYS`] unused, or when `gate` says so. Nothing gets in for an account whose way of
 /// signing in is turned off (a directory account once the directory is), and a token goes with the account that made
 /// it.
+///
+/// Its reads are cached, as every signed-in request makes one.
 fn lookup(c: &Connection, cred: &Credential, gate: Gate) -> Result<Option<Who>> {
     match cred {
         Credential::Bearer(token) => {
             let hash = digest(token);
             let row: Option<TokenRow> = c
-                .query_row(
-                    &format!(
-                        "SELECT t.id, t.name, t.role, u.role, u.id, u.source, {}
-                           FROM access_tokens t JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
-                        use_due("t.last_used_at")
-                    ),
-                    [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?)),
-                )
+                .prepare_cached(&format!(
+                    "SELECT t.id, t.name, t.role, u.role, u.id, u.source, {}
+                       FROM access_tokens t JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
+                    use_due("t.last_used_at")
+                ))?
+                .query_row([&hash], |r| {
+                    Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?))
+                })
                 .optional()?;
             let Some((id, name, own, maker, owner, source, due)) = row else {
                 let who = crate::oauth::lookup(c, &hash)?;
@@ -274,13 +275,12 @@ fn lookup(c: &Connection, cred: &Credential, gate: Gate) -> Result<Option<Who>> 
         Credential::Session(token) => {
             let hash = digest(token);
             let row: Option<(i64, String, String, i64, i64, String)> = c
-                .query_row(
+                .prepare_cached(
                     "SELECT u.id, u.username, u.role, unixepoch('now') - unixepoch(s.last_seen_at),
                             unixepoch('now') - unixepoch(s.created_at), u.source
                        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?1",
-                    [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
-                )
+                )?
+                .query_row([&hash], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)))
                 .optional()?;
             let Some((id, name, role, idle, age, source)) = row else { return Ok(None) };
             let hours = gate.session_hours(&source);

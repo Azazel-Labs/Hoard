@@ -92,16 +92,13 @@ pub(crate) fn challenge(state: &AppState, headers: &HeaderMap, bad_token: bool) 
 /// Who an OAuth access token (by its hash) belongs to, if it's live.
 pub(crate) fn lookup(c: &Connection, hash: &str) -> rusqlite::Result<Option<Who>> {
     let row: Option<(i64, String, String, String, i64, bool)> = c
-        .query_row(
-            &format!(
-                "SELECT g.id, cl.name, u.username, u.role, u.id, {} FROM oauth_grants g
-                   JOIN oauth_clients cl ON cl.id = g.client_id JOIN users u ON u.id = g.user_id
-                  WHERE g.access_hash = ?1 AND g.access_expires_at > unixepoch('now')",
-                crate::auth::use_due("g.last_used_at")
-            ),
-            [hash],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
-        )
+        .prepare_cached(&format!(
+            "SELECT g.id, cl.name, u.username, u.role, u.id, {} FROM oauth_grants g
+               JOIN oauth_clients cl ON cl.id = g.client_id JOIN users u ON u.id = g.user_id
+              WHERE g.access_hash = ?1 AND g.access_expires_at > unixepoch('now')",
+            crate::auth::use_due("g.last_used_at")
+        ))?
+        .query_row([hash], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)))
         .optional()?;
     if let Some((id, .., true)) = &row {
         c.execute("UPDATE oauth_grants SET last_used_at = ?2 WHERE id = ?1", params![id, db::now()])?;

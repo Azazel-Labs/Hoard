@@ -375,17 +375,21 @@ pub(crate) fn strip_dir<'a>(path: &'a str, dir: &str) -> &'a str {
     if dir.is_empty() { path } else { path.strip_prefix(dir).map_or(path, |p| p.trim_start_matches('/')) }
 }
 
+// These run for every file and thumbnail the browser asks for (a grid of results, a model's textures), so their
+// statements are cached.
+
 pub(crate) fn derivative(conn: &Connection, id: &str, kind: &str) -> Result<Option<String>> {
     Ok(conn
-        .query_row("SELECT blob_hash FROM derivatives WHERE asset_id = ?1 AND kind = ?2", params![id, kind], |r| {
-            r.get(0)
-        })
+        .prepare_cached("SELECT blob_hash FROM derivatives WHERE asset_id = ?1 AND kind = ?2")?
+        .query_row(params![id, kind], |r| r.get(0))
         .optional()?)
 }
 
 /// Look up a file in a pack by its original relative path (case-insensitive fallback). Returns (hash, ext).
 pub(crate) fn pack_file(conn: &Connection, pack_id: &str, path: &str) -> Result<Option<(String, String)>> {
-    let row = |sql: &str| conn.query_row(sql, params![pack_id, path], |r| Ok((r.get(0)?, r.get(1)?))).optional();
+    let row = |sql: &str| {
+        conn.prepare_cached(sql)?.query_row(params![pack_id, path], |r| Ok((r.get(0)?, r.get(1)?))).optional()
+    };
     Ok(match row("SELECT blob_hash, ext FROM assets WHERE pack_id = ?1 AND path = ?2")? {
         Some(r) => Some(r),
         None => row("SELECT blob_hash, ext FROM assets WHERE pack_id = ?1 AND lower(path) = lower(?2)")?,
@@ -394,14 +398,17 @@ pub(crate) fn pack_file(conn: &Connection, pack_id: &str, path: &str) -> Result<
 
 pub(crate) fn asset_file_info(conn: &Connection, id: &str) -> Result<Option<(String, String, String)>> {
     Ok(conn
-        .query_row("SELECT blob_hash, path, ext FROM assets WHERE id = ?1", [id], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?))
-        })
+        .prepare_cached("SELECT blob_hash, path, ext FROM assets WHERE id = ?1")?
+        .query_row([id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))
         .optional()?)
 }
 
 pub(crate) fn asset_thumb(conn: &Connection, id: &str) -> Result<Option<String>> {
-    Ok(conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0)).optional()?.flatten())
+    Ok(conn
+        .prepare_cached("SELECT thumb_hash FROM assets WHERE id = ?1")?
+        .query_row([id], |r| r.get(0))
+        .optional()?
+        .flatten())
 }
 
 /// A pack's words in the search index besides its name (`p` being the pack): its tags, as an asset's are, and

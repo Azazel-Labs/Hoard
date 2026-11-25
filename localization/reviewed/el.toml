@@ -8141,6 +8141,22 @@ translation = """
        *[other] { $count } πράγματα σημάνθηκαν ως ειδωμένα
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Το Claude και άλλες εφαρμογές AI συνδεδεμένες μέσω MCP μπορούν τώρα να κάνουν ό,τι κάνει η εφαρμογή web του Hoard, με ακριβώς τα δικαιώματα του λογαριασμού ή του διακριτικού με το οποίο συνδέονται."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Οι εφαρμογές AI κάνουν ό,τι κάνετε κι εσείς"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Το κουμπί με τον κύβο πάνω από αποτελέσματα με μοντέλα 3D ανοίγει τον εξερευνητή πλεγμάτων: όλα τα μοντέλα που βρήκε η αναζήτηση, σε σειρές πάνω σε ένα ατελείωτο δάπεδο για να πετάτε ανάμεσά τους."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Πετάξτε ανάμεσα στα μοντέλα μιας αναζήτησης"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Τα μοντέλα Collada, X3D, VRML, OFF και VRM, τα κινούμενα BVH και τα Gaussian splats αποκτούν τώρα μικρογραφίες, στοιχεία και την προβολή 3D χωρίς Blender, και κατεβαίνουν ως GLB."
@@ -8148,6 +8164,14 @@ translation = "Τα μοντέλα Collada, X3D, VRML, OFF και VRM, τα κι
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Περισσότερες μορφές 3D, χωρίς Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Οι μικρογραφίες των κινούμενων σχεδίων μπορούν τώρα να γίνονται με 12, 24 ή 30 καρέ το δευτερόλεπτο."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Ρυθμός καρέ για τις κινούμενες μικρογραφίες"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8193,6 +8217,14 @@ translation = "Πρόσφατα ειδωμένα"
 source = "Stop pointing out new things"
 translation = "Διακοπή επισήμανσης νέων πραγμάτων"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Ετικέτες που μοιάζουν να είναι η ίδια, όπως ένας πληθυντικός, λέξεις γραμμένες ενωμένες, ένα γράμμα που λείπει ή μια σκέτη λέξη και η δίδυμή της με χώρο ονομάτων, εμφανίζονται για συγχώνευση ή για σήμανση ως διαφορετικές."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Συγχώνευση ετικετών που μοιάζουν"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Βάλτε μια ετικέτα κάτω από μια ευρύτερη, ώστε η αναζήτηση για όχημα να βρίσκει και αυτοκίνητο και σεντάν. Εμφωλεύστε τες στις Ρυθμίσεις → Ετικέτες ή στη σελίδα κάθε ετικέτας."
@@ -8200,6 +8232,14 @@ translation = "Βάλτε μια ετικέτα κάτω από μια ευρύ�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Ετικέτες μέσα σε ετικέτες"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Αν γράψετε μια ετικέτα στο πλαίσιο αναζήτησης, βρίσκει και ό,τι είναι κάτω από αυτήν, ένα μείον μπροστά τα αφήνει όλα έξω, και το πλαίσιο ενός στοιχείου δείχνει τις ευρύτερες ετικέτες στις οποίες ανήκουν οι δικές του."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Μια ετικέτα βρίσκει ό,τι είναι κάτω από αυτήν"
 
 [messages.news-take-me]
 source = "Take me there"

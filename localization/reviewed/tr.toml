@@ -7935,6 +7935,22 @@ translation = """
        *[other] { $count } şey görüldü olarak işaretlendi
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "MCP ile bağlı Claude ve diğer yapay zekâ uygulamaları artık Hoard web uygulamasının yaptığı her şeyi, oturum açtıkları hesabın ya da belirtecin izinleriyle birebir yapabilir."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Yapay zekâ uygulamaları sizin yapabildiğinizi yapabilir"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "3B model içeren arama sonuçlarının üstündeki küp düğmesi örgü gezginini açar: aramanın bulduğu her model, aralarında uçabileceğiniz sonsuz bir zeminde sıralar hâlinde dizilir."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Bir aramanın modelleri arasında uçun"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada, X3D, VRML, OFF ve VRM modelleri, BVH animasyonları ve Gauss splat’leri artık Blender olmadan küçük resim, bilgi ve 3B görüntüleyici alıyor ve GLB olarak indirilebiliyor."
@@ -7942,6 +7958,14 @@ translation = "Collada, X3D, VRML, OFF ve VRM modelleri, BVH animasyonları ve G
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Daha fazla 3B biçimi, Blender olmadan"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Animasyonların küçük resimleri artık saniyede 12, 24 ya da 30 kareyle yapılabilir."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Hareketli küçük resimler için kare hızı"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7987,6 +8011,14 @@ translation = "Son görülenler"
 source = "Stop pointing out new things"
 translation = "Yeni şeyleri işaretlemeyi bırak"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Çoğul hâli, bitişik yazılmış sözcükler, eksik bir harf ya da yalın bir sözcük ile ad alanlı ikizi gibi aynı görünen etiketler, birleştirmek ya da farklı olarak işaretlemek için listelenir."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Birbirine benzeyen etiketleri birleştirin"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Bir etiketi daha geniş bir etiketin altına koyun; böylece “araç” araması “otomobil” ve “sedan” etiketlerini de bulur. Bunları Ayarlar → Etiketler’de ya da her etiketin kendi sayfasında iç içe koyabilirsiniz."
@@ -7994,6 +8026,14 @@ translation = "Bir etiketi daha geniş bir etiketin altına koyun; böylece “a
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Etiket içinde etiket"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Arama kutusuna bir etiket yazmak altındaki her şeyi de bulur, önüne konan eksi hepsini dışarıda bırakır ve bir öğenin paneli kendi etiketlerinin bağlı olduğu daha geniş etiketleri gösterir."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Bir etiket altındaki her şeyi bulur"
 
 [messages.news-take-me]
 source = "Take me there"

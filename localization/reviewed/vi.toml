@@ -7891,6 +7891,22 @@ translation = """
        *[other] Đã đánh dấu { $count } điều là đã xem
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude và các ứng dụng AI khác kết nối qua MCP giờ có thể làm mọi việc ứng dụng web Hoard làm, với đúng quyền của tài khoản hoặc mã thông báo mà chúng dùng để đăng nhập."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Ứng dụng AI làm được những gì bạn làm được"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Nút hình khối lập phương phía trên kết quả tìm kiếm có mô hình 3D sẽ mở trình khám phá lưới: mọi mô hình tìm được xếp thành hàng trên một mặt sàn vô tận để bạn bay quanh."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Bay giữa các mô hình của một lần tìm kiếm"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Mô hình Collada, X3D, VRML, OFF và VRM, hoạt ảnh BVH và Gaussian splat giờ có ảnh thu nhỏ, thông tin và trình xem 3D mà không cần Blender, và tải xuống được dưới dạng GLB."
@@ -7898,6 +7914,14 @@ translation = "Mô hình Collada, X3D, VRML, OFF và VRM, hoạt ảnh BVH và G
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Thêm định dạng 3D, không cần Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Ảnh thu nhỏ của hoạt ảnh giờ có thể được tạo ở 12, 24 hoặc 30 khung hình mỗi giây."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Tốc độ khung hình cho ảnh thu nhỏ chuyển động"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7943,6 +7967,14 @@ translation = "Đã xem gần đây"
 source = "Stop pointing out new things"
 translation = "Ngừng đánh dấu những điều mới"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Các thẻ trông như là một, chẳng hạn dạng số nhiều, các từ viết liền, thiếu một chữ cái hoặc một từ trơn và bản sao có không gian tên của nó, được liệt kê để gộp lại hoặc đánh dấu là khác nhau."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Gộp các thẻ trông giống nhau"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Đặt một thẻ dưới thẻ rộng hơn, để tìm “phương tiện” cũng thấy cả “ô tô” và “sedan”. Lồng chúng vào nhau trong Cài đặt → Thẻ hoặc trên trang riêng của từng thẻ."
@@ -7950,6 +7982,14 @@ translation = "Đặt một thẻ dưới thẻ rộng hơn, để tìm “phư�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Thẻ lồng trong thẻ"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Gõ một thẻ vào ô tìm kiếm giờ cũng tìm ra mọi thứ nằm dưới nó, thêm dấu trừ phía trước sẽ loại bỏ tất cả, và bảng của một tài nguyên cho thấy các thẻ rộng hơn mà thẻ của nó thuộc về."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Một thẻ tìm ra mọi thứ nằm dưới nó"
 
 [messages.news-take-me]
 source = "Take me there"

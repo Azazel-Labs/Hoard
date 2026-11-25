@@ -8100,6 +8100,22 @@ translation = """
        *[other] { $count } saker markerade som sedda
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude och andra AI-appar som är anslutna via MCP kan nu göra allt som Hoards webbapp gör, med exakt de behörigheter som kontot eller token de loggar in med har."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI-appar kan göra det du kan"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Kubknappen ovanför sökresultat med 3D-modeller öppnar mesh-utforskaren: alla modeller sökningen hittade, i rader på ett oändligt golv att flyga runt bland."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Flyg bland en söknings modeller"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada-, X3D-, VRML-, OFF- och VRM-modeller, BVH-animationer och gaussiska splats får nu miniatyrbilder, fakta och 3D-visaren utan Blender och kan laddas ner som GLB."
@@ -8107,6 +8123,14 @@ translation = "Collada-, X3D-, VRML-, OFF- och VRM-modeller, BVH-animationer och
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Fler 3D-format, utan Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniatyrbilder av animationer kan nu göras med 12, 24 eller 30 bilder per sekund."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "En bildfrekvens för rörliga miniatyrbilder"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8152,6 +8176,14 @@ translation = "Nyligen sett"
 source = "Stop pointing out new things"
 translation = "Sluta markera nya saker"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Taggar som ser ut att vara samma, som en plural, ord skrivna ihop, en bokstav för lite eller ett ensamt ord och dess tvilling med namnrymd, listas så att de kan slås ihop eller markeras som olika."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Slå ihop taggar som liknar varandra"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Lägg en tagg under en bredare, så att en sökning på fordon även hittar bil och sedan. Ordna dem i varandra under Inställningar → Taggar eller på en taggs egen sida."
@@ -8159,6 +8191,14 @@ translation = "Lägg en tagg under en bredare, så att en sökning på fordon ä
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Taggar i taggar"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "En tagg i sökrutan hittar nu även allt under den, ett minus framför utesluter allt det, och en tillgångs panel visar de bredare taggar som dess egna hör till."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "En tagg hittar allt under sig"
 
 [messages.news-take-me]
 source = "Take me there"

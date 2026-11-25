@@ -8160,6 +8160,22 @@ translation = """
        *[other] { $count } новина означено као виђено
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude и друге ВИ апликације повезане преко MCP-а сада могу све што може веб апликација Hoard, са тачно оним дозволама које има налог или токен којим се пријављују."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "ВИ апликације могу оно што и ви"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Дугме са коцком изнад резултата претраге са 3D моделима отвара истраживач мрежа: сви пронађени модели поређани у редове на бескрајном поду, између којих можете да летите."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Летите међу моделима из претраге"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Модели Collada, X3D, VRML, OFF и VRM, BVH анимације и Гаусови сплатови сада добијају сличице, податке и 3D прегледач без Blender-а, и могу да се преузму као GLB."
@@ -8167,6 +8183,14 @@ translation = "Модели Collada, X3D, VRML, OFF и VRM, BVH анимациј
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Више 3D формата, без Blender-а"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Сличице анимација сада могу да се праве са 12, 24 или 30 кадрова у секунди."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Брзина кадрова за покретне сличице"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8214,6 +8238,14 @@ translation = "Недавно виђено"
 source = "Stop pointing out new things"
 translation = "Не истичи новине"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Ознаке које изгледају као иста, попут множине, спојено написаних речи, слова мање или саме речи и њене близнакиње са именским простором, наводе се да бисте их спојили или означили као различите."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Спојите ознаке које личе једна на другу"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Ставите ознаку испод шире, па претрага за „возило“ налази и „аутомобил“ и „седан“. Угнездите их у Подешавања → Ознаке или на страници ознаке."
@@ -8221,6 +8253,14 @@ translation = "Ставите ознаку испод шире, па претр�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Ознаке унутар ознака"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Унос ознаке у поље за претрагу проналази и све испод ње, минус испред изоставља све то, а панел ставке приказује шире ознаке под које спадају њене."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Ознака проналази све испод себе"
 
 [messages.news-take-me]
 source = "Take me there"

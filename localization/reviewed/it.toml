@@ -8107,6 +8107,22 @@ translation = """
        *[other] { $count } novità segnate come viste
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude e le altre app di IA collegate tramite MCP ora possono fare tutto ciò che fa l’app web di Hoard, con esattamente i permessi dell’account o del token con cui accedono."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Le app di IA possono fare ciò che fai tu"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Il pulsante con il cubo sopra i risultati che contengono modelli 3D apre l’esploratore di mesh: tutti i modelli trovati, disposti in file su un pavimento infinito tra cui volare."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Vola tra i modelli di una ricerca"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "I modelli Collada, X3D, VRML, OFF e VRM, le animazioni BVH e gli splat gaussiani ora hanno miniature, dati e il visualizzatore 3D senza Blender, e si possono scaricare come GLB."
@@ -8114,6 +8130,14 @@ translation = "I modelli Collada, X3D, VRML, OFF e VRM, le animazioni BVH e gli 
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Più formati 3D, senza Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Le miniature delle animazioni ora si possono creare a 12, 24 o 30 fotogrammi al secondo."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Una frequenza fotogrammi per le miniature animate"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8159,6 +8183,14 @@ translation = "Viste di recente"
 source = "Stop pointing out new things"
 translation = "Non segnalare più le novità"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "I tag che sembrano lo stesso, come un plurale, parole scritte attaccate, una lettera in meno o una parola semplice e la sua gemella con spazio dei nomi, vengono elencati per unirli o segnarli come diversi."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Unisci i tag che si somigliano"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Metti un tag sotto uno più ampio, così cercando veicolo trovi anche auto e berlina. Annidali in Impostazioni → Tag o nella pagina di ciascun tag."
@@ -8166,6 +8198,14 @@ translation = "Metti un tag sotto uno più ampio, così cercando veicolo trovi a
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tag dentro i tag"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Scrivere un tag nella casella di ricerca trova anche tutto ciò che sta sotto, un segno meno davanti esclude tutto questo, e il pannello di un asset mostra i tag più ampi sotto cui stanno i suoi."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Un tag trova tutto ciò che sta sotto"
 
 [messages.news-take-me]
 source = "Take me there"

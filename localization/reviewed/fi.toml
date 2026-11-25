@@ -8123,6 +8123,22 @@ translation = """
        *[other] { $count } asiaa merkitty nähdyiksi
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude ja muut MCP:n kautta yhdistetyt tekoälysovellukset voivat nyt tehdä kaiken, mitä Hoardin verkkosovellus tekee, täsmälleen sen tilin tai tunnuksen oikeuksin, jolla ne kirjautuvat."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Tekoälysovellukset osaavat sen, mitä sinäkin"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Kuutiopainike 3D-malleja sisältävien hakutulosten yläpuolella avaa Mesh-tutkijan: kaikki haun löytämät mallit riveissä loputtomalla lattialla, jonka yllä voi lennellä."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Lennä haun mallien keskellä"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada-, X3D-, VRML-, OFF- ja VRM-mallit, BVH-animaatiot ja Gaussin splatit saavat nyt pikkukuvat, tiedot ja 3D-katselimen ilman Blenderiä, ja ne voi ladata GLB-muodossa."
@@ -8130,6 +8146,14 @@ translation = "Collada-, X3D-, VRML-, OFF- ja VRM-mallit, BVH-animaatiot ja Gaus
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Lisää 3D-muotoja ilman Blenderiä"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Animaatioiden pikkukuvat voi nyt tehdä nopeudella 12, 24 tai 30 kuvaa sekunnissa."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Kuvataajuus liikkuville pikkukuville"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8175,6 +8199,14 @@ translation = "Äskettäin nähdyt"
 source = "Stop pointing out new things"
 translation = "Lopeta uusista asioista huomauttaminen"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Tunnisteet, jotka näyttävät samalta, kuten monikko, yhteen kirjoitetut sanat, puuttuva kirjain tai pelkkä sana ja sen nimiavaruudellinen kaksonen, luetellaan yhdistettäviksi tai erillisiksi merkittäviksi."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Yhdistä samannäköiset tunnisteet"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös auton ja sedanin. Sisäkkäistä niitä kohdassa Asetukset → Tunnisteet tai tunnisteen omalla sivulla."
@@ -8182,6 +8214,14 @@ translation = "Aseta tunniste laajemman alle, niin ajoneuvo-haku löytää myös
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tunnisteita tunnisteiden sisällä"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Hakukenttään kirjoitettu tunniste löytää myös kaiken sen alla olevan, miinus edessä jättää kaiken sen pois, ja kohteen paneeli näyttää laajemmat tunnisteet, joiden alle sen omat kuuluvat."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Tunniste löytää kaiken alaisensa"
 
 [messages.news-take-me]
 source = "Take me there"

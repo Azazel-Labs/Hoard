@@ -8100,6 +8100,22 @@ translation = """
        *[other] { $count } ting merket som sett
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude og andre AI-apper som er koblet til via MCP, kan nå gjøre alt Hoard-nettappen gjør, med nøyaktig de tillatelsene kontoen eller tokenet de logger på med har."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI-apper kan gjøre det du kan"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Terningknappen over søkeresultater med 3D-modeller åpner mesh-utforskeren: alle modellene søket fant, satt i rader på et endeløst gulv du kan fly rundt over."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Fly blant modellene i et søk"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada-, X3D-, VRML-, OFF- og VRM-modeller, BVH-animasjoner og gaussiske splats får nå miniatyrbilder, fakta og 3D-visningen uten Blender, og kan lastes ned som GLB."
@@ -8107,6 +8123,14 @@ translation = "Collada-, X3D-, VRML-, OFF- og VRM-modeller, BVH-animasjoner og g
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Flere 3D-formater, uten Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniatyrbilder av animasjoner kan nå lages med 12, 24 eller 30 bilder i sekundet."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "En bildefrekvens for levende miniatyrbilder"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8152,6 +8176,14 @@ translation = "Sett nylig"
 source = "Stop pointing out new things"
 translation = "Slutt å fremheve nye ting"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Etiketter som ser ut til å være den samme, som et flertall, ord skrevet sammen, en bokstav for lite eller et enkelt ord og tvillingen med navnerom, listes opp så de kan slås sammen eller merkes som forskjellige."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Slå sammen etiketter som ligner hverandre"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Legg en tagg under en bredere, så finner et søk på kjøretøy også bil og sedan. Ordne dem i hverandre under Innstillinger → Tagger eller på en taggs egen side."
@@ -8159,6 +8191,14 @@ translation = "Legg en tagg under en bredere, så finner et søk på kjøretøy 
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tagger inni tagger"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Skriver du en etikett i søkefeltet, finner den også alt under seg, et minus foran utelater alt det, og panelet til et element viser de bredere etikettene dets egne hører under."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "En etikett finner alt under seg"
 
 [messages.news-take-me]
 source = "Take me there"

@@ -8255,6 +8255,22 @@ translation = """
        *[other] Oznaczono { $count } nowości jako obejrzane
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude i inne aplikacje AI połączone przez MCP mogą teraz robić wszystko, co aplikacja internetowa Hoard, z dokładnie takimi uprawnieniami, jakie ma konto lub token, którym się logują."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Aplikacje AI mogą to, co ty"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Przycisk z sześcianem nad wynikami z modelami 3D otwiera eksplorator siatek: wszystkie znalezione modele ułożone w rzędach na nieskończonej podłodze, między którymi można latać."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Lataj wśród modeli z wyszukiwania"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Modele Collada, X3D, VRML, OFF i VRM, animacje BVH oraz splaty gaussowskie mają teraz miniatury, informacje i podgląd 3D bez Blendera, a także można je pobrać jako GLB."
@@ -8262,6 +8278,14 @@ translation = "Modele Collada, X3D, VRML, OFF i VRM, animacje BVH oraz splaty ga
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Więcej formatów 3D, bez Blendera"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniatury animacji można teraz tworzyć w 12, 24 lub 30 klatkach na sekundę."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Liczba klatek ruchomych miniatur"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8309,6 +8333,14 @@ translation = "Ostatnio obejrzane"
 source = "Stop pointing out new things"
 translation = "Przestań wskazywać nowości"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Tagi, które wyglądają na ten sam, na przykład liczba mnoga, słowa pisane łącznie, brakująca litera albo samo słowo i jego bliźniak z przestrzenią nazw, są wypisywane do scalenia lub oznaczenia jako różne."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Scalaj podobne tagi"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Umieść tag pod szerszym, a wyszukiwanie „pojazd” znajdzie też „samochód” i „sedan”. Zagnieżdżaj je w Ustawienia → Tagi albo na stronie danego tagu."
@@ -8316,6 +8348,14 @@ translation = "Umieść tag pod szerszym, a wyszukiwanie „pojazd” znajdzie t
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tagi w tagach"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Wpisanie tagu w pole wyszukiwania znajduje też wszystko, co jest pod nim, minus z przodu pomija to wszystko, a panel zasobu pokazuje szersze tagi, pod które podpadają jego własne."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Tag znajduje wszystko, co pod nim"
 
 [messages.news-take-me]
 source = "Take me there"

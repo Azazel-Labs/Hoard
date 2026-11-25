@@ -7894,6 +7894,22 @@ translation = """
        *[other] ทำเครื่องหมายว่าเห็นแล้ว { $count } รายการ
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude และแอป AI อื่น ๆ ที่เชื่อมต่อผ่าน MCP ทำทุกอย่างที่เว็บแอป Hoard ทำได้แล้ว โดยมีสิทธิ์เท่ากับบัญชีหรือโทเค็นที่ใช้ลงชื่อเข้าใช้ทุกประการ"
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "แอป AI ทำได้อย่างที่คุณทำได้"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "ปุ่มลูกบาศก์เหนือผลการค้นหาที่มีโมเดล 3 มิติจะเปิดตัวสำรวจเมช โมเดลทุกตัวที่ค้นเจอจะเรียงเป็นแถวบนพื้นที่ไม่มีที่สิ้นสุดให้บินชมได้"
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "บินไปมาระหว่างโมเดลจากการค้นหา"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "โมเดล Collada, X3D, VRML, OFF และ VRM แอนิเมชัน BVH และ Gaussian splat ได้ภาพย่อ ข้อมูล และตัวดู 3D โดยไม่ต้องใช้ Blender แล้ว และดาวน์โหลดเป็น GLB ได้"
@@ -7901,6 +7917,14 @@ translation = "โมเดล Collada, X3D, VRML, OFF และ VRM แอน�
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "รองรับรูปแบบ 3D มากขึ้น ไม่ต้องใช้ Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "ตอนนี้สร้างภาพย่อของแอนิเมชันที่ 12, 24 หรือ 30 เฟรมต่อวินาทีได้แล้ว"
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "อัตราเฟรมสำหรับภาพย่อเคลื่อนไหว"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7946,6 +7970,14 @@ translation = "เห็นเมื่อเร็ว ๆ นี้"
 source = "Stop pointing out new things"
 translation = "หยุดชี้สิ่งใหม่"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "แท็กที่ดูเหมือนเป็นอันเดียวกัน เช่น รูปพหูพจน์ คำที่เขียนติดกัน ตัวอักษรตกหล่น หรือคำเปล่ากับคำเดียวกันที่มีเนมสเปซ จะแสดงเป็นรายการให้รวมหรือทำเครื่องหมายว่าต่างกัน"
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "รวมแท็กที่ดูคล้ายกัน"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "ใส่แท็กไว้ใต้แท็กที่กว้างกว่า เพื่อให้ค้นหา “ยานพาหนะ” แล้วเจอ “รถยนต์” และ “รถเก๋ง” ด้วย จัดซ้อนกันได้ที่ การตั้งค่า → แท็ก หรือในหน้าของแต่ละแท็ก"
@@ -7953,6 +7985,14 @@ translation = "ใส่แท็กไว้ใต้แท็กที่ก�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "แท็กซ้อนแท็ก"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "การพิมพ์แท็กในช่องค้นหาจะค้นเจอทุกอย่างที่อยู่ใต้แท็กนั้นด้วย ใส่เครื่องหมายลบข้างหน้าเพื่อตัดทั้งหมดออก และแผงของแอสเซ็ตจะแสดงแท็กที่กว้างกว่าซึ่งแท็กของมันอยู่ภายใต้"
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "แท็กเดียวค้นเจอทุกอย่างที่อยู่ใต้แท็กนั้น"
 
 [messages.news-take-me]
 source = "Take me there"

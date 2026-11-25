@@ -8096,6 +8096,22 @@ translation = """
        *[other] { $count } Neuheiten als gesehen markiert
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude und andere über MCP verbundene KI-Apps können jetzt alles, was die Hoard-Web-App kann, mit genau den Rechten des Kontos oder Tokens, mit dem sie sich anmelden."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "KI-Apps können, was du kannst"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Der Würfel-Knopf über Suchergebnissen mit 3D-Modellen öffnet den Mesh-Explorer: alle gefundenen Modelle in Reihen auf einem endlosen Boden, zwischen denen man umherfliegt."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Durch die Modelle einer Suche fliegen"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada-, X3D-, VRML-, OFF- und VRM-Modelle, BVH-Animationen und Gaussian Splats bekommen jetzt ohne Blender Vorschaubilder, Angaben und die 3D-Ansicht und lassen sich als GLB herunterladen."
@@ -8103,6 +8119,14 @@ translation = "Collada-, X3D-, VRML-, OFF- und VRM-Modelle, BVH-Animationen und 
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Mehr 3D-Formate, ohne Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Vorschaubilder von Animationen lassen sich jetzt mit 12, 24 oder 30 Bildern pro Sekunde erstellen."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Eine Bildrate für bewegte Vorschaubilder"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8148,6 +8172,14 @@ translation = "Kürzlich gesehen"
 source = "Stop pointing out new things"
 translation = "Nicht mehr auf Neues hinweisen"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Tags, die nach demselben aussehen, etwa ein Plural, zusammengeschriebene Wörter, ein fehlender Buchstabe oder ein einzelnes Wort und sein Zwilling mit Namensraum, werden zum Zusammenführen oder Als-verschieden-Markieren aufgelistet."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Ähnliche Tags zusammenführen"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Stell ein Tag unter ein allgemeineres, dann findet die Suche nach Fahrzeug auch Auto und Limousine. Verschachteln kannst du sie unter Einstellungen → Tags oder auf der Seite eines Tags."
@@ -8155,6 +8187,14 @@ translation = "Stell ein Tag unter ein allgemeineres, dann findet die Suche nach
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tags in Tags"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Ein Tag im Suchfeld findet jetzt auch alles darunter, ein Minus davor lässt all das weg, und die Seitenleiste eines Assets zeigt die breiteren Tags, unter die seine eigenen fallen."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Ein Tag findet alles darunter"
 
 [messages.news-take-me]
 source = "Take me there"

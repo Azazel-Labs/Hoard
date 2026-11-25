@@ -8282,6 +8282,22 @@ translation = """
        *[other] { $count } новинки позначено як переглянуті
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude та інші застосунки ШІ, під’єднані через MCP, тепер можуть робити все, що робить вебзастосунок Hoard, рівно з тими правами, що має обліковий запис або токен, з яким вони входять."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Застосунки ШІ можуть те саме, що й ви"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Кнопка з кубом над результатами пошуку з 3D-моделями відкриває оглядач мешів: усі знайдені моделі стоять рядами на безкінечній підлозі, і між ними можна літати."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Літайте серед моделей із пошуку"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Моделі Collada, X3D, VRML, OFF і VRM, анімації BVH і гаусові сплати тепер отримують мініатюри, відомості й 3D-перегляд без Blender, і їх можна завантажити як GLB."
@@ -8289,6 +8305,14 @@ translation = "Моделі Collada, X3D, VRML, OFF і VRM, анімації BVH
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Більше 3D-форматів, без Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Мініатюри анімацій тепер можна робити з частотою 12, 24 або 30 кадрів за секунду."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Частота кадрів для рухомих мініатюр"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8337,6 +8361,14 @@ translation = "Нещодавно переглянуте"
 source = "Stop pointing out new things"
 translation = "Не позначати нове"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Теги, що виглядають як той самий, як-от множина, слова разом, пропущена літера чи просте слово та його близнюк із простором імен, показуються списком, щоб їх об’єднати або позначити як різні."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Об’єднуйте схожі теги"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Помістіть тег під ширший, і пошук за «транспорт» знайде також «автомобіль» і «седан». Вкладати теги можна в «Налаштування → Теги» або на сторінці тегу."
@@ -8344,6 +8376,14 @@ translation = "Помістіть тег під ширший, і пошук за
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Теги в тегах"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Тег у полі пошуку тепер знаходить і все, що під ним, мінус перед ним виключає все це, а панель ресурсу показує ширші теги, під які потрапляють його власні."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Тег знаходить усе, що під ним"
 
 [messages.news-take-me]
 source = "Take me there"

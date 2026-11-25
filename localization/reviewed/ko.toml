@@ -7885,6 +7885,22 @@ translation = """
        *[other] 항목 { $count }개를 확인함으로 표시했습니다
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "MCP로 연결된 Claude 및 다른 AI 앱이 이제 로그인한 계정이나 토큰과 똑같은 권한으로 Hoard 웹 앱이 하는 모든 일을 할 수 있습니다."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI 앱이 여러분이 할 수 있는 일을 합니다"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "3D 모델이 있는 검색 결과 위의 큐브 버튼을 누르면 메시 탐색기가 열립니다. 검색에서 찾은 모든 모델이 끝없는 바닥 위에 줄지어 놓여 있어 사이를 날아다닐 수 있습니다."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "검색 결과의 모델 사이를 날아다니기"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada, X3D, VRML, OFF, VRM 모델과 BVH 애니메이션, 가우시안 스플랫이 이제 Blender 없이 썸네일, 정보, 3D 뷰어를 갖고 GLB로 내려받을 수 있습니다."
@@ -7892,6 +7908,14 @@ translation = "Collada, X3D, VRML, OFF, VRM 모델과 BVH 애니메이션, 가�
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "더 많은 3D 형식, Blender 없이"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "이제 애니메이션 썸네일을 초당 12, 24, 30프레임으로 만들 수 있습니다."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "움직이는 썸네일의 프레임 속도"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7937,6 +7961,14 @@ translation = "최근에 확인함"
 source = "Stop pointing out new things"
 translation = "새로운 것 알려 주지 않기"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "복수형, 붙여 쓴 단어, 빠진 글자, 네임스페이스 없는 단어와 네임스페이스가 붙은 같은 단어처럼 같은 태그로 보이는 것들을 목록으로 보여 주어 병합하거나 서로 다르다고 표시할 수 있습니다."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "비슷해 보이는 태그 병합"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "태그를 더 넓은 태그 아래에 넣으면 탈것을 검색할 때 자동차와 세단도 함께 찾습니다. 설정 → 태그나 각 태그 페이지에서 중첩할 수 있습니다."
@@ -7944,6 +7976,14 @@ translation = "태그를 더 넓은 태그 아래에 넣으면 탈것을 검색�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "태그 안의 태그"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "검색창에 태그를 입력하면 그 아래에 있는 것도 모두 찾고, 앞에 빼기 기호를 붙이면 그 모두를 제외합니다. 에셋 패널에는 그 태그가 속한 더 넓은 태그가 표시됩니다."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "태그 하나로 그 아래 모든 것을 찾기"
 
 [messages.news-take-me]
 source = "Take me there"

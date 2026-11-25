@@ -8100,6 +8100,22 @@ translation = """
        *[other] { $count } ting markeret som set
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude og andre AI-apps, der er forbundet via MCP, kan nu gøre alt, hvad Hoards webapp kan, med præcis de tilladelser, som kontoen eller tokenet de logger ind med har."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI-apps kan gøre det, du kan"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Terningknappen over søgeresultater med 3D-modeller åbner mesh-udforskeren: alle de modeller, søgningen fandt, sat i rækker på et uendeligt gulv, som du kan flyve rundt over."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Flyv rundt blandt en søgnings modeller"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada-, X3D-, VRML-, OFF- og VRM-modeller, BVH-animationer og gaussiske splats får nu miniaturer, fakta og 3D-fremviseren uden Blender og kan hentes som GLB."
@@ -8107,6 +8123,14 @@ translation = "Collada-, X3D-, VRML-, OFF- og VRM-modeller, BVH-animationer og g
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Flere 3D-formater, uden Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniaturer af animationer kan nu laves med 12, 24 eller 30 billeder i sekundet."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "En billedhastighed for levende miniaturer"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8152,6 +8176,14 @@ translation = "Set for nylig"
 source = "Stop pointing out new things"
 translation = "Stop med at gøre opmærksom på nye ting"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Mærker, der ser ud til at være det samme, som et flertal, ord skrevet sammen, et bogstav for lidt eller et enkelt ord og dets tvilling med navnerum, vises, så de kan slås sammen eller markeres som forskellige."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Slå mærker sammen, der ligner hinanden"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Sæt et tag under et bredere, så en søgning på køretøj også finder bil og sedan. Indlejr dem under Indstillinger → Tags eller på et tags egen side."
@@ -8159,6 +8191,14 @@ translation = "Sæt et tag under et bredere, så en søgning på køretøj også
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tags inden i tags"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Skriver du et mærke i søgefeltet, finder det også alt under det, et minus foran udelader det hele, og et elements panel viser de bredere mærker, dets egne hører under."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Et mærke finder alt under sig"
 
 [messages.news-take-me]
 source = "Take me there"

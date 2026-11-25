@@ -8229,6 +8229,22 @@ translation = """
        *[other] { $count } novinek označeno jako zobrazené
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude a další aplikace AI připojené přes MCP teď zvládnou vše, co webová aplikace Hoard, a to přesně s oprávněními účtu nebo tokenu, kterým se přihlásí."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Aplikace AI zvládnou, co vy"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Tlačítko s kostkou nad výsledky hledání s 3D modely otevře průzkumník sítí: všechny nalezené modely v řadách na nekonečné podlaze, mezi kterými můžete létat."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Proleťte se modely z hledání"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Modely Collada, X3D, VRML, OFF a VRM, animace BVH a gaussovské splaty teď dostanou miniatury, údaje a 3D prohlížeč bez Blenderu a jdou stáhnout jako GLB."
@@ -8236,6 +8252,14 @@ translation = "Modely Collada, X3D, VRML, OFF a VRM, animace BVH a gaussovské s
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Další 3D formáty bez Blenderu"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniatury animací teď jde vytvářet při 12, 24 nebo 30 snímcích za sekundu."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Snímková frekvence pohyblivých miniatur"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8283,6 +8307,14 @@ translation = "Nedávno zobrazené"
 source = "Stop pointing out new things"
 translation = "Přestat upozorňovat na novinky"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Štítky, které vypadají jako tentýž, třeba množné číslo, slova psaná dohromady, chybějící písmeno nebo samotné slovo a jeho dvojče s jmenným prostorem, se vypíšou ke sloučení nebo k označení jako různé."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Slučte podobné štítky"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Zařaďte štítek pod širší, aby hledání vozidlo našlo i auto a sedan. Vnořujte je v Nastavení → Štítky nebo na stránce štítku."
@@ -8290,6 +8322,14 @@ translation = "Zařaďte štítek pod širší, aby hledání vozidlo našlo i a
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Štítky ve štítcích"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Napsání štítku do vyhledávacího pole najde i vše pod ním, minus před ním to vše vynechá a panel položky ukazuje širší štítky, pod které spadají její vlastní."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Štítek najde vše pod sebou"
 
 [messages.news-take-me]
 source = "Take me there"

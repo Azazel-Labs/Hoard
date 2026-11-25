@@ -7897,6 +7897,22 @@ translation = """
        *[other] 已將 { $count } 項標為已看過
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "透過 MCP 連線的 Claude 與其他 AI 應用程式現在可以做 Hoard 網頁應用程式能做的一切，權限與其登入所用的帳號或權杖完全相同。"
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI 應用程式能做你能做的事"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "含有 3D 模型的搜尋結果上方的立方體按鈕會開啟網格瀏覽器：搜尋到的每個模型都成排擺放在無盡的地面上，可在其間自由飛行。"
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "在搜尋到的模型間飛行"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada、X3D、VRML、OFF 與 VRM 模型、BVH 動畫以及高斯潑濺現在不需 Blender 就有縮圖、資訊與 3D 檢視器，也能下載為 GLB。"
@@ -7904,6 +7920,14 @@ translation = "Collada、X3D、VRML、OFF 與 VRM 模型、BVH 動畫以及高�
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "支援更多 3D 格式，無需 Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "動畫縮圖現在可以按每秒 12、24 或 30 格製作。"
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "動態縮圖的影格速率"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7949,6 +7973,14 @@ translation = "最近看過"
 source = "Stop pointing out new things"
 translation = "不再提示新功能"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "看起來是同一個的標籤（例如複數形式、連寫的詞、少一個字母，或不帶命名空間的詞與帶命名空間的同一個詞）會列出來，供你合併或標記為不同。"
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "合併看起來相似的標籤"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "把標籤放到更廣泛的標籤下，搜尋「交通工具」時也能找到「汽車」和「轎車」。可在「設定 → 標籤」或各標籤自己的頁面上巢狀排列它們。"
@@ -7956,6 +7988,14 @@ translation = "把標籤放到更廣泛的標籤下，搜尋「交通工具」�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "標籤中的標籤"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "在搜尋框中輸入標籤也會找到其下的所有內容，前面加上減號則把這些全部排除；素材面板會顯示其標籤所屬的更廣泛標籤。"
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "一個標籤能找到其下的一切"
 
 [messages.news-take-me]
 source = "Take me there"

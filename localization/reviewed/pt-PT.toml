@@ -8103,6 +8103,22 @@ translation = """
        *[other] { $count } novidades marcadas como vistas
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "O Claude e outras aplicações de IA ligadas por MCP podem agora fazer tudo o que a aplicação web do Hoard faz, com exatamente as permissões da conta ou do token com que iniciam sessão."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "As aplicações de IA podem fazer o que você faz"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "O botão do cubo acima dos resultados que têm modelos 3D abre o explorador de malhas: todos os modelos que a pesquisa encontrou, em filas sobre um chão sem fim para voar entre eles."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Voe entre os modelos de uma pesquisa"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Os modelos Collada, X3D, VRML, OFF e VRM, as animações BVH e os splats gaussianos passam a ter miniaturas, informações e o visualizador 3D sem o Blender, e podem ser transferidos como GLB."
@@ -8110,6 +8126,14 @@ translation = "Os modelos Collada, X3D, VRML, OFF e VRM, as animações BVH e os
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Mais formatos 3D, sem Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "As miniaturas de animações podem agora ser feitas a 12, 24 ou 30 fotogramas por segundo."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Uma taxa de fotogramas para as miniaturas animadas"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8155,6 +8179,14 @@ translation = "Vistas recentemente"
 source = "Stop pointing out new things"
 translation = "Deixar de destacar novidades"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "As etiquetas que parecem ser a mesma, como um plural, palavras escritas juntas, uma letra a menos ou uma palavra simples e a sua gémea com espaço de nomes, aparecem numa lista para juntar ou marcar como diferentes."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Junte etiquetas parecidas"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Coloque uma etiqueta dentro de outra mais ampla, para que pesquisar veículo encontre também automóvel e berlina. Aninhe-as em Definições → Etiquetas ou na página de cada etiqueta."
@@ -8162,6 +8194,14 @@ translation = "Coloque uma etiqueta dentro de outra mais ampla, para que pesquis
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Etiquetas dentro de etiquetas"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Escrever uma etiqueta na caixa de pesquisa também encontra tudo o que está abaixo dela, um sinal de menos à frente deixa tudo isso de fora, e o painel de um recurso mostra as etiquetas mais amplas sob as quais ficam as suas."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Uma etiqueta encontra tudo o que está abaixo dela"
 
 [messages.news-take-me]
 source = "Take me there"

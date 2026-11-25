@@ -8100,6 +8100,22 @@ translation = """
        *[other] S’han marcat { $count } novetats com a vistes
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude i altres aplicacions d’IA connectades per MCP ara poden fer tot el que fa l’aplicació web de Hoard, amb exactament els permisos del compte o el testimoni amb què inicien la sessió."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Les aplicacions d’IA poden fer el que fas tu"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "El botó del cub sobre els resultats que contenen models 3D obre l’explorador de malles: tots els models que ha trobat la cerca, en files sobre un terra infinit per volar-hi entre ells."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Vola entre els models d’una cerca"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Els models Collada, X3D, VRML, OFF i VRM, les animacions BVH i els splats gaussians ara tenen miniatures, dades i el visor 3D sense Blender, i es poden baixar com a GLB."
@@ -8107,6 +8123,14 @@ translation = "Els models Collada, X3D, VRML, OFF i VRM, les animacions BVH i el
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Més formats 3D, sense Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Les miniatures de les animacions ara es poden fer a 12, 24 o 30 fotogrames per segon."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Fotogrames per segon per a les miniatures mòbils"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8152,6 +8176,14 @@ translation = "Vist fa poc"
 source = "Stop pointing out new things"
 translation = "Deixa d’assenyalar les novetats"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Les etiquetes que semblen la mateixa, com un plural, paraules juntes, una lletra de menys o una paraula sola i la seva bessona amb espai de noms, es llisten per fusionar-les o marcar-les com a diferents."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Fusiona etiquetes que s’assemblen"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Posa una etiqueta sota una de més àmplia, i en cercar vehicle també trobaràs cotxe i berlina. Niua-les a Configuració → Etiquetes o a la pàgina de cada etiqueta."
@@ -8159,6 +8191,14 @@ translation = "Posa una etiqueta sota una de més àmplia, i en cercar vehicle t
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Etiquetes dins d’etiquetes"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Escriure una etiqueta al quadre de cerca també troba tot el que té a sota, un signe menys al davant ho deixa tot fora, i el panell d’un recurs mostra les etiquetes més àmplies sota les quals van les seves."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Una etiqueta troba tot el que té a sota"
 
 [messages.news-take-me]
 source = "Take me there"

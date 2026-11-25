@@ -8225,6 +8225,22 @@ translation = """
        *[other] { $count } de noutăți marcate ca văzute
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude și alte aplicații AI conectate prin MCP pot face acum tot ce face aplicația web Hoard, cu exact permisiunile contului sau tokenului cu care se conectează."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Aplicațiile AI pot face ce poți face tu"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Butonul cu cub de deasupra rezultatelor cu modele 3D deschide exploratorul de mesh-uri: toate modelele găsite, așezate în rânduri pe o podea fără sfârșit, printre care poți zbura."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Zboară printre modelele unei căutări"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Modelele Collada, X3D, VRML, OFF și VRM, animațiile BVH și splaturile gaussiene primesc acum miniaturi, informații și vizualizatorul 3D fără Blender și pot fi descărcate ca GLB."
@@ -8232,6 +8248,14 @@ translation = "Modelele Collada, X3D, VRML, OFF și VRM, animațiile BVH și spl
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Mai multe formate 3D, fără Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Miniaturile animațiilor pot fi făcute acum la 12, 24 sau 30 de cadre pe secundă."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "O rată de cadre pentru miniaturile animate"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8278,6 +8302,14 @@ translation = "Văzute recent"
 source = "Stop pointing out new things"
 translation = "Nu mai semnalați noutățile"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Etichetele care par a fi aceeași, ca un plural, cuvinte scrise legat, o literă lipsă sau un cuvânt simplu și geamănul lui cu spațiu de nume, sunt listate ca să le unești sau să le marchezi ca diferite."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Unește etichetele care seamănă"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Plasați o etichetă sub una mai largă, iar căutarea după „vehicul” găsește și „mașină” și „sedan”. Le puteți încadra în Setări → Etichete sau pe pagina fiecărei etichete."
@@ -8285,6 +8317,14 @@ translation = "Plasați o etichetă sub una mai largă, iar căutarea după „v
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Etichete în etichete"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Scrierea unei etichete în caseta de căutare găsește și tot ce e sub ea, un minus în față lasă afară toate acestea, iar panoul unui element arată etichetele mai largi sub care intră ale sale."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "O etichetă găsește tot ce e sub ea"
 
 [messages.news-take-me]
 source = "Take me there"

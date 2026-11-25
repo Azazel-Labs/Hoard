@@ -41,6 +41,21 @@ export const NEWS: NewThing[] = [
     crumb: () => [t('app-library')],
   },
   {
+    id: 'mesh-explorer', date: '2026-11-24', where: { library: { kind: 'model' } },
+    title: () => t('news-mesh-explorer-title'), body: () => t('news-mesh-explorer-body'),
+    crumb: () => [t('app-library')],
+  },
+  {
+    id: 'tag-lookalikes', date: '2026-11-24', need: 'edit', where: { settings: 'tags' },
+    title: () => t('news-tag-lookalikes-title'), body: () => t('news-tag-lookalikes-body'),
+    crumb: settingsCrumb(() => t('settings-page-tags')),
+  },
+  {
+    id: 'mcp-everything', date: '2026-11-23', where: { settings: 'account' },
+    title: () => t('news-mcp-everything-title'), body: () => t('news-mcp-everything-body'),
+    crumb: settingsCrumb(() => t('settings-page-account')),
+  },
+  {
     id: 'themes-20', date: '2026-11-22', where: { settings: 'appearance' },
     title: () => t('news-themes-title'), body: () => t('news-themes-body'),
     crumb: settingsCrumb(() => t('settings-page-appearance')),
@@ -54,6 +69,16 @@ export const NEWS: NewThing[] = [
     id: 'motion-trails', date: '2026-11-22', where: { library: { kind: 'animation' } },
     title: () => t('news-motion-trails-title'), body: () => t('news-motion-trails-body'),
     crumb: () => [t('app-library')],
+  },
+  {
+    id: 'tags-under', date: '2026-11-22', where: { library: {} },
+    title: () => t('news-tags-under-title'), body: () => t('news-tags-under-body'),
+    crumb: () => [t('app-library')],
+  },
+  {
+    id: 'motion-fps', date: '2026-11-22', need: 'admin', where: { settings: 'performance' },
+    title: () => t('news-motion-fps-title'), body: () => t('news-motion-fps-body'),
+    crumb: settingsCrumb(() => t('settings-page-performance')),
   },
   {
     id: 'text-size', date: '2026-11-21', where: { settings: 'appearance' },

@@ -7905,6 +7905,22 @@ translation = """
        *[other] { $count } 件を確認済みにしました
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "MCP で接続した Claude などの AI アプリが、サインインに使ったアカウントやトークンとまったく同じ権限で、Hoard の Web アプリでできることをすべて行えるようになりました。"
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "AI アプリがあなたと同じことをできるように"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "3D モデルを含む検索結果の上にあるキューブのボタンでメッシュエクスプローラーが開きます。検索で見つかったすべてのモデルが果てしない床に並び、その間を飛び回れます。"
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "検索で見つかったモデルの間を飛び回る"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Collada、X3D、VRML、OFF、VRM のモデル、BVH アニメーション、ガウシアンスプラットが、Blender なしでサムネイル、情報、3D ビューアーを持つようになり、GLB としてダウンロードできます。"
@@ -7912,6 +7928,14 @@ translation = "Collada、X3D、VRML、OFF、VRM のモデル、BVH アニメー�
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "対応する 3D 形式が増え、Blender も不要に"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "アニメーションのサムネイルを 12、24、30 フレーム/秒で作れるようになりました。"
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "動くサムネイルのフレームレート"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7957,6 +7981,14 @@ translation = "最近確認したもの"
 source = "Stop pointing out new things"
 translation = "新着を知らせない"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "複数形、続けて書かれた語、1 文字の抜け、名前空間なしの語と名前空間付きの語など、同じものに見えるタグが一覧になり、まとめるか別物として印を付けられます。"
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "似ているタグをまとめる"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "タグを上位のタグの下に入れると、「乗り物」で検索したときに「車」や「セダン」も見つかります。設定 → タグ か、各タグのページで入れ子にできます。"
@@ -7964,6 +7996,14 @@ translation = "タグを上位のタグの下に入れると、「乗り物」�
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "タグの中のタグ"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "検索ボックスにタグを入力すると、その下にあるものもすべて見つかり、前にマイナスを付けるとそれらをすべて除外します。アセットのパネルには、そのタグが属するより広いタグが表示されます。"
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "タグでその下にあるものもすべて見つかる"
 
 [messages.news-take-me]
 source = "Take me there"

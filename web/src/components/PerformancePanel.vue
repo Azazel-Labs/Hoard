@@ -6,6 +6,7 @@ import { api, type Stats, type ThumbQuality } from '../api'
 import { humanBytes } from '../format'
 import { formatNumber, t } from '../i18n'
 import { formatMiB } from '../sizes'
+import NewPip from './NewPip.vue'
 import ProfilerPanel from './ProfilerPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
@@ -141,7 +142,7 @@ watch(
     <p class="what">{{ t('settings-motion-thumbs-what') }}</p>
     <template v-if="s.options.motion_thumbs.value">
       <div class="opt-row format">
-        <span id="motion-fps">{{ t('settings-motion-fps') }}</span>
+        <span id="motion-fps">{{ t('settings-motion-fps') }}<NewPip id="motion-fps" /></span>
         <div class="modes" role="radiogroup" aria-labelledby="motion-fps">
           <label v-for="f in MOTION_FPS" :key="f">
             <input

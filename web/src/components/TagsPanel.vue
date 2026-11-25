@@ -257,7 +257,7 @@ watch(moreEl, (el) => {
     </section>
 
     <section v-if="lookalikes.length">
-      <div class="sh"><h3>{{ t('tags-lookalike-heading') }}</h3></div>
+      <div class="sh"><h3>{{ t('tags-lookalike-heading') }}<NewPip id="tag-lookalikes" /></h3></div>
       <p class="what">{{ t('tags-lookalike-what') }}</p>
       <ul class="list">
         <li v-for="p in lookalikes" :key="`${p.other}>${p.keep}`">

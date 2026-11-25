@@ -7923,6 +7923,22 @@ translation = """
        *[other] { $count } hal ditandai sudah dilihat
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "Claude dan aplikasi AI lain yang terhubung lewat MCP kini bisa melakukan apa saja yang dilakukan aplikasi web Hoard, dengan izin yang persis sama dengan akun atau token yang mereka pakai untuk masuk."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Aplikasi AI bisa melakukan apa yang Anda bisa"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "Tombol kubus di atas hasil pencarian yang berisi model 3D membuka penjelajah mesh: semua model yang ditemukan, dijajarkan dalam baris di lantai tanpa ujung untuk dijelajahi sambil terbang."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Terbang di antara model hasil pencarian"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "Model Collada, X3D, VRML, OFF, dan VRM, animasi BVH, serta Gaussian splat kini mendapat gambar mini, fakta, dan penampil 3D tanpa Blender, dan bisa diunduh sebagai GLB."
@@ -7930,6 +7946,14 @@ translation = "Model Collada, X3D, VRML, OFF, dan VRM, animasi BVH, serta Gaussi
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Lebih banyak format 3D, tanpa Blender"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Gambar mini animasi kini bisa dibuat pada 12, 24, atau 30 bingkai per detik."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Laju bingkai untuk gambar mini bergerak"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -7975,6 +7999,14 @@ translation = "Dilihat baru-baru ini"
 source = "Stop pointing out new things"
 translation = "Berhenti menandai hal baru"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Tag yang tampaknya sama, seperti bentuk jamak, kata yang disambung, huruf yang hilang, atau kata polos dan kembarannya yang memakai namespace, didaftarkan untuk digabung atau ditandai berbeda."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Gabungkan tag yang mirip"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraan juga menemukan mobil dan sedan. Susun bertingkat di Pengaturan → Tag atau di halaman tag itu sendiri."
@@ -7982,6 +8014,14 @@ translation = "Taruh tag di bawah tag yang lebih luas, sehingga mencari kendaraa
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Tag di dalam tag"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Mengetik tag di kotak pencarian juga menemukan semua yang ada di bawahnya, tanda minus di depannya mengecualikan semua itu, dan panel aset menampilkan tag yang lebih luas tempat tagnya sendiri berada."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Tag menemukan semua yang ada di bawahnya"
 
 [messages.news-take-me]
 source = "Take me there"

@@ -7963,6 +7963,22 @@ translation = """
        *[other] { $count } elem megjelölve látottként
     }"""
 
+[messages.news-mcp-everything-body]
+source = "Claude and other AI apps connected over MCP can now do anything the Hoard web app does, with exactly the permissions of the account or token they sign in with."
+translation = "A Claude és más MCP-n át csatlakozó MI-alkalmazások mostantól mindent megtehetnek, amit a Hoard webalkalmazása, pontosan annak a fióknak vagy tokennek a jogosultságaival, amellyel bejelentkeznek."
+
+[messages.news-mcp-everything-title]
+source = "AI apps can do what you can"
+translation = "Az MI-alkalmazások azt tehetik, amit te"
+
+[messages.news-mesh-explorer-body]
+source = "The cube button above search results that hold 3D models opens the mesh explorer: every model the search found, laid out in rows on an endless floor to fly around."
+translation = "A 3D-modelleket tartalmazó találatok fölötti kocka gomb megnyitja a hálóböngészőt: a keresés minden modellje sorokban, egy végtelen padlón, ahol körberepülheted őket."
+
+[messages.news-mesh-explorer-title]
+source = "Fly among a search's models"
+translation = "Repülj egy keresés modelljei között"
+
 [messages.news-models-read-body]
 source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
 translation = "A Collada, X3D, VRML, OFF és VRM modellek, a BVH-animációk és a Gauss-splatek mostantól Blender nélkül kapnak bélyegképet, adatokat és 3D-nézőt, és GLB-ként letölthetők."
@@ -7970,6 +7986,14 @@ translation = "A Collada, X3D, VRML, OFF és VRM modellek, a BVH-animációk és
 [messages.news-models-read-title]
 source = "More 3D formats, no Blender needed"
 translation = "Több 3D-formátum, Blender nélkül"
+
+[messages.news-motion-fps-body]
+source = "Animation thumbnails can now be made at 12, 24 or 30 frames a second."
+translation = "Az animációk bélyegképei mostantól 12, 24 vagy 30 képkocka/másodperccel készülhetnek."
+
+[messages.news-motion-fps-title]
+source = "A frame rate for moving thumbnails"
+translation = "Képkockasebesség a mozgó bélyegképekhez"
 
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
@@ -8015,6 +8039,14 @@ translation = "Nemrég látott"
 source = "Stop pointing out new things"
 translation = "Újdonságok jelzésének kikapcsolása"
 
+[messages.news-tag-lookalikes-body]
+source = "Tags that seem to be the same one, such as a plural, words run together, a letter out or a bare word and its namespaced twin, are listed to merge or mark as different."
+translation = "Az ugyanannak látszó címkék, például egy többes szám, egybeírt szavak, egy hiányzó betű vagy egy puszta szó és névteres ikerpárja, listában jelennek meg összevonásra vagy különbözőnek jelölésre."
+
+[messages.news-tag-lookalikes-title]
+source = "Merge tags that look alike"
+translation = "Vond össze a hasonló címkéket"
+
 [messages.news-tag-tree-body]
 source = "Put a tag under a broader one, so searching vehicle finds car and sedan too. Nest them on Settings → Tags or on a tag’s own page."
 translation = "Rendeljen egy címkét egy tágabb alá, így a jármű keresésekor az autó és a szedán is előkerül. A Beállítások → Címkék oldalon vagy a címkék saját oldalán ágyazhatja egymásba őket."
@@ -8022,6 +8054,14 @@ translation = "Rendeljen egy címkét egy tágabb alá, így a jármű keresése
 [messages.news-tag-tree-title]
 source = "Tags inside tags"
 translation = "Címkék a címkéken belül"
+
+[messages.news-tags-under-body]
+source = "Typing a tag in the search box finds everything under it too, a minus in front leaves all of that out, and an asset's panel shows the broader tags its own go under."
+translation = "Ha a keresőmezőbe címkét írsz, minden alatta lévőt is megtalál, az elé írt mínusz mindezt kihagyja, egy elem panelje pedig mutatja a tágabb címkéket, amelyek alá a sajátjai tartoznak."
+
+[messages.news-tags-under-title]
+source = "A tag finds everything under it"
+translation = "Egy címke mindent megtalál, ami alatta van"
 
 [messages.news-take-me]
 source = "Take me there"

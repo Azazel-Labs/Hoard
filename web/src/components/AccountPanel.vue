@@ -6,6 +6,7 @@ import { api, type AccessToken, type Account, type AccountSource, type Connectio
 import { auth, isDesktop, may, refreshAuth, signOut } from '../auth'
 import { formatDate, language, t } from '../i18n'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
+import NewPip from './NewPip.vue'
 
 const accounts = ref<Account[] | null>(null)
 const tokens = ref<AccessToken[] | null>(null)
@@ -276,7 +277,7 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
     </section>
 
     <section>
-      <div class="sh"><h3>{{ t('account-ai-apps') }}</h3></div>
+      <div class="sh"><h3>{{ t('account-ai-apps') }}<NewPip id="mcp-everything" /></h3></div>
       <p class="what">
         {{ t('account-ai-apps-hint') }}
       </p>

@@ -86,7 +86,7 @@ fn an_import_with_searches_alongside_is_never_locked_out() {
                         n += 1;
                         drop(c);
                         // Searches come one after another, not in a spin that takes cores from the writers: on a
-                        // busy machine that alone kept a batch waiting past `WAIT_FOR_WRITE`.
+                        // busy machine that alone kept the writers from their turns.
                         std::thread::sleep(Duration::from_millis(1));
                     }
                     n
@@ -169,4 +169,19 @@ fn a_long_run_in_slices_lets_others_write_meanwhile() {
     eprintln!("the longest a short write waited: {longest:.1?}");
     // Timed, a wait of a slice or so is no measure on a loaded machine; what is, is that they all got in meanwhile.
     assert!(outlasted, "the short writes only got in once the long run was over; one waited {longest:?}");
+}
+
+/// A write held up by one that never finishes (another program, say) still gives up, once nothing else has finished
+/// for `WAIT_FOR_WRITE`. Ignored: it takes that long, and run with the rest, their writes would count as progress.
+#[test]
+#[ignore = "takes WAIT_FOR_WRITE; run alone"]
+fn a_write_held_up_by_one_that_never_finishes_gives_up() {
+    let dir = tempfile::tempdir().unwrap();
+    let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+    let held = rusqlite::Connection::open(dir.path().join("hoard.db")).unwrap();
+    held.execute_batch("BEGIN IMMEDIATE").unwrap();
+    let at = Instant::now();
+    let err = pool.get().unwrap().execute("INSERT INTO blobs (hash, size, created_at) VALUES ('x', 1, 'x')", []);
+    assert!(err.is_err(), "the write went ahead of one holding the database");
+    assert!(at.elapsed() >= super::WAIT_FOR_WRITE, "gave up after {:?}", at.elapsed());
 }

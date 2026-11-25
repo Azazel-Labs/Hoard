@@ -127,7 +127,9 @@ fn set_up(c: &mut Connection) -> rusqlite::Result<()> {
     )
 }
 
-/// How long a write waits for the one before it to finish before giving up with "database is locked".
+/// How long a write waits with no other write finishing before giving up with "database is locked": whatever holds
+/// the database is stuck, or is another program. However long it waits while others finish, it waits on: a busy
+/// machine makes every write slower, and that's no reason to fail one.
 const WAIT_FOR_WRITE: Duration = Duration::from_secs(30);
 
 /// How often a waiting write looks again, should nobody wake it.
@@ -175,25 +177,35 @@ fn turn() -> std::sync::MutexGuard<'static, Turn> {
 thread_local! {
     /// When the write this thread is trying to start began waiting.
     static WAITING_SINCE: Cell<Option<Instant>> = const { Cell::new(None) };
+    /// How many writes had finished ([`Turn::writes`]) when this thread's waiting write last saw one finish, and when.
+    static LAST_PROGRESS: Cell<Option<(u64, Instant)>> = const { Cell::new(None) };
     /// Whether the write this thread is trying to start has said in the log that it's been kept waiting.
     static SAID_WAITING: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Waiting for another connection's write to finish (SQLite's busy handler; `tries` counts from 0 per write). A
 /// write that finishes wakes the waiters at once, where SQLite's busy timeout sleeps up to 100 ms between looks, so
-/// under a steady run of short writes a waiter could miss every gap between them.
+/// under a steady run of short writes a waiter could miss every gap between them. It gives up only once no write has
+/// finished for [`WAIT_FOR_WRITE`]. (Writes on any database count, as the handler can't tell which it's waiting on:
+/// there's one in the server, and in tests, which open many, that only ever makes a write wait longer.)
 fn wait_turn(tries: i32) -> bool {
     let now = Instant::now();
-    let since = WAITING_SINCE.with(|w| {
-        if tries == 0 || w.get().is_none() {
-            w.set(Some(now));
-            SAID_WAITING.set(false);
-        }
-        w.get().unwrap_or(now)
-    });
-    let waited = now - since;
-    let gave_up = waited >= WAIT_FOR_WRITE;
     let mut turn = turn();
+    let first = tries == 0 || WAITING_SINCE.get().is_none();
+    if first {
+        WAITING_SINCE.set(Some(now));
+        SAID_WAITING.set(false);
+    }
+    let since = WAITING_SINCE.get().unwrap_or(now);
+    let progress = match LAST_PROGRESS.get() {
+        Some((writes, at)) if !first && writes == turn.writes => at,
+        _ => {
+            LAST_PROGRESS.set(Some((turn.writes, now)));
+            now
+        }
+    };
+    let waited = now - since;
+    let gave_up = now - progress >= WAIT_FOR_WRITE;
     if gave_up || (waited >= SLOW && !SAID_WAITING.replace(true)) {
         say_waiting(&turn, waited, gave_up);
     }

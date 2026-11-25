@@ -2589,7 +2589,7 @@ settings-look-hint = 可在顶栏中切换浅色和深色（或跟随系统）�
 
 ## SettingsPage.vue: 工具
 
-settings-blender-what = 在后台将 .blend、.dae、.abc 和 .x3d 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。
+settings-blender-what = 在后台将 .blend 和 .abc 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。
 settings-blender-download = 使用已安装的 Blender，或从 blender.org 镜像下载 Blender 4.5 LTS（约 400 MB）。
 settings-ffmpeg-what = 编码 MP3、OGG 和 Opus 下载，并读取 Hoard 自身无法解码的音频（AAC、M4A、WMA 等）。
 settings-ffmpeg-download = 使用带有所需编码器的系统 ffmpeg，或下载静态构建版本（约 80 MB）。
@@ -3083,6 +3083,10 @@ news-marked-seen =
     { $count ->
        *[other] 已将 { $count } 项标为已看过
     }
+news-pack-covers-title = 资源包显示自己的图片
+news-pack-covers-body = 附带预览图或截图的资源包会将其用作封面：在资源包列表中指针悬停时，以及在资源包面板中，会逐张切换显示。
+news-models-read-title = 支持更多 3D 格式，无需 Blender
+news-models-read-body = Collada、X3D、VRML、OFF 和 VRM 模型、BVH 动画以及高斯泼溅现在无需 Blender 即可获得缩略图、信息和 3D 查看器，并可下载为 GLB。
 news-themes-title = 十款浅色和十款深色主题
 news-themes-body = 浅色主题新增 Sky、Mint、Apricot 和 Lemon，深色主题新增 Midnight、Lagoon 和 Neon，新外观会从你选中的图块向外铺开。
 news-tiles-move-title = 让图块一直动起来

@@ -2562,7 +2562,7 @@ settings-look-hint = 상단 바에서 밝게와 어둡게(또는 시스템 설�
 
 ## SettingsPage.vue: 도구
 
-settings-blender-what = .blend, .dae, .abc, .x3d 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다.
+settings-blender-what = .blend, .abc 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다.
 settings-blender-download = 설치된 Blender를 사용하거나, blender.org 미러에서 Blender 4.5 LTS(약 400 MB)를 다운로드합니다.
 settings-ffmpeg-what = MP3, OGG, Opus 다운로드를 인코딩하고, Hoard가 직접 디코딩할 수 없는 오디오(AAC, M4A, WMA 등)를 읽습니다.
 settings-ffmpeg-download = 필요한 인코더가 있는 시스템 ffmpeg를 사용하거나, 정적 빌드(약 80 MB)를 다운로드합니다.
@@ -3050,6 +3050,10 @@ news-marked-seen =
     { $count ->
        *[other] 항목 { $count }개를 확인함으로 표시했습니다
     }
+news-pack-covers-title = 팩이 자체 이미지를 보여 줍니다
+news-pack-covers-body = 미리보기나 스크린샷이 들어 있는 팩은 이를 표지로 쓰며, 팩 목록에서 포인터를 올려 두는 동안과 팩 패널에서 차례로 넘겨 보여 줍니다.
+news-models-read-title = 더 많은 3D 형식, Blender 없이
+news-models-read-body = Collada, X3D, VRML, OFF, VRM 모델과 BVH 애니메이션, 가우시안 스플랫이 이제 Blender 없이 썸네일, 정보, 3D 뷰어를 갖고 GLB로 내려받을 수 있습니다.
 news-themes-title = 밝은 테마 10개와 어두운 테마 10개
 news-themes-body = 밝은 테마에 스카이, 민트, 애프리콧, 레몬이, 어두운 테마에 미드나이트, 라군, 네온이 추가되었고, 새 모습은 고른 타일에서부터 퍼져 나갑니다.
 news-tiles-move-title = 타일 계속 움직이기

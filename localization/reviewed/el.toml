@@ -8141,6 +8141,14 @@ translation = """
        *[other] { $count } πράγματα σημάνθηκαν ως ειδωμένα
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Τα μοντέλα Collada, X3D, VRML, OFF και VRM, τα κινούμενα BVH και τα Gaussian splats αποκτούν τώρα μικρογραφίες, στοιχεία και την προβολή 3D χωρίς Blender, και κατεβαίνουν ως GLB."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Περισσότερες μορφές 3D, χωρίς Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "Η μικρογραφία ενός animation χαράζει τη διαδρομή που κάνει ο χαρακτήρας του, με μια κουκκίδα εκεί που βρίσκεται τώρα."
@@ -8152,6 +8160,14 @@ translation = "Ίχνη κίνησης στα animation"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Δεν υπάρχει κάτι νέο για ανακάλυψη αυτή τη στιγμή."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "Ένα πακέτο που έρχεται με προεπισκοπήσεις ή στιγμιότυπα οθόνης τα χρησιμοποιεί ως εξώφυλλο και τα εναλλάσσει όσο ο δείκτης είναι πάνω του στη λίστα πακέτων, καθώς και στο πλαίσιό του."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "Τα πακέτα δείχνουν τις δικές τους εικόνες"
 
 [messages.news-pip]
 source = """
@@ -10164,8 +10180,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Χρησιμοποιεί ένα εγκατεστημένο Blender ή κατεβάζει το Blender 4.5 LTS (περίπου 400 MB) από έναν mirror του blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Μετατρέπει μοντέλα .blend, .dae, .abc και .x3d σε glTF στο παρασκήνιο, ώστε να αποκτούν μικρογραφίες και προεπισκόπηση 3D. Τα πακέτα που προστέθηκαν όσο ήταν ανενεργό μετατρέπονται μόλις είναι έτοιμο."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Μετατρέπει μοντέλα .blend και .abc σε glTF στο παρασκήνιο, ώστε να αποκτούν μικρογραφίες και προεπισκόπηση 3D. Τα πακέτα που προστέθηκαν όσο ήταν ανενεργό μετατρέπονται μόλις είναι έτοιμο."
 
 [messages.settings-chatgpt-account]
 source = "Account"

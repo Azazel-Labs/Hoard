@@ -2589,7 +2589,7 @@ settings-look-hint = ライトとダーク（またはシステムに合わせ�
 
 ## SettingsPage.vue: ツール
 
-settings-blender-what = .blend、.dae、.abc、.x3d のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。
+settings-blender-what = .blend、.abc のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。
 settings-blender-download = インストール済みの Blender を使うか、blender.org のミラーから Blender 4.5 LTS（約 400 MB）をダウンロードします。
 settings-ffmpeg-what = MP3、OGG、Opus のダウンロードをエンコードし、Hoard が自分でデコードできない音声（AAC、M4A、WMA など）を読み取ります。
 settings-ffmpeg-download = 必要なエンコーダーを備えたシステムの ffmpeg を使うか、静的ビルド（約 80 MB）をダウンロードします。
@@ -3083,6 +3083,10 @@ news-marked-seen =
     { $count ->
        *[other] { $count } 件を確認済みにしました
     }
+news-pack-covers-title = パックが自身の画像を表示
+news-pack-covers-body = プレビューやスクリーンショットが付いたパックは、それを表紙として使い、パック一覧でポインターを重ねている間とパックのパネルで順に切り替えて表示します。
+news-models-read-title = 対応する 3D 形式が増え、Blender も不要に
+news-models-read-body = Collada、X3D、VRML、OFF、VRM のモデル、BVH アニメーション、ガウシアンスプラットが、Blender なしでサムネイル、情報、3D ビューアーを持つようになり、GLB としてダウンロードできます。
 news-themes-title = ライトテーマとダークテーマが 10 種類ずつ
 news-themes-body = ライトテーマに Sky、Mint、Apricot、Lemon、ダークテーマに Midnight、Lagoon、Neon が加わりました。新しい見た目は選んだタイルから広がります。
 news-tiles-move-title = タイルを動かし続ける

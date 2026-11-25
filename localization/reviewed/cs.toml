@@ -8229,6 +8229,14 @@ translation = """
        *[other] { $count } novinek označeno jako zobrazené
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Modely Collada, X3D, VRML, OFF a VRM, animace BVH a gaussovské splaty teď dostanou miniatury, údaje a 3D prohlížeč bez Blenderu a jdou stáhnout jako GLB."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Další 3D formáty bez Blenderu"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "Miniatura animace kreslí dráhu, kterou urazí její postava, s tečkou tam, kde je právě teď."
@@ -8240,6 +8248,14 @@ translation = "Stopy pohybu u animací"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Teď tu není nic nového k objevení."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "Balíček, který obsahuje náhledy nebo snímky obrazovky, je použije jako obálku a střídá je, když nad ním v seznamu balíčků držíte ukazatel, i na svém panelu."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "Balíčky ukazují vlastní obrázky"
 
 [messages.news-pip]
 source = """
@@ -10285,8 +10301,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Použije nainstalovaný Blender, nebo stáhne Blender 4.5 LTS (asi 400 MB) ze zrcadla blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Na pozadí převádí modely .blend, .dae, .abc a .x3d do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Na pozadí převádí modely .blend a .abc do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený."
 
 [messages.settings-chatgpt-account]
 source = "Account"

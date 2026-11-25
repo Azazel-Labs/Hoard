@@ -1114,6 +1114,11 @@ function goToNew(n: NewThing) {
     if (w.library.kind) filters.kind = w.library.kind
     return
   }
+  if ('packs' in w) {
+    markSeen(n.id)
+    setView('packs')
+    return
+  }
   openSettings(w.settings)
   // The page may still be loading: look for the pip a little while.
   let tries = 0

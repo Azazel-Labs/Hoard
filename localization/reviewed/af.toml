@@ -8096,6 +8096,14 @@ translation = """
        *[other] { $count } dinge as gesien gemerk
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada-, X3D-, VRML-, OFF- en VRM-modelle, BVH-animasies en Gaussiese splats kry nou duimnaels, feite en die 3D-kyker sonder Blender, en kan as GLB afgelaai word."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Meer 3D-formate, sonder Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "’n Animasie se duimnael trek die pad na wat sy karakter volg, met ’n kolletjie waar dit nou is."
@@ -8107,6 +8115,14 @@ translation = "Bewegingspore op animasies"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Niks nuuts om nou te vind nie."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "’n Pak wat met voorskoue of skermkiekies kom, gebruik hulle as sy omslag en blaai daardeur terwyl die wyser op die pakkelys daaroor is, en op sy paneel."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "Pakke wys hul eie prente"
 
 [messages.news-pip]
 source = """
@@ -10101,8 +10117,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Gebruik 'n geïnstalleerde Blender, of laai Blender 4.5 LTS (omtrent 400 MB) van 'n blender.org-spieël af."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Skakel .blend-, .dae-, .abc- en .x3d-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Skakel .blend- en .abc-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is."
 
 [messages.settings-chatgpt-account]
 source = "Account"

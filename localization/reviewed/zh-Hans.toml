@@ -7905,6 +7905,14 @@ translation = """
        *[other] 已将 { $count } 项标为已看过
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada、X3D、VRML、OFF 和 VRM 模型、BVH 动画以及高斯泼溅现在无需 Blender 即可获得缩略图、信息和 3D 查看器，并可下载为 GLB。"
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "支持更多 3D 格式，无需 Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "动画的缩略图会描出角色走过的路径，并用一个圆点标出它当前的位置。"
@@ -7916,6 +7924,14 @@ translation = "动画运动轨迹"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "暂时没有新功能可看。"
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "附带预览图或截图的资源包会将其用作封面：在资源包列表中指针悬停时，以及在资源包面板中，会逐张切换显示。"
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "资源包显示自己的图片"
 
 [messages.news-pip]
 source = """
@@ -9873,8 +9889,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "使用已安装的 Blender，或从 blender.org 镜像下载 Blender 4.5 LTS（约 400 MB）。"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "在后台将 .blend、.dae、.abc 和 .x3d 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。"
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "在后台将 .blend 和 .abc 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。"
 
 [messages.settings-chatgpt-account]
 source = "Account"

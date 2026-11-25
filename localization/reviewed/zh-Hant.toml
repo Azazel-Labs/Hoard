@@ -7897,6 +7897,14 @@ translation = """
        *[other] 已將 { $count } 項標為已看過
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada、X3D、VRML、OFF 與 VRM 模型、BVH 動畫以及高斯潑濺現在不需 Blender 就有縮圖、資訊與 3D 檢視器，也能下載為 GLB。"
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "支援更多 3D 格式，無需 Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "動畫的縮圖會描出角色走過的路徑，並用一個圓點標出它目前的位置。"
@@ -7908,6 +7916,14 @@ translation = "動畫運動軌跡"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "目前沒有新功能可看。"
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "附有預覽圖或螢幕截圖的素材包會以它們作為封面：在素材包列表中指標停留時，以及在素材包面板中，會逐張切換顯示。"
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "素材包顯示自己的圖片"
 
 [messages.news-pip]
 source = """
@@ -9865,8 +9881,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "使用已安裝的 Blender，或從 blender.org 的鏡像站下載 Blender 4.5 LTS（約 400 MB）。"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "在背景將 .blend、.dae、.abc 與 .x3d 模型轉換為 glTF，讓它們有縮圖與 3D 預覽。在它關閉期間新增的素材包，會在它就緒後轉換。"
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "在背景將 .blend 與 .abc 模型轉換為 glTF，讓它們有縮圖與 3D 預覽。在它關閉期間新增的素材包，會在它就緒後轉換。"
 
 [messages.settings-chatgpt-account]
 source = "Account"

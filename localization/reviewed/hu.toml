@@ -7963,6 +7963,14 @@ translation = """
        *[other] { $count } elem megjelölve látottként
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "A Collada, X3D, VRML, OFF és VRM modellek, a BVH-animációk és a Gauss-splatek mostantól Blender nélkül kapnak bélyegképet, adatokat és 3D-nézőt, és GLB-ként letölthetők."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Több 3D-formátum, Blender nélkül"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "Az animációk bélyegképe kirajzolja a karakter útját, egy ponttal ott, ahol éppen jár."
@@ -7974,6 +7982,14 @@ translation = "Mozgásnyomok az animációkon"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Most nincs felfedeznivaló újdonság."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "Az előnézeti képekkel vagy képernyőképekkel érkező csomag ezeket használja borítóként, és végiglapozza őket, amíg a mutató rajta van a csomaglistában, valamint a saját paneljén."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "A csomagok a saját képeiket mutatják"
 
 [messages.news-pip]
 source = """
@@ -9938,8 +9954,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Telepített Blendert használ, vagy letölti a Blender 4.5 LTS-t (kb. 400 MB) egy blender.org-tükörről."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "A .blend, .dae, .abc és .x3d modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "A .blend és .abc modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül."
 
 [messages.settings-chatgpt-account]
 source = "Account"

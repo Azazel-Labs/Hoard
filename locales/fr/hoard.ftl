@@ -2879,7 +2879,7 @@ settings-look-hint = Passez du clair au sombre (ou suivez le système) depuis la
 
 ## SettingsPage.vue : Outils
 
-settings-blender-what = Convertit en arrière-plan les modèles .blend, .dae, .abc et .x3d en glTF, pour qu’ils aient des miniatures et un aperçu 3D. Les packs ajoutés pendant qu’il était désactivé sont convertis dès qu’il est prêt.
+settings-blender-what = Convertit en arrière-plan les modèles .blend et .abc en glTF, pour qu’ils aient des miniatures et un aperçu 3D. Les packs ajoutés pendant qu’il était désactivé sont convertis dès qu’il est prêt.
 settings-blender-download = Utilise un Blender installé, ou télécharge Blender 4.5 LTS (environ 400 Mo) depuis un miroir de blender.org.
 settings-ffmpeg-what = Encode les téléchargements en MP3, OGG et Opus, et lit l’audio que Hoard ne sait pas décoder lui-même (AAC, M4A, WMA…).
 settings-ffmpeg-download = Utilise un ffmpeg du système doté des bons encodeurs, ou télécharge une version statique (environ 80 Mo).
@@ -3400,6 +3400,10 @@ news-marked-seen =
         [one] { $count } nouveauté marquée comme vue
        *[other] { $count } nouveautés marquées comme vues
     }
+news-pack-covers-title = Les packs montrent leurs propres images
+news-pack-covers-body = Un pack livré avec des aperçus ou des captures d’écran s’en sert comme couverture et les fait défiler quand le pointeur le survole dans la liste des packs, ainsi que dans son panneau.
+news-models-read-title = Plus de formats 3D, sans Blender
+news-models-read-body = Les modèles Collada, X3D, VRML, OFF et VRM, les animations BVH et les splats gaussiens ont désormais des miniatures, des infos et la visionneuse 3D sans Blender, et se téléchargent en GLB.
 news-themes-title = Dix thèmes clairs et dix thèmes sombres
 news-themes-body = Ciel, Menthe, Abricot et Citron rejoignent les thèmes clairs, Minuit, Lagon et Néon les sombres, et le nouveau look se diffuse depuis la vignette choisie.
 news-tiles-move-title = Des vignettes toujours animées

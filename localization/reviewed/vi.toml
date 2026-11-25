@@ -7891,6 +7891,14 @@ translation = """
        *[other] Đã đánh dấu { $count } điều là đã xem
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Mô hình Collada, X3D, VRML, OFF và VRM, hoạt ảnh BVH và Gaussian splat giờ có ảnh thu nhỏ, thông tin và trình xem 3D mà không cần Blender, và tải xuống được dưới dạng GLB."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Thêm định dạng 3D, không cần Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "Ảnh thu nhỏ của hoạt ảnh vẽ lại đường đi của nhân vật, kèm một chấm ở vị trí hiện tại."
@@ -7902,6 +7910,14 @@ translation = "Vệt chuyển động trên hoạt ảnh"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Hiện chưa có gì mới để khám phá."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "Gói đi kèm ảnh xem trước hoặc ảnh chụp màn hình sẽ dùng chúng làm ảnh bìa, lần lượt chuyển qua từng ảnh khi con trỏ nằm trên gói trong danh sách gói, và cả trong bảng của gói."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "Gói hiển thị hình ảnh của chính nó"
 
 [messages.news-pip]
 source = """
@@ -9859,8 +9875,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Dùng Blender đã cài, hoặc tải Blender 4.5 LTS (khoảng 400 MB) từ một máy chủ phản chiếu của blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Chuyển đổi mô hình .blend, .dae, .abc và .x3d sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Chuyển đổi mô hình .blend và .abc sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng."
 
 [messages.settings-chatgpt-account]
 source = "Account"

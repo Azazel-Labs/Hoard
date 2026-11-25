@@ -3067,7 +3067,7 @@ settings-look-hint = Mezi světlým a tmavým (nebo podle systému) přepínáte
 
 ## SettingsPage.vue: Nástroje
 
-settings-blender-what = Na pozadí převádí modely .blend, .dae, .abc a .x3d do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený.
+settings-blender-what = Na pozadí převádí modely .blend a .abc do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený.
 settings-blender-download = Použije nainstalovaný Blender, nebo stáhne Blender 4.5 LTS (asi 400 MB) ze zrcadla blender.org.
 settings-ffmpeg-what = Kóduje stahování v MP3, OGG a Opus a čte zvuk, který Hoard sám dekódovat neumí (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Použije systémový ffmpeg se správnými enkodéry, nebo stáhne statický build (asi 80 MB).
@@ -3629,6 +3629,10 @@ news-marked-seen =
         [many] { $count } novinky označeno jako zobrazené
        *[other] { $count } novinek označeno jako zobrazené
     }
+news-pack-covers-title = Balíčky ukazují vlastní obrázky
+news-pack-covers-body = Balíček, který obsahuje náhledy nebo snímky obrazovky, je použije jako obálku a střídá je, když nad ním v seznamu balíčků držíte ukazatel, i na svém panelu.
+news-models-read-title = Další 3D formáty bez Blenderu
+news-models-read-body = Modely Collada, X3D, VRML, OFF a VRM, animace BVH a gaussovské splaty teď dostanou miniatury, údaje a 3D prohlížeč bez Blenderu a jdou stáhnout jako GLB.
 news-themes-title = Deset světlých a deset tmavých motivů
 news-themes-body = Ke světlým motivům přibyly Obloha, Máta, Meruňka a Citron, k tmavým Půlnoc, Laguna a Neon, a nový vzhled se rozlije od dlaždice, kterou vyberete.
 news-tiles-move-title = Dlaždice stále v pohybu

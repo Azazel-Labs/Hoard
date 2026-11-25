@@ -7905,6 +7905,14 @@ translation = """
        *[other] { $count } 件を確認済みにしました
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada、X3D、VRML、OFF、VRM のモデル、BVH アニメーション、ガウシアンスプラットが、Blender なしでサムネイル、情報、3D ビューアーを持つようになり、GLB としてダウンロードできます。"
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "対応する 3D 形式が増え、Blender も不要に"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "アニメーションのサムネイルにキャラクターの動いた道筋が描かれ、今いる位置に点が表示されます。"
@@ -7916,6 +7924,14 @@ translation = "アニメーションの軌跡"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "今のところ新着はありません。"
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "プレビューやスクリーンショットが付いたパックは、それを表紙として使い、パック一覧でポインターを重ねている間とパックのパネルで順に切り替えて表示します。"
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "パックが自身の画像を表示"
 
 [messages.news-pip]
 source = """
@@ -9873,8 +9889,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "インストール済みの Blender を使うか、blender.org のミラーから Blender 4.5 LTS（約 400 MB）をダウンロードします。"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = ".blend、.dae、.abc、.x3d のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。"
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = ".blend、.abc のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。"
 
 [messages.settings-chatgpt-account]
 source = "Account"

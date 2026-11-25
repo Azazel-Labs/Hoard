@@ -2666,7 +2666,7 @@ settings-look-hint = A világos és a sötét mód (vagy a rendszer követése) 
 
 ## SettingsPage.vue: Eszközök
 
-settings-blender-what = A .blend, .dae, .abc és .x3d modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül.
+settings-blender-what = A .blend és .abc modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül.
 settings-blender-download = Telepített Blendert használ, vagy letölti a Blender 4.5 LTS-t (kb. 400 MB) egy blender.org-tükörről.
 settings-ffmpeg-what = MP3-, OGG- és Opus-letöltéseket kódol, és beolvassa azokat a hangokat, amelyeket a Hoard maga nem tud dekódolni (AAC, M4A, WMA, …).
 settings-ffmpeg-download = A rendszer megfelelő kódolókkal rendelkező ffmpeg-jét használja, vagy letölt egy statikus buildet (kb. 80 MB).
@@ -3177,6 +3177,10 @@ news-marked-seen =
         [one] { $count } elem megjelölve látottként
        *[other] { $count } elem megjelölve látottként
     }
+news-pack-covers-title = A csomagok a saját képeiket mutatják
+news-pack-covers-body = Az előnézeti képekkel vagy képernyőképekkel érkező csomag ezeket használja borítóként, és végiglapozza őket, amíg a mutató rajta van a csomaglistában, valamint a saját paneljén.
+news-models-read-title = Több 3D-formátum, Blender nélkül
+news-models-read-body = A Collada, X3D, VRML, OFF és VRM modellek, a BVH-animációk és a Gauss-splatek mostantól Blender nélkül kapnak bélyegképet, adatokat és 3D-nézőt, és GLB-ként letölthetők.
 news-themes-title = Tíz világos és tíz sötét téma
 news-themes-body = Az Égbolt, a Menta, a Sárgabarack és a Citrom a világos, az Éjfél, a Lagúna és a Neon a sötét témák közé került, az új megjelenés pedig a kiválasztott csempétől terül szét.
 news-tiles-move-title = Mozgásban maradó csempék

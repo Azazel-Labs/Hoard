@@ -3062,7 +3062,7 @@ settings-look-hint = Comutați între luminos și întunecat (sau urmați sistem
 
 ## SettingsPage.vue: Instrumente
 
-settings-blender-what = Convertește în fundal modelele .blend, .dae, .abc și .x3d în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata.
+settings-blender-what = Convertește în fundal modelele .blend și .abc în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata.
 settings-blender-download = Folosește un Blender instalat sau descarcă Blender 4.5 LTS (aproximativ 400 MB) de pe o oglindă blender.org.
 settings-ffmpeg-what = Codifică descărcările MP3, OGG și Opus și citește sunetul pe care Hoard nu îl poate decoda singur (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Folosește un ffmpeg de sistem cu codificatoarele potrivite sau descarcă un build static (aproximativ 80 MB).
@@ -3609,6 +3609,10 @@ news-marked-seen =
         [few] { $count } noutăți marcate ca văzute
        *[other] { $count } de noutăți marcate ca văzute
     }
+news-pack-covers-title = Pachetele își arată propriile imagini
+news-pack-covers-body = Un pachet care vine cu previzualizări sau capturi de ecran le folosește drept copertă și trece de la una la alta cât timp cursorul e deasupra lui în lista de pachete, precum și în panoul său.
+news-models-read-title = Mai multe formate 3D, fără Blender
+news-models-read-body = Modelele Collada, X3D, VRML, OFF și VRM, animațiile BVH și splaturile gaussiene primesc acum miniaturi, informații și vizualizatorul 3D fără Blender și pot fi descărcate ca GLB.
 news-themes-title = Zece teme luminoase și zece întunecate
 news-themes-body = Sky, Mint, Apricot și Lemon se alătură temelor luminoase, iar Midnight, Lagoon și Neon celor întunecate, iar noul aspect se răspândește din dala pe care o alegeți.
 news-tiles-move-title = Dale mereu în mișcare

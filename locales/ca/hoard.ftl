@@ -2843,7 +2843,7 @@ settings-look-hint = Canvieu entre clar i fosc (o seguiu el sistema) des de la b
 
 ## SettingsPage.vue: Eines
 
-settings-blender-what = Converteix models .blend, .dae, .abc i .x3d a glTF en segon pla, perquè tinguin miniatures i previsualització 3D. Els paquets afegits mentre estava desactivat es converteixen quan estigui a punt.
+settings-blender-what = Converteix models .blend i .abc a glTF en segon pla, perquè tinguin miniatures i previsualització 3D. Els paquets afegits mentre estava desactivat es converteixen quan estigui a punt.
 settings-blender-download = Fa servir un Blender instal·lat, o baixa Blender 4.5 LTS (uns 400 MB) d'un mirall de blender.org.
 settings-ffmpeg-what = Codifica les baixades en MP3, OGG i Opus, i llegeix l'àudio que Hoard no pot descodificar per si mateix (AAC, M4A, WMA…).
 settings-ffmpeg-download = Fa servir un ffmpeg del sistema amb els codificadors adequats, o baixa una versió estàtica (uns 80 MB).
@@ -3362,6 +3362,10 @@ news-marked-seen =
         [one] S’ha marcat { $count } novetat com a vista
        *[other] S’han marcat { $count } novetats com a vistes
     }
+news-pack-covers-title = Els paquets mostren les seves pròpies imatges
+news-pack-covers-body = Un paquet que inclou previsualitzacions o captures de pantalla les fa servir de portada i les va passant mentre hi tens el punter a la llista de paquets, i també al seu panell.
+news-models-read-title = Més formats 3D, sense Blender
+news-models-read-body = Els models Collada, X3D, VRML, OFF i VRM, les animacions BVH i els splats gaussians ara tenen miniatures, dades i el visor 3D sense Blender, i es poden baixar com a GLB.
 news-themes-title = Deu temes clars i deu de foscos
 news-themes-body = Cel, Menta, Albercoc i Llimona s’afegeixen als temes clars, i Mitjanit, Llacuna i Neó als foscos; el nou aspecte s’escampa des de la miniatura que triïs.
 news-tiles-move-title = Miniatures sempre en moviment

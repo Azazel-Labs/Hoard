@@ -3088,7 +3088,7 @@ settings-look-hint = Tryb jasny lub ciemny (albo zgodny z systemem) można prze�
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = Konwertuje w tle modele .blend, .dae, .abc i .x3d do glTF, by miały miniatury i podgląd 3D. Paczki dodane, gdy był wyłączony, zostaną przekonwertowane, gdy będzie gotowy.
+settings-blender-what = Konwertuje w tle modele .blend i .abc do glTF, by miały miniatury i podgląd 3D. Paczki dodane, gdy był wyłączony, zostaną przekonwertowane, gdy będzie gotowy.
 settings-blender-download = Używa zainstalowanego Blendera lub pobiera Blender 4.5 LTS (ok. 400 MB) z serwera lustrzanego blender.org.
 settings-ffmpeg-what = Koduje pobrania w formatach MP3, OGG i Opus oraz odczytuje dźwięk, którego Hoard nie potrafi sam zdekodować (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Używa systemowego ffmpeg z odpowiednimi koderami lub pobiera statyczną kompilację (ok. 80 MB).
@@ -3658,6 +3658,10 @@ news-marked-seen =
         [many] Oznaczono { $count } nowości jako obejrzane
        *[other] Oznaczono { $count } nowości jako obejrzane
     }
+news-pack-covers-title = Paczki pokazują własne obrazy
+news-pack-covers-body = Paczka z podglądami lub zrzutami ekranu używa ich jako okładki i przełącza je, gdy kursor jest nad nią na liście paczek, a także w jej panelu.
+news-models-read-title = Więcej formatów 3D, bez Blendera
+news-models-read-body = Modele Collada, X3D, VRML, OFF i VRM, animacje BVH oraz splaty gaussowskie mają teraz miniatury, informacje i podgląd 3D bez Blendera, a także można je pobrać jako GLB.
 news-themes-title = Dziesięć jasnych i dziesięć ciemnych motywów
 news-themes-body = Do jasnych motywów dołączają Niebo, Mięta, Morela i Cytryna, a do ciemnych Północ, Laguna i Neon. Nowy wygląd rozlewa się od wybranego kafelka.
 news-tiles-move-title = Kafelki w ciągłym ruchu

@@ -2621,7 +2621,7 @@ settings-look-hint = Beralih antara terang dan gelap (atau ikuti sistem) dari bi
 
 ## SettingsPage.vue: Alat
 
-settings-blender-what = Mengonversi model .blend, .dae, .abc, dan .x3d ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap.
+settings-blender-what = Mengonversi model .blend dan .abc ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap.
 settings-blender-download = Memakai Blender yang terpasang, atau mengunduh Blender 4.5 LTS (sekitar 400 MB) dari mirror blender.org.
 settings-ffmpeg-what = Meng-encode unduhan MP3, OGG, dan Opus, serta membaca audio yang tidak dapat didekode Hoard sendiri (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Memakai ffmpeg sistem dengan encoder yang sesuai, atau mengunduh build statis (sekitar 80 MB).
@@ -3115,6 +3115,10 @@ news-marked-seen =
     { $count ->
        *[other] { $count } hal ditandai sudah dilihat
     }
+news-pack-covers-title = Paket menampilkan gambarnya sendiri
+news-pack-covers-body = Paket yang disertai pratinjau atau tangkapan layar memakainya sebagai sampul dan berganti dari satu ke yang berikutnya saat penunjuk berada di atasnya di daftar paket, juga di panelnya.
+news-models-read-title = Lebih banyak format 3D, tanpa Blender
+news-models-read-body = Model Collada, X3D, VRML, OFF, dan VRM, animasi BVH, serta Gaussian splat kini mendapat gambar mini, fakta, dan penampil 3D tanpa Blender, dan bisa diunduh sebagai GLB.
 news-themes-title = Sepuluh tema terang dan sepuluh tema gelap
 news-themes-body = Langit, Mint, Aprikot, dan Lemon bergabung dengan tema terang, sedangkan Tengah Malam, Laguna, dan Neon dengan tema gelap, dan tampilan baru menyebar dari ubin yang Anda pilih.
 news-tiles-move-title = Ubin yang terus bergerak

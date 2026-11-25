@@ -2922,7 +2922,7 @@ settings-look-hint = Vaihda vaalean ja tumman välillä (tai seuraa järjestelm�
 
 ## Asetukset: Työkalut
 
-settings-blender-what = Muuntaa .blend-, .dae-, .abc- ja .x3d-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis.
+settings-blender-what = Muuntaa .blend- ja .abc-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis.
 settings-blender-download = Käyttää asennettua Blenderiä tai lataa Blender 4.5 LTS:n (noin 400 Mt) blender.orgin peilipalvelimelta.
 settings-ffmpeg-what = Koodaa MP3-, OGG- ja Opus-lataukset ja lukee äänen, jota Hoard ei itse osaa purkaa (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Käyttää järjestelmän ffmpegiä, jossa on oikeat kooderit, tai lataa staattisen version (noin 80 Mt).
@@ -3443,6 +3443,10 @@ news-marked-seen =
         [one] { $count } asia merkitty nähdyksi
        *[other] { $count } asiaa merkitty nähdyiksi
     }
+news-pack-covers-title = Paketit näyttävät omat kuvansa
+news-pack-covers-body = Paketti, jonka mukana tulee esikatselukuvia tai kuvakaappauksia, käyttää niitä kansikuvanaan ja vaihtaa niitä, kun osoitin on sen päällä pakettiluettelossa, sekä omassa paneelissaan.
+news-models-read-title = Lisää 3D-muotoja ilman Blenderiä
+news-models-read-body = Collada-, X3D-, VRML-, OFF- ja VRM-mallit, BVH-animaatiot ja Gaussin splatit saavat nyt pikkukuvat, tiedot ja 3D-katselimen ilman Blenderiä, ja ne voi ladata GLB-muodossa.
 news-themes-title = Kymmenen vaaleaa ja kymmenen tummaa teemaa
 news-themes-body = Taivas, Minttu, Aprikoosi ja Sitruuna liittyvät vaaleisiin teemoihin ja Keskiyö, Laguuni ja Neon tummiin, ja uusi ulkoasu leviää valitsemastasi ruudusta.
 news-tiles-move-title = Pidä ruudut liikkeessä

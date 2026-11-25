@@ -2589,7 +2589,7 @@ settings-look-hint = Chuyển giữa sáng và tối (hoặc theo hệ thống) 
 
 ## Cài đặt: Công cụ
 
-settings-blender-what = Chuyển đổi mô hình .blend, .dae, .abc và .x3d sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng.
+settings-blender-what = Chuyển đổi mô hình .blend và .abc sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng.
 settings-blender-download = Dùng Blender đã cài, hoặc tải Blender 4.5 LTS (khoảng 400 MB) từ một máy chủ phản chiếu của blender.org.
 settings-ffmpeg-what = Mã hóa bản tải xuống MP3, OGG và Opus, và đọc âm thanh mà Hoard không tự giải mã được (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Dùng ffmpeg của hệ thống có đủ bộ mã hóa, hoặc tải một bản build tĩnh (khoảng 80 MB).
@@ -3083,6 +3083,10 @@ news-marked-seen =
     { $count ->
        *[other] Đã đánh dấu { $count } điều là đã xem
     }
+news-pack-covers-title = Gói hiển thị hình ảnh của chính nó
+news-pack-covers-body = Gói đi kèm ảnh xem trước hoặc ảnh chụp màn hình sẽ dùng chúng làm ảnh bìa, lần lượt chuyển qua từng ảnh khi con trỏ nằm trên gói trong danh sách gói, và cả trong bảng của gói.
+news-models-read-title = Thêm định dạng 3D, không cần Blender
+news-models-read-body = Mô hình Collada, X3D, VRML, OFF và VRM, hoạt ảnh BVH và Gaussian splat giờ có ảnh thu nhỏ, thông tin và trình xem 3D mà không cần Blender, và tải xuống được dưới dạng GLB.
 news-themes-title = Mười chủ đề sáng và mười chủ đề tối
 news-themes-body = Sky, Mint, Apricot và Lemon gia nhập các chủ đề sáng, còn Midnight, Lagoon và Neon gia nhập các chủ đề tối, và giao diện mới lan ra từ ô bạn chọn.
 news-tiles-move-title = Giữ các ô luôn chuyển động

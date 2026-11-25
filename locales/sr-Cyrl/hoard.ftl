@@ -2967,7 +2967,7 @@ settings-look-hint = Пребацујте између светле и тамн�
 
 ## SettingsPage.vue: Алати
 
-settings-blender-what = У позадини претвара моделе .blend, .dae, .abc и .x3d у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман.
+settings-blender-what = У позадини претвара моделе .blend и .abc у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман.
 settings-blender-download = Користи инсталирани Blender или преузима Blender 4.5 LTS (око 400 MB) са огледала blender.org.
 settings-ffmpeg-what = Кодира MP3, OGG и Opus преузимања и чита звук који Hoard не може сам да декодира (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Користи системски ffmpeg с одговарајућим кодерима или преузима статичку верзију (око 80 MB).
@@ -3510,6 +3510,10 @@ news-marked-seen =
         [few] { $count } новине означене као виђене
        *[other] { $count } новина означено као виђено
     }
+news-pack-covers-title = Пакети приказују своје слике
+news-pack-covers-body = Пакет који долази са прегледима или снимцима екрана користи их као насловну слику и мења их док је показивач изнад њега на листи пакета, као и на свом панелу.
+news-models-read-title = Више 3D формата, без Blender-а
+news-models-read-body = Модели Collada, X3D, VRML, OFF и VRM, BVH анимације и Гаусови сплатови сада добијају сличице, податке и 3D прегледач без Blender-а, и могу да се преузму као GLB.
 news-themes-title = Десет светлих и десет тамних тема
 news-themes-body = Светлим темама придружују се Sky, Mint, Apricot и Lemon, а тамнима Midnight, Lagoon и Neon, и нови изглед се шири од плочице коју изаберете.
 news-tiles-move-title = Плочице у покрету

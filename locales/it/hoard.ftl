@@ -2850,7 +2850,7 @@ settings-look-hint = Passa da chiaro a scuro (o segui il sistema) dalla barra su
 
 ## SettingsPage.vue: Strumenti
 
-settings-blender-what = Converte i modelli .blend, .dae, .abc e .x3d in glTF in background, così ricevono miniature e un'anteprima 3D. I pacchetti aggiunti mentre era disattivato vengono convertiti appena è pronto.
+settings-blender-what = Converte i modelli .blend e .abc in glTF in background, così ricevono miniature e un'anteprima 3D. I pacchetti aggiunti mentre era disattivato vengono convertiti appena è pronto.
 settings-blender-download = Usa un Blender installato, oppure scarica Blender 4.5 LTS (circa 400 MB) da un mirror di blender.org.
 settings-ffmpeg-what = Codifica i download in MP3, OGG e Opus, e legge l'audio che Hoard non sa decodificare da sé (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Usa un ffmpeg di sistema con gli encoder giusti, oppure scarica una build statica (circa 80 MB).
@@ -3367,6 +3367,10 @@ news-marked-seen =
         [one] { $count } novità segnata come vista
        *[other] { $count } novità segnate come viste
     }
+news-pack-covers-title = I pacchetti mostrano le proprie immagini
+news-pack-covers-body = Un pacchetto con anteprime o screenshot le usa come copertina e le fa scorrere mentre il puntatore è sopra di esso nell’elenco dei pacchetti, e anche nel suo pannello.
+news-models-read-title = Più formati 3D, senza Blender
+news-models-read-body = I modelli Collada, X3D, VRML, OFF e VRM, le animazioni BVH e gli splat gaussiani ora hanno miniature, dati e il visualizzatore 3D senza Blender, e si possono scaricare come GLB.
 news-themes-title = Dieci temi chiari e dieci scuri
 news-themes-body = Cielo, Menta, Albicocca e Limone si aggiungono ai temi chiari, Mezzanotte, Laguna e Neon a quelli scuri, e il nuovo aspetto si diffonde dal riquadro che scegli.
 news-tiles-move-title = Riquadri sempre in movimento

@@ -7885,6 +7885,14 @@ translation = """
        *[other] 항목 { $count }개를 확인함으로 표시했습니다
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada, X3D, VRML, OFF, VRM 모델과 BVH 애니메이션, 가우시안 스플랫이 이제 Blender 없이 썸네일, 정보, 3D 뷰어를 갖고 GLB로 내려받을 수 있습니다."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "더 많은 3D 형식, Blender 없이"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "애니메이션 썸네일에 캐릭터가 지나가는 경로가 그려지고, 지금 있는 위치에 점이 표시됩니다."
@@ -7896,6 +7904,14 @@ translation = "애니메이션의 움직임 궤적"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "지금은 새로운 항목이 없습니다."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "미리보기나 스크린샷이 들어 있는 팩은 이를 표지로 쓰며, 팩 목록에서 포인터를 올려 두는 동안과 팩 패널에서 차례로 넘겨 보여 줍니다."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "팩이 자체 이미지를 보여 줍니다"
 
 [messages.news-pip]
 source = """
@@ -9835,8 +9851,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "설치된 Blender를 사용하거나, blender.org 미러에서 Blender 4.5 LTS(약 400 MB)를 다운로드합니다."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = ".blend, .dae, .abc, .x3d 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = ".blend, .abc 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다."
 
 [messages.settings-chatgpt-account]
 source = "Account"

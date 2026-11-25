@@ -8096,6 +8096,14 @@ translation = """
        *[other] { $count } Neuheiten als gesehen markiert
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "Collada-, X3D-, VRML-, OFF- und VRM-Modelle, BVH-Animationen und Gaussian Splats bekommen jetzt ohne Blender Vorschaubilder, Angaben und die 3D-Ansicht und lassen sich als GLB herunterladen."
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "Mehr 3D-Formate, ohne Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "Das Vorschaubild einer Animation zeichnet den Weg nach, den ihre Figur nimmt, mit einem Punkt dort, wo sie gerade ist."
@@ -8107,6 +8115,14 @@ translation = "Bewegungsspuren bei Animationen"
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "Gerade gibt es nichts Neues zu entdecken."
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "Ein Paket mit Vorschauen oder Screenshots nimmt sie als Titelbild und blättert durch sie, solange der Zeiger in der Paketliste darauf liegt, und in seinem Seitenbereich."
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "Pakete zeigen ihre eigenen Bilder"
 
 [messages.news-pip]
 source = """
@@ -10101,8 +10117,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Verwendet ein installiertes Blender oder lädt Blender 4.5 LTS (etwa 400 MB) von einem blender.org-Mirror herunter."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Wandelt .blend-, .dae-, .abc- und .x3d-Modelle im Hintergrund in glTF um, damit sie Vorschaubilder und eine 3D-Vorschau bekommen. Pakete, die hinzugefügt wurden, während es aus war, werden umgewandelt, sobald es bereit ist."
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Wandelt .blend- und .abc-Modelle im Hintergrund in glTF um, damit sie Vorschaubilder und eine 3D-Vorschau bekommen. Pakete, die hinzugefügt wurden, während es aus war, werden umgewandelt, sobald es bereit ist."
 
 [messages.settings-chatgpt-account]
 source = "Account"

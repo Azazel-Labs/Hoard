@@ -9,8 +9,8 @@ import { auth, may } from './auth'
 import { t } from './i18n'
 import { toast } from './ui'
 
-/** Where a new thing lives: a page of Settings, or the library (showing one kind of asset). */
-export type NewPlace = { settings: string } | { library: { kind?: string } }
+/** Where a new thing lives: a page of Settings, the library (showing one kind of asset), or the packs list. */
+export type NewPlace = { settings: string } | { library: { kind?: string } } | { packs: true }
 
 export interface NewThing {
   /** Kept in each account's record of what it's seen: short, lowercase, never reused. */
@@ -30,6 +30,16 @@ const settingsCrumb = (page: () => string) => () => [t('settings-title'), page()
 
 /** Newest first. Take things off the end once they're well past NEW_FOR_DAYS. */
 export const NEWS: NewThing[] = [
+  {
+    id: 'pack-covers', date: '2026-11-24', where: { packs: true },
+    title: () => t('news-pack-covers-title'), body: () => t('news-pack-covers-body'),
+    crumb: () => [t('app-packs')],
+  },
+  {
+    id: 'models-read', date: '2026-11-24', where: { library: { kind: 'model' } },
+    title: () => t('news-models-read-title'), body: () => t('news-models-read-body'),
+    crumb: () => [t('app-library')],
+  },
   {
     id: 'themes-20', date: '2026-11-22', where: { settings: 'appearance' },
     title: () => t('news-themes-title'), body: () => t('news-themes-body'),

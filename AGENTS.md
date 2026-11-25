@@ -1,5 +1,20 @@
 # Hoard project guidance
 
+## Point out what's new
+
+When a release brings something a person would notice and want to try (a feature, a new kind of file read, a
+setting, a new place in the portal), add it to the "New in Hoard" list, `NEWS` in
+[web/src/news.ts](web/src/news.ts), in the same change:
+
+- Newest first. `id` is short, lowercase and never reused. `date` is the day it ships. `need` is the role that can use
+  it, if any, and `where` is the page it lives on, which gets the gold pip.
+- Its `news-<id>-title` and `news-<id>-body` go into all 31 catalogs (`cargo xtask translations review`).
+- Leave out fixes, speedups, memory savings and refactors that change nothing a person does.
+- Drop entries from the end once they're well past `NEW_FOR_DAYS`.
+
+Why: the list is the only place people learn what a release added. Features shipped without an entry, such as Hoard
+reading Collada and VRM itself, went unnoticed.
+
 ## Visual output needs a human look before it's done
 
 When a change makes Hoard produce a picture it hasn't produced before (a new thumbnail source, a new viewer, an

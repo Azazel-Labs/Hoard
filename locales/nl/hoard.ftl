@@ -2836,7 +2836,7 @@ settings-look-hint = Wissel tussen licht en donker (of volg het systeem) via de 
 
 ## SettingsPage.vue: Hulpprogramma's
 
-settings-blender-what = Converteert .blend-, .dae-, .abc- en .x3d-modellen op de achtergrond naar glTF, zodat ze miniaturen en een 3D-voorbeeld krijgen. Pakketten die zijn toegevoegd terwijl het uit stond, worden geconverteerd zodra het klaar is.
+settings-blender-what = Converteert .blend- en .abc-modellen op de achtergrond naar glTF, zodat ze miniaturen en een 3D-voorbeeld krijgen. Pakketten die zijn toegevoegd terwijl het uit stond, worden geconverteerd zodra het klaar is.
 settings-blender-download = Gebruikt een geïnstalleerde Blender, of downloadt Blender 4.5 LTS (ongeveer 400 MB) van een mirror van blender.org.
 settings-ffmpeg-what = Codeert MP3-, OGG- en Opus-downloads, en leest audio die Hoard zelf niet kan decoderen (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Gebruikt een ffmpeg van het systeem met de juiste encoders, of downloadt een statische build (ongeveer 80 MB).
@@ -3353,6 +3353,10 @@ news-marked-seen =
         [one] { $count } ding als gezien gemarkeerd
        *[other] { $count } dingen als gezien gemarkeerd
     }
+news-pack-covers-title = Pakketten tonen hun eigen afbeeldingen
+news-pack-covers-body = Een pakket met voorbeelden of schermafbeeldingen gebruikt die als omslag en bladert erdoor zolang de aanwijzer erboven staat in de pakketlijst, en in zijn paneel.
+news-models-read-title = Meer 3D-formaten, zonder Blender
+news-models-read-body = Collada-, X3D-, VRML-, OFF- en VRM-modellen, BVH-animaties en Gaussian splats krijgen nu zonder Blender miniaturen, gegevens en de 3D-viewer, en zijn te downloaden als GLB.
 news-themes-title = Tien lichte en tien donkere thema’s
 news-themes-body = Hemel, Munt, Abrikoos en Citroen komen bij de lichte thema’s en Middernacht, Lagune en Neon bij de donkere, en de nieuwe look verspreidt zich vanaf de tegel die je kiest.
 news-tiles-move-title = Tegels blijven bewegen

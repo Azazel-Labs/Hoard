@@ -3196,7 +3196,7 @@ settings-look-hint = Switch between light and dark (or follow the system) from t
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready.
+settings-blender-what = Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready.
 settings-blender-download = Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror.
 settings-ffmpeg-what = Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB).
@@ -3763,6 +3763,10 @@ news-marked-seen =
        *[other] { $count } things marked seen
     }
 # The new things themselves: a short title and a sentence or two on what it is.
+news-pack-covers-title = Packs show their own pictures
+news-pack-covers-body = A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel.
+news-models-read-title = More 3D formats, no Blender needed
+news-models-read-body = Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB.
 news-themes-title = Ten light and ten dark themes
 news-themes-body = Sky, Mint, Apricot and Lemon join the light themes and Midnight, Lagoon and Neon the dark, and the new look spreads out from the tile you pick.
 news-tiles-move-title = Keep tiles moving

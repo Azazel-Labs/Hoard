@@ -2840,7 +2840,7 @@ settings-look-hint = Växla mellan ljust och mörkt (eller följ systemet) i det
 
 ## SettingsPage.vue: Verktyg
 
-settings-blender-what = Konverterar .blend-, .dae-, .abc- och .x3d-modeller till glTF i bakgrunden, så att de får miniatyrbilder och en 3D-förhandsvisning. Paket som lades till medan det var avstängt konverteras när det är klart.
+settings-blender-what = Konverterar .blend- och .abc-modeller till glTF i bakgrunden, så att de får miniatyrbilder och en 3D-förhandsvisning. Paket som lades till medan det var avstängt konverteras när det är klart.
 settings-blender-download = Använder en installerad Blender, eller laddar ner Blender 4.5 LTS (cirka 400 MB) från en spegel av blender.org.
 settings-ffmpeg-what = Kodar MP3-, OGG- och Opus-nedladdningar, och läser ljud som Hoard inte kan avkoda själv (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Använder en ffmpeg i systemet med rätt kodare, eller laddar ner en statisk version (cirka 80 MB).
@@ -3361,6 +3361,10 @@ news-marked-seen =
         [one] { $count } sak markerad som sedd
        *[other] { $count } saker markerade som sedda
     }
+news-pack-covers-title = Paket visar sina egna bilder
+news-pack-covers-body = Ett paket med förhandsvisningar eller skärmbilder använder dem som omslag och bläddrar mellan dem medan pekaren är över det i paketlistan, och i dess panel.
+news-models-read-title = Fler 3D-format, utan Blender
+news-models-read-body = Collada-, X3D-, VRML-, OFF- och VRM-modeller, BVH-animationer och gaussiska splats får nu miniatyrbilder, fakta och 3D-visaren utan Blender och kan laddas ner som GLB.
 news-themes-title = Tio ljusa och tio mörka teman
 news-themes-body = Sky, Mint, Apricot och Lemon ansluter till de ljusa temana och Midnight, Lagoon och Neon till de mörka, och det nya utseendet sprider sig från rutan du väljer.
 news-tiles-move-title = Rutor i rörelse

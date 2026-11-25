@@ -2836,7 +2836,7 @@ settings-look-hint = Wissel tussen lig en donker (of volg die stelsel) vanuit di
 
 ## SettingsPage.vue: Gereedskap
 
-settings-blender-what = Skakel .blend-, .dae-, .abc- en .x3d-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is.
+settings-blender-what = Skakel .blend- en .abc-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is.
 settings-blender-download = Gebruik 'n geïnstalleerde Blender, of laai Blender 4.5 LTS (omtrent 400 MB) van 'n blender.org-spieël af.
 settings-ffmpeg-what = Enkodeer MP3-, OGG- en Opus-aflaaie, en lees klank wat Hoard nie self kan dekodeer nie (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Gebruik 'n stelsel-ffmpeg met die regte enkodeerders, of laai 'n statiese bou (omtrent 80 MB) af.
@@ -3351,6 +3351,10 @@ news-marked-seen =
         [one] { $count } ding as gesien gemerk
        *[other] { $count } dinge as gesien gemerk
     }
+news-pack-covers-title = Pakke wys hul eie prente
+news-pack-covers-body = ’n Pak wat met voorskoue of skermkiekies kom, gebruik hulle as sy omslag en blaai daardeur terwyl die wyser op die pakkelys daaroor is, en op sy paneel.
+news-models-read-title = Meer 3D-formate, sonder Blender
+news-models-read-body = Collada-, X3D-, VRML-, OFF- en VRM-modelle, BVH-animasies en Gaussiese splats kry nou duimnaels, feite en die 3D-kyker sonder Blender, en kan as GLB afgelaai word.
 news-themes-title = Tien ligte en tien donker temas
 news-themes-body = Lug, Kruisement, Appelkoos en Suurlemoen sluit by die ligte temas aan en Middernag, Strandmeer en Neon by die donkeres, en die nuwe voorkoms versprei vanaf die teël wat jy kies.
 news-tiles-move-title = Hou teëls aan die beweeg

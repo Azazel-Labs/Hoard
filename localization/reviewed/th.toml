@@ -7894,6 +7894,14 @@ translation = """
        *[other] ทำเครื่องหมายว่าเห็นแล้ว { $count } รายการ
     }"""
 
+[messages.news-models-read-body]
+source = "Collada, X3D, VRML, OFF and VRM models, BVH animations and Gaussian splats now get thumbnails, facts and the 3D viewer without Blender, and download as GLB."
+translation = "โมเดล Collada, X3D, VRML, OFF และ VRM แอนิเมชัน BVH และ Gaussian splat ได้ภาพย่อ ข้อมูล และตัวดู 3D โดยไม่ต้องใช้ Blender แล้ว และดาวน์โหลดเป็น GLB ได้"
+
+[messages.news-models-read-title]
+source = "More 3D formats, no Blender needed"
+translation = "รองรับรูปแบบ 3D มากขึ้น ไม่ต้องใช้ Blender"
+
 [messages.news-motion-trails-body]
 source = "An animation’s thumbnail traces the path its character takes, with a dot where it is right now."
 translation = "ภาพย่อของแอนิเมชันจะลากเส้นทางที่ตัวละครเคลื่อนที่ไป พร้อมจุดบอกตำแหน่งปัจจุบัน"
@@ -7905,6 +7913,14 @@ translation = "เส้นทางการเคลื่อนไหวบ�
 [messages.news-none]
 source = "Nothing new to find right now."
 translation = "ตอนนี้ยังไม่มีอะไรใหม่ให้ค้นพบ"
+
+[messages.news-pack-covers-body]
+source = "A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel."
+translation = "แพ็กที่มีภาพตัวอย่างหรือภาพหน้าจอมาด้วยจะใช้ภาพเหล่านั้นเป็นปก และสลับไปทีละภาพขณะที่ตัวชี้อยู่บนแพ็กในรายการแพ็ก รวมถึงในแผงของแพ็ก"
+
+[messages.news-pack-covers-title]
+source = "Packs show their own pictures"
+translation = "แพ็กแสดงภาพของตัวเอง"
 
 [messages.news-pip]
 source = """
@@ -9862,8 +9878,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "ใช้ Blender ที่ติดตั้งไว้ หรือดาวน์โหลด Blender 4.5 LTS (ประมาณ 400 MB) จากมิเรอร์ของ blender.org"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "แปลงโมเดล .blend, .dae, .abc และ .x3d เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม"
+source = "Converts .blend and .abc models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "แปลงโมเดล .blend และ .abc เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม"
 
 [messages.settings-chatgpt-account]
 source = "Account"

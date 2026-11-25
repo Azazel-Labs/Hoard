@@ -81,7 +81,9 @@ pub(super) fn gltf_image_files_found(path: &Path, root: &Path) -> crate::glbfile
             if !file.starts_with(root) {
                 return None;
             }
-            Some((*blake3::hash(&std::fs::read(&file).ok()?).as_bytes(), file))
+            // Streamed through the hasher: a texture can be hundreds of megabytes, and only its hash is wanted.
+            let hash = blake3::Hasher::new().update_reader(std::fs::File::open(&file).ok()?).ok()?.finalize();
+            Some((*hash.as_bytes(), file))
         })
         .collect()
 }
@@ -190,4 +192,28 @@ fn percent_decode(s: &str) -> String {
         }
     }
     String::from_utf8_lossy(&out).into_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn gltf_images_are_found_by_their_bytes_inside_the_root_only() {
+        let root = tempfile::tempdir().unwrap();
+        let model = root.path().join("Models");
+        std::fs::create_dir_all(&model).unwrap();
+        std::fs::create_dir_all(root.path().join("Textures")).unwrap();
+        let wood = vec![7u8; 3 << 20];
+        std::fs::write(root.path().join("Textures/wood.png"), &wood).unwrap();
+        let gltf = model.join("crate.gltf");
+        let doc = json!({ "asset": { "version": "2.0" }, "images": [
+            { "uri": "../Textures/wood.png" }, { "uri": "../../outside.png" }, { "uri": "./missing.png" },
+        ] });
+        std::fs::write(&gltf, serde_json::to_vec(&doc).unwrap()).unwrap();
+
+        let found = gltf_image_files_found(&gltf, root.path());
+        let wanted = root.path().join("Textures").join("wood.png");
+        assert_eq!(found, BTreeMap::from([(*blake3::hash(&wood).as_bytes(), wanted)]));
+    }
 }

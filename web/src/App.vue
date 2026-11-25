@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import {
-  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type SearchParams, type Stats,
+  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type SearchParams,
 } from './api'
 import { filesFromDrop, groupsFromPicked, type Group } from './drop'
 import { KIND_LABEL, KIND_NAME } from './kinds'
@@ -9,7 +9,7 @@ import { canPreview, stop as stopPreview, toggle as togglePreview } from './play
 import { prefs, shows, toggleIn } from './prefs'
 import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'
 import { mine, setFavorite, toggleFavorite } from './mine'
-import { loadProjects, projects } from './projects'
+import { projects } from './projects'
 import { teach } from './storeFormats'
 import { knownTags, leaveOut, marked, pieces, type Piece } from './searchSyntax'
 import { DARK_THEMES, LIGHT_THEMES, SCHEMES, setTheme, themeFor } from './theme'
@@ -38,12 +38,14 @@ import NewsTray from './components/NewsTray.vue'
 import { markAllSeenWithUndo, markSeen, news, newsTray, type NewThing, unseen } from './news'
 import { archiveWithUndo, countText } from './archive'
 import { isModelAsset } from './viewers'
-import { copyText, reducedMotion, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
+import { reducedMotion, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { usePanelFit } from './panelFit'
+import { usePackWatch } from './packWatch'
+import { copiedTags, copyTags, tagsToPaste } from './tagClipboard'
 import { lazy } from './lazy'
 import { formatNumber, t } from './i18n'
-import { clearFilters, filterPlace, filterQuery, filters, filterSources, fromSaved, hasFilters, heardNoise, NO_MUSIC, readFilters, type Named } from './filters'
+import { clearFilters, filterPlace, filterQuery, filters, filterSources, fromSaved, hasFilters, heardNoise, NO_MUSIC, rankLabel, ranking, readFilters, setSort, sortBy, sortOrder, sortWay, type Named } from './filters'
 
 // Opened now and then, so they load when first shown.
 const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
@@ -69,7 +71,7 @@ const view = ref<View>(initial.view)
 /** The open page of Settings. */
 const settingsSection = ref(initial.section || 'appearance')
 
-const collections = ref<Collection[]>([])
+const { packs, stats, collections, busyPacks, refreshPacks, startPolling } = usePackWatch(() => runSearch({ keep: true }))
 /** The results by place, one per match: empty until its page arrives, so the grid is as tall as every match from
  *  the start and fills in wherever it's scrolled to. */
 const slots = shallowRef<(Asset | undefined)[]>([])
@@ -93,8 +95,6 @@ const kindFacets = ref<Facet[]>([])
 const tagFacets = ref<Facet[]>([])
 const loading = ref(false)
 const selected = ref<Asset | null>(null)
-const packs = ref<Pack[]>([])
-const stats = ref<Stats | null>(null)
 const showFilters = ref(false)
 // A new server with nowhere to keep files opens the setup first; it stays up until it's finished.
 const setupOpen = ref(false)
@@ -308,61 +308,6 @@ watch(() => [
   runSearch()
 })
 
-/** Packs, the library's numbers, collections and projects, after a change. Says whether a pack had just finished. */
-async function refreshPacks(): Promise<boolean> {
-  try {
-    const [p, s, c] = await Promise.all([api.packs(), api.stats(), api.collections(), loadProjects()])
-    const wasBusy = packs.value.some(busy)
-    packs.value = p
-    stats.value = s
-    collections.value = c
-    caughtUp = Date.now()
-    // A pack just finished: its assets are now searchable.
-    if (wasBusy && !p.some(busy)) {
-      runSearch({ keep: true })
-      return true
-    }
-  } catch (e) {
-    showError(t('app-unreachable', { error: (e as Error).message }), { label: t('app-retry'), run: refreshPacks })
-  }
-  return false
-}
-const busy = (p: Pack) => p.status === 'ingesting' || p.status === 'analyzing' || p.status === 'uploading'
-
-// While packs import, the portal asks after just those every couple of seconds (more slowly from a tab in the
-// background), and only once the last answer is in, so a server busy importing hundreds of packs is never asked
-// again before it has answered. Everything else (the library's numbers, collections, the grid as the new assets get
-// their pictures and tags) follows when a pack finishes, at most every ten seconds, and at once when the last does.
-const POLL = 2000
-const POLL_HIDDEN = 15_000
-const CATCH_UP = 10_000
-let poll: ReturnType<typeof setTimeout> | undefined
-let caughtUp = 0
-let behind = false
-function schedulePoll() {
-  clearTimeout(poll)
-  poll = setTimeout(async () => {
-    await pollPacks().catch(() => {})
-    schedulePoll()
-  }, document.hidden ? POLL_HIDDEN : POLL)
-}
-async function pollPacks() {
-  const before = packs.value.filter(busy)
-  if (!before.length) return
-  const now = await api.busyPacks()
-  const fresh = new Map(now.map((p) => [p.id, p]))
-  const known = new Set(packs.value.map((p) => p.id))
-  packs.value = [...now.filter((p) => !known.has(p.id)), ...packs.value.map((p) => fresh.get(p.id) ?? p)]
-  if (before.some((p) => !fresh.has(p.id)) || now.some((p) => !known.has(p.id))) behind = true
-  const analyzing = now.some((p) => p.status === 'analyzing')
-  if (!now.length || ((behind || analyzing) && Date.now() - caughtUp >= CATCH_UP)) {
-    behind = false
-    // The last pack finishing searches again by itself.
-    if (!(await refreshPacks())) runSearch({ keep: true })
-  }
-}
-
-
 // ------------------------------------------------------------------ filters
 
 /** Narrow to a tag, or stop; alt-clicked (`leave`), leave whatever has it out instead. */
@@ -497,37 +442,6 @@ function findColor(hex: string) {
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
-const ranking = computed(() => !!(filters.imitation || filters.similar || filters.color || filters.q.trim()))
-const rankLabel = computed(() =>
-  filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : t('app-rank-match'),
-)
-/** Which way each order goes unless turned round: newest, A to Z, biggest and best rated first. */
-const SORT_UP: Record<string, boolean> = { created: false, updated: false, name: true, size: false, rating: false }
-/**
- * What the library is in order by and which way round, from `filters.sort`: `created`, `updated`, `name`, `size` or
- * `rating`,
- * with `:asc` or `:desc` after it when turned round (`new` and `old` from older links are `created` either way). Without
- * one it's best match first while there's something to match, and newest first otherwise.
- */
-const sortOrder = computed(() => {
-  const s = filters.sort === 'new' ? 'created' : filters.sort === 'old' ? 'created:asc' : filters.sort
-  const [by, dir] = s.split(':')
-  if (!Object.hasOwn(SORT_UP, by)) return ranking.value ? null : { by: 'created', up: false }
-  return { by, up: dir ? dir === 'asc' : SORT_UP[by] }
-})
-function setSort(by: string, up = SORT_UP[by]) {
-  filters.sort = !by ? '' : up === SORT_UP[by] ? by : `${by}:${up ? 'asc' : 'desc'}`
-}
-const sortBy = computed({ get: () => sortOrder.value?.by ?? '', set: (by: string) => setSort(by) })
-const sortWay = computed(() => {
-  const o = sortOrder.value
-  if (!o) return ''
-  if (o.by === 'name') return o.up ? t('app-sort-a-to-z') : t('app-sort-z-to-a')
-  if (o.by === 'size') return o.up ? t('app-sort-smallest-first') : t('app-sort-largest-first')
-  if (o.by === 'rating') return o.up ? t('app-sort-lowest-rated-first') : t('app-sort-best-rated-first')
-  return o.up ? t('app-sort-oldest-first') : t('app-sort-newest-first')
-})
-
 // ------------------------------------------------------------------ collections
 
 async function refreshCollections() {
@@ -1068,32 +982,6 @@ async function toggleReviewed(a: Asset) {
   }
 }
 
-/** The tags last copied with `c`, which `v` pastes; the clipboard is only read when nothing's been copied here. */
-const copiedTags = ref<string[]>([])
-function ownTags(a: Asset): string[] {
-  return a.tags.map((x) => x.tag).filter((tag) => !tag.startsWith('kind:') && !tag.startsWith('format:'))
-}
-async function copyTags(a: Asset) {
-  const tags = ownTags(a)
-  if (!tags.length) {
-    showOk(t('app-tags-copy-none', { name: a.name }))
-    return
-  }
-  copiedTags.value = tags
-  await copyText(tags.join(', '))
-  showOk(t('app-tags-copied', { count: tags.length }))
-}
-/** Tags from text copied elsewhere: a short list, not a sentence or a link. */
-async function clipboardTags(): Promise<string[]> {
-  try {
-    const text = await navigator.clipboard.readText()
-    const tags = text.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)
-    const ok = tags.length <= 40 && tags.every((tag) => tag.length <= 48 && !tag.includes('://'))
-    return ok ? [...new Set(tags)] : []
-  } catch {
-    return []
-  }
-}
 /** Add the copied tags to what's picked, or to the focused asset (the `v` key), with Undo. */
 async function pasteTags(focused?: Asset | null) {
   if (!mayEdit() || allMatching.value) return
@@ -1101,7 +989,7 @@ async function pasteTags(focused?: Asset | null) {
     ? checked.value.map((id) => checkedSeen.value.get(id)).filter((a): a is Asset => !!a)
     : focused ? [focused] : []
   if (!targets.length) return
-  const tags = copiedTags.value.length ? copiedTags.value : await clipboardTags()
+  const tags = await tagsToPaste()
   if (!tags.length) {
     showOk(t('app-tags-paste-none'))
     return
@@ -1204,14 +1092,13 @@ onMounted(() => {
   document.addEventListener('scroll', onAnyScroll, { capture: true, passive: true })
   runSearch()
   refreshPacks()
-  schedulePoll()
+  startPolling()
   window.addEventListener('keydown', onKey)
   window.addEventListener('popstate', onHistory)
   if (sideEl.value) unswipeSide = swipeToClose(sideEl.value, -1, () => (showFilters.value = false))
 })
 onBeforeUnmount(() => {
   unswipeSide()
-  clearTimeout(poll)
   clearTimeout(fillTimer)
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('popstate', onHistory)
@@ -1257,8 +1144,6 @@ async function onHistory() {
     lastState = urlState()
   }
 }
-
-const busyPacks = computed(() => packs.value.filter(busy))
 
 const firstLoad = computed(() => loading.value && !items.value.length)
 

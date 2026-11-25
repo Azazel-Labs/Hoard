@@ -138,7 +138,15 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         .with_cameras(false)
         .with_lights(false)
         .with_extras(false);
-    Ok(open(path, ext, &Pack::new(root), nothing)?.facts)
+    let doc = open(path, ext, &Pack::new(root), nothing)?;
+    let mut facts = doc.facts.clone();
+    // The program that wrote it (a slicer, a modeler); a glTF's own is its generator, which is kept apart.
+    if !matches!(ext, "gltf" | "glb" | "vrm" | "vrma")
+        && let Some(tool) = doc.source_info().tool.filter(|t| !t.trim().is_empty())
+    {
+        facts.entry("application").or_insert(Value::String(tool));
+    }
+    Ok(facts)
 }
 
 /// The names of a model's materials, in its order, each once: what an engine's materials are matched to (Unity
@@ -386,6 +394,23 @@ mod tests {
                 "{ext} is filed as {kind:?}"
             );
         }
+    }
+
+    /// A 3MF's facts say which program wrote it.
+    #[test]
+    fn facts_name_the_program_that_wrote_the_model() {
+        use std::io::Write as _;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cube.3mf");
+        let mut zip = zip::ZipWriter::new(std::fs::File::create(&path).unwrap());
+        let options = zip::write::SimpleFileOptions::default();
+        zip.start_file("_rels/.rels", options).unwrap();
+        zip.write_all(br#"<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>"#).unwrap();
+        zip.start_file("3D/3dmodel.model", options).unwrap();
+        zip.write_all(br#"<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><metadata name="Application">BambuStudio-01.10.00.00</metadata><resources><object id="1" type="model"><mesh><vertices><vertex x="0" y="0" z="0"/><vertex x="1" y="0" z="0"/><vertex x="0" y="1" z="0"/></vertices><triangles><triangle v1="0" v2="1" v3="2"/></triangles></mesh></object></resources><build><item objectid="1"/></build></model>"#).unwrap();
+        zip.finish().unwrap();
+        let facts = facts(&path, "3mf", dir.path()).unwrap();
+        assert_eq!(facts.get("application"), Some(&Value::from("BambuStudio-01.10.00.00")), "{facts:?}");
     }
 
     #[test]

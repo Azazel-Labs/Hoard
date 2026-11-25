@@ -2434,6 +2434,10 @@ explorer-orbit-title = Tragerea rotește în jurul modelului selectat în loc s�
 explorer-open = Deschide
 explorer-open-title = Deschide detaliile acestui model (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Copie îndepărtată: { $triangles } din { $total } triunghiuri, simplificată în { $ms } ms
+explorer-full = Încarcă toate detaliile
+explorer-full-title = Încarcă modelul întreg în locul copiei sale îndepărtate. Un model mare poate dura și poate ocupa multă memorie.
+explorer-full-loading = Se încarcă toate detaliile…
 explorer-empty = Niciunul dintre aceste rezultate nu poate fi afișat în 3D.
 explorer-hud-loaded =
     { $total ->
@@ -2442,6 +2446,8 @@ explorer-hud-loaded =
        *[other] { $loaded } din { $total } de modele încărcate
     }
 explorer-hud-loading = { $count } se încarcă
+explorer-hud-far = Copii îndepărtate: { $count }, ~{ $ms } ms fiecare
+explorer-hud-far-title = Modelele detaliate sunt desenate din copii mai simple pe care le face serverul. Timpul arată cât i-a luat serverului, în medie, să simplifice fiecare.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Viteză { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -3024,6 +3030,12 @@ settings-page-issues = Probleme
 settings-page-issues-blurb = Ce a mers prost la deschiderea sau procesarea fișierelor: arhive care nu s-au dezarhivat, fișiere care nu au putut fi citite, sarcini care au eșuat. Reîncercați-le după ce cauza este remediată sau ignorați-le.
 settings-page-maintenance = Întreținere
 settings-page-maintenance-blurb = Copii de rezervă, verificarea deteriorărilor și curățenie. Rulează câte una din fiecare odată și puteți părăsi această pagină cât timp rulează.
+settings-page-experimental = Experimental
+settings-page-experimental-blurb = Funcții la care încă se lucrează, de încercat înainte să fie pornite pentru toată lumea.
+experiments-what = Fiecare e oprită până o porniți aici și se poate schimba sau poate dispărea înainte să fie pornită pentru toată lumea. Ce porniți se salvează doar în acest browser.
+experiments-none = Deocamdată nu e nimic de încercat.
+experiment-far-copies = Copii îndepărtate în exploratorul de mesh-uri
+experiment-far-copies-what = Modelele detaliate vin ca copii mai simple pe care serverul le face pe loc, ca mai mult dintr-o căutare să apară mai repede. Un model ales se încarcă în întregime dacă e destul de mic; unul mai mare are un buton pentru asta.
 settings-page-about = Despre
 settings-page-about-blurb = Ce este Hoard, ce versiune este aceasta și munca altora din care este făcut.
 settings-the-default = valoarea implicită
@@ -3613,6 +3625,8 @@ news-marked-seen =
         [few] { $count } noutăți marcate ca văzute
        *[other] { $count } de noutăți marcate ca văzute
     }
+news-experiments-title = Încercați funcții din timp
+news-experiments-body = Setări › Experimental listează funcții la care încă se lucrează, fiecare oprită până o porniți în browser. Prima: copii îndepărtate în exploratorul de mesh-uri.
 news-pack-covers-title = Pachetele își arată propriile imagini
 news-pack-covers-body = Un pachet care vine cu previzualizări sau capturi de ecran le folosește drept copertă și trece de la una la alta cât timp cursorul e deasupra lui în lista de pachete, precum și în panoul său.
 news-models-read-title = Mai multe formate 3D, fără Blender

@@ -7,17 +7,25 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use anyhow::{Context, Result, bail, ensure};
 use image::DynamicImage;
+use rayon::prelude::*;
 use serde_json::{Value, json};
 
 /// The longest side a texture keeps: sharper than the viewer shows it.
 const MAX_SIDE: u32 = 2048;
 const JPEG_QUALITY: u8 = 90;
+/// How many textures are decoded and re-encoded at once.
+const IMAGES_AT_ONCE: usize = 4;
 /// Texture extensions that point at an image in a format browsers may not draw. The image is re-encoded as JPEG or
 /// PNG, so the texture points at it plainly (or at the fallback beside it, already one of those).
 const IMAGE_EXTENSIONS: &[&str] = &["KHR_texture_basisu", "EXT_texture_webp", "EXT_texture_avif"];
 
 /// `glb` with web-ready textures and nothing in its binary chunk that no buffer view points at.
 pub(crate) fn repack(glb: &[u8]) -> Result<Vec<u8>> {
+    repack_to(glb, MAX_SIDE)
+}
+
+/// [`repack`] with textures at most `side` pixels a side.
+pub(crate) fn repack_to(glb: &[u8], side: u32) -> Result<Vec<u8>> {
     let (mut json, bin) = crate::formats::read_glb(glb)?;
     let doc = json.as_object_mut().context("glTF JSON is not an object")?;
     unwrap_image_extensions(doc);
@@ -31,14 +39,28 @@ pub(crate) fn repack(glb: &[u8]) -> Result<Vec<u8>> {
         bin.get(at..at + len).with_context(|| format!("buffer view {i} runs past the binary chunk"))
     };
 
-    // Each image's bytes, re-encoded where that helps; the view holding them gets the new bytes.
+    // Each image's bytes, re-encoded where that helps; the view holding them gets the new bytes. A few at a time: a
+    // decoded texture can be tens of megabytes.
+    let mut jobs = Vec::new();
+    for (n, img) in doc.get("images").and_then(Value::as_array).into_iter().flatten().enumerate() {
+        if let Some(view) = img.get("bufferView").and_then(Value::as_u64) {
+            jobs.push((n, usize::try_from(view)?));
+        }
+    }
+    let mut made = Vec::with_capacity(jobs.len());
+    for batch in jobs.chunks(IMAGES_AT_ONCE) {
+        let done: Result<Vec<_>> =
+            batch.par_iter().map(|&(n, view)| Ok((n, view, web_image(bytes_of(view)?, side)))).collect();
+        made.extend(done?);
+    }
     let mut replaced: HashMap<usize, Vec<u8>> = HashMap::new();
-    for img in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten() {
-        let Some(view) = img.get("bufferView").and_then(Value::as_u64) else { continue };
-        let view = usize::try_from(view)?;
-        if let Some((bytes, mime)) = web_image(bytes_of(view)?) {
-            replaced.insert(view, bytes);
-            img["mimeType"] = json!(mime);
+    let images = doc.get_mut("images").and_then(Value::as_array_mut);
+    if let Some(images) = images {
+        for (n, view, web) in made {
+            if let Some((bytes, mime)) = web {
+                replaced.insert(view, bytes);
+                images[n]["mimeType"] = json!(mime);
+            }
         }
     }
 
@@ -164,12 +186,13 @@ fn unwrap_image_extensions(doc: &mut serde_json::Map<String, Value>) {
 }
 
 /// An image re-encoded for the web, or `None` to keep it as it is: a JPEG, or a PNG with alpha, already no bigger
-/// than [`MAX_SIDE`]; or something that can't be decoded.
-fn web_image(bytes: &[u8]) -> Option<(Vec<u8>, &'static str)> {
+/// than `side`; or something that can't be decoded.
+fn web_image(bytes: &[u8], side: u32) -> Option<(Vec<u8>, &'static str)> {
     let format = image::guess_format(bytes).ok();
     let img = decode(bytes)?;
-    let big = img.width() > MAX_SIDE || img.height() > MAX_SIDE;
-    let img = if big { img.resize(MAX_SIDE, MAX_SIDE, image::imageops::FilterType::Lanczos3) } else { img };
+    let big = img.width() > side || img.height() > side;
+    // Averaging each block of pixels, as mipmaps are made: right for shrinking, and many times faster than Lanczos.
+    let img = if big { img.thumbnail(side, side) } else { img };
     let alpha = img.color().has_alpha() && img.to_rgba8().pixels().any(|p| p.0[3] < 255);
     match format {
         Some(image::ImageFormat::Jpeg) if !big => return None,

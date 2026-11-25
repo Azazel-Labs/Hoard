@@ -2047,9 +2047,15 @@ explorer-orbit-title = Kéo để xoay quanh mô hình đã chọn thay vì nhì
 explorer-open = Mở
 explorer-open-title = Mở chi tiết của mô hình này (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Bản sao xa: { $triangles } trên { $total } tam giác, đơn giản hóa trong { $ms } ms
+explorer-full = Tải đầy đủ chi tiết
+explorer-full-title = Tải toàn bộ mô hình thay cho bản sao xa của nó. Mô hình lớn có thể mất một lúc và tốn nhiều bộ nhớ.
+explorer-full-loading = Đang tải đầy đủ chi tiết…
 explorer-empty = Không kết quả nào trong số này có thể hiển thị ở dạng 3D.
 explorer-hud-loaded = Đã tải { $loaded } trên { $total } mô hình
 explorer-hud-loading = Đang tải { $count }
+explorer-hud-far = Bản sao xa: { $count }, ~{ $ms } ms mỗi bản
+explorer-hud-far-title = Mô hình chi tiết được vẽ từ các bản sao đơn giản hơn do máy chủ tạo. Thời gian là mức trung bình máy chủ cần để đơn giản hóa mỗi bản.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Tốc độ { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2551,6 +2557,12 @@ settings-page-issues = Sự cố
 settings-page-issues-blurb = Những gì đã trục trặc khi mở hoặc xử lý tệp: tệp nén không giải nén được, tệp không đọc được, tác vụ thất bại. Hãy thử lại khi đã khắc phục nguyên nhân, hoặc bỏ qua chúng.
 settings-page-maintenance = Bảo trì
 settings-page-maintenance-blurb = Sao lưu, kiểm tra hư hỏng và dọn dẹp. Mỗi loại chỉ chạy một lần tại một thời điểm, và bạn có thể rời trang này trong khi chúng chạy.
+settings-page-experimental = Thử nghiệm
+settings-page-experimental-blurb = Các tính năng vẫn đang được phát triển, để dùng thử trước khi bật cho mọi người.
+experiments-what = Mỗi tính năng tắt cho đến khi bạn bật ở đây, và có thể thay đổi hoặc bị bỏ trước khi bật cho mọi người. Những gì bạn bật chỉ được lưu trong trình duyệt này.
+experiments-none = Hiện chưa có gì để thử.
+experiment-far-copies = Bản sao xa trong trình khám phá lưới
+experiment-far-copies-what = Mô hình chi tiết đến dưới dạng bản sao đơn giản hơn do máy chủ tạo ngay lúc đó, nên nhiều kết quả tìm kiếm hiện ra sớm hơn. Mô hình được chọn sẽ tải đầy đủ nếu đủ nhỏ; mô hình lớn hơn có nút để làm việc đó.
 settings-page-about = Giới thiệu
 settings-page-about-blurb = Hoard là gì, đây là phiên bản nào, và công sức của những người khác đã góp phần tạo nên nó.
 settings-the-default = mặc định
@@ -3087,6 +3099,8 @@ news-marked-seen =
     { $count ->
        *[other] Đã đánh dấu { $count } điều là đã xem
     }
+news-experiments-title = Dùng thử tính năng sớm
+news-experiments-body = Cài đặt › Thử nghiệm liệt kê các tính năng vẫn đang phát triển, mỗi tính năng tắt cho đến khi bạn bật trong trình duyệt của mình. Đầu tiên: bản sao xa trong trình khám phá lưới.
 news-pack-covers-title = Gói hiển thị hình ảnh của chính nó
 news-pack-covers-body = Gói đi kèm ảnh xem trước hoặc ảnh chụp màn hình sẽ dùng chúng làm ảnh bìa, lần lượt chuyển qua từng ảnh khi con trỏ nằm trên gói trong danh sách gói, và cả trong bảng của gói.
 news-models-read-title = Thêm định dạng 3D, không cần Blender

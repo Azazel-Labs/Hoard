@@ -2262,6 +2262,10 @@ explorer-orbit-title = Dra for å gå rundt den valgte modellen i stedet for å 
 explorer-open = Åpne
 explorer-open-title = Åpne detaljene for denne modellen (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Fjernkopi: { $triangles } av { $total } trekanter, forenklet på { $ms } ms
+explorer-full = Last inn alle detaljer
+explorer-full-title = Last inn hele modellen i stedet for fjernkopien. En stor modell kan ta litt tid og bruke mye minne.
+explorer-full-loading = Laster inn alle detaljer…
 explorer-empty = Ingen av disse resultatene kan vises i 3D.
 explorer-hud-loaded =
     { $total ->
@@ -2269,6 +2273,8 @@ explorer-hud-loaded =
        *[other] { $loaded } av { $total } modeller lastet inn
     }
 explorer-hud-loading = { $count } lastes inn
+explorer-hud-far = Fjernkopier: { $count }, ~{ $ms } ms hver
+explorer-hud-far-title = Detaljerte modeller tegnes fra enklere kopier som serveren lager. Tiden er hvor lenge serveren i snitt brukte på å forenkle hver.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Fart { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2801,6 +2807,12 @@ settings-page-issues = Problemer
 settings-page-issues-blurb = Hva som gikk galt ved åpning eller behandling av filer: arkiver som ikke ville pakkes ut, filer som ikke kunne leses, jobber som mislyktes. Prøv dem igjen når årsaken er rettet, eller avvis dem.
 settings-page-maintenance = Vedlikehold
 settings-page-maintenance-blurb = Sikkerhetskopier, sjekk for skade og rydd opp. Én av hver kjører om gangen, og du kan forlate denne siden mens de kjører.
+settings-page-experimental = Eksperimentelt
+settings-page-experimental-blurb = Funksjoner som fortsatt er under arbeid, så du kan prøve dem før de er slått på for alle.
+experiments-what = Hver er av til du slår den på her, og kan endres eller forsvinne før den er slått på for alle. Det du slår på, lagres bare i denne nettleseren.
+experiments-none = Ingenting å prøve akkurat nå.
+experiment-far-copies = Fjernkopier i mesh-utforskeren
+experiment-far-copies-what = Detaljerte modeller kommer som enklere kopier serveren lager i farten, så mer av et søk vises raskere. Velger du en, lastes den helt hvis den er liten nok; en større har en knapp for det.
 settings-page-about = Om
 settings-page-about-blurb = Hva Hoard er, hvilken versjon dette er, og arbeidet til andre det er laget med.
 settings-the-default = standardverdien
@@ -3364,6 +3376,8 @@ news-marked-seen =
         [one] { $count } ting merket som sett
        *[other] { $count } ting merket som sett
     }
+news-experiments-title = Prøv funksjoner tidlig
+news-experiments-body = Innstillinger › Eksperimentelt viser funksjoner som fortsatt er under arbeid, hver av til du slår den på i nettleseren din. Først ut: fjernkopier i mesh-utforskeren.
 news-pack-covers-title = Pakker viser sine egne bilder
 news-pack-covers-body = En pakke med forhåndsvisninger eller skjermbilder bruker dem som omslag og blar gjennom dem mens pekeren er over den i pakkelisten, og i panelet dens.
 news-models-read-title = Flere 3D-formater, uten Blender

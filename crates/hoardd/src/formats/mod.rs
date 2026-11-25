@@ -46,6 +46,8 @@ const GLB_LABEL: &str = "GLB + textures (zip)";
 
 /// An animation's skeleton and clips without the mesh it was saved on, as a GLB (see [`crate::meshes::clip_glb`]).
 pub(crate) const CLIP: &str = "clip";
+/// The mesh explorer's copy of a model a way off (see [`crate::farcopy`]). Not offered for download.
+pub(crate) const FAR: &str = "far";
 
 /// Whether an asset can be downloaded as [`CLIP`]: an animation polysmelt reads, or Blender made a GLB of.
 pub(crate) fn offers_clip(animation: bool, ext: &str, derivatives: &[String]) -> bool {
@@ -218,6 +220,9 @@ pub(crate) fn convert(
         }
         "view" if crate::meshes::reads(&src) => {
             Ok(Output { bytes: crate::meshes::view_glb(local, &src, root)?, ext: "glb" })
+        }
+        FAR if crate::meshes::reads(&src) => {
+            Ok(Output { bytes: crate::meshes::far_glb(local, &src, root)?, ext: "glb" })
         }
         _ => bail!("can't convert .{src} to {format}"),
     }

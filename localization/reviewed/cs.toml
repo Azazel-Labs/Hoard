@@ -5448,6 +5448,22 @@ translation = "Jméno a heslo k sobě nepatří"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "To není instalační kód zadaný serveru v HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Vzdálené kopie v průzkumníku sítí"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Podrobné modely přicházejí jako jednodušší kopie, které server vytváří za běhu, takže se z hledání ukáže víc a dřív. Vybraný model se načte celý, pokud je dost malý; větší má na to tlačítko."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Teď tu není nic k vyzkoušení."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Každá je vypnutá, dokud ji tu nezapnete, a než se zapne všem, může se změnit nebo zmizet. Co zapnete, se uloží jen v tomto prohlížeči."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Animovat"
@@ -5464,9 +5480,33 @@ translation = "Průzkumník sítí: létejte mezi modely z těchto výsledků"
 source = "None of these results can be shown in 3D."
 translation = "Žádný z těchto výsledků nelze zobrazit ve 3D."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Vzdálená kopie: { $triangles } z { $total } trojúhelníků, zjednodušeno za { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Načíst plné detaily"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Načítají se plné detaily…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Načíst celý model místo jeho vzdálené kopie. Velký model může chvíli trvat a zabrat hodně paměti."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Zobrazení"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Vzdálené kopie: { $count }, ~{ $ms } ms každá"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Podrobné modely se kreslí z jednodušších kopií, které vytváří server. Čas udává, jak dlouho serveru v průměru trvalo každou zjednodušit."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8218,6 +8258,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Zavřít"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Nastavení › Experimentální uvádí funkce, na kterých se ještě pracuje; každá je vypnutá, dokud ji ve svém prohlížeči nezapnete. Jako první: vzdálené kopie v průzkumníku sítí."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Vyzkoušejte funkce dřív"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11227,6 +11275,14 @@ translation = "Drak"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Poklad tvého draka: každý asset v knihovně je jeho kouskem."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Experimentální"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Funkce, na kterých se ještě pracuje, k vyzkoušení dřív, než se zapnou všem."
 
 [messages.settings-page-issues]
 source = "Issues"

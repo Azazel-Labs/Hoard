@@ -39,10 +39,12 @@ export interface Prefs {
   tilesAlwaysMove: boolean
   /** Parts of the page turned off in Settings → Appearance, by id (see HIDEABLE in AppearancePanel.vue). */
   hidden: string[]
+  /** Features still being worked on that this browser tries, by id (see EXPERIMENTS in experiments.ts). */
+  experiments: string[]
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true, tagSort: 'count', textSize: 'normal', density: 'comfortable', tilesAlwaysMove: false, hidden: [] }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true, tagSort: 'count', textSize: 'normal', density: 'comfortable', tilesAlwaysMove: false, hidden: [], experiments: [] }
 
 function load(): Prefs {
   try {

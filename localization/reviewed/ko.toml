@@ -5229,6 +5229,22 @@ translation = "이름과 비밀번호가 일치하지 않습니다"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "HOARD_SETUP_CODE로 서버에 지정한 설정 코드가 아닙니다"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "메시 탐색기의 원거리 사본"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "세밀한 모델은 서버가 즉석에서 만든 더 단순한 사본으로 오므로 검색 결과가 더 많이, 더 빨리 보입니다. 선택한 모델은 충분히 작으면 전체가 로드되고, 더 큰 모델에는 이를 위한 버튼이 있습니다."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "지금은 써 볼 것이 없습니다."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "각 기능은 여기서 켜기 전까지 꺼져 있으며, 모두에게 켜지기 전에 바뀌거나 없어질 수 있습니다. 켠 기능은 이 브라우저에만 저장됩니다."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "애니메이션"
@@ -5245,9 +5261,33 @@ translation = "메시 탐색기: 이 결과의 모델 사이를 날아다니기"
 source = "None of these results can be shown in 3D."
 translation = "이 결과 중 3D로 표시할 수 있는 항목이 없습니다."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "원거리 사본: 삼각형 { $total }개 중 { $triangles }개, { $ms }ms 만에 단순화"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "전체 디테일 로드"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "전체 디테일 로드 중…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "원거리 사본 대신 모델 전체를 로드합니다. 큰 모델은 시간이 걸리고 메모리를 많이 쓸 수 있습니다."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "보기"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "원거리 사본: { $count }개, 각 ~{ $ms }ms"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "세밀한 모델은 서버가 만든 더 단순한 사본으로 그려집니다. 시간은 서버가 각각을 단순화하는 데 걸린 평균입니다."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -7877,6 +7917,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "닫기"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "설정 › 실험 기능에서 아직 개발 중인 기능을 볼 수 있으며, 각각 브라우저에서 켜기 전까지 꺼져 있습니다. 첫 번째는 메시 탐색기의 원거리 사본입니다."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "새 기능 미리 써 보기"
 
 [messages.news-got-it]
 source = "Got it"
@@ -10731,6 +10779,14 @@ translation = "드래곤"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "당신의 드래곤이 모은 보물: 라이브러리의 에셋 하나하나가 그 보물입니다."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "실험 기능"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "아직 개발 중인 기능을 모두에게 켜지기 전에 미리 써 볼 수 있습니다."
 
 [messages.settings-page-issues]
 source = "Issues"

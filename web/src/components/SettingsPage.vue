@@ -55,7 +55,8 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
   { id: 'performance', sep: true, need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
   { id: 'issues', need: 'admin', get label() { return t('settings-page-issues') }, get blurb() { return t('settings-page-issues-blurb') } },
   { id: 'maintenance', need: 'admin', get label() { return t('settings-page-maintenance') }, get blurb() { return t('settings-page-maintenance-blurb') } },
-  { id: 'about', sep: true, get label() { return t('settings-page-about') }, get blurb() { return t('settings-page-about-blurb') } },
+  { id: 'experimental', sep: true, get label() { return t('settings-page-experimental') }, get blurb() { return t('settings-page-experimental-blurb') } },
+  { id: 'about', get label() { return t('settings-page-about') }, get blurb() { return t('settings-page-about-blurb') } },
 ]
 /** The pages this account may see: an admin sees them all (but the desktop app has no server to set up). */
 const PAGES = computed(() => ALL_PAGES.filter((p) => (!p.need || may(p.need)) && !(p.server && isDesktop())))

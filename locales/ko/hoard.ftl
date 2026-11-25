@@ -2023,9 +2023,15 @@ explorer-orbit-title = 드래그하면 둘러보는 대신 선택한 모델 주�
 explorer-open = 열기
 explorer-open-title = 이 모델의 세부 정보 열기 (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = 원거리 사본: 삼각형 { $total }개 중 { $triangles }개, { $ms }ms 만에 단순화
+explorer-full = 전체 디테일 로드
+explorer-full-title = 원거리 사본 대신 모델 전체를 로드합니다. 큰 모델은 시간이 걸리고 메모리를 많이 쓸 수 있습니다.
+explorer-full-loading = 전체 디테일 로드 중…
 explorer-empty = 이 결과 중 3D로 표시할 수 있는 항목이 없습니다.
 explorer-hud-loaded = 모델 { $total }개 중 { $loaded }개 불러옴
 explorer-hud-loading = { $count }개 불러오는 중
+explorer-hud-far = 원거리 사본: { $count }개, 각 ~{ $ms }ms
+explorer-hud-far-title = 세밀한 모델은 서버가 만든 더 단순한 사본으로 그려집니다. 시간은 서버가 각각을 단순화하는 데 걸린 평균입니다.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = 속도 { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2524,6 +2530,12 @@ settings-page-issues = 문제
 settings-page-issues-blurb = 파일을 열거나 처리하다가 생긴 문제입니다: 풀리지 않은 압축 파일, 읽지 못한 파일, 실패한 작업. 원인을 고친 뒤 다시 시도하거나 닫으세요.
 settings-page-maintenance = 유지 관리
 settings-page-maintenance-blurb = 백업, 손상 검사, 정리를 합니다. 각 작업은 한 번에 하나씩 실행되며, 실행 중에 이 페이지를 떠나도 됩니다.
+settings-page-experimental = 실험 기능
+settings-page-experimental-blurb = 아직 개발 중인 기능을 모두에게 켜지기 전에 미리 써 볼 수 있습니다.
+experiments-what = 각 기능은 여기서 켜기 전까지 꺼져 있으며, 모두에게 켜지기 전에 바뀌거나 없어질 수 있습니다. 켠 기능은 이 브라우저에만 저장됩니다.
+experiments-none = 지금은 써 볼 것이 없습니다.
+experiment-far-copies = 메시 탐색기의 원거리 사본
+experiment-far-copies-what = 세밀한 모델은 서버가 즉석에서 만든 더 단순한 사본으로 오므로 검색 결과가 더 많이, 더 빨리 보입니다. 선택한 모델은 충분히 작으면 전체가 로드되고, 더 큰 모델에는 이를 위한 버튼이 있습니다.
 settings-page-about = 정보
 settings-page-about-blurb = Hoard가 무엇인지, 어떤 버전인지, 그리고 Hoard를 이루는 다른 사람들의 작업.
 settings-the-default = 기본값
@@ -3054,6 +3066,8 @@ news-marked-seen =
     { $count ->
        *[other] 항목 { $count }개를 확인함으로 표시했습니다
     }
+news-experiments-title = 새 기능 미리 써 보기
+news-experiments-body = 설정 › 실험 기능에서 아직 개발 중인 기능을 볼 수 있으며, 각각 브라우저에서 켜기 전까지 꺼져 있습니다. 첫 번째는 메시 탐색기의 원거리 사본입니다.
 news-pack-covers-title = 팩이 자체 이미지를 보여 줍니다
 news-pack-covers-body = 미리보기나 스크린샷이 들어 있는 팩은 이를 표지로 쓰며, 팩 목록에서 포인터를 올려 두는 동안과 팩 패널에서 차례로 넘겨 보여 줍니다.
 news-models-read-title = 더 많은 3D 형식, Blender 없이

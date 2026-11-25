@@ -2124,9 +2124,15 @@ explorer-orbit-title = Húzással a kijelölt modell körül forogsz körbenéz�
 explorer-open = Megnyitás
 explorer-open-title = A modell részleteinek megnyitása (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Távoli másolat: { $triangles } / { $total } háromszög, { $ms } ms alatt egyszerűsítve
+explorer-full = Teljes részletesség betöltése
+explorer-full-title = A teljes modell betöltése a távoli másolata helyett. Egy nagy modell eltarthat egy ideig, és sok memóriát foglalhat.
+explorer-full-loading = Teljes részletesség betöltése…
 explorer-empty = Ezek közül a találatok közül egyik sem jeleníthető meg 3D-ben.
 explorer-hud-loaded = { $total } modellből { $loaded } betöltve
 explorer-hud-loading = { $count } betöltése folyamatban
+explorer-hud-far = Távoli másolatok: { $count }, ~{ $ms } ms darabonként
+explorer-hud-far-title = A részletes modellek a szerver által készített egyszerűbb másolatokból rajzolódnak ki. Az idő azt mutatja, átlagosan mennyi ideig tartott a szervernek egy-egy egyszerűsítése.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Sebesség: { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2628,6 +2634,12 @@ settings-page-issues = Problémák
 settings-page-issues-blurb = Mi ment félre a fájlok megnyitásakor vagy feldolgozásakor: ki nem csomagolható tömörített fájlok, be nem olvasható fájlok, sikertelen feladatok. Próbálja újra őket, ha az ok megszűnt, vagy vesse el őket.
 settings-page-maintenance = Karbantartás
 settings-page-maintenance-blurb = Biztonsági mentés, sérülésellenőrzés és rendrakás. Mindegyikből egyszerre egy fut, és elhagyhatja ezt az oldalt, amíg futnak.
+settings-page-experimental = Kísérleti
+settings-page-experimental-blurb = Még fejlesztés alatt álló funkciók, hogy kipróbálhassa őket, mielőtt mindenkinek bekapcsolnák.
+experiments-what = Mindegyik ki van kapcsolva, amíg itt be nem kapcsolja, és változhat vagy eltűnhet, mielőtt mindenkinek bekapcsolnák. Amit bekapcsol, csak ebben a böngészőben mentődik.
+experiments-none = Most nincs mit kipróbálni.
+experiment-far-copies = Távoli másolatok a hálóböngészőben
+experiment-far-copies-what = A részletes modellek egyszerűbb másolatokként érkeznek, amelyeket a szerver menet közben készít, így egy keresésből több látszik hamarabb. A kiválasztott modell teljesen betöltődik, ha elég kicsi; egy nagyobbnál erre gomb van.
 settings-page-about = Névjegy
 settings-page-about-blurb = Mi a Hoard, melyik verzió ez, és mások munkája, amelyből készült.
 settings-the-default = alapértelmezett
@@ -3181,6 +3193,8 @@ news-marked-seen =
         [one] { $count } elem megjelölve látottként
        *[other] { $count } elem megjelölve látottként
     }
+news-experiments-title = Próbáljon ki funkciókat korán
+news-experiments-body = A Beállítások › Kísérleti a még fejlesztés alatt álló funkciókat sorolja fel, mindegyik ki van kapcsolva, amíg a böngészőjében be nem kapcsolja. Elsőként: távoli másolatok a hálóböngészőben.
 news-pack-covers-title = A csomagok a saját képeiket mutatják
 news-pack-covers-body = Az előnézeti képekkel vagy képernyőképekkel érkező csomag ezeket használja borítóként, és végiglapozza őket, amíg a mutató rajta van a csomaglistában, valamint a saját paneljén.
 news-models-read-title = Több 3D-formátum, Blender nélkül

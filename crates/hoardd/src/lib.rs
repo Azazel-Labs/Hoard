@@ -34,6 +34,7 @@ mod dragonbones;
 mod embed;
 mod error;
 mod extract;
+mod farcopy;
 mod ffmpeg;
 mod flac;
 mod fonts;

@@ -2079,9 +2079,15 @@ explorer-orbit-title = Seret untuk berputar mengelilingi model terpilih alih-ali
 explorer-open = Buka
 explorer-open-title = Buka detail model ini (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Salinan jauh: { $triangles } dari { $total } segitiga, disederhanakan dalam { $ms } md
+explorer-full = Muat detail penuh
+explorer-full-title = Muat seluruh model sebagai ganti salinan jauhnya. Model besar bisa memakan waktu dan banyak memori.
+explorer-full-loading = Memuat detail penuh…
 explorer-empty = Tidak ada hasil ini yang dapat ditampilkan dalam 3D.
 explorer-hud-loaded = { $loaded } dari { $total } model dimuat
 explorer-hud-loading = { $count } sedang dimuat
+explorer-hud-far = Salinan jauh: { $count }, ~{ $ms } md masing-masing
+explorer-hud-far-title = Model yang detail digambar dari salinan lebih sederhana yang dibuat server. Waktunya adalah rata-rata lama server menyederhanakan masing-masing.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Kecepatan { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2583,6 +2589,12 @@ settings-page-issues = Masalah
 settings-page-issues-blurb = Apa yang gagal saat membuka atau memproses berkas: arsip yang tidak bisa dibongkar, berkas yang tidak dapat dibaca, pekerjaan yang gagal. Coba lagi setelah penyebabnya diperbaiki, atau abaikan.
 settings-page-maintenance = Pemeliharaan
 settings-page-maintenance-blurb = Cadangkan, periksa kerusakan, dan rapikan. Masing-masing berjalan satu per satu, dan Anda dapat meninggalkan halaman ini selagi berjalan.
+settings-page-experimental = Eksperimental
+settings-page-experimental-blurb = Fitur yang masih dikerjakan, untuk dicoba sebelum aktif bagi semua orang.
+experiments-what = Masing-masing nonaktif sampai Anda mengaktifkannya di sini, dan bisa berubah atau hilang sebelum aktif bagi semua orang. Yang Anda aktifkan hanya disimpan di browser ini.
+experiments-none = Belum ada yang bisa dicoba saat ini.
+experiment-far-copies = Salinan jauh di penjelajah mesh
+experiment-far-copies-what = Model yang detail datang sebagai salinan lebih sederhana yang dibuat server saat itu juga, agar lebih banyak hasil pencarian tampil lebih cepat. Model yang dipilih dimuat penuh jika cukup kecil; yang lebih besar punya tombol untuk itu.
 settings-page-about = Tentang
 settings-page-about-blurb = Apa itu Hoard, versi mana ini, dan karya orang lain yang menjadi bahannya.
 settings-the-default = bawaan
@@ -3119,6 +3131,8 @@ news-marked-seen =
     { $count ->
        *[other] { $count } hal ditandai sudah dilihat
     }
+news-experiments-title = Coba fitur lebih awal
+news-experiments-body = Pengaturan › Eksperimental berisi fitur yang masih dikerjakan, masing-masing nonaktif sampai Anda mengaktifkannya di browser Anda. Yang pertama: salinan jauh di penjelajah mesh.
 news-pack-covers-title = Paket menampilkan gambarnya sendiri
 news-pack-covers-body = Paket yang disertai pratinjau atau tangkapan layar memakainya sebagai sampul dan berganti dari satu ke yang berikutnya saat penunjuk berada di atasnya di daftar paket, juga di panelnya.
 news-models-read-title = Lebih banyak format 3D, tanpa Blender

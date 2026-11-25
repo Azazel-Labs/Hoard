@@ -5494,6 +5494,22 @@ translation = "Имя и пароль не совпадают"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Это не тот код настройки, что задан серверу в HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Дальние копии в обозревателе мешей"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Детальные модели приходят как упрощённые копии, которые сервер делает на лету, поэтому больше результатов поиска появляется быстрее. Выбранная модель загружается целиком, если она достаточно мала; у большой для этого есть кнопка."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Сейчас пробовать нечего."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Каждая выключена, пока вы не включите её здесь, и может измениться или исчезнуть, прежде чем включится для всех. То, что вы включаете, сохраняется только в этом браузере."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Анимация"
@@ -5510,9 +5526,33 @@ translation = "Обозреватель мешей: летайте среди м
 source = "None of these results can be shown in 3D."
 translation = "Ни один из этих результатов нельзя показать в 3D."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Дальняя копия: { $triangles } из { $total } треугольников, упрощена за { $ms } мс"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Загрузить полную детализацию"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Загружается полная детализация…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Загрузить модель целиком вместо её дальней копии. Большая модель может загружаться долго и занять много памяти."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Вид"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Дальние копии: { $count }, ~{ $ms } мс каждая"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Детальные модели рисуются из упрощённых копий, которые делает сервер. Время показывает, сколько в среднем сервер упрощал каждую."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8257,6 +8297,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Закрыть"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "В разделе Настройки › Экспериментальное перечислены функции, над которыми ещё идёт работа; каждая выключена, пока вы не включите её в своём браузере. Первая: дальние копии в обозревателе мешей."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Пробуйте функции раньше"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11285,6 +11333,14 @@ translation = "Дракон"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Сокровищница вашего дракона: каждый ассет в библиотеке — часть его сокровищ."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Экспериментальное"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Функции, над которыми ещё идёт работа, чтобы попробовать их до того, как они включатся для всех."
 
 [messages.settings-page-issues]
 source = "Issues"

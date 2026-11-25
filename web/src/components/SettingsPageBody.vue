@@ -10,6 +10,7 @@ import AccountPanel from './AccountPanel.vue'
 import AddingPanel from './AddingPanel.vue'
 import AiPanel from './AiPanel.vue'
 import AppearancePanel from './AppearancePanel.vue'
+import ExperimentsPanel from './ExperimentsPanel.vue'
 import AuthPanel from './AuthPanel.vue'
 import CopiesPanel from './CopiesPanel.vue'
 import HoardPanel from './HoardPanel.vue'
@@ -89,6 +90,7 @@ const { s: settings, ready, busy, save, take, opts, saveOpt, resetOpt, changed }
     @section="(id) => emit('section', id)"
   />
   <AccountPanel v-else-if="id === 'account'" />
+  <ExperimentsPanel v-else-if="id === 'experimental'" />
   <AboutPanel v-else-if="id === 'about'" :stats="stats" />
   <AuthPanel v-else-if="id === 'auth'" />
   <CopiesPanel v-else-if="id === 'copies'" @open="(id) => emit('open', id)" @unauthorized="emit('unauthorized')" />

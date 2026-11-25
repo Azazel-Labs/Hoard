@@ -2317,6 +2317,10 @@ explorer-orbit-title = Vetäminen kiertää valitun mallin ympäri katselun sija
 explorer-open = Avaa
 explorer-open-title = Avaa tämän mallin tiedot (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Kaukokopio: { $triangles } / { $total } kolmiota, yksinkertaistettu { $ms } ms:ssa
+explorer-full = Lataa kaikki yksityiskohdat
+explorer-full-title = Lataa koko malli sen kaukokopion tilalle. Iso malli voi viedä aikaa ja paljon muistia.
+explorer-full-loading = Ladataan kaikkia yksityiskohtia…
 explorer-empty = Mitään näistä tuloksista ei voi näyttää 3D:nä.
 explorer-hud-loaded =
     { $total ->
@@ -2324,6 +2328,8 @@ explorer-hud-loaded =
        *[other] { $loaded }/{ $total } mallia ladattu
     }
 explorer-hud-loading = { $count } latautuu
+explorer-hud-far = Kaukokopiot: { $count }, ~{ $ms } ms kukin
+explorer-hud-far-title = Yksityiskohtaiset mallit piirretään palvelimen tekemistä yksinkertaisemmista kopioista. Aika kertoo, kauanko palvelimelta kesti keskimäärin yksinkertaistaa kukin.
 explorer-hud-memory = ~{ $mb } Mt
 explorer-hud-speed = Nopeus { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2884,6 +2890,12 @@ settings-page-issues = Ongelmat
 settings-page-issues-blurb = Mikä meni pieleen tiedostoja avattaessa tai käsiteltäessä: arkistot, jotka eivät purkautuneet, tiedostot, joita ei voitu lukea, ja epäonnistuneet työt. Yritä niitä uudelleen, kun syy on korjattu, tai kuittaa ne.
 settings-page-maintenance = Ylläpito
 settings-page-maintenance-blurb = Varmuuskopioi, tarkista vauriot ja siivoa. Kutakin ajetaan yksi kerrallaan, ja voit poistua tältä sivulta niiden ollessa käynnissä.
+settings-page-experimental = Kokeelliset
+settings-page-experimental-blurb = Vielä työn alla olevia ominaisuuksia kokeiltavaksi ennen kuin ne ovat kaikilla käytössä.
+experiments-what = Jokainen on pois päältä, kunnes kytket sen päälle täällä, ja se voi muuttua tai poistua ennen kuin se on kaikilla käytössä. Päälle kytkemäsi tallentuu vain tähän selaimeen.
+experiments-none = Juuri nyt ei ole mitään kokeiltavaa.
+experiment-far-copies = Kaukokopiot mesh-tutkijassa
+experiment-far-copies-what = Yksityiskohtaiset mallit tulevat yksinkertaisempina kopioina, jotka palvelin tekee lennossa, joten hausta näkyy enemmän nopeammin. Valittu malli latautuu kokonaan, jos se on tarpeeksi pieni; isommassa on sitä varten painike.
 settings-page-about = Tietoja
 settings-page-about-blurb = Mikä Hoard on, mikä versio tämä on ja muiden työ, josta se on tehty.
 settings-the-default = oletus
@@ -3447,6 +3459,8 @@ news-marked-seen =
         [one] { $count } asia merkitty nähdyksi
        *[other] { $count } asiaa merkitty nähdyiksi
     }
+news-experiments-title = Kokeile ominaisuuksia etukäteen
+news-experiments-body = Asetukset › Kokeelliset luettelee vielä työn alla olevia ominaisuuksia, kukin pois päältä, kunnes kytket sen päälle selaimessasi. Ensimmäisenä: kaukokopiot mesh-tutkijassa.
 news-pack-covers-title = Paketit näyttävät omat kuvansa
 news-pack-covers-body = Paketti, jonka mukana tulee esikatselukuvia tai kuvakaappauksia, käyttää niitä kansikuvanaan ja vaihtaa niitä, kun osoitin on sen päällä pakettiluettelossa, sekä omassa paneelissaan.
 news-models-read-title = Lisää 3D-muotoja ilman Blenderiä

@@ -2096,9 +2096,15 @@ explorer-orbit-title = Sürüklemek etrafa bakmak yerine seçili modelin çevres
 explorer-open = Aç
 explorer-open-title = Bu modelin ayrıntılarını aç (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Uzak kopya: { $total } üçgenden { $triangles }, { $ms } ms’de basitleştirildi
+explorer-full = Tüm ayrıntıyı yükle
+explorer-full-title = Uzak kopyası yerine modelin tamamını yükler. Büyük bir model biraz sürebilir ve çok bellek kullanabilir.
+explorer-full-loading = Tüm ayrıntı yükleniyor…
 explorer-empty = Bu sonuçların hiçbiri 3B olarak gösterilemiyor.
 explorer-hud-loaded = { $total } modelden { $loaded } tanesi yüklendi
 explorer-hud-loading = { $count } yükleniyor
+explorer-hud-far = Uzak kopyalar: { $count }, her biri ~{ $ms } ms
+explorer-hud-far-title = Ayrıntılı modeller, sunucunun yaptığı daha basit kopyalardan çizilir. Süre, sunucunun her birini ortalama ne kadar sürede basitleştirdiğidir.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Hız { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2600,6 +2606,12 @@ settings-page-issues = Sorunlar
 settings-page-issues-blurb = Dosyalar açılırken ya da işlenirken ters gidenler: açılmayan arşivler, okunamayan dosyalar, başarısız olan işler. Neden giderildikten sonra onları yeniden deneyin ya da yok sayın.
 settings-page-maintenance = Bakım
 settings-page-maintenance-blurb = Yedekleyin, hasarı denetleyin ve toparlayın. Her birinden aynı anda yalnızca biri çalışır; onlar çalışırken bu sayfadan ayrılabilirsiniz.
+settings-page-experimental = Deneysel
+settings-page-experimental-blurb = Hâlâ üzerinde çalışılan özellikler; herkes için açılmadan önce deneyebilirsiniz.
+experiments-what = Her biri siz burada açana kadar kapalıdır ve herkes için açılmadan önce değişebilir ya da kaldırılabilir. Açtıklarınız yalnızca bu tarayıcıda kaydedilir.
+experiments-none = Şu an denenecek bir şey yok.
+experiment-far-copies = Örgü gezgininde uzak kopyalar
+experiment-far-copies-what = Ayrıntılı modeller, sunucunun anında yaptığı daha basit kopyalar olarak gelir; böylece bir aramanın daha fazlası daha erken görünür. Seçtiğiniz model yeterince küçükse tamamen yüklenir; daha büyüğünde bunun için bir düğme vardır.
 settings-page-about = Hakkında
 settings-page-about-blurb = Hoard’un ne olduğu, bunun hangi sürüm olduğu ve yapıldığı başkalarının emeği.
 settings-the-default = varsayılan
@@ -3153,6 +3165,8 @@ news-marked-seen =
         [one] { $count } şey görüldü olarak işaretlendi
        *[other] { $count } şey görüldü olarak işaretlendi
     }
+news-experiments-title = Özellikleri erkenden deneyin
+news-experiments-body = Ayarlar › Deneysel, hâlâ üzerinde çalışılan özellikleri listeler; her biri siz tarayıcınızda açana kadar kapalıdır. İlki: örgü gezgininde uzak kopyalar.
 news-pack-covers-title = Paketler kendi resimlerini gösteriyor
 news-pack-covers-body = Önizleme veya ekran görüntüsüyle gelen bir paket bunları kapak olarak kullanır; paket listesinde işaretçi üzerindeyken ve kendi panelinde birinden diğerine geçer.
 news-models-read-title = Daha fazla 3B biçimi, Blender olmadan

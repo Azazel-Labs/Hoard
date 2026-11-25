@@ -2436,6 +2436,10 @@ explorer-orbit-title = Tažením otáčet kolem vybraného modelu místo rozhlí
 explorer-open = Otevřít
 explorer-open-title = Otevřít podrobnosti tohoto modelu (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Vzdálená kopie: { $triangles } z { $total } trojúhelníků, zjednodušeno za { $ms } ms
+explorer-full = Načíst plné detaily
+explorer-full-title = Načíst celý model místo jeho vzdálené kopie. Velký model může chvíli trvat a zabrat hodně paměti.
+explorer-full-loading = Načítají se plné detaily…
 explorer-empty = Žádný z těchto výsledků nelze zobrazit ve 3D.
 explorer-hud-loaded =
     { $total ->
@@ -2444,6 +2448,8 @@ explorer-hud-loaded =
        *[other] Načteno { $loaded } z { $total } modelů
     }
 explorer-hud-loading = Načítá se: { $count }
+explorer-hud-far = Vzdálené kopie: { $count }, ~{ $ms } ms každá
+explorer-hud-far-title = Podrobné modely se kreslí z jednodušších kopií, které vytváří server. Čas udává, jak dlouho serveru v průměru trvalo každou zjednodušit.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Rychlost { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -3029,6 +3035,12 @@ settings-page-issues = Problémy
 settings-page-issues-blurb = Co se pokazilo při otevírání nebo zpracování souborů: archivy, které nešly rozbalit, soubory, které nešly přečíst, úlohy, které selhaly. Až odstraníte příčinu, zkuste je znovu, nebo je skryjte.
 settings-page-maintenance = Údržba
 settings-page-maintenance-blurb = Zálohování, kontrola poškození a úklid. Od každého běží najednou jen jedno a během toho můžete tuto stránku opustit.
+settings-page-experimental = Experimentální
+settings-page-experimental-blurb = Funkce, na kterých se ještě pracuje, k vyzkoušení dřív, než se zapnou všem.
+experiments-what = Každá je vypnutá, dokud ji tu nezapnete, a než se zapne všem, může se změnit nebo zmizet. Co zapnete, se uloží jen v tomto prohlížeči.
+experiments-none = Teď tu není nic k vyzkoušení.
+experiment-far-copies = Vzdálené kopie v průzkumníku sítí
+experiment-far-copies-what = Podrobné modely přicházejí jako jednodušší kopie, které server vytváří za běhu, takže se z hledání ukáže víc a dřív. Vybraný model se načte celý, pokud je dost malý; větší má na to tlačítko.
 settings-page-about = O aplikaci
 settings-page-about-blurb = Co je Hoard, jaká je to verze a práce ostatních, ze které vzniká.
 settings-the-default = výchozí hodnota
@@ -3633,6 +3645,8 @@ news-marked-seen =
         [many] { $count } novinky označeno jako zobrazené
        *[other] { $count } novinek označeno jako zobrazené
     }
+news-experiments-title = Vyzkoušejte funkce dřív
+news-experiments-body = Nastavení › Experimentální uvádí funkce, na kterých se ještě pracuje; každá je vypnutá, dokud ji ve svém prohlížeči nezapnete. Jako první: vzdálené kopie v průzkumníku sítí.
 news-pack-covers-title = Balíčky ukazují vlastní obrázky
 news-pack-covers-body = Balíček, který obsahuje náhledy nebo snímky obrazovky, je použije jako obálku a střídá je, když nad ním v seznamu balíčků držíte ukazatel, i na svém panelu.
 news-models-read-title = Další 3D formáty bez Blenderu

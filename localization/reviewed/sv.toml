@@ -5376,6 +5376,22 @@ translation = "Namnet och lösenordet stämmer inte överens"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Det är inte installationskoden som servern fick i HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Fjärrkopior i mesh-utforskaren"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Detaljerade modeller kommer som enklare kopior som servern gör i farten, så mer av en sökning visas snabbare. Väljer du en läses den in helt om den är liten nog; en större har en knapp för det."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Inget att prova just nu."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Var och en är av tills du slår på den här, och kan ändras eller försvinna innan den är på för alla. Det du slår på sparas bara i den här webbläsaren."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Animera"
@@ -5392,9 +5408,33 @@ translation = "Mesh-utforskare: flyg runt bland modellerna i de här resultaten"
 source = "None of these results can be shown in 3D."
 translation = "Inget av de här resultaten kan visas i 3D."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Fjärrkopia: { $triangles } av { $total } trianglar, förenklad på { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Läs in alla detaljer"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Läser in alla detaljer…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Läs in hela modellen i stället för dess fjärrkopia. En stor modell kan ta en stund och mycket minne."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Vy"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Fjärrkopior: { $count }, ~{ $ms } ms var"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Detaljerade modeller ritas från enklare kopior som servern gör. Tiden är hur länge servern i snitt behövde för att förenkla var och en."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8091,6 +8131,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Stäng"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Inställningar › Experimentellt listar funktioner som fortfarande är under arbete, var och en av tills du slår på den i din webbläsare. Först ut: fjärrkopior i mesh-utforskaren."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Prova funktioner tidigt"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11024,6 +11072,14 @@ translation = "Drake"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Din drakes skatt: varje tillgång i biblioteket är en bit av den."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Experimentellt"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Funktioner som fortfarande är under arbete, att prova innan de är på för alla."
 
 [messages.settings-page-issues]
 source = "Issues"

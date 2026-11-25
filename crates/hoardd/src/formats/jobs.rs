@@ -99,7 +99,7 @@ pub(crate) async fn request(
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
     // The 3D viewer's GLB, of any model polysmelt reads or Blender converted. Not offered for download.
     let readable = crate::meshes::reads(&ext.to_ascii_lowercase());
-    let view = format == "view" && max.is_none() && (readable || names.iter().any(|n| n == "glb"));
+    let view = matches!(format, "view" | super::FAR) && max.is_none() && (readable || names.iter().any(|n| n == "glb"));
     let allowed = view
         || options(&ext, &names).iter().any(|o| o.format == format)
         || (format == super::CLIP && super::offers_clip(animation, &ext, &names))
@@ -115,6 +115,8 @@ pub(crate) async fn request(
     let sheet = crate::spritesheet::is_format(format);
     let key = if format == "glb" {
         format!("as:glb~{}~{}~{}:0", facing.turn, facing.tilt, naming.mark())
+    } else if format == super::FAR {
+        format!("as:{format}~{}:0", crate::farcopy::REV)
     } else if sheet {
         // Made from the sheet, so made again when the sheet changes.
         let (_, h) = derivs.iter().find(|(k, _)| k == "sheet").ok_or(Refused::NotFound)?;
@@ -202,6 +204,7 @@ fn format_name(format: &str) -> String {
         "tiff" => "TIFF".into(),
         "exr" => "OpenEXR".into(),
         "view" => "GLB for the viewer".into(),
+        super::FAR => "far copy for the mesh explorer".into(),
         super::CLIP => "GLB clip".into(),
         other => crate::spritesheet::label(other).map_or_else(|| other.to_ascii_uppercase(), str::to_owned),
     }
@@ -249,7 +252,8 @@ impl Job {
         activity: &std::sync::Arc<crate::activity::Handle>,
     ) -> Result<Ready> {
         use crate::db;
-        let _slot = if self.format == "view" { VIEW_SLOTS.acquire().await? } else { SLOTS.acquire().await? };
+        let viewer = matches!(self.format.as_str(), "view" | super::FAR);
+        let _slot = if viewer { VIEW_SLOTS.acquire().await? } else { SLOTS.acquire().await? };
         activity.queued(false);
         tx.send_replace(Stage::Working(0.0));
         let state = &self.state;

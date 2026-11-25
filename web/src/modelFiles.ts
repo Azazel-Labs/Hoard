@@ -13,6 +13,15 @@ type Loaded = {
   missing?: string[]
   /** How long one of the file's own units is, in meters (see `unitOf`). */
   unit?: number | null
+  /** For a far copy (`farUrl`), what the server's simplifying did. */
+  far?: FarCopy | null
+}
+
+/** What making a far copy did: the model's triangles before and after, and how long farthing took. */
+export interface FarCopy {
+  triangles_in: number
+  triangles_out: number
+  ms: number
 }
 
 /** Formats in meters by definition, as polysmelt names them; X3D and VRML scale theirs by `UNIT` while read. */
@@ -92,8 +101,9 @@ export async function loadModel(url: string, ext: string, manager: THREE.Loading
           throw new Error(body.error ?? `HTTP ${res.status}`)
         }
         const g = await loader.parseAsync(await res.arrayBuffer(), '')
-        const asset = g.asset as Parameters<typeof unitOf>[0] & { extras?: { missing_textures?: string[] } }
-        return { object: g.scene, animations: g.animations, missing: asset?.extras?.missing_textures ?? [], unit: unitOf(asset) }
+        const asset = g.asset as Parameters<typeof unitOf>[0] & { extras?: { missing_textures?: string[]; far?: FarCopy } }
+        const far = asset?.extras?.far ?? null
+        return { object: g.scene, animations: g.animations, missing: asset?.extras?.missing_textures ?? [], unit: unitOf(asset), far }
       }
       throw new Error(t('model-error-converting'))
     }
@@ -107,6 +117,12 @@ export async function loadModel(url: string, ext: string, manager: THREE.Loading
  *  GLB. A model only Blender reads comes from Blender's GLB of it. */
 export function sourceFor(a: Pick<Asset | AssetLink, 'id'>): { url: string; ext: string } {
   return { url: `/api/assets/${a.id}/as/view?download=0&wait=30`, ext: 'server-glb' }
+}
+
+/** The mesh explorer's lighter copy of a detailed model: the viewer's GLB with each mesh simplified on the server to its
+ *  share of a few thousand triangles, and smaller textures (`far_glb` in hoardd's meshes.rs). */
+export function farUrl(a: Pick<Asset, 'id'>): string {
+  return `/api/assets/${a.id}/as/far?download=0&wait=30`
 }
 
 /** The loader for files asked for as `.tga`. Loaders pick it by the name they ask for, before the URL is

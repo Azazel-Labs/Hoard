@@ -5238,6 +5238,22 @@ translation = "名前とパスワードが一致しません"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "HOARD_SETUP_CODE でサーバーに指定されたセットアップコードと一致しません"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "メッシュエクスプローラーの遠景コピー"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "詳細なモデルは、サーバーがその場で作る簡略なコピーとして届くので、検索結果がより多く、より早く表示されます。選んだモデルは十分に小さければ完全に読み込まれ、大きいモデルにはそのためのボタンが出ます。"
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "いまは試せるものはありません。"
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "どれもここでオンにするまではオフです。全員に有効になる前に変わったり、なくなったりすることがあります。オンにした内容はこのブラウザーにだけ保存されます。"
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "アニメーション"
@@ -5254,9 +5270,33 @@ translation = "メッシュエクスプローラー：この結果のモデル�
 source = "None of these results can be shown in 3D."
 translation = "この結果には 3D で表示できるものがありません。"
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "遠景コピー: { $total } 三角形中 { $triangles }、{ $ms } ms で簡略化"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "完全な詳細を読み込む"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "完全な詳細を読み込み中…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "遠景コピーの代わりにモデル全体を読み込みます。大きなモデルは時間がかかり、メモリーも多く使います。"
+
 [messages.explorer-group-view]
 source = "View"
 translation = "表示"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "遠景コピー: { $count } 件、各 ~{ $ms } ms"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "詳細なモデルは、サーバーが作る簡略なコピーから描かれます。時間は、サーバーがそれぞれの簡略化にかかった平均です。"
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -7897,6 +7937,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "閉じる"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "設定 › 試験運用 に開発中の機能が並びます。どれもブラウザーでオンにするまではオフです。最初は、メッシュエクスプローラーの遠景コピーです。"
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "新機能をいち早く試す"
 
 [messages.news-got-it]
 source = "Got it"
@@ -10775,6 +10823,14 @@ translation = "ドラゴン"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "あなたのドラゴンの宝の山。ライブラリのアセットひとつひとつがその宝です。"
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "試験運用"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "まだ開発中の機能を、全員に有効になる前に試せます。"
 
 [messages.settings-page-issues]
 source = "Issues"

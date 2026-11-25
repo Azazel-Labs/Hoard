@@ -5235,6 +5235,22 @@ translation = "ชื่อและรหัสผ่านไม่ตรง�
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "นี่ไม่ใช่รหัสตั้งค่าที่กำหนดให้เซิร์ฟเวอร์ใน HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "สำเนาระยะไกลในตัวสำรวจเมช"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "โมเดลที่มีรายละเอียดสูงจะมาเป็นสำเนาที่เรียบง่ายกว่าซึ่งเซิร์ฟเวอร์สร้างขึ้นทันที ผลการค้นหาจึงแสดงได้มากขึ้นและเร็วขึ้น โมเดลที่เลือกจะโหลดเต็มถ้าเล็กพอ ส่วนโมเดลที่ใหญ่กว่าจะมีปุ่มสำหรับโหลด"
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "ตอนนี้ยังไม่มีอะไรให้ลอง"
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "แต่ละรายการปิดอยู่จนกว่าคุณจะเปิดที่นี่ และอาจเปลี่ยนหรือหายไปก่อนเปิดให้ทุกคน สิ่งที่คุณเปิดจะบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น"
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "เคลื่อนไหว"
@@ -5251,9 +5267,33 @@ translation = "ตัวสำรวจเมช: บินไปรอบ ๆ �
 source = "None of these results can be shown in 3D."
 translation = "ไม่มีผลลัพธ์ใดที่แสดงแบบ 3 มิติได้"
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "สำเนาระยะไกล: { $triangles } จาก { $total } สามเหลี่ยม ลดรายละเอียดใน { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "โหลดรายละเอียดเต็ม"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "กำลังโหลดรายละเอียดเต็ม…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "โหลดทั้งโมเดลแทนสำเนาระยะไกล โมเดลขนาดใหญ่อาจใช้เวลาสักพักและใช้หน่วยความจำมาก"
+
 [messages.explorer-group-view]
 source = "View"
 translation = "มุมมอง"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "สำเนาระยะไกล: { $count } ชิ้น ชิ้นละ ~{ $ms } ms"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "โมเดลที่มีรายละเอียดสูงวาดจากสำเนาที่เรียบง่ายกว่าซึ่งเซิร์ฟเวอร์สร้าง เวลาคือค่าเฉลี่ยที่เซิร์ฟเวอร์ใช้ลดรายละเอียดแต่ละชิ้น"
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -7886,6 +7926,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "ปิด"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "การตั้งค่า › ทดลอง แสดงฟีเจอร์ที่ยังพัฒนาอยู่ แต่ละรายการปิดอยู่จนกว่าคุณจะเปิดในเบราว์เซอร์ของคุณ รายการแรก: สำเนาระยะไกลในตัวสำรวจเมช"
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "ลองฟีเจอร์ก่อนใคร"
 
 [messages.news-got-it]
 source = "Got it"
@@ -10764,6 +10812,14 @@ translation = "มังกร"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "ขุมสมบัติของมังกรคุณ: ไฟล์ทุกชิ้นในคลังคือสมบัติชิ้นหนึ่ง"
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "ทดลอง"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "ฟีเจอร์ที่ยังพัฒนาอยู่ ให้ลองใช้ก่อนเปิดให้ทุกคน"
 
 [messages.settings-page-issues]
 source = "Issues"

@@ -2053,9 +2053,15 @@ explorer-orbit-title = 拖曳時環繞所選模型旋轉，而不是環顧四周
 explorer-open = 開啟
 explorer-open-title = 開啟此模型的詳細資訊（Enter）
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = 遠景副本：{ $total } 個三角形中的 { $triangles } 個，簡化用時 { $ms } 毫秒
+explorer-full = 載入完整細節
+explorer-full-title = 載入完整模型以取代其遠景副本。大型模型可能需要一些時間，並佔用大量記憶體。
+explorer-full-loading = 正在載入完整細節…
 explorer-empty = 這些結果中沒有可以 3D 顯示的內容。
 explorer-hud-loaded = 已載入 { $loaded } / { $total } 個模型
 explorer-hud-loading = { $count } 個載入中
+explorer-hud-far = 遠景副本：{ $count } 個，每個約 { $ms } 毫秒
+explorer-hud-far-title = 細節豐富的模型由伺服器產生的簡化副本繪製。時間為伺服器簡化每個模型的平均用時。
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = 速度 { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2557,6 +2563,12 @@ settings-page-issues = 問題
 settings-page-issues-blurb = 開啟或處理檔案時發生的錯誤：無法解壓縮的壓縮檔、無法讀取的檔案、失敗的工作。排除原因後可以重試，或將它們略過。
 settings-page-maintenance = 維護
 settings-page-maintenance-blurb = 備份、檢查損毀並進行整理。每種作業一次只會執行一個，執行期間你可以離開這個頁面。
+settings-page-experimental = 實驗性功能
+settings-page-experimental-blurb = 仍在開發中的功能，可在對所有人開啟前搶先試用。
+experiments-what = 每項功能在你於此處開啟前都是關閉的，並且在對所有人開啟前可能會變更或移除。你開啟的內容只會儲存在此瀏覽器中。
+experiments-none = 目前沒有可試用的功能。
+experiment-far-copies = 網格瀏覽器中的遠景副本
+experiment-far-copies-what = 細節豐富的模型會以伺服器即時產生的簡化副本送達，讓搜尋結果更多、更快地顯示。選取的模型若夠小會完整載入；較大的模型則提供按鈕來載入。
 settings-page-about = 關於
 settings-page-about-blurb = Hoard 是什麼、這是哪個版本，以及構成它的他人成果。
 settings-the-default = 預設值
@@ -3093,6 +3105,8 @@ news-marked-seen =
     { $count ->
        *[other] 已將 { $count } 項標為已看過
     }
+news-experiments-title = 搶先試用新功能
+news-experiments-body = 設定 › 實驗性功能 列出了仍在開發中的功能，每項在你於瀏覽器中開啟前都是關閉的。首個功能：網格瀏覽器中的遠景副本。
 news-pack-covers-title = 素材包顯示自己的圖片
 news-pack-covers-body = 附有預覽圖或螢幕截圖的素材包會以它們作為封面：在素材包列表中指標停留時，以及在素材包面板中，會逐張切換顯示。
 news-models-read-title = 支援更多 3D 格式，無需 Blender

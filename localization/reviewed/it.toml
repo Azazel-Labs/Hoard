@@ -5384,6 +5384,22 @@ translation = "Nome e password non corrispondono"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Non è il codice di configurazione dato al server in HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Copie lontane nell’esploratore di mesh"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "I modelli dettagliati arrivano come copie più semplici che il server crea al volo, così una parte maggiore di una ricerca appare prima. Un modello selezionato si carica per intero se è abbastanza piccolo; uno più grande ha un pulsante apposito."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Al momento non c’è niente da provare."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Ognuna è disattivata finché non la attivi qui, e può cambiare o sparire prima di essere attiva per tutti. Ciò che attivi viene salvato solo in questo browser."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Anima"
@@ -5400,9 +5416,33 @@ translation = "Esploratore di mesh: vola tra i modelli di questi risultati"
 source = "None of these results can be shown in 3D."
 translation = "Nessuno di questi risultati può essere mostrato in 3D."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Copia lontana: { $triangles } di { $total } triangoli, semplificata in { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Carica tutti i dettagli"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Caricamento di tutti i dettagli…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Carica il modello intero al posto della sua copia lontana. Un modello grande può richiedere un po’ di tempo e molta memoria."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Vista"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Copie lontane: { $count }, ~{ $ms } ms ciascuna"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "I modelli dettagliati sono disegnati da copie più semplici create dal server. Il tempo indica quanto ha impiegato in media il server a semplificarle."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8098,6 +8138,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Chiudi"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Impostazioni › Sperimentale elenca funzioni ancora in lavorazione, ognuna disattivata finché non la attivi nel tuo browser. La prima: copie lontane nell’esploratore di mesh."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Prova le funzioni in anticipo"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11034,6 +11082,14 @@ translation = "Drago"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Il tesoro del tuo drago: ogni asset della libreria ne è un pezzo."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Sperimentale"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Funzioni ancora in lavorazione, da provare prima che siano attive per tutti."
 
 [messages.settings-page-issues]
 source = "Issues"

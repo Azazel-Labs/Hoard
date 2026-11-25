@@ -5235,6 +5235,22 @@ translation = "用户名和密码不匹配"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "这不是通过 HOARD_SETUP_CODE 提供给服务器的设置代码"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "网格浏览器中的远景副本"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "细节丰富的模型会以服务器即时生成的简化副本送达，让搜索结果更多、更快地显示。选中的模型如果足够小会完整加载；较大的模型则提供按钮来加载。"
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "目前没有可试用的功能。"
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "每项功能在你于此处开启前都是关闭的，并且在对所有人开启前可能会更改或移除。你开启的内容只保存在此浏览器中。"
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "动画"
@@ -5251,9 +5267,33 @@ translation = "网格浏览器：在这些结果的模型之间飞行"
 source = "None of these results can be shown in 3D."
 translation = "这些结果中没有可以 3D 显示的内容。"
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "远景副本：{ $total } 个三角面中的 { $triangles } 个，简化用时 { $ms } 毫秒"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "加载完整细节"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "正在加载完整细节…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "加载完整模型以替换其远景副本。大型模型可能需要一些时间，并占用大量内存。"
+
 [messages.explorer-group-view]
 source = "View"
 translation = "视图"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "远景副本：{ $count } 个，每个约 { $ms } 毫秒"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "细节丰富的模型由服务器生成的简化副本绘制。时间为服务器简化每个模型的平均用时。"
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -7897,6 +7937,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "关闭"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "设置 › 实验性功能 列出了仍在开发中的功能，每项在你于浏览器中开启前都是关闭的。首个功能：网格浏览器中的远景副本。"
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "抢先试用新功能"
 
 [messages.news-got-it]
 source = "Got it"
@@ -10775,6 +10823,14 @@ translation = "巨龙"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "你的巨龙的宝藏：资源库里的每个资源都是其中一件宝物。"
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "实验性功能"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "仍在开发中的功能，可在对所有人开启前抢先试用。"
 
 [messages.settings-page-issues]
 source = "Issues"

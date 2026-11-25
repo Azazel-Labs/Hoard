@@ -5392,6 +5392,22 @@ translation = "Nimi ja salasana eivät täsmää"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Tämä ei ole palvelimelle HOARD_SETUP_CODE-muuttujassa annettu asennuskoodi"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Kaukokopiot mesh-tutkijassa"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Yksityiskohtaiset mallit tulevat yksinkertaisempina kopioina, jotka palvelin tekee lennossa, joten hausta näkyy enemmän nopeammin. Valittu malli latautuu kokonaan, jos se on tarpeeksi pieni; isommassa on sitä varten painike."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Juuri nyt ei ole mitään kokeiltavaa."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Jokainen on pois päältä, kunnes kytket sen päälle täällä, ja se voi muuttua tai poistua ennen kuin se on kaikilla käytössä. Päälle kytkemäsi tallentuu vain tähän selaimeen."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Animoi"
@@ -5408,9 +5424,33 @@ translation = "Mesh-tutkija: lennä näiden tulosten mallien seassa"
 source = "None of these results can be shown in 3D."
 translation = "Mitään näistä tuloksista ei voi näyttää 3D:nä."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Kaukokopio: { $triangles } / { $total } kolmiota, yksinkertaistettu { $ms } ms:ssa"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Lataa kaikki yksityiskohdat"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Ladataan kaikkia yksityiskohtia…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Lataa koko malli sen kaukokopion tilalle. Iso malli voi viedä aikaa ja paljon muistia."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Näkymä"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Kaukokopiot: { $count }, ~{ $ms } ms kukin"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Yksityiskohtaiset mallit piirretään palvelimen tekemistä yksinkertaisemmista kopioista. Aika kertoo, kauanko palvelimelta kesti keskimäärin yksinkertaistaa kukin."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8114,6 +8154,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Sulje"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Asetukset › Kokeelliset luettelee vielä työn alla olevia ominaisuuksia, kukin pois päältä, kunnes kytket sen päälle selaimessasi. Ensimmäisenä: kaukokopiot mesh-tutkijassa."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Kokeile ominaisuuksia etukäteen"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11070,6 +11118,14 @@ translation = "Lohikäärme"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Lohikäärmeesi aarre: jokainen kirjaston tiedosto on palanen sitä."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Kokeelliset"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Vielä työn alla olevia ominaisuuksia kokeiltavaksi ennen kuin ne ovat kaikilla käytössä."
 
 [messages.settings-page-issues]
 source = "Issues"

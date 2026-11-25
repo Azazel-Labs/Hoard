@@ -140,6 +140,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', onBlur))
         <span>{{ t('explorer-hud-loaded', { loaded: stats.loaded, total: stats.total }) }}</span>
         <span v-if="stats.inFlight">{{ t('explorer-hud-loading', { count: stats.inFlight }) }}</span>
         <span>{{ t('model-triangles', { count: stats.triangles }) }}</span>
+        <span v-if="stats.far" :title="t('explorer-hud-far-title')">{{ t('explorer-hud-far', { count: stats.far, ms: stats.farMs }) }}</span>
         <span>{{ t('explorer-hud-memory', { mb: mb(stats.bytes) }) }}</span>
         <span>{{ t('explorer-hud-speed', { speed: formatNumber(stats.speed, { maximumFractionDigits: 1 }) }) }}</span>
         <span>{{ t('explorer-hud-fps', { fps: stats.fps }) }}</span>
@@ -153,7 +154,10 @@ onBeforeUnmount(() => window.removeEventListener('blur', onBlur))
           <span v-if="picked.triangles !== null">{{ t('model-triangles', { count: Math.round(picked.triangles) }) }}</span>
           <span v-if="picked.size">{{ t('explorer-size', { x: meters(picked.size[0]), y: meters(picked.size[1]), z: meters(picked.size[2]) }) }}</span>
         </span>
+        <span v-if="picked.far" class="dim">{{ t('explorer-far', { triangles: picked.far.triangles_out, total: picked.far.triangles_in, ms: picked.far.ms }) }}</span>
         <span class="actions">
+          <button v-if="picked.canLoadFull" type="button" class="btn ghost" :title="t('explorer-full-title')" @click="stage?.loadFull()">{{ t('explorer-full') }}</button>
+          <span v-else-if="picked.loadingFull" class="dim">{{ t('explorer-full-loading') }}</span>
           <button type="button" class="btn ghost" :title="t('model-frame-title')" @click="stage?.frameSelected()">{{ t('model-frame') }}</button>
           <button type="button" class="btn" :title="t('explorer-open-title')" @click="emit('open', picked.asset)">{{ t('explorer-open') }}</button>
         </span>

@@ -5273,6 +5273,22 @@ translation = "Bu ad ve parola eşleşmiyor"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Bu, sunucuya HOARD_SETUP_CODE ile verilen kurulum kodu değil"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Örgü gezgininde uzak kopyalar"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Ayrıntılı modeller, sunucunun anında yaptığı daha basit kopyalar olarak gelir; böylece bir aramanın daha fazlası daha erken görünür. Seçtiğiniz model yeterince küçükse tamamen yüklenir; daha büyüğünde bunun için bir düğme vardır."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Şu an denenecek bir şey yok."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Her biri siz burada açana kadar kapalıdır ve herkes için açılmadan önce değişebilir ya da kaldırılabilir. Açtıklarınız yalnızca bu tarayıcıda kaydedilir."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Canlandır"
@@ -5289,9 +5305,33 @@ translation = "Örgü gezgini: bu sonuçlardaki modellerin arasında uçun"
 source = "None of these results can be shown in 3D."
 translation = "Bu sonuçların hiçbiri 3B olarak gösterilemiyor."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Uzak kopya: { $total } üçgenden { $triangles }, { $ms } ms’de basitleştirildi"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Tüm ayrıntıyı yükle"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Tüm ayrıntı yükleniyor…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Uzak kopyası yerine modelin tamamını yükler. Büyük bir model biraz sürebilir ve çok bellek kullanabilir."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Görünüm"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Uzak kopyalar: { $count }, her biri ~{ $ms } ms"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Ayrıntılı modeller, sunucunun yaptığı daha basit kopyalardan çizilir. Süre, sunucunun her birini ortalama ne kadar sürede basitleştirdiğidir."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -7926,6 +7966,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Kapat"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Ayarlar › Deneysel, hâlâ üzerinde çalışılan özellikleri listeler; her biri siz tarayıcınızda açana kadar kapalıdır. İlki: örgü gezgininde uzak kopyalar."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Özellikleri erkenden deneyin"
 
 [messages.news-got-it]
 source = "Got it"
@@ -10824,6 +10872,14 @@ translation = "Ejderha"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Ejderhanın hazinesi: kütüphanedeki her varlık hazinenin bir parçası."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Deneysel"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Hâlâ üzerinde çalışılan özellikler; herkes için açılmadan önce deneyebilirsiniz."
 
 [messages.settings-page-issues]
 source = "Issues"

@@ -2290,6 +2290,10 @@ explorer-orbit-title = Glisser pour tourner autour du modèle sélectionné au l
 explorer-open = Ouvrir
 explorer-open-title = Ouvrir les détails de ce modèle (Entrée)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Copie lointaine : { $triangles } triangles sur { $total }, simplifiée en { $ms } ms
+explorer-full = Charger tous les détails
+explorer-full-title = Charger le modèle entier à la place de sa copie lointaine. Un gros modèle peut prendre un moment et beaucoup de mémoire.
+explorer-full-loading = Chargement de tous les détails…
 explorer-empty = Aucun de ces résultats ne peut être affiché en 3D.
 explorer-hud-loaded =
     { $total ->
@@ -2297,6 +2301,8 @@ explorer-hud-loaded =
        *[other] { $loaded } modèles chargés sur { $total }
     }
 explorer-hud-loading = { $count } en chargement
+explorer-hud-far = Copies lointaines : { $count }, ~{ $ms } ms chacune
+explorer-hud-far-title = Les modèles détaillés sont dessinés à partir de copies plus simples créées par le serveur. Le temps indique combien le serveur a mis en moyenne pour simplifier chacune.
 explorer-hud-memory = ~{ $mb } Mo
 explorer-hud-speed = Vitesse { $speed } m/s
 explorer-hud-fps = { $fps } i/s
@@ -2841,6 +2847,12 @@ settings-page-issues = Problèmes
 settings-page-issues-blurb = Ce qui a mal tourné à l’ouverture ou au traitement des fichiers : archives impossibles à décompresser, fichiers illisibles, tâches en échec. Réessayez une fois la cause corrigée, ou ignorez-les.
 settings-page-maintenance = Maintenance
 settings-page-maintenance-blurb = Sauvegarder, vérifier l’intégrité et faire le ménage. Une tâche de chaque type s’exécute à la fois, et vous pouvez quitter cette page pendant ce temps.
+settings-page-experimental = Expérimental
+settings-page-experimental-blurb = Des fonctionnalités encore en chantier, à essayer avant qu’elles soient activées pour tout le monde.
+experiments-what = Chacune est désactivée jusqu’à ce que vous l’activiez ici, et peut changer ou disparaître avant d’être activée pour tout le monde. Ce que vous activez n’est enregistré que dans ce navigateur.
+experiments-none = Rien à essayer pour l’instant.
+experiment-far-copies = Copies lointaines dans l’explorateur de maillages
+experiment-far-copies-what = Les modèles détaillés arrivent sous forme de copies plus simples que le serveur crée à la volée, pour qu’une plus grande partie d’une recherche s’affiche plus tôt. Un modèle sélectionné se charge en entier s’il est assez petit ; un plus gros a un bouton pour cela.
 settings-page-about = À propos
 settings-page-about-blurb = Ce qu’est Hoard, de quelle version il s’agit et le travail d’autres personnes dont il est fait.
 settings-the-default = la valeur par défaut
@@ -3404,6 +3416,8 @@ news-marked-seen =
         [one] { $count } nouveauté marquée comme vue
        *[other] { $count } nouveautés marquées comme vues
     }
+news-experiments-title = Essayez des fonctionnalités en avance
+news-experiments-body = Paramètres › Expérimental liste des fonctionnalités encore en chantier, chacune désactivée jusqu’à ce que vous l’activiez dans votre navigateur. Pour commencer : les copies lointaines dans l’explorateur de maillages.
 news-pack-covers-title = Les packs montrent leurs propres images
 news-pack-covers-body = Un pack livré avec des aperçus ou des captures d’écran s’en sert comme couverture et les fait défiler quand le pointeur le survole dans la liste des packs, ainsi que dans son panneau.
 news-models-read-title = Plus de formats 3D, sans Blender

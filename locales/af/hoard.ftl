@@ -2260,6 +2260,10 @@ explorer-orbit-title = Sleep om om die gekose model te draai in plaas daarvan om
 explorer-open = Maak oop
 explorer-open-title = Maak hierdie model se besonderhede oop (Enter)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Ver kopie: { $triangles } van { $total } driehoeke, vereenvoudig in { $ms } ms
+explorer-full = Laai volle detail
+explorer-full-title = Laai die hele model in plaas van sy ver kopie. ’n Groot model kan ’n ruk neem, en baie geheue.
+explorer-full-loading = Laai volle detail…
 explorer-empty = Geen van hierdie resultate kan in 3D gewys word nie.
 explorer-hud-loaded =
     { $total ->
@@ -2267,6 +2271,8 @@ explorer-hud-loaded =
        *[other] { $loaded } van { $total } modelle gelaai
     }
 explorer-hud-loading = { $count } word gelaai
+explorer-hud-far = Ver kopieë: { $count }, ~{ $ms } ms elk
+explorer-hud-far-title = Gedetailleerde modelle word geteken uit eenvoudiger kopieë wat die bediener maak. Die tyd is hoe lank die bediener gemiddeld geneem het om elkeen te vereenvoudig.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Spoed { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2798,6 +2804,12 @@ settings-page-issues = Probleme
 settings-page-issues-blurb = Wat verkeerd geloop het met die oopmaak of verwerking van lêers: argiewe wat nie wou uitpak nie, lêers wat nie gelees kon word nie, take wat misluk het. Probeer hulle weer sodra die oorsaak reggestel is, of wys hulle weg.
 settings-page-maintenance = Instandhouding
 settings-page-maintenance-blurb = Rugsteun, gaan na vir skade en ruim op. Een van elk loop op 'n slag, en jy kan hierdie bladsy verlaat terwyl hulle loop.
+settings-page-experimental = Eksperimenteel
+settings-page-experimental-blurb = Funksies waaraan nog gewerk word, om te probeer voordat dit vir almal aan is.
+experiments-what = Elkeen is af totdat jy dit hier aanskakel, en kan verander of verdwyn voordat dit vir almal aan is. Wat jy aanskakel, word net in hierdie blaaier gestoor.
+experiments-none = Niks om nou te probeer nie.
+experiment-far-copies = Ver kopieë in die maasverkenner
+experiment-far-copies-what = Gedetailleerde modelle kom as eenvoudiger kopieë wat die bediener dadelik maak, sodat meer van ’n soektog gouer wys. As jy een kies, laai dit volledig as dit klein genoeg is; ’n groter een het ’n knoppie daarvoor.
 settings-page-about = Oor
 settings-page-about-blurb = Wat Hoard is, watter weergawe dit is, en die werk van ander waarmee dit gemaak is.
 settings-the-default = die verstek
@@ -3355,6 +3367,8 @@ news-marked-seen =
         [one] { $count } ding as gesien gemerk
        *[other] { $count } dinge as gesien gemerk
     }
+news-experiments-title = Probeer funksies vroeg
+news-experiments-body = Instellings › Eksperimenteel lys funksies waaraan nog gewerk word, elkeen af totdat jy dit in jou blaaier aanskakel. Eerste: ver kopieë in die maasverkenner.
 news-pack-covers-title = Pakke wys hul eie prente
 news-pack-covers-body = ’n Pak wat met voorskoue of skermkiekies kom, gebruik hulle as sy omslag en blaai daardeur terwyl die wyser op die pakkelys daaroor is, en op sy paneel.
 news-models-read-title = Meer 3D-formate, sonder Blender

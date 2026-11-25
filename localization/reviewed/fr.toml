@@ -5388,6 +5388,22 @@ translation = "Ce nom et ce mot de passe ne correspondent pas"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Ce n’est pas le code de configuration donné au serveur dans HOARD_SETUP_CODE"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Copies lointaines dans l’explorateur de maillages"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Les modèles détaillés arrivent sous forme de copies plus simples que le serveur crée à la volée, pour qu’une plus grande partie d’une recherche s’affiche plus tôt. Un modèle sélectionné se charge en entier s’il est assez petit ; un plus gros a un bouton pour cela."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Rien à essayer pour l’instant."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Chacune est désactivée jusqu’à ce que vous l’activiez ici, et peut changer ou disparaître avant d’être activée pour tout le monde. Ce que vous activez n’est enregistré que dans ce navigateur."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Animer"
@@ -5404,9 +5420,33 @@ translation = "Explorateur de maillages : volez parmi les modèles de ces résul
 source = "None of these results can be shown in 3D."
 translation = "Aucun de ces résultats ne peut être affiché en 3D."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Copie lointaine : { $triangles } triangles sur { $total }, simplifiée en { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Charger tous les détails"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Chargement de tous les détails…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Charger le modèle entier à la place de sa copie lointaine. Un gros modèle peut prendre un moment et beaucoup de mémoire."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Vue"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Copies lointaines : { $count }, ~{ $ms } ms chacune"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Les modèles détaillés sont dessinés à partir de copies plus simples créées par le serveur. Le temps indique combien le serveur a mis en moyenne pour simplifier chacune."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8106,6 +8146,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Fermer"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Paramètres › Expérimental liste des fonctionnalités encore en chantier, chacune désactivée jusqu’à ce que vous l’activiez dans votre navigateur. Pour commencer : les copies lointaines dans l’explorateur de maillages."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Essayez des fonctionnalités en avance"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11050,6 +11098,14 @@ translation = "Dragon"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "Le trésor de votre dragon : chaque ressource de la bibliothèque en est une pièce."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Expérimental"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Des fonctionnalités encore en chantier, à essayer avant qu’elles soient activées pour tout le monde."
 
 [messages.settings-page-issues]
 source = "Issues"

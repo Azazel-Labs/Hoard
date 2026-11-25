@@ -5376,6 +5376,22 @@ translation = "Die naam en dat wachtwoord horen niet bij elkaar"
 source = "That isn't the setup code given to the server in HOARD_SETUP_CODE"
 translation = "Dat is niet de installatiecode die de server in HOARD_SETUP_CODE heeft gekregen"
 
+[messages.experiment-far-copies]
+source = "Far copies in the mesh explorer"
+translation = "Verre kopieën in de mesh-verkenner"
+
+[messages.experiment-far-copies-what]
+source = "Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that."
+translation = "Gedetailleerde modellen komen als eenvoudigere kopieën die de server ter plekke maakt, zodat meer van een zoekopdracht eerder verschijnt. Een gekozen model laadt volledig als het klein genoeg is; een groter model heeft daar een knop voor."
+
+[messages.experiments-none]
+source = "Nothing to try just now."
+translation = "Er is nu niets om te proberen."
+
+[messages.experiments-what]
+source = "Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only."
+translation = "Elke functie staat uit tot je haar hier aanzet, en kan veranderen of verdwijnen voordat ze voor iedereen aan staat. Wat je aanzet, wordt alleen in deze browser bewaard."
+
 [messages.explorer-animate]
 source = "Animate"
 translation = "Animeren"
@@ -5392,9 +5408,33 @@ translation = "Mesh-verkenner: vlieg tussen de modellen in deze resultaten"
 source = "None of these results can be shown in 3D."
 translation = "Geen van deze resultaten kan in 3D worden getoond."
 
+[messages.explorer-far]
+source = "Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms"
+translation = "Verre kopie: { $triangles } van { $total } driehoeken, vereenvoudigd in { $ms } ms"
+
+[messages.explorer-full]
+source = "Load full detail"
+translation = "Alle details laden"
+
+[messages.explorer-full-loading]
+source = "Loading full detail…"
+translation = "Alle details laden…"
+
+[messages.explorer-full-title]
+source = "Load the whole model in place of its far copy. A big model can take a while, and a lot of memory."
+translation = "Laad het hele model in plaats van de verre kopie. Een groot model kan even duren en veel geheugen kosten."
+
 [messages.explorer-group-view]
 source = "View"
 translation = "Weergave"
+
+[messages.explorer-hud-far]
+source = "Far copies: { $count }, ~{ $ms } ms each"
+translation = "Verre kopieën: { $count }, ~{ $ms } ms elk"
+
+[messages.explorer-hud-far-title]
+source = "Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average."
+translation = "Gedetailleerde modellen worden getekend uit eenvoudigere kopieën die de server maakt. De tijd is hoe lang de server er gemiddeld over deed om elk te vereenvoudigen."
 
 [messages.explorer-hud-fps]
 source = "{ $fps } fps"
@@ -8090,6 +8130,14 @@ translation = """
 [messages.news-close]
 source = "Close"
 translation = "Sluiten"
+
+[messages.news-experiments-body]
+source = "Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer."
+translation = "Instellingen › Experimenteel toont functies waar nog aan gewerkt wordt, elk uit tot je het in je browser aanzet. Als eerste: verre kopieën in de mesh-verkenner."
+
+[messages.news-experiments-title]
+source = "Try features early"
+translation = "Probeer functies vroeg"
 
 [messages.news-got-it]
 source = "Got it"
@@ -11020,6 +11068,14 @@ translation = "Draak"
 [messages.settings-page-dragon-blurb]
 source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
 translation = "De schat van je draak: elk asset in de bibliotheek is er een stuk van."
+
+[messages.settings-page-experimental]
+source = "Experimental"
+translation = "Experimenteel"
+
+[messages.settings-page-experimental-blurb]
+source = "Features still being worked on, to try before they’re on for everyone."
+translation = "Functies waar nog aan gewerkt wordt, om te proberen voordat ze voor iedereen aan staan."
 
 [messages.settings-page-issues]
 source = "Issues"

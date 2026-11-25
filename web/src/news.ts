@@ -31,6 +31,11 @@ const settingsCrumb = (page: () => string) => () => [t('settings-title'), page()
 /** Newest first. Take things off the end once they're well past NEW_FOR_DAYS. */
 export const NEWS: NewThing[] = [
   {
+    id: 'experiments', date: '2026-11-25', where: { settings: 'experimental' },
+    title: () => t('news-experiments-title'), body: () => t('news-experiments-body'),
+    crumb: settingsCrumb(() => t('settings-page-experimental')),
+  },
+  {
     id: 'pack-covers', date: '2026-11-24', where: { packs: true },
     title: () => t('news-pack-covers-title'), body: () => t('news-pack-covers-body'),
     crumb: () => [t('app-packs')],

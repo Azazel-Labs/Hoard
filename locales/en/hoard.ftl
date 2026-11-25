@@ -2530,6 +2530,12 @@ explorer-open = Open
 explorer-open-title = Open this model's details (Enter)
 # The picked model's width, height and depth, in meters.
 explorer-size = { $x } × { $y } × { $z } m
+# The picked model's far copy: how many triangles it kept of the model's own, and how long the server took.
+explorer-far = Far copy: { $triangles } of { $total } triangles, simplified in { $ms } ms
+# On the picked model’s card in the mesh explorer, when it’s showing a far copy and is too big to load in full by itself.
+explorer-full = Load full detail
+explorer-full-title = Load the whole model in place of its far copy. A big model can take a while, and a lot of memory.
+explorer-full-loading = Loading full detail…
 explorer-empty = None of these results can be shown in 3D.
 # The status line at the top left. $total is how many models the search found that can be shown in 3D.
 explorer-hud-loaded =
@@ -2538,6 +2544,9 @@ explorer-hud-loaded =
        *[other] { $loaded } of { $total } models loaded
     }
 explorer-hud-loading = { $count } loading
+# A far copy: a simpler version of a model, with fewer triangles, that the server makes for detailed models.
+explorer-hud-far = Far copies: { $count }, ~{ $ms } ms each
+explorer-hud-far-title = Detailed models are drawn from simpler copies the server makes. The time is how long the server took to simplify each, on average.
 # A rough estimate of the graphics memory the loaded models take. MB is megabytes.
 explorer-hud-memory = ~{ $mb } MB
 # How fast the camera flies; $speed is in meters per second.
@@ -3153,6 +3162,14 @@ settings-page-issues = Issues
 settings-page-issues-blurb = What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.
 settings-page-maintenance = Maintenance
 settings-page-maintenance-blurb = Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.
+settings-page-experimental = Experimental
+settings-page-experimental-blurb = Features still being worked on, to try before they’re on for everyone.
+# Settings › Experimental: features still being worked on, which each browser can turn on for itself.
+experiments-what = Each is off until you turn it on here, and may change or go away before it’s on for everyone. What you turn on is saved in this browser only.
+experiments-none = Nothing to try just now.
+# A far copy: a simpler version of a model, with fewer triangles, that the server makes on the fly.
+experiment-far-copies = Far copies in the mesh explorer
+experiment-far-copies-what = Detailed models come as simpler copies the server makes on the fly, so more of a search shows sooner. Picking one loads it in full if it’s small enough; a bigger one has a button for that.
 settings-page-about = About
 settings-page-about-blurb = What Hoard is, which version this is, and the work of others it’s made with.
 # Shown on a reset button and in the note after a reset: what a setting goes back to.
@@ -3767,6 +3784,8 @@ news-marked-seen =
        *[other] { $count } things marked seen
     }
 # The new things themselves: a short title and a sentence or two on what it is.
+news-experiments-title = Try features early
+news-experiments-body = Settings › Experimental lists features still being worked on, each off until you turn it on in your browser. First up: far copies in the mesh explorer.
 news-pack-covers-title = Packs show their own pictures
 news-pack-covers-body = A pack that comes with previews or screenshots uses them as its cover, stepping through them while the pointer is over it on the packs list, and on its panel.
 news-models-read-title = More 3D formats, no Blender needed

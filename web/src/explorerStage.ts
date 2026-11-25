@@ -7,7 +7,8 @@ import { abs, cameraPosition, float, fract, fwidth, length, max, min, mix, posit
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { api, packFacings, thumbUrl, type Asset } from './api'
 import type { SearchParams } from './types/library'
-import { loadModel, sourceFor, textureLinks } from './modelFiles'
+import { trying } from './experiments'
+import { farUrl, loadModel, sourceFor, textureLinks, type FarCopy } from './modelFiles'
 import { MAP_SLOTS } from './modelMaterials'
 import { disposeObject, mergeStill } from './modelScene'
 import { dressModel, standardize, studioRoom, textureManager } from './modelStage'
@@ -20,6 +21,13 @@ const FIT = 1.5
 const DECK = 0.05
 /** Models are fetched this far from the camera, and kept while the budget allows. */
 const LOAD_RADIUS = 24
+/** With far copies tried (Settings → Experimental), models with more triangles than this come as a far copy,
+ *  simplified on the server to a few thousand (`farcopy::SMALL` in hoardd keeps smaller ones whole). One picked is
+ *  loaded whole if it has no more than FULL_WHEN_PICKED; a bigger one only when asked (`loadFull`). */
+const FAR_OVER = 6000
+const FULL_WHEN_PICKED = 100_000
+/** About what a far copy draws (`farcopy::BUDGET`), for the budget's guess before it loads. */
+const FAR_TRIANGLES = 3000
 /** Thumbnails stand in for models not loaded yet this far out; past it, only the slabs show. */
 const THUMB_RADIUS = 46
 /** Names show this far out. */
@@ -40,6 +48,8 @@ const PAGE = 100
 const COLORS = { background: 0x1a1c21, deck: 0x2b2f37, loading: 0x354157, failed: 0x4a2d30, empty: 0x2f333b }
 
 type CellState = 'idle' | 'loading' | 'ready' | 'failed' | 'empty'
+/** What's drawn of a loaded model: its far copy, or all of it. */
+type Detail = 'far' | 'full'
 
 interface Cell {
   index: number
@@ -57,6 +67,15 @@ interface Cell {
   stopMaps: (() => void) | null
   bytes: number
   triangles: number
+  detail: Detail
+  /** The whole model is loading to take its far copy's place. */
+  upgrading: boolean
+  /** Asked to be loaded whole (`loadFull`), however big. */
+  wantsFull: boolean
+  /** Raised each time its model is let go, so a load that finishes after that knows it's no longer wanted. */
+  gen: number
+  /** What simplifying it did, while its far copy is what's drawn. */
+  far: FarCopy | null
   /** When it was last in view, for the budget. */
   seen: number
   sprite: THREE.Sprite | null
@@ -80,6 +99,9 @@ export interface ExplorerStats {
   /** Frames drawn in the last second (none while nothing moves). */
   fps: number
   speed: number
+  /** Models drawn from their far copies, and how long simplifying them took on average, in milliseconds. */
+  far: number
+  farMs: number
 }
 
 export interface ExplorerSelection {
@@ -89,6 +111,12 @@ export interface ExplorerSelection {
   /** Its width, height and depth in meters, once loaded. */
   size: [number, number, number] | null
   loaded: boolean
+  /** What simplifying it did, while its far copy is what's drawn. */
+  far: FarCopy | null
+  /** Its far copy is drawn and it's too big to load whole without being asked (`loadFull`). */
+  canLoadFull: boolean
+  /** The whole model is loading to take its far copy's place. */
+  loadingFull: boolean
 }
 
 export interface ExplorerOptions {
@@ -235,7 +263,8 @@ export class ExplorerStage {
         this.cells.push({
           index: i, asset: a, x, z, state: 'idle', holder: null, natural: null,
           box: new THREE.Box3(new THREE.Vector3(x - 0.8, 0, z - 0.8), new THREE.Vector3(x + 0.8, 1.6, z + 0.8)),
-          mixer: null, action: null, stopMaps: null, bytes: 0, triangles: 0, seen: 0,
+          mixer: null, action: null, stopMaps: null, bytes: 0, triangles: 0,
+          detail: 'full', upgrading: false, wantsFull: false, gen: 0, far: null, seen: 0,
           sprite: null, thumb: a.has_thumb ? 'none' : 'failed', thumbSeen: 0, wire: null, dist: Infinity, inView: false,
         })
         this.setDeck(this.cells[i])
@@ -341,12 +370,16 @@ export class ExplorerStage {
     near.sort((a, b) => rank(a) - rank(b))
     this.near = near
 
-    // Models: the most wanted first, while loads are free and the budget holds.
+    // Models: the most wanted first, while loads are free and the budget holds. With far copies tried, big ones come
+    // as far copies, and one is loaded whole when it's picked and small enough, or asked for.
     for (const cell of near) {
       if (this.inFlight >= MAX_IN_FLIGHT) break
-      if (cell.state !== 'idle' || cell.dist > LOAD_RADIUS) continue
-      if (!this.makeRoom(cell, rank)) break
-      void this.loadCell(cell)
+      const load = cell.state === 'idle' && cell.dist <= LOAD_RADIUS
+      const upgrade = cell.state === 'ready' && cell.detail === 'far' && !cell.upgrading && cell === this.selected && (cell.wantsFull || fullWhenPicked(cell))
+      if (!load && !upgrade) continue
+      const detail: Detail = load && wantsFar(cell) ? 'far' : 'full'
+      if (!this.makeRoom(cell, rank, detail)) break
+      void this.loadCell(cell, detail)
     }
 
     // Thumbnails stand in for what isn't loaded; a wire box for what has none.
@@ -378,18 +411,21 @@ export class ExplorerStage {
 
   /** Free the budget for a model: let go of the loaded ones seen longest ago, then the farthest, but only those
    *  wanted less than it, so two models never take turns. */
-  private makeRoom(cell: Cell, rank: (c: Cell) => number): boolean {
+  private makeRoom(cell: Cell, rank: (c: Cell) => number, detail: Detail): boolean {
+    // Loading it whole for its far copy doesn't add a model.
+    const more = cell.state === 'ready' ? 0 : 1
     const over = (extra: { bytes: number; tris: number }) => {
       const s = this.usage()
-      return s.models + 1 > BUDGET.models || s.bytes + extra.bytes > BUDGET.bytes || s.triangles + extra.tris > BUDGET.triangles
+      return s.models + more > BUDGET.models || s.bytes + extra.bytes > BUDGET.bytes || s.triangles + extra.tris > BUDGET.triangles
     }
     // A guess at what it will take, from what the server measured.
-    const tris = Number(cell.asset.meta?.triangles) || 20_000
-    const extra = { bytes: tris * 3 * 32 + 4 * 2 ** 20, tris }
+    const measured = Number(cell.asset.meta?.triangles) || 20_000
+    const tris = detail === 'far' ? Math.min(measured, FAR_TRIANGLES) : measured
+    const extra = { bytes: tris * 3 * 32 + (detail === 'far' ? 2 ** 20 : 4 * 2 ** 20), tris }
     if (!over(extra)) return true
     const mine = rank(cell)
     const victims = this.cells
-      .filter((c) => c.state === 'ready' && c !== this.selected && !c.inView && rank(c) > mine)
+      .filter((c) => c.state === 'ready' && c !== cell && c !== this.selected && !c.inView && rank(c) > mine)
       .sort((a, b) => a.seen - b.seen || b.dist - a.dist)
     for (const v of victims) {
       this.unload(v)
@@ -411,84 +447,124 @@ export class ExplorerStage {
     return { models, bytes, triangles }
   }
 
-  /** Load one model the way its viewer does: the server's GLB, its textures found by name, its materials made
-   *  standard, the textures it doesn't name put on, turned as its pack's models face. */
-  private async loadCell(cell: Cell) {
-    cell.state = 'loading'
+  /** Load one model (or its far copy) and stand it in its cell. A whole model loading for a far copy takes its place
+   *  once it's ready, its clip carrying on where the far copy's was. */
+  private async loadCell(cell: Cell, detail: Detail) {
+    const upgrade = cell.state === 'ready'
+    const gen = cell.gen
+    // Still wanted: not let go of (the budget) while it loaded, nor the explorer closed.
+    const wanted = () => !this.disposed && cell.gen === gen && cell.state === (upgrade ? 'ready' : 'loading')
+    if (upgrade) cell.upgrading = true
+    else cell.state = 'loading'
     this.inFlight++
     this.colorDeck(cell)
+    let made: Built | 'empty' | null = null
     try {
-      const { named, guesses, full } = await textureLinks(cell.asset)
-      if (this.disposed) return
-      const redraw = () => this.redraw()
-      const manager = textureManager(full, named, guesses, false, { end: redraw })
-      const src = sourceFor(full)
-      const { object, animations } = await loadModel(src.url, src.ext, manager)
-      if (this.disposed) {
-        disposeObject(object)
-        return
-      }
-      const made = standardize(object)
-      if (!made.meshes.length) {
+      made = await this.build(cell, detail)
+      if (made === 'empty') {
         // A clip with no mesh of its own: its thumbnail stays.
-        disposeObject(object)
-        cell.state = 'empty'
+        if (wanted() && !upgrade) cell.state = 'empty'
         return
       }
-      if (!animations.length) mergeStill(object, made.meshes)
-      const dressed = dressModel(full, guesses, made.materials, made.textured, {
-        fullTextures: false,
-        manager,
-        onMaps: redraw,
-        track: () => redraw,
-      })
-      const facing = packFacings.get(full.pack_id) ?? full.facing ?? { turn: 0, tilt: 0 }
-      const turner = new THREE.Group()
-      turner.add(object)
-      turner.rotation.set((facing.tilt * Math.PI) / 180, (facing.turn * Math.PI) / 180, 0, 'YXZ')
-      const holder = new THREE.Group()
-      holder.add(turner)
-      holder.updateMatrixWorld(true)
-      const natural = new THREE.Box3().setFromObject(holder, true)
-      if (natural.isEmpty() || !Number.isFinite(natural.min.x)) natural.set(new THREE.Vector3(-0.5, 0, -0.5), new THREE.Vector3(0.5, 1, 0.5))
-      cell.holder = holder
-      cell.natural = natural
-      cell.stopMaps = dressed.stop
-      cell.triangles = Math.round(made.triangles)
-      cell.bytes = estimateBytes(holder)
-      if (animations.length) {
-        // An idle clip first, as the viewer plays: a looping "Death" is a poor first look.
-        const clip = [...animations].sort((a, b) => Number(/idle/i.test(b.name)) - Number(/idle/i.test(a.name)))[0]
-        cell.mixer = new THREE.AnimationMixer(object)
-        cell.action = cell.mixer.clipAction(clip)
-        cell.action.play()
-        cell.action.paused = !this.animate
-      }
-      this.place(cell)
+      if (!made || !wanted()) return
       // Build its shaders before it shows, so it doesn't stall the frame it first appears in.
       try {
-        await this.renderer?.compileAsync(holder, this.camera, this.scene)
+        await this.renderer?.compileAsync(made.holder, this.camera, this.scene)
       } catch {
         // Built on first draw instead.
       }
-      if (this.disposed) {
-        this.release(cell)
-        return
-      }
-      this.scene.add(holder)
+      if (!wanted()) return
+      const clipTime = cell.action?.time ?? 0
+      if (upgrade) this.release(cell, false)
+      // The server sends a small model whole when its far copy is asked for.
+      Object.assign(cell, made, { detail: made.far ? 'far' : 'full' })
+      if (upgrade && cell.action) cell.action.time = clipTime
+      made = null
+      this.place(cell)
+      this.scene.add(cell.holder!)
       cell.state = 'ready'
       if (cell.sprite) cell.sprite.visible = false
       if (cell === this.selected) this.select(cell)
     } catch (e) {
-      cell.state = 'failed'
+      if (!upgrade && wanted()) cell.state = 'failed'
+      // The far copy stays rather than the whole model being asked for again and again.
+      else if (upgrade && wanted()) cell.detail = 'full'
       console.warn(`explorer: ${cell.asset.name}:`, e)
     } finally {
+      // Built but not wanted any more.
+      if (made && made !== 'empty') {
+        made.stopMaps?.()
+        made.mixer?.stopAllAction()
+        disposeObject(made.holder)
+      }
+      if (upgrade) {
+        cell.upgrading = false
+        if (cell === this.selected && !this.disposed) this.select(cell)
+      }
       this.inFlight--
       if (!this.disposed) {
         this.colorDeck(cell)
         this.dirty = true
         this.redraw()
       }
+    }
+  }
+
+  /** A model loaded the way its viewer does: the server's GLB (or its far copy), its textures found by name, its
+   *  materials made standard, the textures it doesn't name put on, turned as its pack's models face. `'empty'` for a
+   *  file with nothing to draw, null if the explorer closed meanwhile. */
+  private async build(cell: Cell, detail: Detail): Promise<Built | 'empty' | null> {
+    const { named, guesses, full } = await textureLinks(cell.asset)
+    if (this.disposed) return null
+    const redraw = () => this.redraw()
+    const manager = textureManager(full, named, guesses, false, { end: redraw })
+    const url = detail === 'far' ? farUrl(full) : sourceFor(full).url
+    const { object, animations, far } = await loadModel(url, 'server-glb', manager)
+    if (this.disposed) {
+      disposeObject(object)
+      return null
+    }
+    const made = standardize(object)
+    if (!made.meshes.length) {
+      disposeObject(object)
+      return 'empty'
+    }
+    if (!animations.length) mergeStill(object, made.meshes)
+    const dressed = dressModel(full, guesses, made.materials, made.textured, {
+      fullTextures: false,
+      manager,
+      onMaps: redraw,
+      track: () => redraw,
+    })
+    const facing = packFacings.get(full.pack_id) ?? full.facing ?? { turn: 0, tilt: 0 }
+    const turner = new THREE.Group()
+    turner.add(object)
+    turner.rotation.set((facing.tilt * Math.PI) / 180, (facing.turn * Math.PI) / 180, 0, 'YXZ')
+    const holder = new THREE.Group()
+    holder.add(turner)
+    holder.updateMatrixWorld(true)
+    const natural = new THREE.Box3().setFromObject(holder, true)
+    if (natural.isEmpty() || !Number.isFinite(natural.min.x)) natural.set(new THREE.Vector3(-0.5, 0, -0.5), new THREE.Vector3(0.5, 1, 0.5))
+    let mixer: THREE.AnimationMixer | null = null
+    let action: THREE.AnimationAction | null = null
+    if (animations.length) {
+      // An idle clip first, as the viewer plays: a looping "Death" is a poor first look.
+      const clip = [...animations].sort((a, b) => Number(/idle/i.test(b.name)) - Number(/idle/i.test(a.name)))[0]
+      mixer = new THREE.AnimationMixer(object)
+      action = mixer.clipAction(clip)
+      action.play()
+      action.paused = !this.animate
+    }
+    return {
+      holder,
+      natural,
+      mixer,
+      action,
+      stopMaps: dressed.stop,
+      triangles: Math.round(made.triangles),
+      bytes: estimateBytes(holder),
+      // The server sends small models whole when a far copy is asked for.
+      far: detail === 'far' && far && far.triangles_out < far.triangles_in ? far : null,
     }
   }
 
@@ -516,7 +592,10 @@ export class ExplorerStage {
     this.colorDeck(cell)
   }
 
-  private release(cell: Cell) {
+  /** Let go of a cell's model. Unless it's only being replaced (`gone` false), a load still running for it is no
+   *  longer wanted. */
+  private release(cell: Cell, gone = true) {
+    if (gone) cell.gen++
     cell.stopMaps?.()
     cell.mixer?.stopAllAction()
     if (cell.holder) {
@@ -524,7 +603,8 @@ export class ExplorerStage {
       cell.holder.removeFromParent()
       disposeObject(cell.holder)
     }
-    Object.assign(cell, { holder: null, natural: null, mixer: null, action: null, stopMaps: null, bytes: 0, triangles: 0 })
+    Object.assign(cell, { holder: null, natural: null, mixer: null, action: null, stopMaps: null, bytes: 0, triangles: 0, detail: 'full', far: null })
+    if (gone) cell.wantsFull = false
   }
 
   private loadThumb(cell: Cell) {
@@ -641,11 +721,24 @@ export class ExplorerStage {
         triangles: cell.state === 'ready' ? cell.triangles : Number.isFinite(meta) && meta > 0 ? meta : null,
         size: cell.natural ? (cell.natural.getSize(new THREE.Vector3()).toArray() as [number, number, number]) : null,
         loaded: cell.state === 'ready',
+        far: cell.far,
+        canLoadFull: cell.state === 'ready' && cell.detail === 'far' && !cell.wantsFull && !fullWhenPicked(cell),
+        loadingFull: cell.upgrading || (cell.detail === 'far' && (cell.wantsFull || fullWhenPicked(cell))),
       })
+      // Picked: a far copy small enough is loaded whole.
+      if (cell.detail === 'far') this.dirty = true
     } else {
       this.opts.onSelect?.(null)
     }
     this.redraw()
+  }
+
+  /** Load the picked model whole in place of its far copy, however big it is. */
+  loadFull() {
+    const cell = this.selected
+    if (!cell || cell.detail !== 'far') return
+    cell.wantsFull = true
+    this.select(cell)
   }
 
   /** Glide to look at the picked model from a little above. */
@@ -927,6 +1020,7 @@ export class ExplorerStage {
     if (!force && now - this.lastStats < 250) return
     this.lastStats = now
     const u = this.usage()
+    const far = this.cells.filter((c) => c.state === 'ready' && c.far)
     this.opts.onStats?.({
       loaded: this.cells.filter((c) => c.state === 'ready').length,
       inFlight: this.inFlight,
@@ -936,6 +1030,8 @@ export class ExplorerStage {
       triangles: u.triangles,
       fps: this.fps,
       speed: this.speed,
+      far: far.length,
+      farMs: far.length ? Math.round(far.reduce((n, c) => n + c.far!.ms, 0) / far.length) : 0,
     })
   }
 
@@ -1051,6 +1147,33 @@ function makeFloor(): THREE.Mesh {
   floor.renderOrder = -1
   floor.frustumCulled = false
   return floor
+}
+
+/** A model loaded and placed in its holder, ready to take its cell. */
+interface Built {
+  holder: THREE.Group
+  natural: THREE.Box3
+  mixer: THREE.AnimationMixer | null
+  action: THREE.AnimationAction | null
+  stopMaps: (() => void) | null
+  triangles: number
+  bytes: number
+  far: FarCopy | null
+}
+
+/** Whether a model is worth asking for a far copy of, with far copies tried. One the server hasn't measured asks
+ *  anyway, and gets the whole model back if it's small. */
+function wantsFar(cell: Cell): boolean {
+  if (!trying('far-copies')) return false
+  const tris = Number(cell.asset.meta?.triangles)
+  return !(tris > 0) || tris > FAR_OVER
+}
+
+/** Whether a model drawn from its far copy is small enough to load whole just for being picked. Its far copy says
+ *  how big it is when the server hadn't measured it. */
+function fullWhenPicked(cell: Cell): boolean {
+  const tris = cell.far?.triangles_in ?? Number(cell.asset.meta?.triangles)
+  return tris > 0 && tris <= FULL_WHEN_PICKED
 }
 
 /** Roughly what a model holds on the GPU: its vertex and index buffers, and each texture with its mipmaps. */

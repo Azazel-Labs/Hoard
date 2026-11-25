@@ -251,6 +251,18 @@ pub(crate) fn turn(gltf: &mut Map<String, Value>, facing: Facing) {
 /// model on itself, where it can tell whether the model is colored already. The image files it names that the pack
 /// lacks are listed in `asset.extras.missing_textures`.
 pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
+    crate::webglb::repack(&viewable(path, ext, root)?)
+}
+
+/// The mesh explorer's copy of a model a way off: [`view_glb`] with each mesh reduced to a share of a few thousand
+/// triangles and its textures smaller (see [`crate::farcopy`]).
+pub(crate) fn far_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
+    let (glb, _) = crate::farcopy::reduce(&viewable(path, ext, root)?)?;
+    crate::webglb::repack_to(&glb, crate::farcopy::TEXTURE_SIDE)
+}
+
+/// [`view_glb`] before its textures are made web-ready.
+pub(crate) fn viewable(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     let pack = Pack { guess: false, ..Pack::new(root) };
     let mut doc = open(path, ext, &pack, Keep::ALL)?;
     doc.decode()?;
@@ -267,7 +279,7 @@ pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
             extras.insert("missing_textures".into(), missing.into());
         }
     }
-    crate::webglb::repack(&doc.to_glb()?)
+    Ok(doc.to_glb()?)
 }
 
 /// An animation's skeleton and clips as a GLB without its meshes, materials or textures: a clip saved on a copy of its

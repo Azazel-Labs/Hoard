@@ -2047,9 +2047,15 @@ explorer-orbit-title = ドラッグで見回す代わりに、選択したモデ
 explorer-open = 開く
 explorer-open-title = このモデルの詳細を開く（Enter）
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = 遠景コピー: { $total } 三角形中 { $triangles }、{ $ms } ms で簡略化
+explorer-full = 完全な詳細を読み込む
+explorer-full-title = 遠景コピーの代わりにモデル全体を読み込みます。大きなモデルは時間がかかり、メモリーも多く使います。
+explorer-full-loading = 完全な詳細を読み込み中…
 explorer-empty = この結果には 3D で表示できるものがありません。
 explorer-hud-loaded = { $total } 件中 { $loaded } 件のモデルを読み込み済み
 explorer-hud-loading = { $count } 件を読み込み中
+explorer-hud-far = 遠景コピー: { $count } 件、各 ~{ $ms } ms
+explorer-hud-far-title = 詳細なモデルは、サーバーが作る簡略なコピーから描かれます。時間は、サーバーがそれぞれの簡略化にかかった平均です。
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = 速度 { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2551,6 +2557,12 @@ settings-page-issues = 問題
 settings-page-issues-blurb = ファイルを開いたり処理したりするときに起きた問題です。展開できなかったアーカイブ、読み取れなかったファイル、失敗したジョブなど。原因を解決してから再試行するか、閉じてください。
 settings-page-maintenance = メンテナンス
 settings-page-maintenance-blurb = バックアップ、破損の確認、整理を行います。それぞれ一度に 1 つずつ実行され、実行中はこのページを離れても構いません。
+settings-page-experimental = 試験運用
+settings-page-experimental-blurb = まだ開発中の機能を、全員に有効になる前に試せます。
+experiments-what = どれもここでオンにするまではオフです。全員に有効になる前に変わったり、なくなったりすることがあります。オンにした内容はこのブラウザーにだけ保存されます。
+experiments-none = いまは試せるものはありません。
+experiment-far-copies = メッシュエクスプローラーの遠景コピー
+experiment-far-copies-what = 詳細なモデルは、サーバーがその場で作る簡略なコピーとして届くので、検索結果がより多く、より早く表示されます。選んだモデルは十分に小さければ完全に読み込まれ、大きいモデルにはそのためのボタンが出ます。
 settings-page-about = このアプリについて
 settings-page-about-blurb = Hoard とは何か、このバージョン、そして Hoard を形作る他の人々の成果。
 settings-the-default = 既定値
@@ -3087,6 +3099,8 @@ news-marked-seen =
     { $count ->
        *[other] { $count } 件を確認済みにしました
     }
+news-experiments-title = 新機能をいち早く試す
+news-experiments-body = 設定 › 試験運用 に開発中の機能が並びます。どれもブラウザーでオンにするまではオフです。最初は、メッシュエクスプローラーの遠景コピーです。
 news-pack-covers-title = パックが自身の画像を表示
 news-pack-covers-body = プレビューやスクリーンショットが付いたパックは、それを表紙として使い、パック一覧でポインターを重ねている間とパックのパネルで順に切り替えて表示します。
 news-models-read-title = 対応する 3D 形式が増え、Blender も不要に

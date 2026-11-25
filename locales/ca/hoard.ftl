@@ -2266,6 +2266,10 @@ explorer-orbit-title = Arrossega per girar al voltant del model seleccionat en l
 explorer-open = Obre
 explorer-open-title = Obre els detalls d'aquest model (Retorn)
 explorer-size = { $x } × { $y } × { $z } m
+explorer-far = Còpia llunyana: { $triangles } de { $total } triangles, simplificada en { $ms } ms
+explorer-full = Carrega amb tot el detall
+explorer-full-title = Carrega el model sencer en lloc de la seva còpia llunyana. Un model gran pot trigar una estona i ocupar molta memòria.
+explorer-full-loading = S’està carregant amb tot el detall…
 explorer-empty = Cap d'aquests resultats es pot mostrar en 3D.
 explorer-hud-loaded =
     { $total ->
@@ -2273,6 +2277,8 @@ explorer-hud-loaded =
        *[other] { $loaded } de { $total } models carregats
     }
 explorer-hud-loading = { $count } carregant-se
+explorer-hud-far = Còpies llunyanes: { $count }, ~{ $ms } ms cadascuna
+explorer-hud-far-title = Els models detallats es dibuixen a partir de còpies més simples que fa el servidor. El temps és el que el servidor va trigar de mitjana a simplificar-ne cadascuna.
 explorer-hud-memory = ~{ $mb } MB
 explorer-hud-speed = Velocitat { $speed } m/s
 explorer-hud-fps = { $fps } fps
@@ -2805,6 +2811,12 @@ settings-page-issues = Incidències
 settings-page-issues-blurb = Què ha fallat en obrir o processar fitxers: arxius comprimits que no s'han pogut descomprimir, fitxers que no s'han pogut llegir, tasques que han fallat. Torneu-les a provar un cop resolta la causa, o descarteu-les.
 settings-page-maintenance = Manteniment
 settings-page-maintenance-blurb = Feu còpies de seguretat, comproveu si hi ha danys i feu neteja. Se n'executa una de cada tipus alhora, i podeu sortir d'aquesta pàgina mentre s'executen.
+settings-page-experimental = Experimental
+settings-page-experimental-blurb = Funcions encara en desenvolupament, per provar-les abans que s’activin per a tothom.
+experiments-what = Cadascuna està desactivada fins que l’activeu aquí, i pot canviar o desaparèixer abans que s’activi per a tothom. El que activeu només es desa en aquest navegador.
+experiments-none = Ara mateix no hi ha res per provar.
+experiment-far-copies = Còpies llunyanes a l’explorador de malles
+experiment-far-copies-what = Els models detallats arriben com a còpies més simples que el servidor fa al moment, perquè es vegi abans més part d’una cerca. Si en trieu un, es carrega sencer si és prou petit; un de més gran té un botó per fer-ho.
 settings-page-about = Quant a
 settings-page-about-blurb = Què és Hoard, quina versió és aquesta i la feina d’altres amb què està fet.
 settings-the-default = el valor per defecte
@@ -3366,6 +3378,8 @@ news-marked-seen =
         [one] S’ha marcat { $count } novetat com a vista
        *[other] S’han marcat { $count } novetats com a vistes
     }
+news-experiments-title = Proveu funcions abans d’hora
+news-experiments-body = Configuració › Experimental mostra funcions encara en desenvolupament, cadascuna desactivada fins que l’activeu al vostre navegador. La primera: còpies llunyanes a l’explorador de malles.
 news-pack-covers-title = Els paquets mostren les seves pròpies imatges
 news-pack-covers-body = Un paquet que inclou previsualitzacions o captures de pantalla les fa servir de portada i les va passant mentre hi tens el punter a la llista de paquets, i també al seu panell.
 news-models-read-title = Més formats 3D, sense Blender

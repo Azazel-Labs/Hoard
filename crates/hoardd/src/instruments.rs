@@ -599,7 +599,7 @@ fn play(sample: &Sample, r: &Region, key: u8, start: usize, len: f32, left: &mut
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
     fn wav(dir: &Path, name: &str, freq: f32) {
@@ -667,7 +667,7 @@ mod tests {
 
     /// A SoundFont with one preset ("Lead", bank 0, program 0) of one instrument playing a looped sine over keys
     /// 48–84.
-    fn sf2() -> Vec<u8> {
+    pub(crate) fn sf2() -> Vec<u8> {
         fn chunk(id: &[u8], body: &[u8]) -> Vec<u8> {
             let mut c = id.to_vec();
             c.extend((body.len() as u32).to_le_bytes());

@@ -9,6 +9,7 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, PoisonError};
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
 use serde_json::{Map, Value, json};
@@ -37,27 +38,59 @@ type Font = Option<(Arc<rustysynth::SoundFont>, String)>;
 struct FontSlot {
     path: Option<PathBuf>,
     font: Option<Font>,
+    /// When a MIDI file last played with the font.
+    used: Option<Instant>,
 }
 
-static FONT: Mutex<FontSlot> = Mutex::new(FontSlot { path: None, font: None });
+static FONT: Mutex<FontSlot> = Mutex::new(FontSlot { path: None, font: None, used: None });
+
+/// How long a SoundFont stays loaded after the last MIDI file played with it. Fonts run to a hundred megabytes and
+/// more, and stayed loaded until the server stopped, though MIDI mostly comes in a pack at a time.
+const FONT_IDLE: Duration = Duration::from_mins(5);
 
 /// Use this SoundFont (from Settings); `None` searches the usual paths. Can be called again
 /// when the setting changes: the next MIDI render loads the new font.
 pub(crate) fn configure(path: Option<PathBuf>) {
     let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
     if slot.path != path {
-        *slot = FontSlot { path, font: None };
+        *slot = FontSlot { path, font: None, used: None };
     }
 }
 
 fn soundfont() -> Font {
     let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
+    slot.used = Some(Instant::now());
     if let Some(font) = &slot.font {
         return font.clone();
     }
     let font = load_soundfont(slot.path.clone());
     slot.font = Some(font.clone());
+    if font.is_some() {
+        let _ = std::thread::Builder::new().name("soundfont-idle".into()).spawn(let_go_when_idle);
+    }
     font
+}
+
+/// Drop the SoundFont once no MIDI file has played with it for [`FONT_IDLE`]; runs while one is loaded.
+fn let_go_when_idle() {
+    loop {
+        std::thread::sleep(FONT_IDLE / 5);
+        let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
+        // Gone already (the setting changed), or let go now: a later load watches for itself.
+        if !matches!(slot.font, Some(Some(_))) || let_go_if_idle(&mut slot, FONT_IDLE) {
+            return;
+        }
+    }
+}
+
+/// Drop the font if nothing has played with it for `idle`; whether it did. The next MIDI file loads it again.
+fn let_go_if_idle(slot: &mut FontSlot, idle: Duration) -> bool {
+    let idle = matches!(slot.font, Some(Some(_))) && slot.used.is_some_and(|t| t.elapsed() >= idle);
+    if idle {
+        slot.font = None;
+        tracing::debug!("no MIDI played for a while; let go of the SoundFont until the next");
+    }
+    idle
 }
 
 /// Why this file isn't a SoundFont MIDI can be played with, if it isn't.
@@ -542,6 +575,21 @@ pub(crate) fn render_full(path: &Path, ext: &str) -> Result<Audio> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
+
+    #[test]
+    fn a_soundfont_nothing_played_with_for_a_while_is_let_go() {
+        let sf2 = crate::instruments::tests::sf2();
+        let font = rustysynth::SoundFont::new(&mut sf2.as_slice()).unwrap();
+        let mut slot = FontSlot { path: None, font: Some(Some((Arc::new(font), "tiny.sf2".into()))), used: None };
+        slot.used = Some(Instant::now());
+        assert!(!let_go_if_idle(&mut slot, Duration::from_mins(5)), "just played with");
+        assert!(slot.font.is_some());
+        assert!(let_go_if_idle(&mut slot, Duration::ZERO));
+        assert!(slot.font.is_none(), "the next MIDI file loads it again");
+        // Having looked and found none isn't worth forgetting.
+        slot.font = Some(None);
+        assert!(!let_go_if_idle(&mut slot, Duration::ZERO));
+    }
 
     /// A one-track MIDI file: tempo, a name, a program change, C-E-G as quarter notes, a kick on the drum channel.
     pub(crate) fn tiny_midi() -> Vec<u8> {

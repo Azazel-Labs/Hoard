@@ -6,9 +6,8 @@
 //! server, accounts or other people in it.
 use std::{
     cell::Cell,
-    collections::HashMap,
     sync::{
-        LazyLock,
+        OnceLock,
         atomic::{AtomicBool, Ordering},
     },
 };
@@ -19,20 +18,24 @@ use fluent_bundle::{FluentArgs, FluentResource, FluentValue, concurrent::FluentB
 // `CATALOGS`, each locale with its catalog's text, and `LANGUAGES`, their codes.
 include!(concat!(env!("OUT_DIR"), "/catalogs.rs"));
 
-static BUNDLES: LazyLock<HashMap<&'static str, FluentBundle<FluentResource>>> = LazyLock::new(|| {
-    CATALOGS
-        .iter()
-        .map(|&(code, text)| {
-            let mut bundle =
-                FluentBundle::new_concurrent(vec![code.parse().expect("the build checked each locale's name")]);
-            // Every catalog is left-to-right; bidi isolation marks would only show up as stray characters.
-            bundle.set_use_isolating(false);
-            let resource = FluentResource::try_new(text.to_owned()).expect("the build checked each catalog");
-            bundle.add_resource(resource).expect("the build checked each catalog");
-            (code, bundle)
-        })
-        .collect()
-});
+/// Each catalog, made ready the first time a message is wanted in its language: a server mostly answers in one or two,
+/// and all of them at once took tens of megabytes.
+static BUNDLES: [OnceLock<FluentBundle<FluentResource>>; CATALOGS.len()] = [const { OnceLock::new() }; CATALOGS.len()];
+
+/// The catalog for `code`, if there is one.
+fn bundle(code: &str) -> Option<&'static FluentBundle<FluentResource>> {
+    let at = CATALOGS.iter().position(|&(c, _)| c == code)?;
+    Some(BUNDLES[at].get_or_init(|| {
+        let (code, text) = CATALOGS[at];
+        let mut bundle =
+            FluentBundle::new_concurrent(vec![code.parse().expect("the build checked each locale's name")]);
+        // Every catalog is left-to-right; bidi isolation marks would only show up as stray characters.
+        bundle.set_use_isolating(false);
+        let resource = FluentResource::try_new(text.to_owned()).expect("the build checked each catalog");
+        bundle.add_resource(resource).expect("the build checked each catalog");
+        bundle
+    }))
+}
 
 /// Whether messages are the desktop app's (see [`for_desktop`]).
 static DESKTOP: AtomicBool = AtomicBool::new(false);
@@ -73,7 +76,7 @@ pub(crate) fn text(id: &str, args: &[(&str, FluentValue<'_>)]) -> String {
     }
     let desktop = DESKTOP.load(Ordering::Relaxed).then(|| format!("{id}-desktop"));
     for code in [current(), "en"] {
-        let Some(bundle) = BUNDLES.get(code) else { continue };
+        let Some(bundle) = bundle(code) else { continue };
         let message = desktop.as_deref().and_then(|id| bundle.get_message(id)).or_else(|| bundle.get_message(id));
         if let Some(pattern) = message.and_then(|message| message.value()) {
             let mut errors = Vec::new();

@@ -100,7 +100,20 @@ impl Assets for Pack {
 pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
     // What a rest-pose mesh needs: animations, cameras and lights are skipped.
     let doc = open(path, ext, &Pack::new(root), Keep::MESHES)?;
-    Ok((doc.flatten(Pose::Rest)?, doc.facts))
+    let facts = facts_of(&doc, ext);
+    Ok((doc.flatten(Pose::Rest)?, facts))
+}
+
+/// What a read model says of itself worth recording: polysmelt's facts and the program that wrote it (a slicer, a
+/// modeler). A glTF's own program is its generator, which is kept apart.
+fn facts_of(doc: &polysmelt::Document, ext: &str) -> Map<String, Value> {
+    let mut facts = doc.facts.clone();
+    if !matches!(ext, "gltf" | "glb" | "vrm" | "vrma")
+        && let Some(tool) = doc.source_info().tool.filter(|t| !t.trim().is_empty())
+    {
+        facts.entry("application").or_insert(Value::String(tool));
+    }
+    facts
 }
 
 /// A model as analysis takes it in: its rest-pose mesh and facts, as [`load`] gives them, and its skeleton and clips
@@ -115,7 +128,8 @@ pub(crate) struct Rigged {
 pub(crate) fn load_rigged(path: &Path, ext: &str, root: &Path) -> Result<Rigged> {
     let doc = open(path, ext, &Pack::new(root), Keep::MESHES.with_animations(true))?;
     let rig = crate::animations::rig(&Value::Object(doc.json().clone()));
-    Ok(Rigged { mesh: doc.flatten(Pose::Rest)?, facts: doc.facts, rig })
+    let facts = facts_of(&doc, ext);
+    Ok(Rigged { mesh: doc.flatten(Pose::Rest)?, facts, rig })
 }
 
 /// A model's document to pose: its meshes, skins, materials, textures and clips, any compression decoded.
@@ -138,15 +152,7 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         .with_cameras(false)
         .with_lights(false)
         .with_extras(false);
-    let doc = open(path, ext, &Pack::new(root), nothing)?;
-    let mut facts = doc.facts.clone();
-    // The program that wrote it (a slicer, a modeler); a glTF's own is its generator, which is kept apart.
-    if !matches!(ext, "gltf" | "glb" | "vrm" | "vrma")
-        && let Some(tool) = doc.source_info().tool.filter(|t| !t.trim().is_empty())
-    {
-        facts.entry("application").or_insert(Value::String(tool));
-    }
-    Ok(facts)
+    Ok(facts_of(&open(path, ext, &Pack::new(root), nothing)?, ext))
 }
 
 /// The names of a model's materials, in its order, each once: what an engine's materials are matched to (Unity
@@ -409,8 +415,15 @@ mod tests {
         zip.start_file("3D/3dmodel.model", options).unwrap();
         zip.write_all(br#"<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><metadata name="Application">BambuStudio-01.10.00.00</metadata><resources><object id="1" type="model"><mesh><vertices><vertex x="0" y="0" z="0"/><vertex x="1" y="0" z="0"/><vertex x="0" y="1" z="0"/></vertices><triangles><triangle v1="0" v2="1" v3="2"/></triangles></mesh></object></resources><build><item objectid="1"/></build></model>"#).unwrap();
         zip.finish().unwrap();
-        let facts = facts(&path, "3mf", dir.path()).unwrap();
-        assert_eq!(facts.get("application"), Some(&Value::from("BambuStudio-01.10.00.00")), "{facts:?}");
+        // Each way a model is read: for its facts alone, for its mesh, and for its mesh and rig as analysis does.
+        let read = [
+            facts(&path, "3mf", dir.path()).unwrap(),
+            load(&path, "3mf", dir.path()).unwrap().1,
+            load_rigged(&path, "3mf", dir.path()).unwrap().facts,
+        ];
+        for facts in read {
+            assert_eq!(facts.get("application"), Some(&Value::from("BambuStudio-01.10.00.00")), "{facts:?}");
+        }
     }
 
     #[test]

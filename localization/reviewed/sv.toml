@@ -1160,9 +1160,25 @@ translation = "Typ"
 source = "the archive"
 translation = "arkivet"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "massredigeringen"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "mesh-utforskaren"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "nyheterna"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "paketets detaljer"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "kommandopaletten"
 
 [messages.app-lazy-settings]
 source = "settings"

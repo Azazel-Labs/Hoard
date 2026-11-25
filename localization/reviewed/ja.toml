@@ -1124,9 +1124,25 @@ translation = "種類"
 source = "the archive"
 translation = "アーカイブ"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "一括編集"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "メッシュエクスプローラー"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "新機能"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "パックの詳細"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "コマンドパレット"
 
 [messages.app-lazy-settings]
 source = "settings"

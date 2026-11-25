@@ -1168,9 +1168,25 @@ translation = "Τύπος"
 source = "the archive"
 translation = "αρχειοθήκης"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "της μαζικής επεξεργασίας"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "του εξερευνητή πλεγμάτων"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "των νέων"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "των στοιχείων του πακέτου"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "της παλέτας εντολών"
 
 [messages.app-lazy-settings]
 source = "settings"

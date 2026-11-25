@@ -1160,9 +1160,25 @@ translation = "Soort"
 source = "the archive"
 translation = "die argief"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "die grootmaatredigeerder"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "die maasverkenner"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "wat nuut is"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "die pak se besonderhede"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "die opdragpalet"
 
 [messages.app-lazy-settings]
 source = "settings"

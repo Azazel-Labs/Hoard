@@ -1128,9 +1128,25 @@ translation = "Tür"
 source = "the archive"
 translation = "arşiv"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "toplu düzenleme"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "örgü gezgini"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "yenilikler"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "paket ayrıntıları"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "komut paleti"
 
 [messages.app-lazy-settings]
 source = "settings"

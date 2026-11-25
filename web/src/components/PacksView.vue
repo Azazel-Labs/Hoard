@@ -10,8 +10,10 @@ import { archiveWithUndo } from '../archive'
 import { mayEdit } from '../auth'
 import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
 import { formatDate, t } from '../i18n'
+import { lazy } from '../lazy'
 import ShowcaseCover from './ShowcaseCover.vue'
-import PackContextForm from './PackContextForm.vue'
+// Only an editor opening a pack's store details needs the form.
+const PackContextForm = lazy(() => import('./PackContextForm.vue'), () => t('app-lazy-pack-details'))
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 

@@ -1127,9 +1127,25 @@ translation = "类型"
 source = "the archive"
 translation = "归档"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "批量编辑"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "网格浏览器"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "新功能"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "资源包详情"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "命令面板"
 
 [messages.app-lazy-settings]
 source = "settings"

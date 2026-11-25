@@ -1160,9 +1160,25 @@ translation = "Art"
 source = "the archive"
 translation = "Archiv"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "Sammelbearbeitung"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "Mesh-Explorer"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "Neuigkeiten"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "Paketdetails"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "Befehlspalette"
 
 [messages.app-lazy-settings]
 source = "settings"

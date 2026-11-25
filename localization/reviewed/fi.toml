@@ -1160,9 +1160,25 @@ translation = "Tyyppi"
 source = "the archive"
 translation = "arkisto"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "joukkomuokkaus"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "mesh-tutkija"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "uutuudet"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "paketin tiedot"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "komentopaletti"
 
 [messages.app-lazy-settings]
 source = "settings"

@@ -1184,9 +1184,25 @@ translation = "Rodzaj"
 source = "the archive"
 translation = "archiwum"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "edycji zbiorczej"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "eksploratora siatek"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "nowości"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "szczegółów paczki"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "palety poleceń"
 
 [messages.app-lazy-settings]
 source = "settings"

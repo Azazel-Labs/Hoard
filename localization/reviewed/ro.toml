@@ -1184,9 +1184,25 @@ translation = "Tip"
 source = "the archive"
 translation = "arhiva"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "editarea în bloc"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "exploratorul de mesh-uri"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "noutățile"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "detaliile pachetului"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "paleta de comenzi"
 
 [messages.app-lazy-settings]
 source = "settings"

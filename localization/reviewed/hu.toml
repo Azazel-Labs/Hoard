@@ -1140,9 +1140,25 @@ translation = "Típus"
 source = "the archive"
 translation = "archívum"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "tömeges szerkesztés"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "a hálóböngésző"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "újdonságok"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "a csomag adatai"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "parancspaletta"
 
 [messages.app-lazy-settings]
 source = "settings"

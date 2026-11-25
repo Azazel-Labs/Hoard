@@ -1160,9 +1160,25 @@ translation = "Tipo"
 source = "the archive"
 translation = "o arquivo"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "a edição em massa"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "o explorador de malhas"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "as novidades"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "os detalhes do pacote"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "a paleta de comandos"
 
 [messages.app-lazy-settings]
 source = "settings"

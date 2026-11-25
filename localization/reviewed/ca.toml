@@ -1160,9 +1160,25 @@ translation = "Tipus"
 source = "the archive"
 translation = "l'arxiu"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "l'editor en bloc"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "l'explorador de malles"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "les novetats"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "els detalls del paquet"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "la paleta d'ordres"
 
 [messages.app-lazy-settings]
 source = "settings"

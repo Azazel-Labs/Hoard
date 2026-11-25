@@ -1179,9 +1179,25 @@ translation = "Druh"
 source = "the archive"
 translation = "archiv"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "hromadné úpravy"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "průzkumník sítí"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "novinky"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "podrobnosti balíčku"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "paleta příkazů"
 
 [messages.app-lazy-settings]
 source = "settings"

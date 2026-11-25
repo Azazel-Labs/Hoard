@@ -1190,9 +1190,25 @@ translation = "Вид"
 source = "the archive"
 translation = "архив"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "массовое редактирование"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "обозреватель мешей"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "новинки"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "сведения о паке"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "палитра команд"
 
 [messages.app-lazy-settings]
 source = "settings"

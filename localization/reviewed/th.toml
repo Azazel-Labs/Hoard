@@ -1124,9 +1124,25 @@ translation = "ประเภท"
 source = "the archive"
 translation = "ที่เก็บถาวร"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "การแก้ไขหลายรายการ"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "ตัวสำรวจเมช"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "สิ่งใหม่"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "รายละเอียดแพ็ก"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "ชุดคำสั่ง"
 
 [messages.app-lazy-settings]
 source = "settings"

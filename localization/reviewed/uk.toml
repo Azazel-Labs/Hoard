@@ -1191,9 +1191,25 @@ translation = "Тип"
 source = "the archive"
 translation = "архів"
 
+[messages.app-lazy-bulk-edit]
+source = "the bulk editor"
+translation = "масове редагування"
+
 [messages.app-lazy-explorer]
 source = "the mesh explorer"
 translation = "оглядач мешів"
+
+[messages.app-lazy-news]
+source = "what’s new"
+translation = "новинки"
+
+[messages.app-lazy-pack-details]
+source = "the pack’s details"
+translation = "відомості про пакет"
+
+[messages.app-lazy-palette]
+source = "the command palette"
+translation = "палітра команд"
 
 [messages.app-lazy-settings]
 source = "settings"

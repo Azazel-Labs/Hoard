@@ -19,7 +19,7 @@ import AssetDetail from './components/AssetDetail.vue'
 import SelectionBag from './components/SelectionBag.vue'
 import AssetTile from './components/AssetTile.vue'
 import SelectionBar from './components/SelectionBar.vue'
-import BulkEditDialog, { type UndoGroup } from './components/BulkEditDialog.vue'
+import type { UndoGroup } from './components/BulkEditDialog.vue'
 import DropOverlay from './components/DropOverlay.vue'
 import PacksView from './components/PacksView.vue'
 import ActiveFilters from './components/ActiveFilters.vue'
@@ -31,9 +31,7 @@ import TagHeader from './components/TagHeader.vue'
 import NothingHere from './components/NothingHere.vue'
 import ThemeSwitch from './components/ThemeSwitch.vue'
 import UiLayer from './components/UiLayer.vue'
-import CommandPalette from './components/CommandPalette.vue'
 import InsecureNotice from './components/InsecureNotice.vue'
-import NewsTray from './components/NewsTray.vue'
 import { markAllSeenWithUndo, markSeen, news, newsTray, type NewThing, unseen } from './news'
 import { archiveWithUndo, countText } from './archive'
 import { isModelAsset } from './viewers'
@@ -52,6 +50,9 @@ const ArchiveView = lazy(() => import('./components/ArchiveView.vue'), () => t('
 const ShortcutsDialog = lazy(() => import('./components/ShortcutsDialog.vue'), () => t('app-lazy-shortcuts'), 'overlay')
 const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), () => t('app-lazy-setup'), 'overlay')
 const ModelExplorer = lazy(() => import('./components/ModelExplorer.vue'), () => t('app-lazy-explorer'), 'overlay')
+const CommandPalette = lazy(() => import('./components/CommandPalette.vue'), () => t('app-lazy-palette'), 'overlay')
+const NewsTray = lazy(() => import('./components/NewsTray.vue'), () => t('app-lazy-news'), 'overlay')
+const BulkEditDialog = lazy(() => import('./components/BulkEditDialog.vue'), () => t('app-lazy-bulk-edit'), 'overlay')
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 100

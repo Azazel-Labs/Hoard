@@ -459,7 +459,7 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
         db::call(&state.pool, move |c| {
             let pack = reply.pack.filter(|_| ask_pack).map(|p| (pid.as_str(), p));
             apply_reply(c, pack, &targets, reply.assets)?;
-            c.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pid, done])?;
+            c.prepare_cached("UPDATE packs SET files_done = ?2 WHERE id = ?1")?.execute(params![pid, done])?;
             Ok(())
         })
         .await?;
@@ -477,16 +477,15 @@ const UNTAGGED: &str = "NOT EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id 
 /// Find a live pack by id or name: exact (any case) first, then the newest whose name contains `want`.
 fn find_pack(c: &rusqlite::Connection, want: &str) -> Result<Option<String>> {
     let id = c
-        .query_row(
+        .prepare_cached(
             "SELECT id FROM (
                SELECT id, 0 AS rank, created_at FROM packs
                 WHERE archived_at IS NULL AND (id = ?1 OR lower(name) = lower(?1))
                UNION ALL
                SELECT id, 1, created_at FROM packs WHERE archived_at IS NULL AND instr(lower(name), lower(?1)) > 0)
              ORDER BY rank, created_at DESC LIMIT 1",
-            [want],
-            |r| r.get(0),
-        )
+        )?
+        .query_row([want], |r| r.get(0))
         .optional()?;
     Ok(id)
 }
@@ -515,15 +514,18 @@ pub(crate) async fn next_untagged(
                   ORDER BY p.created_at DESC LIMIT 1",
                 untagged_sql()
             );
-            let Some(id) = c.query_row(&sql, [], |r| r.get::<_, String>(0)).optional()? else { return Ok(None) };
+            let Some(id) = c.prepare_cached(&sql)?.query_row([], |r| r.get::<_, String>(0)).optional()? else {
+                return Ok(None);
+            };
             id
         };
         let pack = db::get_pack(c, &pid)?.context("pack not found")?;
-        let other_packs: i64 = c.query_row(
-            &format!("SELECT COUNT(DISTINCT a.pack_id) FROM assets a WHERE a.pack_id != ?1 AND {}", untagged_sql()),
-            [&pid],
-            |r| r.get(0),
-        )?;
+        let other_packs: i64 = c
+            .prepare_cached(&format!(
+                "SELECT COUNT(DISTINCT a.pack_id) FROM assets a WHERE a.pack_id != ?1 AND {}",
+                untagged_sql()
+            ))?
+            .query_row([&pid], |r| r.get(0))?;
         Ok(Some((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?, other_packs, db::tag_tree(c)?)))
     })
     .await?;
@@ -670,20 +672,27 @@ fn apply_reply(
         let mut tags: Vec<String> = p.tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
         // What the pack's own files said (a Megascans JSON) stays: its tags alongside the AI's, its description
         // instead of the AI's.
-        let file_tags: Option<String> =
-            tx.query_row("SELECT file_tags FROM packs WHERE id = ?1", [pack_id], |r| r.get(0)).optional()?.flatten();
+        let file_tags: Option<String> = tx
+            .prepare_cached("SELECT file_tags FROM packs WHERE id = ?1")?
+            .query_row([pack_id], |r| r.get(0))
+            .optional()?
+            .flatten();
         for t in file_tags.as_deref().and_then(|t| serde_json::from_str::<Vec<String>>(t).ok()).unwrap_or_default() {
             if !tags.contains(&t) {
                 tags.push(t);
             }
         }
-        tx.execute(
+        tx.prepare_cached(
             "UPDATE packs SET description = CASE WHEN file_tags IS NOT NULL AND description IS NOT NULL
                                                  THEN description ELSE COALESCE(?2, description) END,
                               tags = ?3
              WHERE id = ?1",
-            params![pack_id, p.description.or(p.title.map(|t| format!("{t}."))), serde_json::to_string(&tags)?],
-        )?;
+        )?
+        .execute(params![
+            pack_id,
+            p.description.or(p.title.map(|t| format!("{t}."))),
+            serde_json::to_string(&tags)?
+        ])?;
     }
     for a in assets {
         let Some(members) = targets.get(a.i) else { continue };
@@ -695,10 +704,10 @@ fn apply_reply(
         narrowest(&mut tags, &tree);
         for (n, (id, human_edited)) in members.iter().enumerate() {
             if !human_edited {
-                tx.execute(
-                    // Category: only take the LLM's answer if it's at least as specific as what we have,
-                    // so "sfx/footsteps" from the filename doesn't get flattened to "sfx".
-                    // Names go to the representative only: variants keep their own (numbered) names.
+                // Category: only take the LLM's answer if it's at least as specific as what we have,
+                // so "sfx/footsteps" from the filename doesn't get flattened to "sfx".
+                // Names go to the representative only: variants keep their own (numbered) names.
+                tx.prepare_cached(
                     "UPDATE assets SET name = COALESCE(?2, name),
                             category = CASE
                                 WHEN ?3 IS NULL THEN category
@@ -706,15 +715,13 @@ fn apply_reply(
                                 ELSE category END,
                             updated_at = ?4
                      WHERE id = ?1",
-                    params![id, name.as_ref().filter(|_| n == 0), category, now],
-                )?;
+                )?
+                .execute(params![id, name.as_ref().filter(|_| n == 0), category, now])?;
             }
             // The AI's description has its own field, so it stays current even after a person edits the asset.
             if description.is_some() {
-                tx.execute(
-                    "UPDATE assets SET ai_description = ?2, updated_at = ?3 WHERE id = ?1",
-                    params![id, description, now],
-                )?;
+                tx.prepare_cached("UPDATE assets SET ai_description = ?2, updated_at = ?3 WHERE id = ?1")?
+                    .execute(params![id, description, now])?;
             }
             for t in &tags {
                 db::upsert_tag(&tx, id, t, TagSource::Ai, LLM_CONFIDENCE)?;

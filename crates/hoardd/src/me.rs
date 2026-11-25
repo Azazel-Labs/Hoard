@@ -99,16 +99,19 @@ async fn change_favorites(
     let ids = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         let now = db::now();
+        // Prepared once for the lot: a selection can be thousands of assets.
+        let mut add = tx.prepare(
+            "INSERT OR IGNORE INTO favorites (user_id, asset_id, added_at)
+             SELECT ?1, id, ?3 FROM assets WHERE id = ?2",
+        )?;
         for id in &change.add {
-            tx.execute(
-                "INSERT OR IGNORE INTO favorites (user_id, asset_id, added_at)
-                 SELECT ?1, id, ?3 FROM assets WHERE id = ?2",
-                params![user, id, now],
-            )?;
+            add.execute(params![user, id, now])?;
         }
+        let mut remove = tx.prepare("DELETE FROM favorites WHERE user_id = ?1 AND asset_id = ?2")?;
         for id in &change.remove {
-            tx.execute("DELETE FROM favorites WHERE user_id = ?1 AND asset_id = ?2", params![user, id])?;
+            remove.execute(params![user, id])?;
         }
+        drop((add, remove));
         let ids = favorite_ids(&tx, user)?;
         tx.commit()?;
         Ok(ids)

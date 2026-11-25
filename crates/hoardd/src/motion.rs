@@ -141,7 +141,8 @@ async fn forget(state: &AppState, ids: Vec<String>) -> Result<()> {
                     .collect::<rusqlite::Result<Vec<(String, i64)>>>()?,
             );
             drop(stmt);
-            tx.execute("DELETE FROM derivatives WHERE asset_id = ?1 AND kind IN ('motion', 'still')", [id])?;
+            tx.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1 AND kind IN ('motion', 'still')")?
+                .execute([id])?;
         }
         tx.commit()?;
         Ok(blobs)
@@ -325,30 +326,29 @@ async fn make(state: &AppState, t: &Todo, motion: bool, fps: u32) -> Result<()> 
             let now = db::now();
             let tx = c.transaction()?;
             for b in motion.iter().chain([&still]) {
-                tx.execute(
+                tx.prepare_cached(
                     "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-                    params![b.hash, i64::try_from(b.size).unwrap_or(i64::MAX), now],
-                )?;
+                )?
+                .execute(params![b.hash, i64::try_from(b.size).unwrap_or(i64::MAX), now])?;
             }
             let kinds = motion.iter().map(|m| ("motion", m)).chain([("still", &still)]);
             // What it replaces (an older drawing of it) goes, unless something still shows it.
             let mut old: Vec<(String, i64)> = Vec::new();
             for (kind, b) in kinds {
                 old.extend(
-                    tx.query_row(
+                    tx.prepare_cached(
                         "SELECT b.hash, b.size FROM derivatives d JOIN blobs b ON b.hash = d.blob_hash
                          WHERE d.asset_id = ?1 AND d.kind = ?2 AND d.blob_hash <> ?3",
-                        params![id, kind, b.hash],
-                        |r| Ok((r.get(0)?, r.get(1)?)),
-                    )
+                    )?
+                    .query_row(params![id, kind, b.hash], |r| Ok((r.get(0)?, r.get(1)?)))
                     .optional()?,
                 );
-                tx.execute(
+                tx.prepare_cached(
                     "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at, rev) VALUES (?1, ?2, ?3, ?4, ?5)
                      ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash,
                        created_at = excluded.created_at, rev = excluded.rev",
-                    params![id, kind, b.hash, now, DRAWN],
-                )?;
+                )?
+                .execute(params![id, kind, b.hash, now, DRAWN])?;
             }
             // As does the rest pose it was drawn in.
             old.extend(

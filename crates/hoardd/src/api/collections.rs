@@ -111,17 +111,15 @@ pub(super) async fn collection_members(
         let now = db::now();
         let tx = c.transaction()?;
         for asset in &body.add {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT OR IGNORE INTO collection_assets (collection_id, asset_id, added_at)
                  SELECT ?1, id, ?3 FROM assets WHERE id = ?2",
-                params![existing.id, asset, now],
-            )?;
+            )?
+            .execute(params![existing.id, asset, now])?;
         }
         for asset in &body.remove {
-            tx.execute(
-                "DELETE FROM collection_assets WHERE collection_id = ?1 AND asset_id = ?2",
-                params![existing.id, asset],
-            )?;
+            tx.prepare_cached("DELETE FROM collection_assets WHERE collection_id = ?1 AND asset_id = ?2")?
+                .execute(params![existing.id, asset])?;
         }
         tx.execute("UPDATE collections SET updated_at = ?2 WHERE id = ?1", params![existing.id, now])?;
         tx.commit()?;

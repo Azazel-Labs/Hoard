@@ -417,7 +417,8 @@ fn convert_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<usize> {
         // A FLAC gives back the WAV it was made from.
         let keep = rule.to != "flac";
         if crate::extract::replace_asset(&tx, &t.file.id, &blob, &rule.to, &origin, keep)? {
-            tx.execute("UPDATE asset_origin SET upright = ?2 WHERE asset_id = ?1", params![t.file.id, rule.upright])?;
+            tx.prepare_cached("UPDATE asset_origin SET upright = ?2 WHERE asset_id = ?1")?
+                .execute(params![t.file.id, rule.upright])?;
         }
         tx.commit()?;
         done += 1;

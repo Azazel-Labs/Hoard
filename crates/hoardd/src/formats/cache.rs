@@ -66,7 +66,7 @@ pub(crate) async fn trim_conversions(state: &crate::AppState) -> Result<(u64, u6
             if over == 0 {
                 break;
             }
-            tx.execute("DELETE FROM derivatives WHERE asset_id = ?1 AND kind = ?2", [&id, &kind])?;
+            tx.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1 AND kind = ?2")?.execute([&id, &kind])?;
             if !doomed.iter().any(|(h, _)| *h == hash) {
                 over = over.saturating_sub(u64::try_from(size).unwrap_or(0));
                 doomed.push((hash, size));

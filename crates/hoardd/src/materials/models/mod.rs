@@ -135,7 +135,7 @@ pub(super) fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pac
                 Err(e) => tracing::debug!(asset = %id, error = %format!("{e:#}"), "model thumbnail kept as it was"),
             }
         }
-        conn.execute("UPDATE assets SET meta = json_remove(meta, '$.redress') WHERE id = ?1", [&id])?;
+        conn.prepare_cached("UPDATE assets SET meta = json_remove(meta, '$.redress') WHERE id = ?1")?.execute([&id])?;
     }
     if done > 0 {
         tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
@@ -223,10 +223,8 @@ pub(super) fn read_material_names(state: &AppState, rt: &Handle, conn: &Connecti
                 Vec::new()
             });
         std::fs::remove_file(&file).ok();
-        conn.execute(
-            "UPDATE assets SET meta = json_set(meta, '$.material_names', json(?2)) WHERE id = ?1",
-            params![id, serde_json::to_string(&names)?],
-        )?;
+        conn.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.material_names', json(?2)) WHERE id = ?1")?
+            .execute(params![id, serde_json::to_string(&names)?])?;
     }
     Ok(())
 }
@@ -236,10 +234,9 @@ pub(super) fn read_material_names(state: &AppState, rt: &Handle, conn: &Connecti
 /// Run `f`, which draws model `id`, with the model turned its own way: upright when a conversion rule turned it so
 /// as it wrote the file, otherwise as its pack's models are (see [`db::asset_facing`]).
 fn turned_as<R>(conn: &Connection, id: &str, f: impl FnOnce() -> R) -> Result<R> {
-    let upright: bool =
-        conn.query_row("SELECT EXISTS (SELECT 1 FROM asset_origin WHERE asset_id = ?1 AND upright = 1)", [id], |r| {
-            r.get(0)
-        })?;
+    let upright: bool = conn
+        .prepare_cached("SELECT EXISTS (SELECT 1 FROM asset_origin WHERE asset_id = ?1 AND upright = 1)")?
+        .query_row([id], |r| r.get(0))?;
     Ok(if upright { crate::meshes::facing(hoard_core::Facing::default(), f) } else { f() })
 }
 
@@ -299,7 +296,8 @@ pub(super) fn redraw_glass(state: &AppState, rt: &Handle, conn: &Connection, pac
                 return Ok(None);
             }
             if dressed {
-                conn.execute("UPDATE assets SET meta = json_remove(meta, '$.thumb_dressed') WHERE id = ?1", [&id])?;
+                conn.prepare_cached("UPDATE assets SET meta = json_remove(meta, '$.thumb_dressed') WHERE id = ?1")?
+                    .execute([&id])?;
                 return Ok(None);
             }
             let file = fetch_model(state, rt, conn, &id, &dir)?;
@@ -317,7 +315,8 @@ pub(super) fn redraw_glass(state: &AppState, rt: &Handle, conn: &Connection, pac
         if redrawn {
             done += 1;
         } else {
-            conn.execute("UPDATE assets SET meta = json_remove(meta, '$.reglass') WHERE id = ?1", [&id])?;
+            conn.prepare_cached("UPDATE assets SET meta = json_remove(meta, '$.reglass') WHERE id = ?1")?
+                .execute([&id])?;
         }
     }
     if done > 0 {
@@ -363,7 +362,8 @@ pub(super) fn recolor_stls(state: &AppState, rt: &Handle, conn: &Connection, pac
         if redrawn {
             done += 1;
         } else {
-            conn.execute("UPDATE assets SET meta = json_remove(meta, '$.recolor') WHERE id = ?1", [&id])?;
+            conn.prepare_cached("UPDATE assets SET meta = json_remove(meta, '$.recolor') WHERE id = ?1")?
+                .execute([&id])?;
         }
     }
     if done > 0 {

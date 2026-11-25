@@ -237,11 +237,10 @@ pub(crate) fn thumbs_from_conversions(state: &AppState, rt: &tokio::runtime::Han
         let Some(thumb) = draw_thumb(&rt.block_on(state.blobs.read_all(&glb))?) else { continue };
         let blob = rt.block_on(state.blobs.put_cache_bytes(thumb))?;
         let conn = state.pool.get()?;
-        conn.execute(
-            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-            params![blob.hash, blob.size as i64, db::now()],
-        )?;
-        conn.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_hash IS NULL", params![id, blob.hash])?;
+        conn.prepare_cached("INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING")?
+            .execute(params![blob.hash, blob.size as i64, db::now()])?;
+        conn.prepare_cached("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_hash IS NULL")?
+            .execute(params![id, blob.hash])?;
     }
     Ok(())
 }
@@ -303,10 +302,10 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
             let now = db::now();
             let tx = c.transaction()?;
             for b in std::iter::once(&glb_blob).chain(thumb_blob.as_ref()) {
-                tx.execute(
+                tx.prepare_cached(
                     "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-                    params![b.hash, b.size as i64, now],
-                )?;
+                )?
+                .execute(params![b.hash, b.size as i64, now])?;
             }
             tx.execute(
                 "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, 'glb', ?2, ?3)

@@ -75,29 +75,21 @@ async fn recolor(state: &AppState) -> Result<usize> {
         let changed = db::call(&state.pool, move |c| {
             let now = db::now();
             let tx = c.transaction()?;
-            let still: bool = tx.query_row(
-                "SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND blob_hash = ?2)",
-                params![asset, was],
+            let still: bool = tx.prepare_cached("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND blob_hash = ?2)")?.query_row(params![asset, was],
                 |r| r.get(0),
             )?;
             if still {
                 if let Some(b) = &blob {
-                    tx.execute(
-                        "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-                        params![b.hash, b.size as i64, now],
+                    tx.prepare_cached("INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING")?.execute(params![b.hash, b.size as i64, now],
                     )?;
-                    tx.execute(
-                        "UPDATE assets SET blob_hash = ?2, updated_at = ?3 WHERE id = ?1",
-                        params![asset, b.hash, now],
+                    tx.prepare_cached("UPDATE assets SET blob_hash = ?2, updated_at = ?3 WHERE id = ?1")?.execute(params![asset, b.hash, now],
                     )?;
-                    tx.execute(
-                        "DELETE FROM derivatives WHERE asset_id = ?1 AND (kind IN ('source', 'views') OR kind LIKE 'as:%')",
-                        [&asset],
+                    tx.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1 AND (kind IN ('source', 'views') OR kind LIKE 'as:%')")?.execute([&asset],
                     )?;
                 }
-                tx.execute("UPDATE asset_origin SET converter = ?2 WHERE asset_id = ?1", params![asset, converter])?;
+                tx.prepare_cached("UPDATE asset_origin SET converter = ?2 WHERE asset_id = ?1")?.execute(params![asset, converter])?;
             }
-            tx.execute("DELETE FROM unreal_recolor WHERE asset_id = ?1", [&asset])?;
+            tx.prepare_cached("DELETE FROM unreal_recolor WHERE asset_id = ?1")?.execute([&asset])?;
             tx.commit()?;
             Ok(still && blob.is_some())
         })
@@ -113,11 +105,11 @@ async fn recolor(state: &AppState) -> Result<usize> {
         // have read them before.
         db::call(&state.pool, move |c| {
             for p in &packs {
-                let waiting: bool = c.query_row(
-                    "SELECT EXISTS (SELECT 1 FROM jobs WHERE pack_id = ?1 AND kind = ?2 AND status = 'queued')",
-                    params![p, jobs::RETAG],
-                    |r| r.get(0),
-                )?;
+                let waiting: bool = c
+                    .prepare_cached(
+                        "SELECT EXISTS (SELECT 1 FROM jobs WHERE pack_id = ?1 AND kind = ?2 AND status = 'queued')",
+                    )?
+                    .query_row(params![p, jobs::RETAG], |r| r.get(0))?;
                 if !waiting {
                     db::enqueue(c, jobs::RETAG, Some(p), &json!({ "then_llm": false }))?;
                 }

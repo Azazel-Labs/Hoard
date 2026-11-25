@@ -332,18 +332,20 @@ pub(crate) fn purge_archived(
     for id in &pack_ids {
         empty_pack(conn, id, true)?;
         let tx = conn.transaction()?;
-        let archived: Option<bool> =
-            tx.query_row("SELECT archived_at IS NOT NULL FROM packs WHERE id = ?1", [id], |r| r.get(0)).optional()?;
+        let archived: Option<bool> = tx
+            .prepare_cached("SELECT archived_at IS NOT NULL FROM packs WHERE id = ?1")?
+            .query_row([id], |r| r.get(0))
+            .optional()?;
         if archived != Some(true) {
             continue;
         }
-        tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
-        tx.execute(
+        tx.prepare_cached("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')")?.execute([id])?;
+        tx.prepare_cached(
             "INSERT OR IGNORE INTO skipped_folders (location_id, folder)
              SELECT location_id, folder FROM packs WHERE id = ?1 AND location_id IS NOT NULL AND folder IS NOT NULL",
-            [id],
-        )?;
-        n.packs += tx.execute("DELETE FROM packs WHERE id = ?1", [id])? as u64;
+        )?
+        .execute([id])?;
+        n.packs += tx.prepare_cached("DELETE FROM packs WHERE id = ?1")?.execute([id])? as u64;
         tx.commit()?;
         gone.push(id.clone());
     }

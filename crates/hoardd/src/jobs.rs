@@ -543,7 +543,8 @@ pub(crate) async fn scrub(
             if *s == "unreachable" || *s == "skipped" {
                 continue;
             }
-            tx.execute("UPDATE blobs SET status = ?2, verified_at = ?3 WHERE hash = ?1", params![h, s, now])?;
+            tx.prepare_cached("UPDATE blobs SET status = ?2, verified_at = ?3 WHERE hash = ?1")?
+                .execute(params![h, s, now])?;
         }
         tx.commit()?;
         Ok(())
@@ -583,13 +584,13 @@ pub(crate) async fn delete_unused(state: &AppState, blobs: Vec<(String, i64)>) -
         let h = hash.clone();
         // Drop the row first, re-checking references under the write, and only then the bytes.
         let deleted = db::call(&state.pool, move |c| {
-            Ok(c.execute(
+            Ok(c.prepare_cached(
                 "DELETE FROM blobs WHERE hash = ?1
                    AND NOT EXISTS (SELECT 1 FROM assets a WHERE a.blob_hash = ?1 OR a.thumb_hash = ?1)
                    AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.blob_hash = ?1)
                    AND NOT EXISTS (SELECT 1 FROM asset_origin o WHERE o.blob_hash = ?1)",
-                [&h],
-            )?)
+            )?
+            .execute([&h])?)
         })
         .await?;
         if deleted > 0 {

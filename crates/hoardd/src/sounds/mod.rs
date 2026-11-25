@@ -279,11 +279,11 @@ fn put_features(c: &rusqlite::Connection, hash: &str, features: &Map<String, Val
     );
     for (id, meta) in changed {
         let by_prefix = prefixes.iter().flat_map(|p| [*p, *p]);
-        c.execute(&forget, rusqlite::params_from_iter(std::iter::once(id.as_str()).chain(measured).chain(by_prefix)))?;
-        let looped: bool =
-            c.query_row("SELECT EXISTS (SELECT 1 FROM asset_tags WHERE asset_id = ?1 AND tag = 'loop')", [&id], |r| {
-                r.get(0)
-            })?;
+        c.prepare_cached(&forget)?
+            .execute(rusqlite::params_from_iter(std::iter::once(id.as_str()).chain(measured).chain(by_prefix)))?;
+        let looped: bool = c
+            .prepare_cached("SELECT EXISTS (SELECT 1 FROM asset_tags WHERE asset_id = ?1 AND tag = 'loop')")?
+            .query_row([&id], |r| r.get(0))?;
         let meta: Map<String, Value> = serde_json::from_str(&meta).unwrap_or_default();
         for (tag, source, confidence) in crate::tagger::measured_sound_tags(&meta, looped) {
             db::upsert_tag(c, &id, &tag, source, confidence)?;

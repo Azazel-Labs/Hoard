@@ -69,7 +69,10 @@ fn clip(s: &str, max: usize) -> String {
 /// Apply `patch` to the asset `id` (and its family, with `apply_to_family`), writing each change into its history.
 /// False when there's no such asset. The caller commits.
 pub(crate) fn apply(tx: &Connection, id: &str, patch: &AssetPatch, actor: &Actor) -> Result<bool> {
-    if !tx.query_row("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)", [id], |r| r.get::<_, bool>(0))? {
+    if !tx
+        .prepare_cached("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)")?
+        .query_row([id], |r| r.get::<_, bool>(0))?
+    {
         return Ok(false);
     }
     let at = now();
@@ -124,7 +127,7 @@ pub(crate) fn apply(tx: &Connection, id: &str, patch: &AssetPatch, actor: &Actor
     }
     for target in &targets {
         if log.touched(target) {
-            tx.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![target, at])?;
+            tx.prepare_cached("UPDATE assets SET updated_at = ?2 WHERE id = ?1")?.execute(params![target, at])?;
             reindex_asset(tx, target)?;
         }
     }
@@ -154,11 +157,8 @@ pub(crate) fn history(conn: &Connection, id: &str, limit: u32) -> Result<Vec<Cha
 /// down as a change. False when there's no such change for that asset.
 pub(crate) fn revert(tx: &Connection, asset_id: &str, change_id: i64, actor: &Actor) -> Result<bool> {
     let change: Option<(String, Option<String>)> = tx
-        .query_row(
-            "SELECT field, old FROM asset_history WHERE id = ?1 AND asset_id = ?2",
-            params![change_id, asset_id],
-            |r| Ok((r.get(0)?, r.get(1)?)),
-        )
+        .prepare_cached("SELECT field, old FROM asset_history WHERE id = ?1 AND asset_id = ?2")?
+        .query_row(params![change_id, asset_id], |r| Ok((r.get(0)?, r.get(1)?)))
         .optional()?;
     let Some((field, old)) = change else { return Ok(false) };
     let at = now();
@@ -173,7 +173,7 @@ pub(crate) fn revert(tx: &Connection, asset_id: &str, change_id: i64, actor: &Ac
         log.set_column(asset_id, &field, old.as_deref())?;
     }
     if log.touched(asset_id) {
-        tx.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![asset_id, at])?;
+        tx.prepare_cached("UPDATE assets SET updated_at = ?2 WHERE id = ?1")?.execute(params![asset_id, at])?;
         reindex_asset(tx, asset_id)?;
     }
     Ok(true)
@@ -198,12 +198,16 @@ struct Log<'a> {
     touched: HashSet<String>,
 }
 
+// Its statements are cached: an edit to many assets runs them for each, and compiling the ones on the assets table
+// (with its indexes and triggers) costs more than running them.
 impl Log<'_> {
     fn record(&mut self, id: &str, field: &str, old: Option<&str>, new: Option<&str>) -> Result<()> {
-        self.tx.execute(
-            "INSERT INTO asset_history (asset_id, field, old, new, who, source, at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-            params![id, field, old, new, self.actor.who, self.actor.source, self.at],
-        )?;
+        self.tx
+            .prepare_cached(
+                "INSERT INTO asset_history (asset_id, field, old, new, who, source, at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            )?
+            .execute(params![id, field, old, new, self.actor.who, self.actor.source, self.at])?;
         self.touched.insert(id.to_owned());
         Ok(())
     }
@@ -215,8 +219,10 @@ impl Log<'_> {
 
     fn set_column(&mut self, id: &str, col: &str, new: Option<&str>) -> Result<()> {
         let Some(&(col, protects)) = COLUMNS.iter().find(|(c, _)| *c == col) else { return Ok(()) };
-        let old: Option<String> =
-            self.tx.query_row(&format!("SELECT CAST({col} AS TEXT) FROM assets WHERE id = ?1"), [id], |r| r.get(0))?;
+        let old: Option<String> = self
+            .tx
+            .prepare_cached(&format!("SELECT CAST({col} AS TEXT) FROM assets WHERE id = ?1"))?
+            .query_row([id], |r| r.get(0))?;
         // A name can't be cleared.
         if old.as_deref() == new || (col == "name" && new.is_none()) {
             return Ok(());
@@ -226,64 +232,66 @@ impl Log<'_> {
             (_, Some(s)) => rusqlite::types::Value::Text(s.to_owned()),
             (_, None) => rusqlite::types::Value::Null,
         };
-        self.tx.execute(
-            &format!("UPDATE assets SET {col} = ?2, human_edited = human_edited OR ?3 WHERE id = ?1"),
-            params![id, value, protects],
-        )?;
+        self.tx
+            .prepare_cached(&format!("UPDATE assets SET {col} = ?2, human_edited = human_edited OR ?3 WHERE id = ?1"))?
+            .execute(params![id, value, protects])?;
         self.record(id, col, old.as_deref(), new)
     }
 
     /// Reviewing an asset also keeps the automatic passes from renaming or recategorizing it.
     fn set_reviewed(&mut self, id: &str, on: bool) -> Result<()> {
         let old: Option<String> =
-            self.tx.query_row("SELECT reviewed_at FROM assets WHERE id = ?1", [id], |r| r.get(0))?;
+            self.tx.prepare_cached("SELECT reviewed_at FROM assets WHERE id = ?1")?.query_row([id], |r| r.get(0))?;
         if old.is_some() == on {
             return Ok(());
         }
         let new = on.then(|| self.at.to_owned());
-        self.tx.execute(
-            "UPDATE assets SET reviewed_at = ?2, human_edited = human_edited OR ?3 WHERE id = ?1",
-            params![id, new, on],
-        )?;
+        self.tx
+            .prepare_cached("UPDATE assets SET reviewed_at = ?2, human_edited = human_edited OR ?3 WHERE id = ?1")?
+            .execute(params![id, new, on])?;
         self.record(id, "reviewed", old.as_deref(), new.as_deref())
     }
 
     fn set_field(&mut self, id: &str, key: &str, new: Option<&str>) -> Result<()> {
         let old: Option<String> = self
             .tx
-            .query_row("SELECT value FROM asset_fields WHERE asset_id = ?1 AND key = ?2", params![id, key], |r| {
-                r.get(0)
-            })
+            .prepare_cached("SELECT value FROM asset_fields WHERE asset_id = ?1 AND key = ?2")?
+            .query_row(params![id, key], |r| r.get(0))
             .optional()?;
         if old.as_deref() == new {
             return Ok(());
         }
         match new {
-            Some(v) => self.tx.execute(
-                "INSERT INTO asset_fields (asset_id, key, value) VALUES (?1, ?2, ?3)
-                 ON CONFLICT (asset_id, key) DO UPDATE SET value = excluded.value",
-                params![id, key, v],
-            )?,
-            None => self.tx.execute("DELETE FROM asset_fields WHERE asset_id = ?1 AND key = ?2", params![id, key])?,
+            Some(v) => self
+                .tx
+                .prepare_cached(
+                    "INSERT INTO asset_fields (asset_id, key, value) VALUES (?1, ?2, ?3)
+                     ON CONFLICT (asset_id, key) DO UPDATE SET value = excluded.value",
+                )?
+                .execute(params![id, key, v])?,
+            None => self
+                .tx
+                .prepare_cached("DELETE FROM asset_fields WHERE asset_id = ?1 AND key = ?2")?
+                .execute(params![id, key])?,
         };
         self.record(id, &format!("field:{key}"), old.as_deref(), new)
     }
 
     /// The tag as it's kept: a tag merged into another is that one.
     fn resolve(&self, tag: &str) -> Result<String> {
-        let into: Option<String> =
-            self.tx.query_row("SELECT into_tag FROM tag_aliases WHERE tag = ?1", [tag], |r| r.get(0)).optional()?;
+        let into: Option<String> = self
+            .tx
+            .prepare_cached("SELECT into_tag FROM tag_aliases WHERE tag = ?1")?
+            .query_row([tag], |r| r.get(0))
+            .optional()?;
         Ok(into.unwrap_or_else(|| tag.to_owned()))
     }
 
     fn tag_now(&self, id: &str, tag: &str) -> Result<Option<(String, f64)>> {
         Ok(self
             .tx
-            .query_row(
-                "SELECT source, confidence FROM asset_tags WHERE asset_id = ?1 AND tag = ?2",
-                params![id, tag],
-                |r| Ok((r.get(0)?, r.get(1)?)),
-            )
+            .prepare_cached("SELECT source, confidence FROM asset_tags WHERE asset_id = ?1 AND tag = ?2")?
+            .query_row(params![id, tag], |r| Ok((r.get(0)?, r.get(1)?)))
             .optional()?)
     }
 
@@ -301,14 +309,15 @@ impl Log<'_> {
     /// A rule's or the AI's tag taken off is remembered, so retagging doesn't put it back.
     fn remove_tag(&mut self, id: &str, tag: &str) -> Result<()> {
         let Some((source, conf)) = self.tag_now(id, tag)? else { return Ok(()) };
-        self.tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2", params![id, tag])?;
+        self.tx.prepare_cached("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2")?.execute(params![id, tag])?;
         if matches!(source.as_str(), "rule" | "ai" | "llm") {
-            self.tx.execute(
-                "INSERT INTO rejected_tags (asset_id, tag, source, confidence, at) VALUES (?1, ?2, ?3, ?4, ?5)
-                 ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source, confidence = excluded.confidence,
-                   at = excluded.at",
-                params![id, tag, source, conf, self.at],
-            )?;
+            self.tx
+                .prepare_cached(
+                    "INSERT INTO rejected_tags (asset_id, tag, source, confidence, at) VALUES (?1, ?2, ?3, ?4, ?5)
+                     ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source,
+                       confidence = excluded.confidence, at = excluded.at",
+                )?
+                .execute(params![id, tag, source, conf, self.at])?;
         }
         self.record(id, &format!("tag:{tag}"), Some(&tag_state(&source, conf)), None)
     }
@@ -327,21 +336,19 @@ impl Log<'_> {
         if source == "human" {
             return Ok(());
         }
-        self.tx.execute(
-            "UPDATE asset_tags SET source = 'human', confidence = 1.0 WHERE asset_id = ?1 AND tag = ?2",
-            params![id, tag],
-        )?;
+        self.tx
+            .prepare_cached(
+                "UPDATE asset_tags SET source = 'human', confidence = 1.0 WHERE asset_id = ?1 AND tag = ?2",
+            )?
+            .execute(params![id, tag])?;
         self.record(id, &format!("tag:{tag}"), Some(&tag_state(&source, conf)), Some("human"))
     }
 
     fn unreject_tag(&mut self, id: &str, tag: &str) -> Result<()> {
         let was: Option<(String, f64)> = self
             .tx
-            .query_row(
-                "DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2 RETURNING source, confidence",
-                params![id, tag],
-                |r| Ok((r.get(0)?, r.get(1)?)),
-            )
+            .prepare_cached("DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2 RETURNING source, confidence")?
+            .query_row(params![id, tag], |r| Ok((r.get(0)?, r.get(1)?)))
             .optional()?;
         let Some((source, conf)) = was else { return Ok(()) };
         let state = tag_state(&source, conf);
@@ -358,15 +365,21 @@ impl Log<'_> {
         match state {
             Some(state) => {
                 let (source, conf) = parse_tag_state(state);
-                self.tx.execute("DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2", params![id, tag])?;
-                self.tx.execute(
-                    "INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4)
-                     ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source, confidence = excluded.confidence",
-                    params![id, tag, source.as_str(), conf],
-                )?;
+                self.tx
+                    .prepare_cached("DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2")?
+                    .execute(params![id, tag])?;
+                self.tx
+                    .prepare_cached(
+                        "INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4)
+                         ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source,
+                           confidence = excluded.confidence",
+                    )?
+                    .execute(params![id, tag, source.as_str(), conf])?;
             }
             None => {
-                self.tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2", params![id, tag])?;
+                self.tx
+                    .prepare_cached("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2")?
+                    .execute(params![id, tag])?;
             }
         }
         self.record(id, &format!("tag:{tag}"), old.as_deref(), state)

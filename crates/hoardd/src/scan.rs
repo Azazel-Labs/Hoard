@@ -332,10 +332,15 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
         .collect();
     let known = db::known_paths(c, pack_id)?;
     let added = on_disk.iter().any(|p| !known.contains(p));
-    for id in &gone {
-        // With its takes, if it had them.
-        c.execute("DELETE FROM assets WHERE json_extract(meta, '$.take_of') = ?1", [id])?;
-        c.execute("DELETE FROM assets WHERE id = ?1", [id])?;
+    if !gone.is_empty() {
+        // Prepared once: a whole folder can go at once, and deleting from assets fires its triggers.
+        let mut takes = c.prepare("DELETE FROM assets WHERE json_extract(meta, '$.take_of') = ?1")?;
+        let mut asset = c.prepare("DELETE FROM assets WHERE id = ?1")?;
+        for id in &gone {
+            // With its takes, if it had them.
+            takes.execute([id])?;
+            asset.execute([id])?;
+        }
     }
     if added {
         db::enqueue(c, jobs::INGEST, Some(pack_id), &json!({ "auto_name": false }))?;
@@ -431,18 +436,17 @@ fn changed_in_place(c: &Connection, pack_id: &str, dir: &Path) -> Result<Vec<Str
         let now = db::now();
         if blob.hash == hash {
             // Touched but the same: not looked at again until it's touched again.
-            c.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![id, now])?;
+            c.prepare_cached("UPDATE assets SET updated_at = ?2 WHERE id = ?1")?.execute(params![id, now])?;
             continue;
         }
-        c.execute(
-            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-            params![blob.hash, blob.size as i64, now],
-        )?;
-        c.execute(
+        // (Cached, as a folder's files can all change at once.)
+        c.prepare_cached("INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING")?
+            .execute(params![blob.hash, blob.size as i64, now])?;
+        c.prepare_cached(
             "UPDATE assets SET blob_hash = ?2, thumb_hash = NULL, thumb_source = NULL, updated_at = ?3 WHERE id = ?1",
-            params![id, blob.hash, now],
-        )?;
-        c.execute("DELETE FROM derivatives WHERE asset_id = ?1", [&id])?;
+        )?
+        .execute(params![id, blob.hash, now])?;
+        c.prepare_cached("DELETE FROM derivatives WHERE asset_id = ?1")?.execute([&id])?;
         changed.push(id);
     }
     Ok(changed)

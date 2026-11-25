@@ -346,27 +346,31 @@ async fn encode_again(state: &AppState, s: &Stale, px: u32, q: u8) -> Result<i64
     let (id, old, current) = (s.id.clone(), s.thumb.clone(), s.current);
     let new2 = new.clone();
     let replaced = db::call(&state.pool, move |c| {
+        // Run once per thumbnail redrawn, so cached: the assets table's indexes and triggers make
+        // compiling these cost more than running them.
         let tx = c.transaction()?;
         if let Some(b) = &new2 {
-            tx.execute(
+            tx.prepare_cached(
                 "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-                params![b.hash, i64::try_from(b.size).unwrap_or(i64::MAX), db::now()],
-            )?;
+            )?
+            .execute(params![b.hash, i64::try_from(b.size).unwrap_or(i64::MAX), db::now()])?;
             // Unless it was replaced meanwhile.
-            if tx.execute(
-                "UPDATE assets SET thumb_hash = ?3 WHERE id = ?1 AND thumb_hash = ?2 AND thumb_source IS NULL",
-                params![id, old, b.hash],
-            )? == 0
+            if tx
+                .prepare_cached(
+                    "UPDATE assets SET thumb_hash = ?3 WHERE id = ?1 AND thumb_hash = ?2 AND thumb_source IS NULL",
+                )?
+                .execute(params![id, old, b.hash])?
+                == 0
             {
                 return Ok(false);
             }
             carry_looks(&tx, &old, &b.hash)?;
         }
-        tx.execute(
+        tx.prepare_cached(
             "UPDATE assets SET thumb_drawn = MAX(thumb_drawn, ?2), thumb_px = ?3, thumb_q = ?4
               WHERE id = ?1 AND thumb_source IS NULL",
-            params![id, current, px, q],
-        )?;
+        )?
+        .execute(params![id, current, px, q])?;
         tx.commit()?;
         Ok(new2.is_some())
     })
@@ -379,19 +383,17 @@ async fn encode_again(state: &AppState, s: &Stale, px: u32, q: u8) -> Result<i64
 
 /// What image search and search by look made of a thumbnail, for one made from it: it looks the same.
 fn carry_looks(c: &Connection, from: &str, to: &str) -> rusqlite::Result<()> {
-    c.execute(
+    c.prepare_cached(
         "INSERT OR IGNORE INTO looks (thumb_hash, version, palette, descriptor, phash, print)
          SELECT ?2, version, palette, descriptor, phash, print FROM looks WHERE thumb_hash = ?1",
-        [from, to],
-    )?;
+    )?
+    .execute([from, to])?;
     for table in ["look_embeddings", "embeddings"] {
-        c.execute(
-            &format!(
-                "INSERT OR IGNORE INTO {table} (thumb_hash, model, vector)
-                 SELECT ?2, model, vector FROM {table} WHERE thumb_hash = ?1"
-            ),
-            [from, to],
-        )?;
+        c.prepare_cached(&format!(
+            "INSERT OR IGNORE INTO {table} (thumb_hash, model, vector)
+             SELECT ?2, model, vector FROM {table} WHERE thumb_hash = ?1"
+        ))?
+        .execute([from, to])?;
     }
     Ok(())
 }

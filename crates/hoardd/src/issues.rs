@@ -502,8 +502,10 @@ pub(crate) async fn dismiss(State(state): State<AppState>, Json(chosen): Json<Pi
         let mut n = 0;
         for id in &ids {
             n += match id.split_once(':') {
-                Some(("issue", i)) => tx.execute("DELETE FROM issues WHERE id = ?1", [i])?,
-                Some(("job", i)) => tx.execute("DELETE FROM jobs WHERE id = ?1 AND status = 'failed'", [i])?,
+                Some(("issue", i)) => tx.prepare_cached("DELETE FROM issues WHERE id = ?1")?.execute([i])?,
+                Some(("job", i)) => {
+                    tx.prepare_cached("DELETE FROM jobs WHERE id = ?1 AND status = 'failed'")?.execute([i])?
+                }
                 _ => 0,
             };
         }
@@ -605,11 +607,11 @@ pub(crate) async fn retry(State(state): State<AppState>, Json(chosen): Json<Pick
         for r in &todo {
             match r {
                 Redo::Job(id) => {
-                    c.execute(
+                    c.prepare_cached(
                         "UPDATE jobs SET status = 'queued', attempts = 0, error = NULL, run_after = ?2, updated_at = ?2
                          WHERE id = ?1 AND status = 'failed'",
-                        params![id, now],
-                    )?;
+                    )?
+                    .execute(params![id, now])?;
                 }
                 Redo::Scan(loc) => crate::scan::enqueue(c, &st, *loc, true)?,
                 Redo::Retag(pack) => {
@@ -628,7 +630,7 @@ pub(crate) async fn retry(State(state): State<AppState>, Json(chosen): Json<Pick
         }
         let forget: HashSet<String> = forget.into_iter().collect();
         for i in &forget {
-            c.execute("DELETE FROM issues WHERE id = ?1", [i])?;
+            c.prepare_cached("DELETE FROM issues WHERE id = ?1")?.execute([i])?;
         }
         Ok(todo.len())
     })

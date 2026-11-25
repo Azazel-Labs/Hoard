@@ -93,10 +93,10 @@ pub(crate) fn backfill(state: &AppState, rt: &Handle, conn: &Connection, pack_id
             }
         };
         std::fs::remove_file(&file).ok();
-        conn.execute(
+        conn.prepare_cached(
             "UPDATE assets SET meta = json_patch(json_remove(meta, '$.provenance'), ?2) WHERE id = ?1",
-            rusqlite::params![id, Value::Object(facts.clone()).to_string()],
-        )?;
+        )?
+        .execute(rusqlite::params![id, Value::Object(facts.clone()).to_string()])?;
         if let Some(t) = tag(&facts) {
             crate::db::upsert_tag(conn, &id, t, TagSource::Meta, 1.0)?;
             found += 1;

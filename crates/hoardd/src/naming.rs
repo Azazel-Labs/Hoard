@@ -119,10 +119,8 @@ pub(crate) fn rename_maps(conn: &Connection, pack_id: &str, were_maps: &[(String
     for (id, path) in were_maps {
         if !still_map.exists([id])? {
             let name = crate::tagger::display_name(&crate::tagger::name_stem(path));
-            conn.execute(
-                "UPDATE assets SET name = ?2 WHERE id = ?1 AND human_edited = 0",
-                rusqlite::params![id, name],
-            )?;
+            conn.prepare_cached("UPDATE assets SET name = ?2 WHERE id = ?1 AND human_edited = 0")?
+                .execute(rusqlite::params![id, name])?;
             renamed.push(id.clone());
         }
     }

@@ -95,10 +95,10 @@ pub(crate) fn detect_pack(conn: &mut Connection, pack_id: &str) -> Result<usize>
         [pack_id],
     )?;
     for (from, to) in &links {
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'format') ON CONFLICT DO NOTHING",
-            params![from, to],
-        )?;
+        )?
+        .execute(params![from, to])?;
     }
     tx.commit()?;
     Ok(shown)

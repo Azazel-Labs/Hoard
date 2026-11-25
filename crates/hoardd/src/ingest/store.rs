@@ -73,10 +73,8 @@ async fn cached(blobs: &BlobStore, bytes: Option<Vec<u8>>) -> Result<Option<Stor
 }
 
 pub(super) fn insert_blob(tx: &rusqlite::Transaction<'_>, blob: &StoredBlob, now: &str) -> Result<()> {
-    tx.execute(
-        "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-        params![blob.hash, blob.size as i64, now],
-    )?;
+    tx.prepare_cached("INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING")?
+        .execute(params![blob.hash, blob.size as i64, now])?;
     Ok(())
 }
 
@@ -101,10 +99,11 @@ pub(super) fn store_derivative(
 ) -> Result<()> {
     if let Some(v) = blob {
         insert_blob(tx, v, now)?;
-        tx.execute(
+        tx.prepare_cached(
             "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, ?4, ?2, ?3)
              ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
-            params![asset_id, v.hash, now, kind],
+        )?
+        .execute(params![asset_id, v.hash, now, kind],
         )?;
     }
     Ok(())
@@ -133,12 +132,16 @@ pub(super) fn insert_asset(
         insert_blob(tx, t, now)?;
     }
     let id = uuid::Uuid::now_v7().to_string();
-    let added = tx.execute(
-        "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
-                             created_at, updated_at, source_description)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12, ?13)
-         ON CONFLICT (pack_id, path) DO NOTHING",
-        params![
+    // Kept compiled, as are the rest of an asset's writes: with the library's indexes and triggers on `assets`,
+    // compiling this took several times as long as running it.
+    let added = tx
+        .prepare_cached(
+            "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
+                                 created_at, updated_at, source_description)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12, ?13)
+             ON CONFLICT (pack_id, path) DO NOTHING",
+        )?
+        .execute(params![
             id,
             pack_id,
             item.blob.hash,
@@ -152,8 +155,7 @@ pub(super) fn insert_asset(
             thumb.as_ref().map(|t| t.hash.clone()),
             now,
             item.analysis.description,
-        ],
-    )?;
+        ])?;
     if added == 0 {
         return Ok(());
     }

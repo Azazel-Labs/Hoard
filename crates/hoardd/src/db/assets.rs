@@ -418,14 +418,29 @@ const PACK_TAGS: &str = "concat_ws(' ', (SELECT group_concat(replace(replace(val
 /// The row is kept by number in `assets.fts_row`, found and replaced by that: the index can't look rows up by its
 /// `asset_id` column, so a query on that reads all of it. Deleting the asset deletes its row (a trigger). Anything that
 /// writes the index otherwise has to keep `fts_row` too.
+///
+/// Its statements are kept compiled: it runs for every asset an import adds, and compiling them (the last with the
+/// triggers on `assets`) took longer than running them.
 pub(crate) fn reindex_asset(conn: &Connection, id: &str) -> Result<()> {
-    let row: Option<i64> =
-        conn.query_row("SELECT fts_row FROM assets WHERE id = ?1", [id], |r| r.get(0)).optional()?.flatten();
+    let row: Option<i64> = conn
+        .prepare_cached("SELECT fts_row FROM assets WHERE id = ?1")?
+        .query_row([id], |r| r.get(0))
+        .optional()?
+        .flatten();
     if let Some(row) = row {
-        conn.execute("DELETE FROM assets_fts WHERE rowid = ?1", [row])?;
+        conn.prepare_cached("DELETE FROM assets_fts WHERE rowid = ?1")?.execute([row])?;
     }
-    let added = conn.execute(
-        &format!(
+    let added = conn.prepare_cached(&INDEX_ASSET)?.execute(rusqlite::params![id, row])?;
+    if added == 1 && row.is_none() {
+        conn.prepare_cached("UPDATE assets SET fts_row = ?2 WHERE id = ?1")?
+            .execute(rusqlite::params![id, conn.last_insert_rowid()])?;
+    }
+    Ok(())
+}
+
+/// An asset's row in the search index, numbered `?2` (see [`reindex_asset`]).
+static INDEX_ASSET: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+    format!(
             "INSERT INTO assets_fts (rowid, asset_id, name, words, category, description, tags, pack_name, pack_tags)
              SELECT ?2, a.id, a.name, a.words, COALESCE(a.category, ''),
                     concat_ws(' ', a.description, a.source_description, a.ai_description,
@@ -434,11 +449,5 @@ pub(crate) fn reindex_asset(conn: &Connection, id: &str) -> Result<()> {
                               FROM asset_tags t WHERE t.asset_id = a.id), ''),
                     COALESCE(p.name, ''), {PACK_TAGS}
              FROM assets a LEFT JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1"
-        ),
-        rusqlite::params![id, row],
-    )?;
-    if added == 1 && row.is_none() {
-        conn.execute("UPDATE assets SET fts_row = ?2 WHERE id = ?1", rusqlite::params![id, conn.last_insert_rowid()])?;
-    }
-    Ok(())
-}
+        )
+});

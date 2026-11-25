@@ -18,12 +18,12 @@ fn write_batch(pool: &Pool, writer: usize, batch: usize) -> anyhow::Result<()> {
     let tx = c.transaction()?;
     for i in 0..PER_BATCH {
         let id = format!("a{writer}-{batch}-{i}");
-        tx.execute("INSERT INTO blobs (hash, size, created_at) VALUES (?1, 1, 'x')", [&id])?;
-        tx.execute(
+        tx.prepare_cached("INSERT INTO blobs (hash, size, created_at) VALUES (?1, 1, 'x')")?.execute([&id])?;
+        tx.prepare_cached(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, created_at, updated_at)
              VALUES (?1, 'p', ?1, ?2, ?3, 'png', 'texture', 'rock wall', 'x', 'x')",
-            params![id, format!("Dir{writer}/{id}.png"), format!("rock {id}")],
-        )?;
+        )?
+        .execute(params![id, format!("Dir{writer}/{id}.png"), format!("rock {id}")])?;
         super::upsert_tag(&tx, &id, "stone", hoard_core::TagSource::Rule, 0.6)?;
         super::reindex_asset(&tx, &id)?;
     }
@@ -52,7 +52,13 @@ fn an_import_with_searches_alongside_is_never_locked_out() {
                     let (mut slowest, mut passed_over) = (Duration::ZERO, 0);
                     for b in 0..BATCHES {
                         let (at, before) = (Instant::now(), written.load(Ordering::Acquire));
-                        write_batch(pool, w, b).unwrap_or_else(|e| panic!("writer {w}, batch {b}: {e:#}"));
+                        write_batch(pool, w, b).unwrap_or_else(|e| {
+                            panic!(
+                                "writer {w}, batch {b}: {e:#} after {:?}, {} written meanwhile",
+                                at.elapsed(),
+                                written.load(Ordering::Acquire) - before
+                            )
+                        });
                         slowest = slowest.max(at.elapsed());
                         passed_over = passed_over.max(written.fetch_add(1, Ordering::AcqRel) - before);
                     }

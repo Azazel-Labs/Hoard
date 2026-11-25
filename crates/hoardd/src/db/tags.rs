@@ -14,31 +14,37 @@ pub(crate) fn upsert_tag(
     confidence: f32,
 ) -> Result<()> {
     // A tag merged into another lands on the one it was merged into.
-    let alias: Option<String> =
-        conn.query_row("SELECT into_tag FROM tag_aliases WHERE tag = ?1", [tag], |r| r.get(0)).optional()?;
+    // Kept compiled: this runs for every tag of every asset an import adds.
+    let alias: Option<String> = conn
+        .prepare_cached("SELECT into_tag FROM tag_aliases WHERE tag = ?1")?
+        .query_row([tag], |r| r.get(0))
+        .optional()?;
     let tag = alias.as_deref().unwrap_or(tag);
     if source == TagSource::Human {
-        conn.execute("DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2", params![asset_id, tag])?;
+        conn.prepare_cached("DELETE FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2")?
+            .execute(params![asset_id, tag])?;
     } else {
         // A tag a person turned down stays off. Once a person has said an asset's details are right, rules and the
         // AI leave its tags alone; facts read from its file still come.
-        let blocked: bool = conn.query_row(
-            "SELECT EXISTS (SELECT 1 FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2)
-                 OR (?3 AND EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
-            params![asset_id, tag, source != TagSource::Meta],
-            |r| r.get(0),
-        )?;
+        let blocked: bool = conn
+            .prepare_cached(
+                "SELECT EXISTS (SELECT 1 FROM rejected_tags WHERE asset_id = ?1 AND tag = ?2)
+                     OR (?3 AND EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
+            )?
+            .query_row(params![asset_id, tag, source != TagSource::Meta], |r| r.get(0))?;
         if blocked {
             return Ok(());
         }
     }
     // Never let a machine overwrite a human tag; otherwise keep the most confident source.
-    conn.execute(
-        &format!("INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4) {KEEP_BEST_TAG}"),
-        params![asset_id, tag, source.as_str(), f64::from(confidence)],
-    )?;
+    conn.prepare_cached(&ADD_TAG)?.execute(params![asset_id, tag, source.as_str(), f64::from(confidence)])?;
     Ok(())
 }
+
+/// Adding a tag to an asset (see [`upsert_tag`]).
+static ADD_TAG: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+    format!("INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4) {KEEP_BEST_TAG}")
+});
 
 /// When an asset gets a tag it already has: a person's tag stands; otherwise the more confident one wins.
 const KEEP_BEST_TAG: &str =

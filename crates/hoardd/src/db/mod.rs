@@ -66,7 +66,10 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // (It sets `temp_store`, which would throw away a pool connection's triggers.)
         upkeep::give_back_room_over_time(&conn);
     }
-    let manager = SqliteConnectionManager::file(path).with_init(|c| {
+    // Writes finished on this database (by any of its connections), for a write that steps aside to tell when another
+    // has had its turn (see `finished`).
+    let written = Arc::new(AtomicU64::new(0));
+    let manager = SqliteConnectionManager::file(path).with_init(move |c| {
         // First: setting `temp_store` throws away temporary triggers.
         set_up(c)?;
         // What each transaction changes, for what's kept from the library to be put right (see `changes`).
@@ -74,9 +77,10 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // (Its lock is only ever free: a connection is used by one thread at a time.)
         changes::watch(c, &pending)?;
         let (rolled, committed) = (Arc::clone(&pending), pending);
+        let (undone, done) = (Arc::clone(&written), Arc::clone(&written));
         c.rollback_hook(Some(move || {
             changes::rolled_back(&mut rolled.lock().unwrap_or_else(std::sync::PoisonError::into_inner));
-            turn_over();
+            turn_over(&undone);
         }))?;
         // Every write counts, on whichever connection (see `writes`), once it's there for others to read: unlike a
         // commit hook, which runs just before. Taking the place of SQLite's own hook, this checkpoints the log the
@@ -88,7 +92,7 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
                 // As SQLite's own: a checkpoint that can't finish now is done by a later one.
                 wal.checkpoint().ok();
             }
-            finished();
+            finished(&done);
             Ok(())
         }))
     });
@@ -107,6 +111,9 @@ fn set_up(c: &mut Connection) -> rusqlite::Result<()> {
     // Waiting first: switching to WAL takes a lock, and connections opened at once must wait for it rather than
     // fail with "database is locked".
     c.busy_handler(Some(wait_turn))?;
+    // Statements kept compiled (`prepare_cached`): adding an asset alone takes ten, and with the library's indexes
+    // and triggers, compiling one can take longer than running it.
+    c.set_prepared_statement_cache_capacity(48);
     // The log is used again from the start once everything in it is in the database, but never made smaller: after
     // a big import, or writes while a long search kept it from being reused, it stayed hundreds of megabytes.
     // `journal_size_limit` cuts it back to 64 MB each time it's reused.
@@ -127,7 +134,7 @@ const LOOK_AGAIN: Duration = Duration::from_millis(20);
 
 /// Whose turn it is to write.
 struct Turn {
-    /// Writes since the server started, bumped as each finishes.
+    /// Writes since the server started (on any database), bumped as each finishes.
     writes: u64,
     /// When a write last waited for another to finish: one still waiting looks again at least every [`LOOK_AGAIN`].
     waited: Option<Instant>,
@@ -212,8 +219,9 @@ fn say_waiting(turn: &Turn, waited: Duration, gave_up: bool) {
     }
 }
 
-/// A write was undone: whoever's waiting can go.
-fn turn_over() {
+/// A write was undone: whoever's waiting can go. (`written` counts the writes finished on its database.)
+fn turn_over(written: &AtomicU64) {
+    written.fetch_add(1, Ordering::AcqRel);
     let mut turn = turn();
     turn.writes += 1;
     let holder = turn.holder.take();
@@ -227,14 +235,19 @@ fn turn_over() {
 /// machine, writers going one after another (an import's) kept a tag edit waiting until it gave up. So this one
 /// steps aside until another write finishes, or a waiter has had time to look again. Whether one is waiting is told
 /// by when one last looked, which can't be left behind by a write that ended some way no hook sees.
-fn finished() {
+///
+/// `written` counts the writes finished on its database: it's another write there that ends the wait, not one on
+/// another database. (There's one in the server, but tests open many at once, and with every other test's writes
+/// ending it, a write stepped aside for no time at all and the stress test's waiting writers kept missing their turn.)
+fn finished(written: &AtomicU64) {
+    // Counted before taking the lock: one stepping aside checks the count with it held, so this can't be missed.
+    let this = written.fetch_add(1, Ordering::AcqRel) + 1;
     let mut turn = turn();
     turn.writes += 1;
     let holder = turn.holder.take();
     TURN.1.notify_all();
     if turn.waited.is_some_and(|at| at.elapsed() < 2 * LOOK_AGAIN) {
-        let at = turn.writes;
-        drop(TURN.1.wait_timeout_while(turn, LOOK_AGAIN, |t| t.writes == at));
+        drop(TURN.1.wait_timeout_while(turn, LOOK_AGAIN, |_| written.load(Ordering::Acquire) == this));
     } else {
         drop(turn);
     }

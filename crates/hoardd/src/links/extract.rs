@@ -24,7 +24,7 @@ pub(crate) fn extract_refs(local: &Path, ext: &str) -> Vec<Ref> {
             .ok()
             .and_then(|f| serde_json::from_reader::<_, Value>(BufReader::new(f)).ok())
             .map(|doc| gltf_refs(&doc)),
-        "glb" => glb_json(local).map(|doc| gltf_refs(&doc)),
+        "glb" => crate::analyze::glb_json(local).ok().map(|doc| gltf_refs(&doc)),
         "obj" => Some(obj_refs(local)),
         "mtl" => Some(mtl_refs(local)),
         "fbx" => Some(fbx_refs(local)),
@@ -204,22 +204,6 @@ fn material_refs(local: &Path) -> Option<Vec<Ref>> {
     let referenced = doc.get("referenced_textures").and_then(Value::as_array).into_iter().flatten();
     refs.extend(textures.chain(referenced).filter_map(package).map(|t| Ref { target: t, rel: LinkRel::Texture }));
     Some(refs)
-}
-
-fn glb_json(path: &Path) -> Option<Value> {
-    let mut f = File::open(path).ok()?;
-    let mut header = [0u8; 20];
-    f.read_exact(&mut header).ok()?;
-    if &header[0..4] != b"glTF" || &header[16..20] != b"JSON" {
-        return None;
-    }
-    let len = u32::from_le_bytes([header[12], header[13], header[14], header[15]]) as usize;
-    if len > 128 << 20 {
-        return None;
-    }
-    let mut buf = vec![0u8; len];
-    f.read_exact(&mut buf).ok()?;
-    serde_json::from_slice(&buf).ok()
 }
 
 fn gltf_refs(doc: &Value) -> Vec<Ref> {

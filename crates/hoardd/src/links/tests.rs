@@ -43,6 +43,28 @@ fn a_spine_skeleton_names_its_atlas() {
 }
 
 #[test]
+fn a_glb_names_the_files_beside_it() {
+    let mut json = serde_json::to_vec(&serde_json::json!({
+        "asset": { "version": "2.0" },
+        "buffers": [{ "byteLength": 4 }],
+        "images": [{ "uri": "textures/wood.png" }, { "uri": "data:image/png;base64,AAAA" }],
+    }))
+    .unwrap();
+    json.resize(json.len().next_multiple_of(4), b' ');
+    let mut glb = b"glTF".to_vec();
+    glb.extend(2u32.to_le_bytes());
+    glb.extend((12 + 8 + json.len() as u32).to_le_bytes());
+    glb.extend((json.len() as u32).to_le_bytes());
+    glb.extend(b"JSON");
+    glb.extend(json);
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("crate.glb");
+    std::fs::write(&path, glb).unwrap();
+    let refs: Vec<(String, LinkRel)> = extract_refs(&path, "glb").into_iter().map(|r| (r.target, r.rel)).collect();
+    assert_eq!(refs, [("textures/wood.png".to_owned(), LinkRel::Texture)]);
+}
+
+#[test]
 fn reads_unity_guid_references() {
     let dir = tempfile::tempdir().unwrap();
     let mat = dir.path().join("M.mat");

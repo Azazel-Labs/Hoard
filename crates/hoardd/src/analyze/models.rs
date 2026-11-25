@@ -183,7 +183,8 @@ pub(super) fn analyze_model(
     Ok(rig)
 }
 
-fn glb_json(path: &Path) -> anyhow::Result<Value> {
+/// A `.glb`'s JSON chunk, read without the binary chunk after it.
+pub(crate) fn glb_json(path: &Path) -> anyhow::Result<Value> {
     let mut f = File::open(path)?;
     let mut header = [0u8; 20];
     f.read_exact(&mut header)?;

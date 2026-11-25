@@ -24,7 +24,7 @@ use hoard_unreal as unreal;
 use images::{analyze_decoded, analyze_image};
 pub(crate) use images::{is_float, tonemap};
 use models::{analyze_mesh, analyze_model, mesh_thumb, render_model_thumb};
-pub(crate) use models::{gltf_thumb, gltf_thumb_dressed, mesh_thumb_bytes};
+pub(crate) use models::{glb_json, gltf_thumb, gltf_thumb_dressed, mesh_thumb_bytes};
 use sounds::{analyze_music, analyze_sound};
 
 static RENDER_ENABLED: AtomicBool = AtomicBool::new(true);

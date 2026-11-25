@@ -10,7 +10,7 @@ test('About says what Hoard is and which version, and lists every library it is 
   await expect(page.getByTestId('about-discord')).toHaveAttribute('href', 'https://discord.gg/zf9ncS4EW')
   await expect(page.getByRole('link', { name: 'Source code on GitHub' })).toHaveAttribute('href', 'https://github.com/Azazel-Labs/Hoard')
 
-  await page.getByText('MIT-0', { exact: true }).click()
+  await page.locator('summary', { hasText: /^MIT-0$/ }).click()
   await expect(page.getByText(/MIT No Attribution/).first()).toBeVisible()
 
   const built = page.getByTestId('about-built-with')

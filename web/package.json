@@ -1,7 +1,6 @@
 {
   "name": "hoard-web",
   "private": true,
-  "version": "1.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -5,12 +5,14 @@
 //! cargo xtask dev --llm                   # ...plus a local model server (pick a model in Settings)
 //! cargo xtask llm                         # just the local model server (llama.cpp in router mode)
 //! cargo xtask ci                          # what CI runs: fmt, clippy, tests, web build
+//! cargo xtask bump minor                  # raise Cargo.toml's version: pushing that to main releases it
 //! cargo xtask translations check          # the catalogs in locales/ against each other and the code
 //! cargo xtask licenses                    # what Hoard ships and their licenses, for Settings → About
 //! cargo xtask spelling                    # no British spellings: Hoard is written in American English
 //! ```
 #![expect(clippy::print_stdout, reason = "a CLI tool: printing is the point")]
 
+mod bump;
 mod licenses;
 mod llm;
 mod spelling;
@@ -55,6 +57,11 @@ enum Cmd {
     },
     /// Everything CI checks: rustfmt, clippy (warnings are errors), tests and the web build.
     Ci,
+    /// Raise Hoard's version in Cargo.toml (and Cargo.lock). Pushing that to main releases it once CI passes.
+    Bump {
+        /// `patch`, `minor`, `major`, or an exact version such as `2.0.0` or `2.0.0-rc.1`.
+        to: String,
+    },
     /// Install web dependencies if needed and build the portal into web/dist.
     Web,
     /// Export an Unreal content folder to FBX/PNG/WAV with Unreal Editor (headless), ready to import into Hoard.
@@ -157,6 +164,7 @@ then pick a model in Settings → AI tagging → Local model. Ctrl-C to stop."
         }
         Cmd::Dev { llm, no_web, serve } => dev(llm, no_web, &serve),
         Cmd::Ci => ci(),
+        Cmd::Bump { to } => bump::run(&root(), &to),
         Cmd::Web => web(),
         Cmd::Sample { upload } => sample(upload),
         Cmd::UnrealExport(args) => unreal_export(&args),

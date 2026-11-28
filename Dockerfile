@@ -44,7 +44,7 @@ COPY xtask ./xtask
 COPY locales ./locales
 COPY localization ./localization
 COPY tools/unreal_export.py ./tools/unreal_export.py
-# The version this build reports (CI passes the release tag's); empty means Cargo.toml's.
+# The version this build reports, when it isn't Cargo.toml's: CI passes an :edge build's X.Y.Z+edge.<sha>.
 ARG HOARD_VERSION=
 RUN cargo build --release --locked -p hoardd -p hoard
 

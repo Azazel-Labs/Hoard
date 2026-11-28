@@ -1,13 +1,12 @@
 name: auto-release
 # After ci passes on a push to main:
-#   - usually                                                   ->  publish ghcr.io/<owner>/hoard:edge and :sha-<short>;
-#   - a commit since the last tag says #release, #minor or #major  ->  tag the next version and release it (release.yml),
-#                                                                    moving :edge.
-# So releases come when asked for, each gathering every commit since the one before, rather than one per push.
-# Releasing only adds a vX.Y.Z tag: no files are changed and nothing is committed to main, so your next push never
-# has to pull a bot commit first. Builds read their version from the tag (HOARD_VERSION).
+#   - Cargo.toml's [workspace.package] version has no vX.Y.Z tag yet  ->  tag that commit with it and release it
+#                                                                       (release.yml), moving :edge;
+#   - otherwise                                                        ->  publish ghcr.io/<owner>/hoard:edge and
+#                                                                       :sha-<short>.
+# So Cargo.toml's version is the one source of truth: raising it (cargo xtask bump patch|minor|major|X.Y.Z) and pushing
+# is what releases, and each release gathers every commit since the one before. Nothing is committed back to main.
 # The release notes are the commit subjects since the last tag (scripts/release-notes.sh).
-# #release bumps the patch version, #minor the minor and #major the major; the biggest one asked for wins.
 #
 # The tag is pushed with GITHUB_TOKEN, which deliberately doesn't trigger workflows, so release.yml is called here
 # rather than run a second time from the tag push.
@@ -55,31 +54,31 @@ jobs:
           echo "tip=true" >> "$GITHUB_OUTPUT"
           echo "short=$short" >> "$GITHUB_OUTPUT"
 
-          last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
-          # No release yet: start from Cargo.toml's version.
-          current="${last#v}"
-          [ -n "$current" ] || current="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
-          # An :edge build reports the release it's built on, plus where it is (not "newer" than that release).
-          echo "edge-version=${current}+edge.$short" >> "$GITHUB_OUTPUT"
+          version="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)".*/\1/p' Cargo.toml | head -1)"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Cargo.toml's [workspace.package] version, '$version', isn't X.Y.Z"; exit 1
+          fi
+          # An :edge build reports the version it's built on, plus where it is.
+          echo "edge-version=${version}+edge.$short" >> "$GITHUB_OUTPUT"
 
-          if [ -n "$last" ] && [ "$(git rev-list --count "$last..HEAD")" = 0 ]; then
-            echo "$last is already main's tip; nothing to release"
+          # A version behind the newest release is a mistake (pre-releases of the newest X.Y.Z are fine).
+          newest="$(git tag --list 'v[0-9]*' --sort=-v:refname | head -1)"
+          newest="${newest#v}"; newest="${newest%%-*}"
+          if [ -n "$newest" ] && [ "$newest" != "${version%%-*}" ] &&
+             [ "$(printf '%s\n%s\n' "$newest" "${version%%-*}" | sort -V | tail -1)" = "$newest" ]; then
+            echo "::error::Cargo.toml says $version, behind the newest release, v$newest. Raise it with cargo xtask bump."
+            exit 1
+          fi
+          if [[ "$version" == *-* ]] && git rev-parse -q --verify "refs/tags/v${version%%-*}" >/dev/null; then
+            echo "::error::Cargo.toml says $version, a pre-release of v${version%%-*}, which is already out."
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "v$version is already released; publishing :edge only"
             echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
-          log="$(git log --format=%B ${last:+$last..}HEAD)"
-          if ! grep -qiE '#(release|minor|major)\b' <<< "$log"; then
-            echo "no #release, #minor or #major since ${last:-the start}; publishing :edge only"
-            echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          IFS=. read -r major minor patch <<< "${current%%-*}"
-          if [ -z "$last" ]; then version="$current"                    # the first release is Cargo.toml's version
-          elif grep -qi '#major' <<< "$log"; then version="$((major + 1)).0.0"
-          elif grep -qi '#minor' <<< "$log"; then version="$major.$((minor + 1)).0"
-          elif [[ "$current" == *-* ]]; then version="${current%%-*}"   # 0.9.0-rc.1 -> 0.9.0
-          else version="$major.$minor.$((patch + 1))"; fi
-
-          echo "Releasing ${last:-nothing yet} -> v$version"
+          echo "Releasing v$version"
           echo "release=true" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 

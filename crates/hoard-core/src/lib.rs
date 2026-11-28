@@ -22,8 +22,8 @@ pub use unreal::*;
 
 use serde::{Deserialize, Serialize};
 
-/// This build's version. Releases set `HOARD_VERSION` from their git tag when building, so version numbers never
-/// have to be committed; without it (a local build) it's Cargo.toml's version.
+/// This build's version: Cargo.toml's, which is what releases are tagged with. An `:edge` build between releases sets
+/// `HOARD_VERSION` to that plus where it's from (`1.18.19+edge.3549957`).
 pub const VERSION: &str = match option_env!("HOARD_VERSION") {
     Some(v) if !v.is_empty() => v,
     _ => env!("CARGO_PKG_VERSION"),

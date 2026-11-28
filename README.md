@@ -242,9 +242,11 @@ cargo xtask sample --upload  # generate the sample pack and upload it
 cargo xtask web              # build the portal into web/dist
 ```
 
-Releases change no files. Each push to `main` that passes CI refreshes the `:edge` image; when a commit since the last
-release says `#release` (or `#minor` or `#major`, to bump those instead of the patch version), CI tags the next version,
-and the tag builds the binaries, the container image and the GitHub release. Builds take their version from the tag.
+The version in Cargo.toml (`[workspace.package] version`) is the one source of truth for releases. Each push to `main`
+that passes CI refreshes the `:edge` image; when the push carries a version that hasn't been released yet, CI tags that
+commit `vX.Y.Z` and builds the binaries, the desktop installers, the container image and the GitHub release from it.
+`cargo xtask bump patch` (or `minor`, `major`, or an exact version like `2.0.0-rc.1`) raises it in Cargo.toml and
+Cargo.lock; commit those and push.
 
 ### Tests
 

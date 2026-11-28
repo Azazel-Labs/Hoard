@@ -3,9 +3,9 @@ resolver = "3"
 members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoardd", "crates/hoard", "crates/hoard-render", "crates/hoard-desktop", "xtask"]
 
 [workspace.package]
-# Only what a local build reports. Releases are git tags (auto-release.yml tags every push to main that passes ci) and
-# builds take their version from the tag (HOARD_VERSION), so this isn't bumped.
-version = "1.3.0"
+# Hoard's version, and the one place it's set: when a push to main that passes ci has a version no release has yet,
+# auto-release.yml tags that commit vX.Y.Z and releases it. Raise it with `cargo xtask bump patch|minor|major|X.Y.Z`.
+version = "1.18.19"
 edition = "2024"
 rust-version = "1.100"
 license = "MIT-0"

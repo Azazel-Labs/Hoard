@@ -1,9 +1,9 @@
 name: release
-# Builds binaries, the desktop app's installers and a multi-arch container image, and publishes a GitHub release whose notes are the commit
-# subjects since the previous tag (scripts/release-notes.sh). The version comes from the tag alone (builds get it as
-# HOARD_VERSION); nothing in the repository is bumped. Runs two ways:
-#   - auto-release.yml calls it after ci passes on main and it has tagged a version (the usual path);
-#   - pushing a v*.*.* tag yourself (scripts/release.sh, then git push origin vX.Y.Z).
+# Builds binaries, the desktop app's installers and a multi-arch container image, and publishes a GitHub release whose
+# notes are the commit subjects since the previous tag (scripts/release-notes.sh). The version is Cargo.toml's
+# [workspace.package] version, which must match the tag. Runs two ways:
+#   - auto-release.yml calls it after ci passes on main with a version that has no tag yet (the usual path);
+#   - pushing a v*.*.* tag yourself, on a commit whose Cargo.toml has that version.
 on:
   push:
     tags: ["v*.*.*"]
@@ -40,6 +40,8 @@ jobs:
         run: |
           v="${TAG#v}"
           [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::$TAG isn't vX.Y.Z"; exit 1; }
+          cargo="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)".*/\1/p' Cargo.toml | head -1)"
+          [ "$cargo" = "$v" ] || { echo "::error::$TAG's Cargo.toml says $cargo, not $v"; exit 1; }
           # Pre-releases get only their exact tag; releases also move :<major>.<minor> and :latest.
           if [[ "$v" == *-* ]]; then tags="$v"; else tags="$v ${v%.*} latest"; fi
           [ "$EDGE" = "true" ] && tags="$tags edge sha-$(git rev-parse --short=7 HEAD)"

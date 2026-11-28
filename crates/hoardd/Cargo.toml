@@ -90,9 +90,9 @@ ww2ogg = "0.1"
 lewton = "0.10"
 # Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, Collada, X3D, VRML, VRM, splats, and glTF with Draco) read
 # natively for thumbnails and GLB copies.
-polysmelt = "0.17.7"
+polysmelt = "0.22.0"
 # Far copies of models for the mesh explorer: each mesh reduced to a few thousand triangles (its glTF is read here).
-farthing = { version = "0.20.0", default-features = false }
+farthing = { version = "0.22.0", default-features = false }
 # Where a clip's bones stand, to put its moves in the units of the character it's drawn on.
 glam = "0.34"
 ddsfile = "0.6"

@@ -34,7 +34,7 @@ const SAMPLE: usize = 200;
 
 /// The libraries that make what rules convert to, as `asset_origin.converter` names them. Keep in step with
 /// Cargo.lock (a test checks).
-const POLYSMELT: &str = "polysmelt 0.17.7";
+const POLYSMELT: &str = "polysmelt 0.22.0";
 const FLACENC: &str = "flacenc 0.5.1";
 
 /// The formats rules convert to.

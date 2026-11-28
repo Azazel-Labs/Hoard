@@ -2153,9 +2153,9 @@ dependencies = [
 
 [[package]]
 name = "farthing"
-version = "0.20.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc9a5a8c1e3af5e696c15ee92324910f673672f959256277d3332971dcb28f86"
+checksum = "771eb0d48938914766606faefc9683ff75b21685650340ef794933db5ec3a4ff"
 dependencies = [
  "glam 0.34.3",
  "image 0.25.10",
@@ -6131,9 +6131,9 @@ dependencies = [
 
 [[package]]
 name = "polysmelt"
-version = "0.17.7"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "425a33ffd3eabee5e007ee9061ea486e84d0b5908e14be37e485bf269fd9169e"
+checksum = "3ca9d9e3f089061b1fff98acb828960255e7460a7dc70088b55e75c8485bdff5"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",
